@@ -5,18 +5,21 @@ import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, User, Mail, Lock } from "lucide-react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { signupSchema, type SignupInput } from "@/schemas/auth.schema";
 import { signupAction } from "@/app/(auth)/signup/actions";
 import CountrySelectField from "@/components/ui/CountrySelectField";
 import PhoneInputField from "@/components/ui/PhoneInputField";
 import type { Country as LibCountry } from "@/lib/countries";
 import type { Country as PhoneCountry } from "react-phone-number-input";
-
-const inputCls =
-  "w-full rounded-lg border border-zinc-300 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export default function SignupForm() {
-  const [serverError, setServerError] = useState<string | null>(null);
+  const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>("EG");
@@ -32,83 +35,69 @@ export default function SignupForm() {
   });
 
   async function onSubmit(data: SignupInput) {
-    setServerError(null);
     const result = await signupAction(data);
-    if (result?.error) setServerError(result.error);
+    if (result.error) {
+      toast.error(result.error);
+    } else {
+      toast.success("Account created successfully!");
+      router.push("/dashboard");
+    }
   }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-      {serverError && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {serverError}
-        </div>
-      )}
-
       {/* First & Last Name */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1.5">
-          <label htmlFor="first_name" className="block text-sm font-medium text-zinc-700">
-            First Name
-          </label>
+          <Label htmlFor="first_name">First Name</Label>
           <div className="relative">
-            <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
-            <input
+            <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <Input
               id="first_name"
               type="text"
               placeholder="John"
               {...register("first_name")}
-              className={`${inputCls} pl-9 pr-3`}
+              className="pl-9 h-10"
             />
           </div>
-          {errors.first_name && (
-            <p className="text-xs text-red-600">{errors.first_name.message}</p>
-          )}
+          {errors.first_name && <p className="text-xs text-destructive">{errors.first_name.message}</p>}
         </div>
         <div className="space-y-1.5">
-          <label htmlFor="last_name" className="block text-sm font-medium text-zinc-700">
-            Last Name
-          </label>
+          <Label htmlFor="last_name">Last Name</Label>
           <div className="relative">
-            <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
-            <input
+            <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <Input
               id="last_name"
               type="text"
               placeholder="Doe"
               {...register("last_name")}
-              className={`${inputCls} pl-9 pr-3`}
+              className="pl-9 h-10"
             />
           </div>
-          {errors.last_name && (
-            <p className="text-xs text-red-600">{errors.last_name.message}</p>
-          )}
+          {errors.last_name && <p className="text-xs text-destructive">{errors.last_name.message}</p>}
         </div>
       </div>
 
       {/* Email */}
       <div className="space-y-1.5">
-        <label htmlFor="email" className="block text-sm font-medium text-zinc-700">
-          Email
-        </label>
+        <Label htmlFor="email">Email</Label>
         <div className="relative">
-          <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
-          <input
+          <Mail size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+          <Input
             id="email"
             type="email"
             autoComplete="email"
             placeholder="you@example.com"
             {...register("email")}
-            className={`${inputCls} pl-9 pr-3`}
+            className="pl-9 h-10"
           />
         </div>
-        {errors.email && (
-          <p className="text-xs text-red-600">{errors.email.message}</p>
-        )}
+        {errors.email && <p className="text-xs text-destructive">{errors.email.message}</p>}
       </div>
 
       {/* Country */}
       <div className="space-y-1.5">
-        <label className="block text-sm font-medium text-zinc-700">Country</label>
+        <Label>Country</Label>
         <Controller
           control={control}
           name="country_code"
@@ -128,7 +117,7 @@ export default function SignupForm() {
 
       {/* Phone */}
       <div className="space-y-1.5">
-        <label className="block text-sm font-medium text-zinc-700">Phone Number</label>
+        <Label>Phone Number</Label>
         <Controller
           control={control}
           name="phone"
@@ -144,91 +133,89 @@ export default function SignupForm() {
 
       {/* Password */}
       <div className="space-y-1.5">
-        <label htmlFor="password" className="block text-sm font-medium text-zinc-700">
-          Password
-        </label>
+        <Label htmlFor="password">Password</Label>
         <div className="relative">
-          <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
-          <input
+          <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+          <Input
             id="password"
             type={showPassword ? "text" : "password"}
             autoComplete="new-password"
             placeholder="Set your password"
             {...register("password")}
-            className={`${inputCls} pl-9 pr-10`}
+            className="pl-9 pr-10 h-10"
           />
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
           </button>
         </div>
-        {errors.password && (
-          <p className="text-xs text-red-600">{errors.password.message}</p>
-        )}
+        {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
       </div>
 
       {/* Confirm Password */}
       <div className="space-y-1.5">
-        <label htmlFor="confirm_password" className="block text-sm font-medium text-zinc-700">
-          Confirm Password
-        </label>
+        <Label htmlFor="confirm_password">Confirm Password</Label>
         <div className="relative">
-          <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 pointer-events-none" />
-          <input
+          <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+          <Input
             id="confirm_password"
             type={showConfirm ? "text" : "password"}
             autoComplete="new-password"
             placeholder="Confirm your password"
             {...register("confirm_password")}
-            className={`${inputCls} pl-9 pr-10`}
+            className="pl-9 pr-10 h-10"
           />
           <button
             type="button"
             onClick={() => setShowConfirm((v) => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
             aria-label={showConfirm ? "Hide password" : "Show password"}
           >
             {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
           </button>
         </div>
-        {errors.confirm_password && (
-          <p className="text-xs text-red-600">{errors.confirm_password.message}</p>
-        )}
+        {errors.confirm_password && <p className="text-xs text-destructive">{errors.confirm_password.message}</p>}
       </div>
 
       {/* Terms */}
       <div className="space-y-1">
-        <label className="flex items-center gap-2 text-sm text-zinc-700 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            {...register("terms")}
-            className="h-4 w-4 rounded border-zinc-300 accent-[#7C2020] cursor-pointer"
+        <div className="flex items-center gap-2">
+          <Controller
+            control={control}
+            name="terms"
+            render={({ field }) => (
+              <Checkbox
+                id="terms"
+                checked={field.value}
+                onCheckedChange={field.onChange}
+              />
+            )}
           />
-          I agree to{" "}
-          <Link href="/terms" className="font-semibold text-[#7C2020] hover:underline">
-            Term &amp; Condition
-          </Link>
-        </label>
-        {errors.terms && (
-          <p className="text-xs text-red-600">{errors.terms.message}</p>
-        )}
+          <label htmlFor="terms" className="text-sm text-foreground cursor-pointer select-none">
+            I agree to{" "}
+            <Link href="/terms" className="font-semibold text-primary hover:underline">
+              Term &amp; Condition
+            </Link>
+          </label>
+        </div>
+        {errors.terms && <p className="text-xs text-destructive">{errors.terms.message}</p>}
       </div>
 
-      <button
+      <Button
         type="submit"
         disabled={isSubmitting}
-        className="w-full rounded-lg bg-[#7C2020] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#6b1b1b] disabled:cursor-not-allowed disabled:opacity-50"
+        className="w-full h-10 cursor-pointer hover:opacity-90"
       >
         {isSubmitting ? "Creating account..." : "Sign up"}
-      </button>
+      </Button>
 
-      <p className="text-center text-sm text-zinc-500">
+      <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}
-        <Link href="/login" className="font-semibold text-[#7C2020] hover:underline">
+        <Link href="/login" className="font-semibold text-primary hover:underline">
           Sign in
         </Link>
       </p>

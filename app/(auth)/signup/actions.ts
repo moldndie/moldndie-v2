@@ -1,10 +1,11 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
 import type { SignupInput } from "@/schemas/auth.schema";
 
-export async function signupAction(data: SignupInput): Promise<{ error: string } | void> {
+export async function signupAction(
+  data: SignupInput
+): Promise<{ error?: string; success?: boolean }> {
   const supabase = await createClient();
 
   const { data: authData, error } = await supabase.auth.signUp({
@@ -25,5 +26,5 @@ export async function signupAction(data: SignupInput): Promise<{ error: string }
     });
   }
 
-  redirect("/dashboard");
+  return { success: true };
 }
