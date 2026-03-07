@@ -9,7 +9,7 @@ export const blogSchema = z.object({
   excerpt: z.string().optional(),
   cover_image: z.string().optional(),
   category_id: z.string().optional(),
-  published: z.boolean().default(false),
+  published: z.boolean(),
 })
 
 export type BlogFormValues = z.infer<typeof blogSchema>
