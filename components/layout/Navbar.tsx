@@ -42,7 +42,7 @@ export default function Navbar() {
 
         {/* Auth */}
         <div className="flex items-center gap-4">
-          <Button asChild className="rounded-full px-6 hover:opacity-90 cursor-pointer">
+          <Button  className="rounded-full px-6 hover:opacity-90 cursor-pointer">
             <Link href="/login">Login</Link>
           </Button>
           <Link href="/signup" className="text-sm text-zinc-700 hover:text-zinc-900 transition-colors">

@@ -172,7 +172,7 @@ export default function HomePage() {
               Stay informed, stay ahead.
             </p>
             <Button
-              asChild
+              
               className="mt-8 px-12 py-3 h-auto rounded-full text-sm font-semibold tracking-widest uppercase hover:opacity-90 cursor-pointer"
             >
               <Link href="/signup">Sign Up</Link>
