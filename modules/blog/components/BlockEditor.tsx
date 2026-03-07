@@ -67,19 +67,21 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
 
   function renderInput(block: EditorBlock) {
     const handleChange = (content: Record<string, unknown>) => updateBlock(block.id, content)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const h = (v: any) => handleChange(v as Record<string, unknown>)
     switch (block.type) {
       case "heading":
-        return <HeadingBlock value={block.content as { text: string; level: 1 | 2 | 3 }} onChange={handleChange} />
+        return <HeadingBlock value={block.content as { text: string; level: 1 | 2 | 3 }} onChange={h} />
       case "paragraph":
-        return <ParagraphBlock value={block.content as { text: string }} onChange={handleChange} />
+        return <ParagraphBlock value={block.content as { text: string }} onChange={h} />
       case "image":
-        return <ImageBlock value={block.content as { url: string; caption?: string }} onChange={handleChange} />
+        return <ImageBlock value={block.content as { url: string; caption?: string }} onChange={h} />
       case "quote":
-        return <QuoteBlock value={block.content as { text: string; author?: string }} onChange={handleChange} />
+        return <QuoteBlock value={block.content as { text: string; author?: string }} onChange={h} />
       case "list":
-        return <ListBlock value={block.content as { items: string[] }} onChange={handleChange} />
+        return <ListBlock value={block.content as { items: string[] }} onChange={h} />
       case "video":
-        return <VideoBlock value={block.content as { url: string }} onChange={handleChange} />
+        return <VideoBlock value={block.content as { url: string }} onChange={h} />
     }
   }
 

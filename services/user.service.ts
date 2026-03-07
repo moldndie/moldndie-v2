@@ -33,23 +33,6 @@ export async function getUsers(): Promise<Profile[]> {
   })) as Profile[]
 }
 
-export async function getUserById(id: string): Promise<Profile> {
-  const supabase = await createClient()
-  const admin = createAdminClient()
-
-  const [profileResult, authResult] = await Promise.all([
-    supabase.from("profiles").select("*").eq("id", id).single(),
-    admin.auth.admin.getUserById(id),
-  ])
-
-  if (profileResult.error) throw dbError(profileResult.error)
-  if (authResult.error) throw dbError(authResult.error)
-
-  return {
-    ...profileResult.data,
-    email: authResult.data.user?.email ?? null,
-  } as Profile
-}
 
 export async function updateUser(id: string, payload: Partial<Profile>): Promise<Profile> {
   const admin = createAdminClient()
