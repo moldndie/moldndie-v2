@@ -113,7 +113,7 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
         {/* Price */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Price (USD)</label>
-          <Input {...register("price")} type="number" step="0.01" min="0" placeholder="0.00" />
+          <Input {...register("price", { valueAsNumber: true })} type="number" step="0.01" min="0" placeholder="0.00" />
           {errors.price && <p className="text-xs text-red-500">{errors.price.message}</p>}
         </div>
 
