@@ -5,7 +5,10 @@ export type Profile = {
   phone: string | null;
   country_code: string | null;
   role: "admin" | "user";
+  is_active: boolean;
   created_at: string;
+  // Enriched from auth.users
+  email?: string | null;
 };
 
 export type ProfileUpdateData = {
