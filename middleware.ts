@@ -2,6 +2,16 @@ import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // Public routes bypass ALL auth checks — must come first, before any Supabase call.
+  // /reset-password uses a URL hash (#access_token=...) that the server cannot read,
+  // so session checks here would always fail and redirect to /login.
+  const publicRoutes = ["/login", "/signup", "/forgot-password", "/reset-password"];
+  if (publicRoutes.some((r) => pathname.startsWith(r))) {
+    return NextResponse.next();
+  }
+
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -25,17 +35,10 @@ export async function middleware(request: NextRequest) {
     }
   );
 
-  // Refresh session — must be called before any redirect logic
+  // Refresh session — only runs for non-public routes
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const { pathname } = request.nextUrl;
-
-  // Redirect logged-in users away from auth pages
-  if (user && (pathname.startsWith("/login") || pathname.startsWith("/signup"))) {
-    return NextResponse.redirect(new URL("/dashboard", request.url));
-  }
 
   // Protect /dashboard and /account
   if ((pathname.startsWith("/dashboard") || pathname.startsWith("/account")) && !user) {
