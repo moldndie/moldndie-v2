@@ -11,7 +11,7 @@ export async function forgotPasswordAction(
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
 
   const { error } = await supabase.auth.resetPasswordForEmail(data.email, {
-    redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
+    redirectTo: `${siteUrl}/reset-password`,
   });
 
   if (error) return { error: error.message };

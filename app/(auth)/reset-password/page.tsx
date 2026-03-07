@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Eye, EyeOff, Lock } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { resetPasswordSchema, type ResetPasswordInput } from "@/schemas/auth.schema";
-import { resetPasswordAction } from "./actions";
+import { createClient } from "@/lib/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -16,6 +16,7 @@ export default function ResetPasswordPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [ready, setReady] = useState(false);
 
   const {
     register,
@@ -23,14 +24,38 @@ export default function ResetPasswordPage() {
     formState: { errors, isSubmitting },
   } = useForm<ResetPasswordInput>({ resolver: zodResolver(resetPasswordSchema) });
 
+  useEffect(() => {
+    const supabase = createClient();
+
+    // The browser client automatically reads the #access_token hash.
+    // getSession() resolves after that processing is done.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) {
+        router.replace("/login");
+      } else {
+        setReady(true);
+      }
+    });
+  }, [router]);
+
   async function onSubmit(data: ResetPasswordInput) {
-    const result = await resetPasswordAction(data);
-    if (result?.error) {
-      toast.error(result.error);
+    const supabase = createClient();
+    const { error } = await supabase.auth.updateUser({ password: data.password });
+
+    if (error) {
+      toast.error(error.message);
     } else {
       toast.success("Password updated successfully!");
       router.push("/login");
     }
+  }
+
+  if (!ready) {
+    return (
+      <div className="w-full flex items-center justify-center py-12">
+        <div className="h-6 w-6 animate-spin rounded-full border-2 border-current border-t-transparent text-muted-foreground" />
+      </div>
+    );
   }
 
   return (
