@@ -21,6 +21,7 @@ interface UserEditModalProps {
   user: Profile | null
   currentUserRole: "admin" | "user"
   onSuccess?: () => void
+  onSave?: (values: UserEditValues) => Promise<void>
 }
 
 export function UserEditModal({
@@ -29,6 +30,7 @@ export function UserEditModal({
   user,
   currentUserRole,
   onSuccess,
+  onSave,
 }: UserEditModalProps) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -70,13 +72,17 @@ export function UserEditModal({
     setSaving(true)
     setError(null)
     try {
-      await updateUser(user.id, {
-        first_name: values.first_name,
-        last_name: values.last_name,
-        phone: values.phone || null,
-        country_code: values.country_code || null,
-        role: values.role,
-      })
+      if (onSave) {
+        await onSave(values)
+      } else {
+        await updateUser(user.id, {
+          first_name: values.first_name,
+          last_name: values.last_name,
+          phone: values.phone || null,
+          country_code: values.country_code || null,
+          role: values.role,
+        })
+      }
       onSuccess?.()
       onClose()
     } catch (e) {
