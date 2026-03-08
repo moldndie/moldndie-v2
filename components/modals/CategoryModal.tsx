@@ -25,7 +25,7 @@ interface CategoryModalProps {
   category?: BlogCategory | null
   onCreated?: (category: BlogCategory) => void
   onSuccess?: () => void
-  onSave?: (values: BlogCategoryFormValues) => Promise<void>
+  onSave?: (values: BlogCategoryFormValues) => Promise<unknown>
 }
 
 export function CategoryModal({ open, onClose, category, onCreated, onSuccess, onSave }: CategoryModalProps) {

@@ -21,7 +21,7 @@ interface UserEditModalProps {
   user: Profile | null
   currentUserRole: "admin" | "user"
   onSuccess?: () => void
-  onSave?: (values: UserEditValues) => Promise<void>
+  onSave?: (values: UserEditValues) => Promise<unknown>
 }
 
 export function UserEditModal({

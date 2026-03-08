@@ -25,7 +25,7 @@ interface TagModalProps {
   tag?: BlogTag | null
   onCreated?: (tag: BlogTag) => void
   onSuccess?: () => void
-  onSave?: (values: BlogTagFormValues) => Promise<void>
+  onSave?: (values: BlogTagFormValues) => Promise<unknown>
 }
 
 export function TagModal({ open, onClose, tag, onCreated, onSuccess, onSave }: TagModalProps) {
