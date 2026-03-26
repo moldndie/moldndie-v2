@@ -57,9 +57,14 @@ export async function getMoldCategories(): Promise<MoldCategory[]> {
   return (data ?? []) as MoldCategory[]
 }
 
+export type PriceFilter = "all" | "free" | "paid"
+export type SortOption = "newest" | "oldest" | "price_asc" | "price_desc" | "title_asc"
+
 export interface MoldsListingParams {
   search?: string
   categoryId?: string | null
+  priceFilter?: PriceFilter
+  sort?: SortOption
   page?: number
   pageSize?: number
 }
@@ -71,14 +76,23 @@ export interface MoldsListingResult {
 
 export async function getMoldsListing(params: MoldsListingParams = {}): Promise<MoldsListingResult> {
   const supabase = await createClient()
-  const { search, categoryId, page = 1, pageSize = 12 } = params
+  const { search, categoryId, priceFilter = "all", sort = "newest", page = 1, pageSize = 12 } = params
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
+
+  const sortMap: Record<SortOption, { column: string; ascending: boolean }> = {
+    newest:     { column: "created_at", ascending: false },
+    oldest:     { column: "created_at", ascending: true },
+    price_asc:  { column: "price",      ascending: true },
+    price_desc: { column: "price",      ascending: false },
+    title_asc:  { column: "title",      ascending: true },
+  }
+  const { column, ascending } = sortMap[sort]
 
   let query = supabase
     .from("molds")
     .select("*, category:mold_categories(id,name,slug)", { count: "exact" })
-    .order("created_at", { ascending: false })
+    .order(column, { ascending })
     .range(from, to)
 
   if (search?.trim()) {
@@ -87,6 +101,12 @@ export async function getMoldsListing(params: MoldsListingParams = {}): Promise<
 
   if (categoryId) {
     query = query.eq("category_id", categoryId)
+  }
+
+  if (priceFilter === "free") {
+    query = query.eq("price", 0)
+  } else if (priceFilter === "paid") {
+    query = query.gt("price", 0)
   }
 
   const { data, error, count } = await query

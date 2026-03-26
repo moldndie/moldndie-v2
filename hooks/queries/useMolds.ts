@@ -10,11 +10,13 @@ import {
   deleteMold,
   type MoldsParams,
   type MoldsListingParams,
+  type PriceFilter,
+  type SortOption,
 } from "@/services/mold.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { MoldFormValues } from "@/schemas/mold.schema"
 
-export type { MoldsParams, MoldsListingParams }
+export type { MoldsParams, MoldsListingParams, PriceFilter, SortOption }
 
 export function useMolds(params?: MoldsParams) {
   return useQuery({
@@ -33,7 +35,14 @@ export function useMoldCategories() {
 
 export function useMoldsListing(params: MoldsListingParams = {}) {
   return useQuery({
-    queryKey: ["molds", "listing", params.search ?? "", params.categoryId ?? null, params.page ?? 1],
+    queryKey: [
+      "molds", "listing",
+      params.search ?? "",
+      params.categoryId ?? null,
+      params.priceFilter ?? "all",
+      params.sort ?? "newest",
+      params.page ?? 1,
+    ],
     queryFn: () => getMoldsListing(params),
     placeholderData: keepPreviousData,
     staleTime: 30 * 1000,
