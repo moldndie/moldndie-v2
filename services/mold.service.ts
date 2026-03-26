@@ -12,12 +12,29 @@ function dbError(e: unknown): Error {
   return new Error("Database error")
 }
 
-export async function getMolds(): Promise<Mold[]> {
+export interface MoldsParams {
+  search?: string
+  filter?: "all" | "free" | "paid"
+}
+
+export async function getMolds(params?: MoldsParams): Promise<Mold[]> {
   const supabase = await createClient()
-  const { data, error } = await supabase
+  let query = supabase
     .from("molds")
     .select("*, category:mold_categories(id,name,slug)")
     .order("created_at", { ascending: false })
+
+  if (params?.search?.trim()) {
+    query = query.ilike("title", `%${params.search.trim()}%`)
+  }
+
+  if (params?.filter === "free") {
+    query = query.eq("price", 0)
+  } else if (params?.filter === "paid") {
+    query = query.gt("price", 0)
+  }
+
+  const { data, error } = await query
   if (error) throw dbError(error)
   return (data ?? []) as Mold[]
 }
@@ -48,9 +65,10 @@ export async function createMold(values: MoldFormValues): Promise<Mold> {
       title: values.title,
       description: values.description ?? null,
       category_id: values.category_id || null,
-      price: values.price ?? null,
+      // is_free is form-only; derive price: free molds store null
+      price: values.is_free ? 0 : values.price,
       preview_image: values.preview_image ?? null,
-      download_url: values.download_url ?? null,
+      file_key: values.file_key,
     })
     .select()
     .single()
@@ -67,9 +85,9 @@ export async function updateMold(id: string, values: MoldFormValues): Promise<Mo
       title: values.title,
       description: values.description ?? null,
       category_id: values.category_id || null,
-      price: values.price ?? null,
+      price: values.is_free ? 0 : values.price,
       preview_image: values.preview_image ?? null,
-      download_url: values.download_url ?? null,
+      file_key: values.file_key,
     })
     .eq("id", id)
     .select()

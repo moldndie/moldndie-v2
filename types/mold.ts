@@ -2,12 +2,15 @@ export interface MoldCategory {
   id: string
   name: string
   slug: string
+  created_at: string
 }
 
-export interface MoldImage {
+export interface MoldGalleryItem {
   id: string
   mold_id: string
-  image_url: string
+  file_key: string
+  type: "image" | "video"
+  position: number
 }
 
 export interface Mold {
@@ -17,8 +20,8 @@ export interface Mold {
   category_id: string | null
   price: number | null
   preview_image: string | null
-  download_url: string | null
+  file_key: string | null
   created_at: string
   category?: MoldCategory | null
-  images?: MoldImage[]
+  gallery?: MoldGalleryItem[]
 }
