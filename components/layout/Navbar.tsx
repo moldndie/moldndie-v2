@@ -1,7 +1,13 @@
 import Link from "next/link";
 import NavbarUserMenu from "@/components/layout/NavbarUserMenu";
 
-const navLinks = ["Blogs", "Library", "Events", "Suppliers", "Services"];
+const navLinks = [
+  { label: "Blogs",     href: "/blogs" },
+  { label: "Library",   href: "/molds" },
+  { label: "Events",    href: "/events" },
+  { label: "Suppliers", href: "/suppliers" },
+  { label: "Services",  href: "/services" },
+];
 
 function LogoIcon() {
   return (
@@ -31,11 +37,11 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <Link
-              key={link}
-              href={`/${link.toLowerCase()}`}
+              key={link.href}
+              href={link.href}
               className="text-sm text-zinc-600 hover:text-zinc-900 transition-colors"
             >
-              {link}
+              {link.label}
             </Link>
           ))}
         </nav>
