@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import NavbarUserMenu from "@/components/layout/NavbarUserMenu";
 
 const navLinks = ["Blogs", "Library", "Events", "Suppliers", "Services"];
 
@@ -41,14 +41,7 @@ export default function Navbar() {
         </nav>
 
         {/* Auth */}
-        <div className="flex items-center gap-4">
-          <Button  className="rounded-full px-6 hover:opacity-90 cursor-pointer">
-            <Link href="/login">Login</Link>
-          </Button>
-          <Link href="/signup" className="text-sm text-zinc-700 hover:text-zinc-900 transition-colors">
-            Sign Up
-          </Link>
-        </div>
+        <NavbarUserMenu />
       </div>
     </header>
   );
