@@ -66,3 +66,29 @@ export async function reactivateUser(id: string): Promise<void> {
   if (error) throw dbError(error)
   revalidatePath("/dashboard/users")
 }
+
+export async function createUser(payload: {
+  email: string
+  password: string
+  role: "admin" | "user"
+}): Promise<Profile> {
+  const admin = createAdminClient()
+
+  const { data: authData, error: authError } = await admin.auth.admin.createUser({
+    email: payload.email,
+    password: payload.password,
+    email_confirm: true,
+  })
+  if (authError) throw dbError(authError)
+
+  const userId = authData.user.id
+  const { data, error } = await admin
+    .from("profiles")
+    .insert({ id: userId, role: payload.role })
+    .select()
+    .single()
+  if (error) throw dbError(error)
+
+  revalidatePath("/dashboard/users")
+  return { ...data, email: payload.email } as Profile
+}

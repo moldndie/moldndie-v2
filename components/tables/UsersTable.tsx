@@ -7,7 +7,9 @@ import { Pencil, UserX, UserCheck } from "lucide-react"
 import { toast } from "sonner"
 import { DataTable } from "./DataTable"
 import { UserEditModal } from "@/components/modals/UserEditModal"
+import { UserCreateModal } from "@/components/modals/UserCreateModal"
 import { DeactivateUserModal } from "@/components/modals/DeactivateUserModal"
+import { Button } from "@/components/ui/button"
 import { countries } from "@/lib/countries"
 import { getUsers, updateUser, deactivateUser, reactivateUser } from "@/services/user.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
@@ -22,6 +24,79 @@ export function UsersTable({ currentUserRole }: UsersTableProps) {
   const queryClient = useQueryClient()
   const [editingUser, setEditingUser] = useState<Profile | null>(null)
   const [togglingUser, setTogglingUser] = useState<Profile | null>(null)
+  const [creating, setCreating] = useState(false)
+
+  const { data = [], isLoading } = useQuery({
+    queryKey: QUERY_KEYS.USERS,
+    queryFn: getUsers,
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, values }: { id: string; values: UserEditValues }) =>
+      updateUser(id, {
+        first_name: values.first_name,
+        last_name: values.last_name,
+        phone: values.phone || null,
+        country_code: values.country_code || null,
+        role: values.role,
+      }),
+    onMutate: async ({ id, values }) => {
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.USERS })
+      const prev = queryClient.getQueryData<Profile[]>(QUERY_KEYS.USERS)
+      queryClient.setQueryData<Profile[]>(QUERY_KEYS.USERS, (old = []) =>
+        old.map((u) =>
+          u.id === id
+            ? {
+                ...u,
+                first_name: values.first_name,
+                last_name: values.last_name,
+                phone: values.phone || null,
+                country_code: values.country_code || null,
+                role: values.role,
+              }
+            : u
+        )
+      )
+      return { prev }
+    },
+    onError: (e: Error, _, ctx) => {
+      queryClient.setQueryData(QUERY_KEYS.USERS, ctx?.prev)
+      toast.error(e.message || "Update failed.")
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS })
+    },
+  })
+
+  const createMutation = useMutation({
+    mutationFn: (values: UserCreateValues) => createUser(values),
+    onSuccess: (newUser) => {
+      queryClient.setQueryData<Profile[]>(QUERY_KEYS.USERS, (old = []) => [newUser, ...old])
+      toast.success("User created.")
+    },
+    onError: (e: Error) => toast.error(e.message || "Failed to create user."),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS }),
+  })
+
+  const toggleMutation = useMutation({
+    mutationFn: ({ id, isActive }: { id: string; isActive: boolean }) =>
+      isActive ? deactivateUser(id) : reactivateUser(id),
+    onMutate: async ({ id, isActive }) => {
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.USERS })
+      const prev = queryClient.getQueryData<Profile[]>(QUERY_KEYS.USERS)
+      queryClient.setQueryData<Profile[]>(QUERY_KEYS.USERS, (old = []) =>
+        old.map((u) => (u.id === id ? { ...u, is_active: !isActive } : u))
+      )
+      return { prev }
+    },
+    onError: (e: Error, _, ctx) => {
+      queryClient.setQueryData(QUERY_KEYS.USERS, ctx?.prev)
+      toast.error(e.message || "Action failed.")
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS })
+    },
+  })
 
   const { data = [], isLoading } = useQuery({
     queryKey: QUERY_KEYS.USERS,

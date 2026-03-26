@@ -12,3 +12,11 @@ export const userEditSchema = z.object({
 })
 
 export type UserEditValues = z.infer<typeof userEditSchema>
+
+export const userCreateSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+  role: z.enum(["admin", "user"]),
+})
+
+export type UserCreateValues = z.infer<typeof userCreateSchema>
