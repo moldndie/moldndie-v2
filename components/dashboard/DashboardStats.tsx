@@ -1,29 +1,106 @@
-import { FileText, Package, Users, BookOpen } from "lucide-react"
+"use client"
 
-const stats = [
-  { label: "Total Blogs", value: "—", icon: FileText, color: "bg-blue-50 text-blue-600" },
-  { label: "Total Molds", value: "—", icon: Package, color: "bg-purple-50 text-purple-600" },
-  { label: "Total Users", value: "—", icon: Users, color: "bg-green-50 text-green-600" },
-  { label: "Total Courses", value: "—", icon: BookOpen, color: "bg-orange-50 text-orange-600" },
-]
+import { Package, BookOpen, Truck, CalendarDays, Megaphone, Users } from "lucide-react"
+import { useDashboardStats } from "@/hooks/queries/useDashboard"
+
+function StatCard({
+  label,
+  value,
+  icon: Icon,
+}: {
+  label: string
+  value: number | undefined
+  icon: React.ElementType
+}) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+      <div className="flex items-center justify-between mb-3">
+        <p className="text-sm text-gray-500">{label}</p>
+        <Icon className="size-4 text-gray-400" />
+      </div>
+      <p className="text-xl font-semibold text-gray-900">
+        {value === undefined ? "—" : value.toLocaleString()}
+      </p>
+    </div>
+  )
+}
+
+function MetricCard({ label, value }: { label: string; value: number | undefined }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-xl font-semibold text-gray-900 mt-1">
+        {value === undefined ? "—" : value.toLocaleString()}
+      </p>
+    </div>
+  )
+}
+
+function RecentList({
+  title,
+  items,
+  isLoading,
+}: {
+  title: string
+  items: { id: string; title: string; created_at: string }[] | undefined
+  isLoading: boolean
+}) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
+      <h2 className="text-base font-medium text-gray-800 mb-3">{title}</h2>
+      {isLoading ? (
+        <p className="text-sm text-gray-400 py-2">Loading…</p>
+      ) : !items?.length ? (
+        <p className="text-sm text-gray-400 py-2">No items yet.</p>
+      ) : (
+        <ul>
+          {items.map((item, i) => (
+            <li
+              key={item.id}
+              className={`flex items-center justify-between gap-3 py-2 ${
+                i < items.length - 1 ? "border-b border-gray-100" : ""
+              }`}
+            >
+              <span className="text-sm text-gray-700 line-clamp-1 flex-1">{item.title}</span>
+              <span className="text-xs text-gray-400 shrink-0">
+                {new Date(item.created_at).toLocaleDateString("en-US", {
+                  month: "short",
+                  day: "numeric",
+                })}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  )
+}
 
 export default function DashboardStats() {
+  const { data, isLoading } = useDashboardStats()
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-      {stats.map(({ label, value, icon: Icon, color }) => (
-        <div
-          key={label}
-          className="rounded-xl border border-zinc-200 bg-white p-5 flex items-center gap-4"
-        >
-          <div className={`rounded-lg p-2.5 ${color}`}>
-            <Icon className="size-5" />
-          </div>
-          <div>
-            <p className="text-sm text-zinc-500">{label}</p>
-            <p className="text-2xl font-semibold text-zinc-900">{value}</p>
-          </div>
-        </div>
-      ))}
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        <StatCard label="Total Molds" value={data?.counts.molds} icon={Package} />
+        <StatCard label="Total Courses" value={data?.counts.courses} icon={BookOpen} />
+        <StatCard label="Total Suppliers" value={data?.counts.suppliers} icon={Truck} />
+        <StatCard label="Total Events" value={data?.counts.events} icon={CalendarDays} />
+        <StatCard label="Total Ads" value={data?.counts.ads} icon={Megaphone} />
+        <StatCard label="Total Users" value={data?.counts.users} icon={Users} />
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+        <MetricCard label="Free Molds" value={data?.metrics.freeMolds} />
+        <MetricCard label="Paid Molds" value={data?.metrics.paidMolds} />
+        <MetricCard label="Active Ads" value={data?.metrics.activeAds} />
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <RecentList title="Recent Molds" items={data?.recent.molds} isLoading={isLoading} />
+        <RecentList title="Recent Courses" items={data?.recent.courses} isLoading={isLoading} />
+        <RecentList title="Recent Events" items={data?.recent.events} isLoading={isLoading} />
+      </div>
     </div>
   )
 }
