@@ -4,5 +4,12 @@ export const QUERY_KEYS = {
   BLOG_CATEGORIES: ["blog_categories"] as const,
   BLOG_TAGS: ["blog_tags"] as const,
   MOLDS: ["molds"] as const,
+  MOLD_CATEGORIES: ["mold_categories"] as const,
   COURSES: ["courses"] as const,
+  EVENTS: ["events"] as const,
+  EVENT_CATEGORIES: ["event_categories"] as const,
+  SUPPLIERS: ["suppliers"] as const,
+  SUPPLIER_CATEGORIES: ["supplier_categories"] as const,
+  ADS: ["ads"] as const,
+  DASHBOARD: ["dashboard"] as const,
 }
