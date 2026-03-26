@@ -115,12 +115,11 @@ function Thumbnail({
           <Play size={18} className="text-white" fill="white" />
         </div>
       ) : (
-        <Image
+        <img
           src={`${R2_BASE}/${media.key}`}
           alt={`${title} thumbnail ${index + 1}`}
-          fill
-          className="object-cover"
-          sizes="64px"
+          className="w-full h-full object-cover"
+          onError={(e) => { e.currentTarget.style.display = "none" }}
         />
       )}
     </button>
