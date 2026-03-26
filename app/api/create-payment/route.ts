@@ -4,7 +4,6 @@ import { createAdminClient } from "@/lib/supabase/admin"
 
 const PAYMOB_API_KEY = process.env.PAYMOB_API_KEY!
 const PAYMOB_INTEGRATION_ID = process.env.PAYMOB_INTEGRATION_ID!
-const PAYMOB_IFRAME_ID = process.env.PAYMOB_IFRAME_ID!
 
 type CartItemInput = {
   id: string
@@ -196,21 +195,11 @@ export async function POST(req: Request) {
       }))
     )
 
-    // Fetch user email for billing data
     const billingData = {
-      apartment: "NA",
-      email: user.email ?? "NA",
-      floor: "NA",
-      first_name: user.email?.split("@")[0] ?? "Customer",
-      street: "NA",
-      building: "NA",
-      phone_number: "NA",
-      shipping_method: "NA",
-      postal_code: "NA",
-      city: "NA",
-      country: "NA",
-      last_name: "NA",
-      state: "NA",
+      first_name: "Test",
+      last_name: "User",
+      email: user.email ?? "test@test.com",
+      phone_number: "01000000000",
     }
 
     const paymentToken = await paymobPaymentKey(authToken, paymobOrderId, totalCents, billingData)
@@ -221,8 +210,8 @@ export async function POST(req: Request) {
       .update({ paymob_order_id: String(paymobOrderId) })
       .eq("id", order.id)
 
-    // ── 9. Return payment URL ─────────────────────────────────────────────
-    const paymentUrl = `https://accept.paymob.com/api/acceptance/iframes/${PAYMOB_IFRAME_ID}?payment_token=${paymentToken}`
+    // ── 9. Return redirect payment URL ────────────────────────────────────
+    const paymentUrl = `https://accept.paymob.com/api/acceptance/payments/pay?payment_token=${paymentToken}`
 
     return NextResponse.json({ paymentUrl })
   } catch (error) {
