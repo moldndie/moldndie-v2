@@ -17,7 +17,7 @@ function WireframeCube() {
   const w = "1.5";
   const gw = "1";
   const go = "0.45";
-  return (
+  return ( 
     <svg
       viewBox="30 10 180 180"
       fill="none"

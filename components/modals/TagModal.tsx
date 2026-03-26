@@ -25,9 +25,10 @@ interface TagModalProps {
   tag?: BlogTag | null
   onCreated?: (tag: BlogTag) => void
   onSuccess?: () => void
+  onSave?: (values: BlogTagFormValues) => Promise<unknown>
 }
 
-export function TagModal({ open, onClose, tag, onCreated, onSuccess }: TagModalProps) {
+export function TagModal({ open, onClose, tag, onCreated, onSuccess, onSave }: TagModalProps) {
   const isEdit = !!tag
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -65,7 +66,9 @@ export function TagModal({ open, onClose, tag, onCreated, onSuccess }: TagModalP
     setSaving(true)
     setError(null)
     try {
-      if (isEdit) {
+      if (onSave) {
+        await onSave(values)
+      } else if (isEdit) {
         const updated = await updateTag(tag!.id, values)
         onCreated?.(updated)
       } else {
