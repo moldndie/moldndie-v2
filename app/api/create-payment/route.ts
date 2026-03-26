@@ -18,10 +18,10 @@ async function paymobAuth(): Promise<string> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ api_key: PAYMOB_API_KEY }),
   })
-  const json = await res.json()
-  console.log("[PAYMOB] auth response:", JSON.stringify(json))
-  if (!res.ok) throw new Error(`Paymob auth failed: ${json.message ?? res.status}`)
-  return json.token as string
+  const authData = await res.json()
+  console.log("AUTH RESPONSE:", JSON.stringify(authData))
+  if (!authData.token) throw new Error(`Auth token failed: ${JSON.stringify(authData)}`)
+  return authData.token as string
 }
 
 async function paymobCreateOrder(
@@ -40,10 +40,10 @@ async function paymobCreateOrder(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   })
-  const json = await res.json()
-  console.log("[PAYMOB] create order response:", JSON.stringify(json))
-  if (!res.ok) throw new Error(`Paymob order creation failed: ${json.message ?? res.status}`)
-  return json.id as number
+  const orderData = await res.json()
+  console.log("ORDER RESPONSE:", JSON.stringify(orderData))
+  if (!orderData.id) throw new Error(`Paymob order creation failed: ${JSON.stringify(orderData)}`)
+  return orderData.id as number
 }
 
 async function paymobPaymentKey(
@@ -58,9 +58,9 @@ async function paymobPaymentKey(
     expiration: 3600,
     order_id: paymobOrderId,
     billing_data: {
-      first_name: "Test",
+      first_name: "Customer",
       last_name: "User",
-      email,
+      email: email || "customer@example.com",
       phone_number: "01000000000",
     },
     currency: "EGP",
@@ -71,15 +71,19 @@ async function paymobPaymentKey(
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   })
-  const json = await res.json()
-  console.log("[PAYMOB] payment key response:", JSON.stringify(json))
-  if (!res.ok) throw new Error(`Paymob payment key failed: ${json.message ?? res.status}`)
-  return json.token as string
+  const paymentData = await res.json()
+  console.log("PAYMENT KEY RESPONSE:", JSON.stringify(paymentData))
+  if (!paymentData.token) throw new Error(`Payment key generation failed: ${JSON.stringify(paymentData)}`)
+  return paymentData.token as string
 }
 
 // ── Route handler ──────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
+  // ── 0. Log ENV (debug) ─────────────────────────────────────────────────
+  console.log("API KEY:", PAYMOB_API_KEY ? `set (length ${PAYMOB_API_KEY.length})` : "MISSING")
+  console.log("INTEGRATION ID:", PAYMOB_INTEGRATION_ID || "MISSING")
+
   try {
     // ── 1. Parse & validate body ──────────────────────────────────────────
     const body = await req.json()
@@ -196,7 +200,7 @@ export async function POST(req: Request) {
       authToken,
       paymobOrderId,
       totalCents,
-      user.email ?? "test@test.com"
+      user.email ?? "customer@example.com"
     )
 
     // ── 10. Save paymob_order_id ──────────────────────────────────────────
@@ -210,8 +214,15 @@ export async function POST(req: Request) {
     console.log("[PAYMENT] payment URL:", paymentUrl)
 
     return NextResponse.json({ paymentUrl })
-  } catch (error) {
-    console.error("PAYMENT ERROR:", error)
-    return NextResponse.json({ error: "Payment initialization failed" }, { status: 500 })
+  } catch (error: any) {
+    console.error("FULL PAYMENT ERROR:", error)
+
+    return NextResponse.json(
+      {
+        error: error?.message || "Unknown error",
+        details: error,
+      },
+      { status: 500 }
+    )
   }
 }
