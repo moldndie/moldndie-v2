@@ -8,7 +8,7 @@ export type {
 export type {
   Mold,
   MoldCategory,
-  MoldImage,
+  MoldGalleryItem,
 } from "./mold"
 export type {
   Course,
@@ -20,3 +20,6 @@ export type {
   ProductType,
   PaymentStatus,
 } from "./purchase"
+export type { Event, EventCategory } from "./event"
+export type { Supplier, SupplierCategory } from "./supplier"
+export type { Ad, AdTargetType } from "./ad"
