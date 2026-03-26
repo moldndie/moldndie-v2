@@ -43,7 +43,7 @@ export async function getMoldById(id: string): Promise<Mold> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from("molds")
-    .select("*, category:mold_categories(id,name,slug), images:mold_images(*)")
+    .select("*, category:mold_categories(id,name,slug)")
     .eq("id", id)
     .single()
   if (error) throw dbError(error)

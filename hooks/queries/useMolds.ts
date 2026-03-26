@@ -14,6 +14,7 @@ import {
   type PriceFilter,
   type SortOption,
 } from "@/services/mold.service"
+import { getGalleryItems } from "@/services/moldGallery.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { MoldFormValues } from "@/schemas/mold.schema"
 
@@ -25,6 +26,15 @@ export function useMoldById(id: string) {
     queryFn: () => getMoldById(id),
     staleTime: 60 * 1000,
     enabled: !!id,
+  })
+}
+
+export function useMoldGallery(moldId: string) {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.MOLDS, moldId, "gallery"],
+    queryFn: () => getGalleryItems(moldId),
+    staleTime: 60 * 1000,
+    enabled: !!moldId,
   })
 }
 

@@ -12,7 +12,7 @@ import {
   AlertCircle,
   ArrowLeft,
 } from "lucide-react"
-import { useMoldById } from "@/hooks/queries/useMolds"
+import { useMoldById, useMoldGallery } from "@/hooks/queries/useMolds"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -104,7 +104,7 @@ function Thumbnail({
   return (
     <button
       onClick={onClick}
-      className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all duration-150 ${
+      className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 shrink-0 transition-all duration-150 ${
         active
           ? "border-primary shadow-sm"
           : "border-zinc-200 hover:border-zinc-400"
@@ -130,6 +130,7 @@ function Thumbnail({
 // ── Main component ────────────────────────────────────────────
 export default function MoldProductClient({ moldId }: { moldId: string }) {
   const { data: mold, isLoading, isError } = useMoldById(moldId)
+  const { data: galleryItems = [] } = useMoldGallery(moldId)
   const [activeIndex, setActiveIndex] = useState(0)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
@@ -138,20 +139,12 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
   if (isError) return <ErrorState />
   if (!mold) return <NotFoundState />
 
-  // getMoldById joins gallery as "images" (alias in the select query)
-  const rawImages = ((mold as Record<string, unknown>).images ?? []) as {
-    id: string
-    file_key: string
-    type: "image" | "video"
-    position: number
-  }[]
-
-  const sortedImages = [...rawImages].sort((a, b) => a.position - b.position)
+  const sortedGallery = [...galleryItems].sort((a, b) => a.position - b.position)
 
   // Build full media list: preview first, then gallery items
   const allMedia: MoldMedia[] = [
     ...(mold.preview_image ? [{ key: mold.preview_image, type: "image" as const }] : []),
-    ...sortedImages.map((img) => ({ key: img.file_key, type: img.type })),
+    ...sortedGallery.map((img) => ({ key: img.file_key, type: img.type })),
   ]
 
   const activeMedia = allMedia[activeIndex] ?? null
@@ -201,7 +194,7 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
           Mold Library
         </Link>
         <ChevronLeft size={12} className="-rotate-180" />
-        <span className="text-zinc-600 truncate max-w-[200px] sm:max-w-none">{mold.title}</span>
+        <span className="text-zinc-600 truncate max-w-50 sm:max-w-none">{mold.title}</span>
       </nav>
 
       {/* ── 2-column layout ── */}
