@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { revalidatePath } from "next/cache"
 import type { Blog, BlogCategory, BlogTag, BlogBlock } from "@/types"
 import type { BlogFormValues } from "@/schemas/blog.schema"
@@ -44,14 +45,14 @@ export async function getBlogTagIds(blogId: string): Promise<string[]> {
 }
 
 export async function getBlogCategories(): Promise<BlogCategory[]> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase.from("blog_categories").select("*").order("name")
   if (error) throw dbError(error)
   return (data ?? []) as BlogCategory[]
 }
 
 export async function getBlogTags(): Promise<BlogTag[]> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase.from("blog_tags").select("*").order("name")
   if (error) throw dbError(error)
   return (data ?? []) as BlogTag[]
