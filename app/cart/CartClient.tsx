@@ -16,6 +16,15 @@ export default function CartClient() {
   const total = items.reduce((sum, item) => sum + item.price, 0)
 
   async function handleCheckout() {
+    const cartItems = items
+      .filter((item) => item.id && item.type)
+      .map((item) => ({ id: item.id, type: item.type }))
+
+    if (cartItems.length === 0) {
+      setCheckoutError("Your cart is empty.")
+      return
+    }
+
     setIsCheckingOut(true)
     setCheckoutError(null)
 
@@ -23,9 +32,7 @@ export default function CartClient() {
       const res = await fetch("/api/create-payment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          items: items.map((item) => ({ id: item.id, type: item.type })),
-        }),
+        body: JSON.stringify({ items: cartItems }),
       })
 
       const data = await res.json()

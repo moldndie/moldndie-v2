@@ -18,94 +18,98 @@ async function paymobAuth(): Promise<string> {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ api_key: PAYMOB_API_KEY }),
   })
-  if (!res.ok) throw new Error("Paymob auth failed")
-  const { token } = await res.json()
-  return token as string
+  const json = await res.json()
+  console.log("[PAYMOB] auth response:", JSON.stringify(json))
+  if (!res.ok) throw new Error(`Paymob auth failed: ${json.message ?? res.status}`)
+  return json.token as string
 }
 
 async function paymobCreateOrder(
   authToken: string,
-  amountCents: number,
-  items: { name: string; amount_cents: number; quantity: number; description: string }[]
+  amountCents: number
 ): Promise<number> {
+  const body = {
+    auth_token: authToken,
+    delivery_needed: false,
+    amount_cents: amountCents,
+    currency: "EGP",
+    items: [],
+  }
   const res = await fetch("https://accept.paymob.com/api/ecommerce/orders", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      auth_token: authToken,
-      delivery_needed: false,
-      amount_cents: amountCents,
-      currency: "EGP",
-      items,
-    }),
+    body: JSON.stringify(body),
   })
-  if (!res.ok) throw new Error("Paymob order creation failed")
-  const { id } = await res.json()
-  return id as number
+  const json = await res.json()
+  console.log("[PAYMOB] create order response:", JSON.stringify(json))
+  if (!res.ok) throw new Error(`Paymob order creation failed: ${json.message ?? res.status}`)
+  return json.id as number
 }
 
 async function paymobPaymentKey(
   authToken: string,
   paymobOrderId: number,
   amountCents: number,
-  billingData: Record<string, string>
+  email: string
 ): Promise<string> {
+  const body = {
+    auth_token: authToken,
+    amount_cents: amountCents,
+    expiration: 3600,
+    order_id: paymobOrderId,
+    billing_data: {
+      first_name: "Test",
+      last_name: "User",
+      email,
+      phone_number: "01000000000",
+    },
+    currency: "EGP",
+    integration_id: Number(PAYMOB_INTEGRATION_ID),
+  }
   const res = await fetch("https://accept.paymob.com/api/acceptance/payment_keys", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      auth_token: authToken,
-      amount_cents: amountCents,
-      expiration: 3600,
-      order_id: paymobOrderId,
-      billing_data: billingData,
-      currency: "EGP",
-      integration_id: Number(PAYMOB_INTEGRATION_ID),
-    }),
+    body: JSON.stringify(body),
   })
-  if (!res.ok) throw new Error("Paymob payment key generation failed")
-  const { token } = await res.json()
-  return token as string
+  const json = await res.json()
+  console.log("[PAYMOB] payment key response:", JSON.stringify(json))
+  if (!res.ok) throw new Error(`Paymob payment key failed: ${json.message ?? res.status}`)
+  return json.token as string
 }
 
 // ── Route handler ──────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
-  const supabase = await createClient()
-
-  // ── 1. Auth ──────────────────────────────────────────────────────────────
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
-  // ── 2. Parse body ─────────────────────────────────────────────────────────
-  let items: CartItemInput[]
-
   try {
+    // ── 1. Parse & validate body ──────────────────────────────────────────
     const body = await req.json()
-    items = body.items
+    console.log("[PAYMENT] request body:", JSON.stringify(body))
 
-    if (!Array.isArray(items) || items.length === 0) {
-      return NextResponse.json({ error: "No items provided" }, { status: 400 })
+    if (!body.items || !Array.isArray(body.items) || body.items.length === 0) {
+      return NextResponse.json({ error: "Invalid items" }, { status: 400 })
     }
+
+    const items: CartItemInput[] = body.items
 
     for (const item of items) {
       if (!item.id || !["mold", "course"].includes(item.type)) {
         return NextResponse.json({ error: "Invalid item" }, { status: 400 })
       }
     }
-  } catch {
-    return NextResponse.json({ error: "Invalid request body" }, { status: 400 })
-  }
 
-  try {
+    // ── 2. Authenticate user ──────────────────────────────────────────────
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+    }
+
     const admin = createAdminClient()
 
-    // ── 3. Validate prices from DB (never trust frontend) ─────────────────
+    // ── 3. Fetch real prices from DB ──────────────────────────────────────
     const moldIds = items.filter((i) => i.type === "mold").map((i) => i.id)
     const courseIds = items.filter((i) => i.type === "course").map((i) => i.id)
 
@@ -131,8 +135,12 @@ export async function POST(req: Request) {
       dbProducts.set(`course:${c.id}`, { ...c, type: "course" })
     }
 
-    // Verify all items exist and are paid products
-    const validatedItems: Array<{ id: string; type: "mold" | "course"; title: string; price: number }> = []
+    const validatedItems: Array<{
+      id: string
+      type: "mold" | "course"
+      title: string
+      price: number
+    }> = []
 
     for (const item of items) {
       const product = dbProducts.get(`${item.type}:${item.id}`)
@@ -142,28 +150,24 @@ export async function POST(req: Request) {
           { status: 404 }
         )
       }
-      const price = product.price
-      if (price === null || price <= 0) {
+      if (product.price === null || product.price <= 0) {
         return NextResponse.json(
-          { error: `${product.title} is free — remove it from checkout` },
+          { error: `${product.title} is free and cannot be purchased` },
           { status: 400 }
         )
       }
-      validatedItems.push({ id: item.id, type: item.type, title: product.title, price })
+      validatedItems.push({ id: item.id, type: item.type, title: product.title, price: product.price })
     }
 
     // ── 4. Calculate total ────────────────────────────────────────────────
     const totalAmount = validatedItems.reduce((sum, i) => sum + i.price, 0)
     const totalCents = Math.round(totalAmount * 100)
+    console.log("[PAYMENT] total amount:", totalAmount, "cents:", totalCents)
 
     // ── 5. Create order in DB ─────────────────────────────────────────────
     const { data: order, error: orderError } = await admin
       .from("orders")
-      .insert({
-        user_id: user.id,
-        total_amount: totalAmount,
-        status: "pending",
-      })
+      .insert({ user_id: user.id, total_amount: totalAmount, status: "pending" })
       .select("id")
       .single()
 
@@ -181,41 +185,33 @@ export async function POST(req: Request) {
 
     if (itemsError) throw new Error(itemsError.message)
 
-    // ── 7. Paymob integration ─────────────────────────────────────────────
+    // ── 7. Paymob: auth token ─────────────────────────────────────────────
     const authToken = await paymobAuth()
 
-    const paymobOrderId = await paymobCreateOrder(
+    // ── 8. Paymob: create order ───────────────────────────────────────────
+    const paymobOrderId = await paymobCreateOrder(authToken, totalCents)
+
+    // ── 9. Paymob: generate payment key ───────────────────────────────────
+    const paymentToken = await paymobPaymentKey(
       authToken,
+      paymobOrderId,
       totalCents,
-      validatedItems.map((i) => ({
-        name: i.title,
-        amount_cents: Math.round(i.price * 100),
-        quantity: 1,
-        description: i.type,
-      }))
+      user.email ?? "test@test.com"
     )
 
-    const billingData = {
-      first_name: "Test",
-      last_name: "User",
-      email: user.email ?? "test@test.com",
-      phone_number: "01000000000",
-    }
-
-    const paymentToken = await paymobPaymentKey(authToken, paymobOrderId, totalCents, billingData)
-
-    // ── 8. Save paymob_order_id in DB ─────────────────────────────────────
+    // ── 10. Save paymob_order_id ──────────────────────────────────────────
     await admin
       .from("orders")
       .update({ paymob_order_id: String(paymobOrderId) })
       .eq("id", order.id)
 
-    // ── 9. Return redirect payment URL ────────────────────────────────────
+    // ── 11. Return payment URL ────────────────────────────────────────────
     const paymentUrl = `https://accept.paymob.com/api/acceptance/payments/pay?payment_token=${paymentToken}`
+    console.log("[PAYMENT] payment URL:", paymentUrl)
 
     return NextResponse.json({ paymentUrl })
   } catch (error) {
-    console.error("[create-payment]", error)
+    console.error("PAYMENT ERROR:", error)
     return NextResponse.json({ error: "Payment initialization failed" }, { status: 500 })
   }
 }
