@@ -178,7 +178,6 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
 
   function handleBuy() {
     // TODO: integrate payment gateway
-    console.log("Buy initiated for mold:", mold.id, "price:", mold.price)
   }
 
   return (
