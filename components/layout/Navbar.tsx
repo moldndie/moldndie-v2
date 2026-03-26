@@ -1,5 +1,6 @@
 import Link from "next/link";
 import NavbarUserMenu from "@/components/layout/NavbarUserMenu";
+import NavbarCartButton from "@/components/layout/NavbarCartButton";
 
 const navLinks = [
   { label: "Blogs",     href: "/blogs" },
@@ -46,8 +47,11 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Auth */}
-        <NavbarUserMenu />
+        {/* Cart + Auth */}
+        <div className="flex items-center gap-2">
+          <NavbarCartButton />
+          <NavbarUserMenu />
+        </div>
       </div>
     </header>
   );

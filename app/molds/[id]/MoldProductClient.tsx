@@ -11,8 +11,10 @@ import {
   ChevronLeft,
   AlertCircle,
   ArrowLeft,
+  CheckCircle,
 } from "lucide-react"
 import { useMoldById, useMoldGallery } from "@/hooks/queries/useMolds"
+import { useCartStore } from "@/store/useCartStore"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -134,6 +136,7 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
   const [activeMedia, setActiveMedia] = useState<MoldMedia | null>(null)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
+  const { addItem, hasItem } = useCartStore()
 
   if (isLoading) return <SkeletonProductPage />
   if (isError) return <ErrorState />
@@ -154,7 +157,7 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
       const res = await fetch("/api/download-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ moldId: mold.id }),
+        body: JSON.stringify({ moldId: mold!.id }),
       })
 
       if (!res.ok) {
@@ -166,7 +169,7 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
       const { downloadUrl } = await res.json()
       const a = document.createElement("a")
       a.href = downloadUrl
-      a.download = mold.title
+      a.download = mold!.title
       document.body.appendChild(a)
       a.click()
       document.body.removeChild(a)
@@ -177,10 +180,17 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
     }
   }
 
-  function handleBuy() {
-    // TODO: integrate payment gateway
-    console.log("Buy initiated for mold:", mold.id, "price:", mold.price)
+  function handleAddToCart() {
+    addItem({
+      id: mold!.id,
+      title: mold!.title,
+      price: mold!.price ?? 0,
+      type: "mold",
+      image: mold!.preview_image ?? "",
+    })
   }
+
+  const inCart = hasItem(mold!.id, "mold")
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
@@ -300,13 +310,21 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
               <Download size={18} />
               {isDownloading ? "Preparing download…" : "Free Download"}
             </button>
+          ) : inCart ? (
+            <Link
+              href="/cart"
+              className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
+            >
+              <CheckCircle size={18} />
+              View in Cart
+            </Link>
           ) : (
             <button
-              onClick={handleBuy}
+              onClick={handleAddToCart}
               className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
             >
               <ShoppingCart size={18} />
-              Buy Now — ${mold.price}
+              Add to Cart — ${mold.price}
             </button>
           )}
 
