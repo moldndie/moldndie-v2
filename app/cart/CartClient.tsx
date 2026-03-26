@@ -1,16 +1,48 @@
 "use client"
 
+import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Trash2, ShoppingCart, Package } from "lucide-react"
+import { Trash2, ShoppingCart, Package, AlertCircle, Loader2 } from "lucide-react"
 import { useCartStore } from "@/store/useCartStore"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 export default function CartClient() {
   const { items, removeItem, clearCart } = useCartStore()
+  const [isCheckingOut, setIsCheckingOut] = useState(false)
+  const [checkoutError, setCheckoutError] = useState<string | null>(null)
 
   const total = items.reduce((sum, item) => sum + item.price, 0)
+
+  async function handleCheckout() {
+    setIsCheckingOut(true)
+    setCheckoutError(null)
+
+    try {
+      const res = await fetch("/api/create-payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          items: items.map((item) => ({ id: item.id, type: item.type })),
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        setCheckoutError(data.error ?? "Checkout failed. Please try again.")
+        return
+      }
+
+      // Redirect to Paymob hosted checkout
+      window.location.href = data.paymentUrl
+    } catch {
+      setCheckoutError("Network error. Please try again.")
+    } finally {
+      setIsCheckingOut(false)
+    }
+  }
 
   if (items.length === 0) {
     return (
@@ -101,9 +133,29 @@ export default function CartClient() {
           <span className="text-2xl font-extrabold text-zinc-900">${total.toFixed(2)}</span>
         </div>
 
-        <button className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm">
-          <ShoppingCart size={18} />
-          Checkout — ${total.toFixed(2)}
+        {checkoutError && (
+          <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-3">
+            <AlertCircle size={16} className="shrink-0 mt-0.5" />
+            {checkoutError}
+          </div>
+        )}
+
+        <button
+          onClick={handleCheckout}
+          disabled={isCheckingOut}
+          className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
+        >
+          {isCheckingOut ? (
+            <>
+              <Loader2 size={18} className="animate-spin" />
+              Preparing checkout…
+            </>
+          ) : (
+            <>
+              <ShoppingCart size={18} />
+              Checkout — ${total.toFixed(2)}
+            </>
+          )}
         </button>
 
         <p className="text-center text-xs text-zinc-400">
