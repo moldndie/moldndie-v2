@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
 import {
   getMolds,
+  getMoldById,
   getMoldCategories,
   getMoldsListing,
   createMold,
@@ -17,6 +18,15 @@ import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { MoldFormValues } from "@/schemas/mold.schema"
 
 export type { MoldsParams, MoldsListingParams, PriceFilter, SortOption }
+
+export function useMoldById(id: string) {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.MOLDS, id],
+    queryFn: () => getMoldById(id),
+    staleTime: 60 * 1000,
+    enabled: !!id,
+  })
+}
 
 export function useMolds(params?: MoldsParams) {
   return useQuery({
