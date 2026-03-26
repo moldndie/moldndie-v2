@@ -57,6 +57,43 @@ export async function getMoldCategories(): Promise<MoldCategory[]> {
   return (data ?? []) as MoldCategory[]
 }
 
+export interface MoldsListingParams {
+  search?: string
+  categoryId?: string | null
+  page?: number
+  pageSize?: number
+}
+
+export interface MoldsListingResult {
+  data: Mold[]
+  total: number
+}
+
+export async function getMoldsListing(params: MoldsListingParams = {}): Promise<MoldsListingResult> {
+  const supabase = await createClient()
+  const { search, categoryId, page = 1, pageSize = 12 } = params
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
+  let query = supabase
+    .from("molds")
+    .select("*, category:mold_categories(id,name,slug)", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(from, to)
+
+  if (search?.trim()) {
+    query = query.ilike("title", `%${search.trim()}%`)
+  }
+
+  if (categoryId) {
+    query = query.eq("category_id", categoryId)
+  }
+
+  const { data, error, count } = await query
+  if (error) throw dbError(error)
+  return { data: (data ?? []) as Mold[], total: count ?? 0 }
+}
+
 export async function createMold(values: MoldFormValues): Promise<Mold> {
   const supabase = await createClient()
   const { data, error } = await supabase

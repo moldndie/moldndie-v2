@@ -1,18 +1,20 @@
 "use client"
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
 import {
   getMolds,
   getMoldCategories,
+  getMoldsListing,
   createMold,
   updateMold,
   deleteMold,
   type MoldsParams,
+  type MoldsListingParams,
 } from "@/services/mold.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { MoldFormValues } from "@/schemas/mold.schema"
 
-export type { MoldsParams }
+export type { MoldsParams, MoldsListingParams }
 
 export function useMolds(params?: MoldsParams) {
   return useQuery({
@@ -26,6 +28,15 @@ export function useMoldCategories() {
     queryKey: QUERY_KEYS.MOLD_CATEGORIES,
     queryFn: getMoldCategories,
     staleTime: 5 * 60 * 1000,
+  })
+}
+
+export function useMoldsListing(params: MoldsListingParams = {}) {
+  return useQuery({
+    queryKey: ["molds", "listing", params.search ?? "", params.categoryId ?? null, params.page ?? 1],
+    queryFn: () => getMoldsListing(params),
+    placeholderData: keepPreviousData,
+    staleTime: 30 * 1000,
   })
 }
 
