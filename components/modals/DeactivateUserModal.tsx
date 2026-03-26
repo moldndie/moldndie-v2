@@ -12,6 +12,8 @@ interface DeactivateUserModalProps {
   onClose: () => void
   user: Profile | null
   onSuccess?: () => void
+  onConfirm?: () => Promise<void>
+  isPending?: boolean
 }
 
 export function DeactivateUserModal({
@@ -19,17 +21,33 @@ export function DeactivateUserModal({
   onClose,
   user,
   onSuccess,
+  onConfirm,
+  isPending,
 }: DeactivateUserModalProps) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   const isActive = user?.is_active ?? true
   const name = [user?.first_name, user?.last_name].filter(Boolean).join(" ") || user?.email || "this user"
+  const busy = isPending ?? loading
 
   async function handleConfirm() {
     if (!user) return
-    setLoading(true)
     setError(null)
+    if (onConfirm) {
+      setLoading(true)
+      try {
+        await onConfirm()
+        onSuccess?.()
+        onClose()
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Action failed")
+      } finally {
+        setLoading(false)
+      }
+      return
+    }
+    setLoading(true)
     try {
       if (isActive) {
         await deactivateUser(user.id)
@@ -80,16 +98,16 @@ export function DeactivateUserModal({
         {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>}
 
         <div className="flex justify-end gap-3">
-          <Button type="button" variant="outline" onClick={onClose} disabled={loading}>
+          <Button type="button" variant="outline" onClick={onClose} disabled={busy}>
             Cancel
           </Button>
           <Button
             type="button"
             variant={isActive ? "destructive" : "default"}
             onClick={handleConfirm}
-            disabled={loading}
+            disabled={busy}
           >
-            {loading
+            {busy
               ? isActive ? "Deactivating…" : "Reactivating…"
               : isActive ? "Deactivate" : "Reactivate"}
           </Button>

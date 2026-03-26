@@ -25,9 +25,10 @@ interface CategoryModalProps {
   category?: BlogCategory | null
   onCreated?: (category: BlogCategory) => void
   onSuccess?: () => void
+  onSave?: (values: BlogCategoryFormValues) => Promise<unknown>
 }
 
-export function CategoryModal({ open, onClose, category, onCreated, onSuccess }: CategoryModalProps) {
+export function CategoryModal({ open, onClose, category, onCreated, onSuccess, onSave }: CategoryModalProps) {
   const isEdit = !!category
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -65,7 +66,9 @@ export function CategoryModal({ open, onClose, category, onCreated, onSuccess }:
     setSaving(true)
     setError(null)
     try {
-      if (isEdit) {
+      if (onSave) {
+        await onSave(values)
+      } else if (isEdit) {
         const updated = await updateCategory(category!.id, values)
         onCreated?.(updated)
       } else {
