@@ -1,14 +1,13 @@
 import { Metadata } from "next"
 import PageHeader from "@/components/dashboard/PageHeader"
 import { UsersTable } from "@/components/tables/UsersTable"
-import { getUsers } from "@/services/user.service"
 import { getCurrentUser } from "@/services/auth.service"
 import { createClient } from "@/lib/supabase/server"
 
 export const metadata: Metadata = { title: "Users | Admin" }
 
 export default async function UsersPage() {
-  const [users, currentUser] = await Promise.all([getUsers(), getCurrentUser()])
+  const currentUser = await getCurrentUser()
 
   let currentUserRole: "admin" | "user" = "user"
   if (currentUser) {
@@ -24,7 +23,7 @@ export default async function UsersPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="Users" description="Manage platform users." />
-      <UsersTable data={users} currentUserRole={currentUserRole} />
+      <UsersTable currentUserRole={currentUserRole} />
     </div>
   )
 }
