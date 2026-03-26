@@ -43,6 +43,7 @@ export default function CartClient() {
       }
 
       // Redirect to Paymob hosted checkout
+      console.log("REDIRECT URL:", data.paymentUrl)
       window.location.href = data.paymentUrl
     } catch {
       setCheckoutError("Network error. Please try again.")

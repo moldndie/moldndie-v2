@@ -218,7 +218,7 @@ export async function POST(req: Request) {
     // ── 11. Return payment URL ────────────────────────────────────────────
     if (!paymentToken) throw new Error("paymentToken is empty — cannot build redirect URL")
     const paymentUrl = `https://accept.paymob.com/api/acceptance/payments/pay?payment_token=${paymentToken}`
-    console.log("[PAYMENT] payment URL:", paymentUrl)
+    console.log("FINAL PAYMENT URL:", paymentUrl)
 
     return NextResponse.json({ paymentUrl })
   } catch (error: any) {
