@@ -30,7 +30,7 @@ export default function LoginForm() {
       toast.error(result.error);
     } else {
       toast.success("Signed in successfully!");
-      router.push("/dashboard");
+      router.push("/");
     }
   }
 
