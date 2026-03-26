@@ -1,20 +1,29 @@
 import { Metadata } from "next"
+import { Suspense } from "react"
 import PageHeader from "@/components/dashboard/PageHeader"
-import { Button } from "@/components/ui/button"
+import { SuppliersTable } from "@/components/tables/SuppliersTable"
+import { SupplierCategoriesTable } from "@/modules/supplier/components/SupplierCategoriesTable"
+import { SupplierTabs } from "@/modules/supplier/components/SupplierTabs"
 
 export const metadata: Metadata = { title: "Suppliers | Admin" }
 
-export default function SuppliersPage() {
+interface SuppliersPageProps {
+  searchParams: Promise<{ tab?: string }>
+}
+
+export default async function SuppliersPage({ searchParams }: SuppliersPageProps) {
+  const { tab = "suppliers" } = await searchParams
+
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Suppliers"
-        description="Manage supplier accounts."
-        action={<Button>Add Supplier</Button>}
-      />
-      <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-400">
-        No suppliers yet. Suppliers table will appear here.
-      </div>
+      <PageHeader title="Suppliers" description="Manage platform suppliers and categories." />
+
+      <Suspense>
+        <SupplierTabs />
+      </Suspense>
+
+      {tab === "categories" && <SupplierCategoriesTable />}
+      {(tab === "suppliers" || tab !== "categories") && <SuppliersTable />}
     </div>
   )
 }
