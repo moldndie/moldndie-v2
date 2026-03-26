@@ -131,7 +131,7 @@ function Thumbnail({
 export default function MoldProductClient({ moldId }: { moldId: string }) {
   const { data: mold, isLoading, isError } = useMoldById(moldId)
   const { data: galleryItems = [] } = useMoldGallery(moldId)
-  const [activeIndex, setActiveIndex] = useState(0)
+  const [activeMedia, setActiveMedia] = useState<MoldMedia | null>(null)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
 
@@ -141,13 +141,10 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
 
   const sortedGallery = [...galleryItems].sort((a, b) => a.position - b.position)
 
-  // Build full media list: preview first, then gallery items
-  const allMedia: MoldMedia[] = [
-    ...(mold.preview_image ? [{ key: mold.preview_image, type: "image" as const }] : []),
-    ...sortedGallery.map((img) => ({ key: img.file_key, type: img.type })),
-  ]
+  // Main display: active thumbnail selection or fallback to preview image
+  const mainMedia: MoldMedia | null =
+    activeMedia ?? (mold.preview_image ? { key: mold.preview_image, type: "image" } : null)
 
-  const activeMedia = allMedia[activeIndex] ?? null
   const isFree = mold.price === null || mold.price === 0
 
   async function handleDownload() {
@@ -203,18 +200,18 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
         <div className="space-y-4">
           {/* Main display */}
           <div className="aspect-square relative bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-100">
-            {activeMedia ? (
-              activeMedia.type === "video" ? (
+            {mainMedia ? (
+              mainMedia.type === "video" ? (
                 <video
-                  key={activeMedia.key}
+                  key={mainMedia.key}
                   controls
-                  src={`${R2_BASE}/${activeMedia.key}`}
+                  src={`${R2_BASE}/${mainMedia.key}`}
                   className="w-full h-full object-contain"
                 />
               ) : (
                 <Image
-                  key={activeMedia.key}
-                  src={`${R2_BASE}/${activeMedia.key}`}
+                  key={mainMedia.key}
+                  src={`${R2_BASE}/${mainMedia.key}`}
                   alt={mold.title}
                   fill
                   className="object-contain"
@@ -229,19 +226,22 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
             )}
           </div>
 
-          {/* Thumbnails */}
-          {allMedia.length > 1 && (
+          {/* Thumbnails — gallery items only, no preview image */}
+          {sortedGallery.length > 0 && (
             <div className="flex gap-2 flex-wrap">
-              {allMedia.map((media, i) => (
-                <Thumbnail
-                  key={media.key + i}
-                  media={media}
-                  active={activeIndex === i}
-                  index={i}
-                  title={mold.title}
-                  onClick={() => setActiveIndex(i)}
-                />
-              ))}
+              {sortedGallery.map((item, i) => {
+                const media: MoldMedia = { key: item.file_key, type: item.type }
+                return (
+                  <Thumbnail
+                    key={item.id}
+                    media={media}
+                    active={activeMedia?.key === item.file_key}
+                    index={i}
+                    title={mold.title}
+                    onClick={() => setActiveMedia(media)}
+                  />
+                )
+              })}
             </div>
           )}
         </div>
