@@ -40,9 +40,8 @@ export async function createCourse(values: CourseFormValues): Promise<Course> {
     .insert({
       title: values.title,
       description: values.description ?? null,
-      price: values.price ?? null,
+      price: values.is_free ? 0 : values.price,
       thumbnail: values.thumbnail ?? null,
-      intro_video: values.intro_video ?? null,
     })
     .select()
     .single()
@@ -58,9 +57,8 @@ export async function updateCourse(id: string, values: CourseFormValues): Promis
     .update({
       title: values.title,
       description: values.description ?? null,
-      price: values.price ?? null,
+      price: values.is_free ? 0 : values.price,
       thumbnail: values.thumbnail ?? null,
-      intro_video: values.intro_video ?? null,
     })
     .eq("id", id)
     .select()

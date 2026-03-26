@@ -3,6 +3,7 @@ export interface CourseLesson {
   course_id: string
   title: string
   video_url: string | null
+  pdf_key: string | null
   position: number
 }
 
