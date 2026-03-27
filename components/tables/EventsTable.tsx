@@ -113,7 +113,7 @@ export function EventsTable() {
       <DataTable
         columns={columns}
         data={events}
-        emptyMessage={isLoading ? "Loading…" : "No events yet."}
+        isLoading={isLoading} emptyMessage="No events yet."
       />
 
       <EventModal

@@ -22,6 +22,56 @@ export async function getEvents(): Promise<Event[]> {
   return (data ?? []) as Event[]
 }
 
+export interface EventsListingParams {
+  search?: string
+  categoryId?: string | null
+  page?: number
+  pageSize?: number
+}
+
+export interface EventsListingResult {
+  data: Event[]
+  total: number
+}
+
+export async function getEventsListing(
+  params: EventsListingParams = {}
+): Promise<EventsListingResult> {
+  const supabase = await createClient()
+  const { search, categoryId, page = 1, pageSize = 12 } = params
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
+  let query = supabase
+    .from("events")
+    .select("*, category:event_categories(id,name)", { count: "exact" })
+    .order("event_date", { ascending: false })
+    .range(from, to)
+
+  if (search?.trim()) {
+    query = query.ilike("title", `%${search.trim()}%`)
+  }
+
+  if (categoryId) {
+    query = query.eq("category_id", categoryId)
+  }
+
+  const { data, error, count } = await query
+  if (error) throw dbError(error)
+  return { data: (data ?? []) as Event[], total: count ?? 0 }
+}
+
+export async function getEventById(id: string): Promise<Event> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from("events")
+    .select("*, category:event_categories(id,name)")
+    .eq("id", id)
+    .single()
+  if (error) throw dbError(error)
+  return data as Event
+}
+
 export async function createEvent(values: EventFormValues): Promise<Event> {
   const supabase = await createClient()
   const { data, error } = await supabase

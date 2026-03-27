@@ -120,7 +120,7 @@ export function SuppliersTable() {
       <DataTable
         columns={columns}
         data={suppliers}
-        emptyMessage={isLoading ? "Loading…" : "No suppliers yet."}
+        isLoading={isLoading} emptyMessage="No suppliers yet."
       />
 
       <SupplierModal

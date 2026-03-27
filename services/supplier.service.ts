@@ -22,6 +22,56 @@ export async function getSuppliers(): Promise<Supplier[]> {
   return (data ?? []) as Supplier[]
 }
 
+export interface SuppliersListingParams {
+  search?: string
+  categoryId?: string | null
+  page?: number
+  pageSize?: number
+}
+
+export interface SuppliersListingResult {
+  data: Supplier[]
+  total: number
+}
+
+export async function getSuppliersListing(
+  params: SuppliersListingParams = {}
+): Promise<SuppliersListingResult> {
+  const supabase = await createClient()
+  const { search, categoryId, page = 1, pageSize = 12 } = params
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
+  let query = supabase
+    .from("suppliers")
+    .select("*, category:supplier_categories(id,name)", { count: "exact" })
+    .order("name", { ascending: true })
+    .range(from, to)
+
+  if (search?.trim()) {
+    query = query.ilike("name", `%${search.trim()}%`)
+  }
+
+  if (categoryId) {
+    query = query.eq("category_id", categoryId)
+  }
+
+  const { data, error, count } = await query
+  if (error) throw dbError(error)
+  return { data: (data ?? []) as Supplier[], total: count ?? 0 }
+}
+
+export async function getSupplierById(id: string): Promise<Supplier> {
+  const supabase = await createClient()
+  const { data, error } = await supabase
+    .from("suppliers")
+    .select("*, category:supplier_categories(id,name)")
+    .eq("id", id)
+    .single()
+  if (error) throw dbError(error)
+  return data as Supplier
+}
+
 export async function createSupplier(values: SupplierFormValues): Promise<Supplier> {
   const supabase = await createClient()
   const { data, error } = await supabase
