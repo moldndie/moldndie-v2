@@ -57,8 +57,8 @@ export function AdModal({ open, onClose, ad, onSuccess }: AdModalProps) {
       target_type: "external",
       link: "",
       is_active: true,
-      start_date: "",
-      end_date: "",
+      starts_at: "",
+      ends_at: "",
     },
   })
 
@@ -76,8 +76,8 @@ export function AdModal({ open, onClose, ad, onSuccess }: AdModalProps) {
         target_type: ad.target_type,
         link: ad.link,
         is_active: ad.is_active,
-        start_date: ad.start_date ? ad.start_date.slice(0, 10) : "",
-        end_date: ad.end_date ? ad.end_date.slice(0, 10) : "",
+        starts_at: ad.starts_at ? ad.starts_at.slice(0, 10) : "",
+        ends_at: ad.ends_at ? ad.ends_at.slice(0, 10) : "",
       })
     } else {
       reset({
@@ -86,8 +86,8 @@ export function AdModal({ open, onClose, ad, onSuccess }: AdModalProps) {
         target_type: "external",
         link: "",
         is_active: true,
-        start_date: "",
-        end_date: "",
+        starts_at: "",
+        ends_at: "",
       })
     }
   }, [open, ad, reset])
@@ -159,12 +159,12 @@ export function AdModal({ open, onClose, ad, onSuccess }: AdModalProps) {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700">Start Date</label>
-            <Input {...register("start_date")} type="date" />
+            <Input {...register("starts_at")} type="date" />
           </div>
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700">End Date</label>
-            <Input {...register("end_date")} type="date" />
+            <Input {...register("ends_at")} type="date" />
           </div>
         </div>
 
