@@ -10,7 +10,7 @@ import { QuoteBlock } from "./blocks/QuoteBlock"
 import { ListBlock } from "./blocks/ListBlock"
 import { VideoBlock } from "./blocks/VideoBlock"
 
-const BLOCK_LABELS: Record<EditorBlock["type"], string> = {
+const BLOCK_LABELS: Record<EditorBlock["block_type"], string> = {
   heading: "Heading",
   paragraph: "Paragraph",
   image: "Image",
@@ -19,8 +19,8 @@ const BLOCK_LABELS: Record<EditorBlock["type"], string> = {
   video: "Video",
 }
 
-function getDefaultContent(type: EditorBlock["type"]): Record<string, unknown> {
-  switch (type) {
+function getDefaultContent(block_type: EditorBlock["block_type"]): Record<string, unknown> {
+  switch (block_type) {
     case "heading": return { text: "", level: 2 }
     case "paragraph": return { text: "" }
     case "image": return { url: "", caption: "" }
@@ -36,13 +36,13 @@ interface BlockEditorProps {
 }
 
 export function BlockEditor({ value, onChange }: BlockEditorProps) {
-  function addBlock(type: EditorBlock["type"]) {
+  function addBlock(block_type: EditorBlock["block_type"]) {
     onChange([
       ...value,
       {
         id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-        type,
-        content: getDefaultContent(type),
+        block_type,
+        content: getDefaultContent(block_type),
       },
     ])
   }
@@ -69,7 +69,7 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
     const handleChange = (content: Record<string, unknown>) => updateBlock(block.id, content)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const h = (v: any) => handleChange(v as Record<string, unknown>)
-    switch (block.type) {
+    switch (block.block_type) {
       case "heading":
         return <HeadingBlock value={block.content as { text: string; level: 1 | 2 | 3 }} onChange={h} />
       case "paragraph":
@@ -120,7 +120,7 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
 
               <div className="min-w-0 flex-1 space-y-2">
                 <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
-                  {BLOCK_LABELS[block.type]}
+                  {BLOCK_LABELS[block.block_type]}
                 </span>
                 {renderInput(block)}
               </div>

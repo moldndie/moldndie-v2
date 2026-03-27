@@ -9,7 +9,7 @@ export default function AdminDashboardPage() {
     <div className="space-y-6">
       <PageHeader
         title="Dashboard"
-        description="Overview of your platform metrics."
+        description="System overview"
       />
       <DashboardStats />
     </div>

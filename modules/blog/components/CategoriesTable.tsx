@@ -1,38 +1,92 @@
 "use client"
 
 import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { type ColumnDef } from "@tanstack/react-table"
 import { Pencil, Trash2, Plus } from "lucide-react"
+import { toast } from "sonner"
 import { DataTable } from "@/components/tables/DataTable"
 import { Button } from "@/components/ui/button"
 import { CategoryModal } from "@/components/modals/CategoryModal"
-import { deleteCategory } from "@/services/blogCategory.service"
+import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal"
+import { getCategories, createCategory, updateCategory, deleteCategory } from "@/services/blogCategory.service"
+import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { BlogCategory } from "@/types"
+import type { BlogCategoryFormValues } from "@/schemas/blogCategory.schema"
 
-interface CategoriesTableProps {
-  data: BlogCategory[]
-}
-
-export function CategoriesTable({ data }: CategoriesTableProps) {
-  const router = useRouter()
+export function CategoriesTable() {
+  const queryClient = useQueryClient()
   const [createOpen, setCreateOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<BlogCategory | null>(null)
-  const [deletingId, setDeletingId] = useState<string | null>(null)
-  const [deleteError, setDeleteError] = useState<string | null>(null)
+  const [deletingCategory, setDeletingCategory] = useState<BlogCategory | null>(null)
 
-  async function handleDelete(id: string) {
-    setDeletingId(id)
-    setDeleteError(null)
-    try {
-      await deleteCategory(id)
-      router.refresh()
-    } catch (e) {
-      setDeleteError(e instanceof Error ? e.message : "Delete failed")
-    } finally {
-      setDeletingId(null)
-    }
-  }
+  const { data = [], isLoading } = useQuery({
+    queryKey: QUERY_KEYS.BLOG_CATEGORIES,
+    queryFn: getCategories,
+  })
+
+  const createMutation = useMutation({
+    mutationFn: (values: BlogCategoryFormValues) => createCategory(values),
+    onMutate: async (values) => {
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.BLOG_CATEGORIES })
+      const prev = queryClient.getQueryData<BlogCategory[]>(QUERY_KEYS.BLOG_CATEGORIES)
+      queryClient.setQueryData<BlogCategory[]>(QUERY_KEYS.BLOG_CATEGORIES, (old = []) => [
+        ...old,
+        { id: `temp-${Date.now()}`, ...values, created_at: new Date().toISOString() },
+      ])
+      return { prev }
+    },
+    onError: (e: Error, _, ctx) => {
+      queryClient.setQueryData(QUERY_KEYS.BLOG_CATEGORIES, ctx?.prev)
+      toast.error(e.message || "Create failed.")
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BLOG_CATEGORIES })
+    },
+  })
+
+  const updateMutation = useMutation({
+    mutationFn: ({ id, values }: { id: string; values: BlogCategoryFormValues }) =>
+      updateCategory(id, values),
+    onMutate: async ({ id, values }) => {
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.BLOG_CATEGORIES })
+      const prev = queryClient.getQueryData<BlogCategory[]>(QUERY_KEYS.BLOG_CATEGORIES)
+      queryClient.setQueryData<BlogCategory[]>(QUERY_KEYS.BLOG_CATEGORIES, (old = []) =>
+        old.map((c) => (c.id === id ? { ...c, ...values } : c))
+      )
+      return { prev }
+    },
+    onError: (e: Error, _, ctx) => {
+      queryClient.setQueryData(QUERY_KEYS.BLOG_CATEGORIES, ctx?.prev)
+      toast.error(e.message || "Update failed.")
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BLOG_CATEGORIES })
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteCategory(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: QUERY_KEYS.BLOG_CATEGORIES })
+      const prev = queryClient.getQueryData<BlogCategory[]>(QUERY_KEYS.BLOG_CATEGORIES)
+      queryClient.setQueryData<BlogCategory[]>(QUERY_KEYS.BLOG_CATEGORIES, (old = []) =>
+        old.filter((c) => c.id !== id)
+      )
+      return { prev }
+    },
+    onError: (e: Error, _, ctx) => {
+      queryClient.setQueryData(QUERY_KEYS.BLOG_CATEGORIES, ctx?.prev)
+      toast.error(e.message || "Delete failed.")
+    },
+    onSuccess: () => {
+      toast.success("Category deleted.")
+      setDeletingCategory(null)
+    },
+    onSettled: () => {
+      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BLOG_CATEGORIES })
+    },
+  })
 
   const columns: ColumnDef<BlogCategory>[] = [
     {
@@ -73,9 +127,8 @@ export function CategoriesTable({ data }: CategoriesTableProps) {
             <Pencil className="size-3.5" />
           </button>
           <button
-            onClick={() => handleDelete(row.original.id)}
-            disabled={deletingId === row.original.id}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-40"
+            onClick={() => setDeletingCategory(row.original)}
+            className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 transition-colors"
           >
             <Trash2 className="size-3.5" />
           </button>
@@ -86,12 +139,6 @@ export function CategoriesTable({ data }: CategoriesTableProps) {
 
   return (
     <>
-      {deleteError && (
-        <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
-          {deleteError}
-        </div>
-      )}
-
       <div className="flex items-center justify-end mb-4">
         <Button onClick={() => setCreateOpen(true)}>
           <Plus className="size-4" />
@@ -99,24 +146,37 @@ export function CategoriesTable({ data }: CategoriesTableProps) {
         </Button>
       </div>
 
-      <DataTable columns={columns} data={data} emptyMessage="No categories yet." />
+      <DataTable
+        columns={columns}
+        data={data}
+        isLoading={isLoading} emptyMessage="No categories yet."
+      />
 
       <CategoryModal
         open={createOpen}
         onClose={() => setCreateOpen(false)}
-        onSuccess={() => {
-          setCreateOpen(false)
-          router.refresh()
-        }}
+        onSave={(values) => createMutation.mutateAsync(values)}
+        onSuccess={() => setCreateOpen(false)}
       />
+
       <CategoryModal
         open={!!editingCategory}
         onClose={() => setEditingCategory(null)}
         category={editingCategory}
-        onSuccess={() => {
-          setEditingCategory(null)
-          router.refresh()
-        }}
+        onSave={(values) => updateMutation.mutateAsync({ id: editingCategory!.id, values })}
+        onSuccess={() => setEditingCategory(null)}
+      />
+
+      <DeleteConfirmModal
+        open={!!deletingCategory}
+        onClose={() => setDeletingCategory(null)}
+        onConfirm={() => deletingCategory && deleteMutation.mutate(deletingCategory.id)}
+        isPending={deleteMutation.isPending}
+        message={
+          deletingCategory
+            ? `Are you sure you want to delete "${deletingCategory.name}"? This cannot be undone.`
+            : undefined
+        }
       />
     </>
   )

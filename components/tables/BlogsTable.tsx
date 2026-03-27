@@ -64,11 +64,11 @@ export function BlogsTable({ data, categories }: BlogsTableProps) {
         ),
     },
     {
-      accessorKey: "published",
+      accessorKey: "is_published",
       header: "Status",
       enableSorting: true,
       cell: ({ row }) =>
-        row.original.published ? (
+        row.original.is_published ? (
           <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
             Published
           </span>

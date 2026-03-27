@@ -12,12 +12,29 @@ function dbError(e: unknown): Error {
   return new Error("Database error")
 }
 
-export async function getMolds(): Promise<Mold[]> {
+export interface MoldsParams {
+  search?: string
+  filter?: "all" | "free" | "paid"
+}
+
+export async function getMolds(params?: MoldsParams): Promise<Mold[]> {
   const supabase = await createClient()
-  const { data, error } = await supabase
+  let query = supabase
     .from("molds")
     .select("*, category:mold_categories(id,name,slug)")
     .order("created_at", { ascending: false })
+
+  if (params?.search?.trim()) {
+    query = query.ilike("title", `%${params.search.trim()}%`)
+  }
+
+  if (params?.filter === "free") {
+    query = query.eq("price", 0)
+  } else if (params?.filter === "paid") {
+    query = query.gt("price", 0)
+  }
+
+  const { data, error } = await query
   if (error) throw dbError(error)
   return (data ?? []) as Mold[]
 }
@@ -26,7 +43,7 @@ export async function getMoldById(id: string): Promise<Mold> {
   const supabase = await createClient()
   const { data, error } = await supabase
     .from("molds")
-    .select("*, category:mold_categories(id,name,slug), images:mold_images(*)")
+    .select("*, category:mold_categories(id,name,slug)")
     .eq("id", id)
     .single()
   if (error) throw dbError(error)
@@ -40,6 +57,63 @@ export async function getMoldCategories(): Promise<MoldCategory[]> {
   return (data ?? []) as MoldCategory[]
 }
 
+export type PriceFilter = "all" | "free" | "paid"
+export type SortOption = "newest" | "oldest" | "price_asc" | "price_desc" | "title_asc"
+
+export interface MoldsListingParams {
+  search?: string
+  categoryId?: string | null
+  priceFilter?: PriceFilter
+  sort?: SortOption
+  page?: number
+  pageSize?: number
+}
+
+export interface MoldsListingResult {
+  data: Mold[]
+  total: number
+}
+
+export async function getMoldsListing(params: MoldsListingParams = {}): Promise<MoldsListingResult> {
+  const supabase = await createClient()
+  const { search, categoryId, priceFilter = "all", sort = "newest", page = 1, pageSize = 12 } = params
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
+
+  const sortMap: Record<SortOption, { column: string; ascending: boolean }> = {
+    newest:     { column: "created_at", ascending: false },
+    oldest:     { column: "created_at", ascending: true },
+    price_asc:  { column: "price",      ascending: true },
+    price_desc: { column: "price",      ascending: false },
+    title_asc:  { column: "title",      ascending: true },
+  }
+  const { column, ascending } = sortMap[sort]
+
+  let query = supabase
+    .from("molds")
+    .select("*, category:mold_categories(id,name,slug)", { count: "exact" })
+    .order(column, { ascending })
+    .range(from, to)
+
+  if (search?.trim()) {
+    query = query.ilike("title", `%${search.trim()}%`)
+  }
+
+  if (categoryId) {
+    query = query.eq("category_id", categoryId)
+  }
+
+  if (priceFilter === "free") {
+    query = query.eq("price", 0)
+  } else if (priceFilter === "paid") {
+    query = query.gt("price", 0)
+  }
+
+  const { data, error, count } = await query
+  if (error) throw dbError(error)
+  return { data: (data ?? []) as Mold[], total: count ?? 0 }
+}
+
 export async function createMold(values: MoldFormValues): Promise<Mold> {
   const supabase = await createClient()
   const { data, error } = await supabase
@@ -48,9 +122,10 @@ export async function createMold(values: MoldFormValues): Promise<Mold> {
       title: values.title,
       description: values.description ?? null,
       category_id: values.category_id || null,
-      price: values.price ?? null,
+      // is_free is form-only; derive price: free molds store null
+      price: values.is_free ? 0 : values.price,
       preview_image: values.preview_image ?? null,
-      download_url: values.download_url ?? null,
+      file_key: values.file_key,
     })
     .select()
     .single()
@@ -67,9 +142,9 @@ export async function updateMold(id: string, values: MoldFormValues): Promise<Mo
       title: values.title,
       description: values.description ?? null,
       category_id: values.category_id || null,
-      price: values.price ?? null,
+      price: values.is_free ? 0 : values.price,
       preview_image: values.preview_image ?? null,
-      download_url: values.download_url ?? null,
+      file_key: values.file_key,
     })
     .eq("id", id)
     .select()

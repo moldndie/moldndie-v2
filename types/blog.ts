@@ -19,9 +19,9 @@ export interface BlogTag {
 export interface BlogBlock {
   id: string
   blog_id: string
-  type: BlockType
+  block_type: BlockType
   content: Record<string, unknown>
-  position: number
+  order_index: number
   created_at: string
 }
 
@@ -29,11 +29,12 @@ export interface Blog {
   id: string
   title: string
   slug: string
-  excerpt: string | null
-  cover_image: string | null
+  introduction: string | null
+  cover_image_path: string | null
   author_id: string | null
+  created_by: string | null
   category_id: string | null
-  published: boolean
+  is_published: boolean
   created_at: string
   category?: BlogCategory | null
   author?: Profile | null

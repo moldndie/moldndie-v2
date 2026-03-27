@@ -12,15 +12,14 @@ interface EditBlogPageProps {
 
 export default async function EditBlogPage({ params }: EditBlogPageProps) {
   const { id } = await params
-  const [blog, categories, tags] = await Promise.all([
+  const [blog, categories, tags, selectedTagIds] = await Promise.all([
     getBlogById(id).catch(() => null),
     getBlogCategories(),
     getBlogTags(),
+    getBlogTagIds(id),
   ])
 
   if (!blog) notFound()
-
-  const selectedTagIds = await getBlogTagIds(id)
 
   return (
     <div className="space-y-6">

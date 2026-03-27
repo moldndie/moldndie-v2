@@ -3,7 +3,9 @@ export interface CourseLesson {
   course_id: string
   title: string
   video_url: string | null
-  position: number
+  pdf_url: string | null
+  order_index: number
+  is_free: boolean
 }
 
 export interface CourseResource {
@@ -18,8 +20,9 @@ export interface Course {
   title: string
   description: string | null
   price: number | null
-  thumbnail: string | null
+  thumbnail_url: string | null
   intro_video: string | null
+  is_published: boolean
   created_at: string
   lessons?: CourseLesson[]
   resources?: CourseResource[]

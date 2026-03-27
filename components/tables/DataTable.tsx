@@ -18,6 +18,7 @@ interface DataTableProps<TData> {
   data: TData[]
   pageSize?: number
   emptyMessage?: string
+  isLoading?: boolean
 }
 
 export function DataTable<TData>({
@@ -25,6 +26,7 @@ export function DataTable<TData>({
   data,
   pageSize = 10,
   emptyMessage = "No records found.",
+  isLoading = false,
 }: DataTableProps<TData>) {
   const [sorting, setSorting] = useState<SortingState>([])
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize })
@@ -82,7 +84,17 @@ export function DataTable<TData>({
             ))}
           </thead>
           <tbody>
-            {table.getRowModel().rows.length > 0 ? (
+            {isLoading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <tr key={i} className="border-b border-zinc-100 last:border-0">
+                  {columns.map((_, j) => (
+                    <td key={j} className="px-4 py-3">
+                      <div className="h-4 bg-zinc-100 rounded animate-pulse" style={{ width: `${60 + (j * 17 + i * 11) % 35}%` }} />
+                    </td>
+                  ))}
+                </tr>
+              ))
+            ) : table.getRowModel().rows.length > 0 ? (
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}

@@ -6,10 +6,10 @@ export const blogSchema = z.object({
     .string()
     .min(1, "Slug is required")
     .regex(/^[a-z0-9-]+$/, "Slug must only contain lowercase letters, numbers and hyphens"),
-  excerpt: z.string().optional(),
-  cover_image: z.string().optional(),
+  introduction: z.string().optional(),
+  cover_image_path: z.string().optional(),
   category_id: z.string().optional(),
-  published: z.boolean(),
+  is_published: z.boolean(),
 })
 
 export type BlogFormValues = z.infer<typeof blogSchema>

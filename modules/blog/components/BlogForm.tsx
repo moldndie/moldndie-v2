@@ -9,12 +9,12 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { ImageUploadField } from "@/components/forms/ImageUploadField"
+import { FileUploadField } from "@/components/forms/FileUploadField"
 import { CategoryModal } from "@/components/modals/CategoryModal"
 import { TagModal } from "@/components/modals/TagModal"
 import { blogSchema, type BlogFormValues } from "@/schemas/blog.schema"
-import { createBlog, updateBlog, saveBlogBlocks, saveBlogTags } from "@/services/blog.service"
-import { createClient } from "@/lib/supabase/client"
+import { useCreateBlog, useUpdateBlog } from "@/hooks/queries/useBlog"
+import { saveBlogBlocks, saveBlogTags } from "@/services/blog.service"
 import type { Blog, BlogCategory, BlogTag } from "@/types"
 import type { EditorBlock } from "../types"
 import { BlockEditor } from "./BlockEditor"
@@ -38,21 +38,18 @@ interface BlogFormProps {
 export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFormProps) {
   const router = useRouter()
   const isEdit = !!blog
-  const [blocks, setBlocks] = useState<EditorBlock[]>([])
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
-  // Local state for immediate dropdown sync after inline creation
+  const createBlog = useCreateBlog()
+  const updateBlog = useUpdateBlog()
+  const isPending = createBlog.isPending || updateBlog.isPending
+
+  const [coverUploading, setCoverUploading] = useState(false)
+  const [blocks, setBlocks] = useState<EditorBlock[]>([])
+  const [submitError, setSubmitError] = useState<string | null>(null)
+
   const [localCategories, setLocalCategories] = useState<BlogCategory[]>(categories)
   const [localTags, setLocalTags] = useState<BlogTag[]>(tags)
-
-  // Cover image: File for new selection, string for existing URL
-  const [coverFile, setCoverFile] = useState<File | null>(null)
-
-  // Tags chip-toggle
   const [pickedTagIds, setPickedTagIds] = useState<string[]>(selectedTagIds)
-
-  // Inline creation modals
   const [categoryModalOpen, setCategoryModalOpen] = useState(false)
   const [tagModalOpen, setTagModalOpen] = useState(false)
 
@@ -67,17 +64,17 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
     defaultValues: {
       title: blog?.title ?? "",
       slug: blog?.slug ?? "",
-      excerpt: blog?.excerpt ?? "",
-      cover_image: blog?.cover_image ?? "",
+      introduction: blog?.introduction ?? "",
+      cover_image_path: blog?.cover_image_path ?? "",
       category_id: blog?.category_id ?? "",
-      published: blog?.published ?? false,
+      is_published: blog?.is_published ?? false,
     },
   })
 
   const titleValue = watch("title")
-  const coverImageUrl = watch("cover_image")
 
   useEffect(() => {
+    if (submitError) setSubmitError(null)
     if (!isEdit && titleValue) {
       setValue("slug", slugify(titleValue), { shouldValidate: false })
     }
@@ -87,8 +84,8 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
     if (blog?.blocks) {
       setBlocks(
         [...blog.blocks]
-          .sort((a, b) => a.position - b.position)
-          .map((b) => ({ id: b.id, type: b.type, content: b.content }))
+          .sort((a, b) => a.order_index - b.order_index)
+          .map((b) => ({ id: b.id, block_type: b.block_type, content: b.content }))
       )
     }
   }, [blog])
@@ -99,48 +96,37 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
     )
   }
 
-  async function uploadCover(file: File): Promise<string> {
-    const supabase = createClient()
-    const ext = file.name.split(".").pop()
-    const path = `covers/${Date.now()}.${ext}`
-    const { error: uploadError } = await supabase.storage
-      .from("blog-images")
-      .upload(path, file, { upsert: true })
-    if (uploadError) throw new Error(uploadError.message)
-    const { data } = supabase.storage.from("blog-images").getPublicUrl(path)
-    return data.publicUrl
-  }
-
   async function onSubmit(values: BlogFormValues) {
-    setSaving(true)
-    setError(null)
+    setSubmitError(null)
+    let saved: Blog
     try {
-      let coverUrl = values.cover_image ?? ""
-      if (coverFile) {
-        coverUrl = await uploadCover(coverFile)
-      }
-
-      const saved = isEdit
-        ? await updateBlog(blog!.id, { ...values, cover_image: coverUrl })
-        : await createBlog({ ...values, cover_image: coverUrl })
-
-      await saveBlogBlocks(
-        saved.id,
-        blocks.map((b, i) => ({ type: b.type, content: b.content, position: i }))
-      )
-      await saveBlogTags(saved.id, pickedTagIds)
-
-      router.push("/dashboard/blogs")
-      router.refresh()
+      saved = isEdit
+        ? await updateBlog.mutateAsync({ id: blog!.id, values })
+        : await createBlog.mutateAsync(values)
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong")
-      setSaving(false)
+      setSubmitError(e instanceof Error ? e.message : "Failed to save blog")
+      return
     }
+
+    try {
+      await saveBlogBlocks(saved.id, blocks.map((b, i) => ({ block_type: b.block_type, content: b.content, order_index: i })))
+      await saveBlogTags(saved.id, pickedTagIds)
+    } catch {
+      // blocks/tags save failure is non-fatal
+    }
+
+    router.push("/dashboard/blogs")
+    router.refresh()
   }
+
+  const mutationError = createBlog.error ?? updateBlog.error
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit, (errs) => {
+          console.error("[BlogForm] validation errors:", errs)
+          setSubmitError("Please fix the highlighted fields above.")
+        })}>
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Main content */}
           <div className="lg:col-span-2 space-y-6">
@@ -157,8 +143,8 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-zinc-700">Excerpt</label>
-              <Textarea {...register("excerpt")} placeholder="Short description…" rows={3} />
+              <label className="text-sm font-medium text-zinc-700">Introduction</label>
+              <Textarea {...register("introduction")} placeholder="Short description…" rows={3} />
             </div>
 
             <div className="space-y-3">
@@ -171,12 +157,13 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
           <div className="space-y-4">
             <div className="rounded-xl border border-zinc-200 p-4 space-y-3">
               <p className="text-sm font-semibold text-zinc-900">Cover Image</p>
-              <ImageUploadField
-                value={coverFile ?? (coverImageUrl || null)}
-                onChange={(file) => {
-                  setCoverFile(file)
-                  if (!file) setValue("cover_image", "")
-                }}
+              <FileUploadField
+                folder="blogs/covers"
+                accept="image/*"
+                label="Click to upload cover image"
+                existingValue={isEdit ? (blog?.cover_image_path ?? null) : null}
+                onUploadSuccess={({ key }) => setValue("cover_image_path", key, { shouldValidate: true })}
+                onUploadingChange={setCoverUploading}
               />
             </div>
 
@@ -244,25 +231,38 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
               <div className="flex items-center gap-2">
                 <input
                   type="checkbox"
-                  id="published"
-                  {...register("published")}
+                  id="is_published"
+                  {...register("is_published")}
                   className="h-4 w-4 rounded border-zinc-300"
                 />
-                <label htmlFor="published" className="text-sm text-zinc-700">
+                <label htmlFor="is_published" className="text-sm text-zinc-700">
                   Published
                 </label>
               </div>
             </div>
 
-            {error && <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">{error}</p>}
+            {(mutationError || submitError) && (
+              <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                {mutationError instanceof Error
+                  ? mutationError.message
+                  : submitError ?? "Something went wrong"}
+              </p>
+            )}
 
             <div className="flex flex-col gap-2">
-              <Button type="submit" disabled={saving}>
-                {saving ? "Saving…" : isEdit ? "Save Changes" : "Create Blog"}
+              <Button type="submit" disabled={coverUploading || isPending}>
+                {coverUploading
+                  ? "Uploading…"
+                  : isPending
+                    ? "Saving…"
+                    : isEdit
+                      ? "Save Changes"
+                      : "Create Blog"}
               </Button>
               <Button
                 type="button"
                 variant="outline"
+                disabled={coverUploading || isPending}
                 onClick={() => router.push("/dashboard/blogs")}
               >
                 Cancel
