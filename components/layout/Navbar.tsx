@@ -5,6 +5,7 @@ import NavbarCartButton from "@/components/layout/NavbarCartButton";
 const navLinks = [
   { label: "Blogs",     href: "/blogs" },
   { label: "Library",   href: "/molds" },
+  { label: "Academy",   href: "/courses" },
   { label: "Events",    href: "/events" },
   { label: "Suppliers", href: "/suppliers" },
   { label: "Services",  href: "/services" },

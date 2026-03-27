@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { LogOut, LayoutDashboard, ChevronDown, ShoppingBag } from "lucide-react"
+import { LogOut, LayoutDashboard, ChevronDown, ShoppingBag, GraduationCap } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import type { User } from "@supabase/supabase-js"
@@ -94,6 +94,14 @@ export default function NavbarUserMenu() {
 
       {open && (
         <div className="absolute right-0 mt-2 w-48 rounded-xl border border-zinc-200 bg-white shadow-md py-1 z-50">
+          <Link
+            href="/my-courses"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
+          >
+            <GraduationCap className="size-4 text-zinc-400" />
+            My Courses
+          </Link>
           <Link
             href="/purchases"
             onClick={() => setOpen(false)}
