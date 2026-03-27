@@ -9,13 +9,14 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { ImageUpload } from "@/components/ui/image-upload"
+import { FileUploadField } from "@/components/forms/FileUploadField"
 import { blogSchema, type BlogFormValues } from "@/schemas/blog.schema"
-import { createBlog, updateBlog, saveBlogBlocks } from "@/services/blog.service"
+import { useCreateBlog, useUpdateBlog } from "@/hooks/queries/useBlog"
+import { saveBlogBlocks } from "@/services/blog.service"
 import type { Blog, BlogCategory } from "@/types"
 
 interface ContentBlock {
-  type: "heading" | "paragraph" | "image"
+  block_type: "heading" | "paragraph" | "image"
   content: string
 }
 
@@ -40,9 +41,13 @@ const BLOCK_LABELS = { heading: "Heading", paragraph: "Paragraph", image: "Image
 
 export function BlogModal({ open, onClose, blog, categories, onSuccess }: BlogModalProps) {
   const isEdit = !!blog
+
+  const createBlog = useCreateBlog()
+  const updateBlog = useUpdateBlog()
+  const isPending = createBlog.isPending || updateBlog.isPending
+
+  const [coverUploading, setCoverUploading] = useState(false)
   const [blocks, setBlocks] = useState<ContentBlock[]>([])
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState<string | null>(null)
 
   const {
     register,
@@ -56,49 +61,51 @@ export function BlogModal({ open, onClose, blog, categories, onSuccess }: BlogMo
     defaultValues: {
       title: "",
       slug: "",
-      excerpt: "",
-      cover_image: "",
+      introduction: "",
+      cover_image_path: "",
       category_id: "",
-      published: false,
+      is_published: false,
     },
   })
 
   const titleValue = watch("title")
 
-  // Auto-generate slug from title (only when creating)
   useEffect(() => {
     if (!isEdit && titleValue) {
       setValue("slug", slugify(titleValue), { shouldValidate: false })
     }
   }, [titleValue, isEdit, setValue])
 
-  // Populate form when editing
   useEffect(() => {
-    if (open && blog) {
+    if (!open) {
+      setCoverUploading(false)
+      return
+    }
+    if (blog) {
       reset({
         title: blog.title,
         slug: blog.slug,
-        excerpt: blog.excerpt ?? "",
-        cover_image: blog.cover_image ?? "",
+        introduction: blog.introduction ?? "",
+        cover_image_path: blog.cover_image_path ?? "",
         category_id: blog.category_id ?? "",
-        published: blog.published,
+        is_published: blog.is_published,
       })
       setBlocks(
         (blog.blocks ?? [])
-          .sort((a, b) => a.position - b.position)
+          .sort((a, b) => a.order_index - b.order_index)
           .map((b) => ({
-            type: b.type as ContentBlock["type"],
+            block_type: b.block_type as ContentBlock["block_type"],
             content: String((b.content as { text?: string }).text ?? ""),
           }))
       )
-    } else if (open && !blog) {
-      reset({ title: "", slug: "", excerpt: "", cover_image: "", category_id: "", published: false })
+    } else {
+      reset({ title: "", slug: "", introduction: "", cover_image_path: "", category_id: "", is_published: false })
       setBlocks([])
     }
   }, [open, blog, reset])
 
-  function addBlock(type: ContentBlock["type"]) {
-    setBlocks((prev) => [...prev, { type, content: "" }])
+  function addBlock(block_type: ContentBlock["block_type"]) {
+    setBlocks((prev) => [...prev, { block_type, content: "" }])
   }
 
   function updateBlock(index: number, content: string) {
@@ -110,30 +117,33 @@ export function BlogModal({ open, onClose, blog, categories, onSuccess }: BlogMo
   }
 
   async function onSubmit(values: BlogFormValues) {
-    setSaving(true)
-    setError(null)
+    let saved: Blog
     try {
-      const saved = isEdit
-        ? await updateBlog(blog!.id, values)
-        : await createBlog(values)
+      saved = isEdit
+        ? await updateBlog.mutateAsync({ id: blog!.id, values })
+        : await createBlog.mutateAsync(values)
+    } catch {
+      return
+    }
 
+    try {
       await saveBlogBlocks(
         saved.id,
         blocks.map((b, i) => ({
-          type: b.type,
+          block_type: b.block_type,
           content: { text: b.content },
-          position: i,
+          order_index: i,
         }))
       )
-
-      onSuccess?.()
-      onClose()
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong")
-    } finally {
-      setSaving(false)
+      console.error("Failed to save blocks:", e)
     }
+
+    onSuccess?.()
+    onClose()
   }
+
+  const mutationError = createBlog.error ?? updateBlog.error
 
   return (
     <Modal
@@ -157,20 +167,22 @@ export function BlogModal({ open, onClose, blog, categories, onSuccess }: BlogMo
           {errors.slug && <p className="text-xs text-red-500">{errors.slug.message}</p>}
         </div>
 
-        {/* Excerpt */}
+        {/* Introduction */}
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-zinc-700">Excerpt</label>
-          <Textarea {...register("excerpt")} placeholder="Short description…" rows={3} />
+          <label className="text-sm font-medium text-zinc-700">Introduction</label>
+          <Textarea {...register("introduction")} placeholder="Short description…" rows={3} />
         </div>
 
         {/* Cover image */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Cover Image</label>
-          <ImageUpload
-            bucket="blog-images"
-            value={watch("cover_image") || undefined}
-            onChange={(url) => setValue("cover_image", url)}
-            onClear={() => setValue("cover_image", "")}
+          <FileUploadField
+            folder="blogs/covers"
+            accept="image/*"
+            label="Click to upload cover image"
+            existingValue={isEdit ? (blog?.cover_image_path ?? null) : null}
+            onUploadSuccess={({ key }) => setValue("cover_image_path", key, { shouldValidate: true })}
+            onUploadingChange={setCoverUploading}
           />
         </div>
 
@@ -189,11 +201,11 @@ export function BlogModal({ open, onClose, blog, categories, onSuccess }: BlogMo
         <div className="flex items-center gap-2">
           <input
             type="checkbox"
-            id="published"
-            {...register("published")}
+            id="is_published"
+            {...register("is_published")}
             className="h-4 w-4 rounded border-zinc-300"
           />
-          <label htmlFor="published" className="text-sm font-medium text-zinc-700">
+          <label htmlFor="is_published" className="text-sm font-medium text-zinc-700">
             Published
           </label>
         </div>
@@ -203,7 +215,7 @@ export function BlogModal({ open, onClose, blog, categories, onSuccess }: BlogMo
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-semibold text-zinc-900">Content Blocks</h3>
             <div className="flex gap-2">
-              {(["heading", "paragraph", "image"] as ContentBlock["type"][]).map((t) => (
+              {(["heading", "paragraph", "image"] as ContentBlock["block_type"][]).map((t) => (
                 <button
                   key={t}
                   type="button"
@@ -229,9 +241,9 @@ export function BlogModal({ open, onClose, blog, categories, onSuccess }: BlogMo
                 <GripVertical className="mt-1 size-4 shrink-0 text-zinc-300" />
                 <div className="flex-1 space-y-1">
                   <span className="text-xs font-medium uppercase tracking-wide text-zinc-400">
-                    {BLOCK_LABELS[block.type]}
+                    {BLOCK_LABELS[block.block_type]}
                   </span>
-                  {block.type === "paragraph" ? (
+                  {block.block_type === "paragraph" ? (
                     <Textarea
                       value={block.content}
                       onChange={(e) => updateBlock(i, e.target.value)}
@@ -242,7 +254,7 @@ export function BlogModal({ open, onClose, blog, categories, onSuccess }: BlogMo
                     <Input
                       value={block.content}
                       onChange={(e) => updateBlock(i, e.target.value)}
-                      placeholder={block.type === "image" ? "https://…" : "Heading text"}
+                      placeholder={block.block_type === "image" ? "https://…" : "Heading text"}
                     />
                   )}
                 </div>
@@ -258,15 +270,25 @@ export function BlogModal({ open, onClose, blog, categories, onSuccess }: BlogMo
           </div>
         </div>
 
-        {error && <p className="text-sm text-red-500">{error}</p>}
+        {mutationError && (
+          <p className="text-sm text-red-500">
+            {mutationError instanceof Error ? mutationError.message : "Something went wrong"}
+          </p>
+        )}
 
         {/* Actions */}
         <div className="flex justify-end gap-3 pt-2">
-          <Button type="button" variant="outline" onClick={onClose}>
+          <Button type="button" variant="outline" onClick={onClose} disabled={coverUploading || isPending}>
             Cancel
           </Button>
-          <Button type="submit" disabled={saving}>
-            {saving ? "Saving…" : isEdit ? "Save Changes" : "Create Blog"}
+          <Button type="submit" disabled={coverUploading || isPending}>
+            {coverUploading
+              ? "Uploading…"
+              : isPending
+                ? "Saving…"
+                : isEdit
+                  ? "Save Changes"
+                  : "Create Blog"}
           </Button>
         </div>
       </form>

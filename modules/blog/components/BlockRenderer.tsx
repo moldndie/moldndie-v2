@@ -5,7 +5,7 @@ interface BlockRendererProps {
 }
 
 export function BlockRenderer({ blocks }: BlockRendererProps) {
-  const sorted = [...blocks].sort((a, b) => a.position - b.position)
+  const sorted = [...blocks].sort((a, b) => a.order_index - b.order_index)
 
   return (
     <div className="space-y-4">
@@ -17,7 +17,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
 }
 
 function BlockItem({ block }: { block: BlogBlock }) {
-  switch (block.type) {
+  switch (block.block_type) {
     case "heading": {
       const c = block.content as { text?: string; level?: number }
       const level = (c.level ?? 2) as 1 | 2 | 3

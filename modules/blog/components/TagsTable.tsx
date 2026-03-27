@@ -149,7 +149,7 @@ export function TagsTable() {
       <DataTable
         columns={columns}
         data={data}
-        emptyMessage={isLoading ? "Loading…" : "No tags yet."}
+        isLoading={isLoading} emptyMessage="No tags yet."
       />
 
       <TagModal

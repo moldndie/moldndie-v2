@@ -3,26 +3,25 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { type ColumnDef } from "@tanstack/react-table"
-import { Pencil, Trash2, Plus } from "lucide-react"
+import { Pencil, Trash2, Plus, BarChart2 } from "lucide-react"
 import { DataTable } from "@/components/tables/DataTable"
 import { Button } from "@/components/ui/button"
-import { deleteBlog } from "@/services/blog.service"
+import { useBlogs, useDeleteBlog } from "@/hooks/queries/useBlog"
+import { EngagementModal } from "./EngagementModal"
 import type { Blog } from "@/types"
 
-interface BlogTableProps {
-  data: Blog[]
-}
-
-export function BlogTable({ data }: BlogTableProps) {
+export function BlogTable() {
   const router = useRouter()
+  const { data = [], isLoading } = useBlogs()
+  const deleteMutation = useDeleteBlog()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [engagementBlog, setEngagementBlog] = useState<Blog | null>(null)
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this blog post? This cannot be undone.")) return
     setDeletingId(id)
     try {
-      await deleteBlog(id)
-      router.refresh()
+      await deleteMutation.mutateAsync(id)
     } catch (e) {
       alert(e instanceof Error ? e.message : "Delete failed")
     } finally {
@@ -60,11 +59,11 @@ export function BlogTable({ data }: BlogTableProps) {
         ),
     },
     {
-      accessorKey: "published",
+      accessorKey: "is_published",
       header: "Status",
       enableSorting: true,
       cell: ({ row }) =>
-        row.original.published ? (
+        row.original.is_published ? (
           <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
             Published
           </span>
@@ -91,6 +90,13 @@ export function BlogTable({ data }: BlogTableProps) {
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
           <button
+            onClick={() => setEngagementBlog(row.original)}
+            className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+            title="View engagement"
+          >
+            <BarChart2 className="size-3.5" />
+          </button>
+          <button
             onClick={() => router.push(`/dashboard/blogs/${row.original.id}/edit`)}
             className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
           >
@@ -116,7 +122,14 @@ export function BlogTable({ data }: BlogTableProps) {
           Create Blog
         </Button>
       </div>
-      <DataTable columns={columns} data={data} emptyMessage="No blog posts yet." />
+      <DataTable columns={columns} data={data} isLoading={isLoading} emptyMessage="No blog posts yet." />
+
+      <EngagementModal
+        open={!!engagementBlog}
+        blogId={engagementBlog?.id ?? ""}
+        blogTitle={engagementBlog?.title ?? ""}
+        onClose={() => setEngagementBlog(null)}
+      />
     </>
   )
 }
