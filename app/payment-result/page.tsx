@@ -87,7 +87,7 @@ function PaymentSuccessContent({ orderId, amount }: { orderId: string | null; am
           </button>
         ) : items.length > 1 ? (
           <Link
-            href="/molds"
+            href="/purchases"
             className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-white font-bold text-sm px-8 py-3 rounded-xl transition-colors"
           >
             Go to My Purchases
@@ -95,7 +95,7 @@ function PaymentSuccessContent({ orderId, amount }: { orderId: string | null; am
         ) : null}
 
         <Link
-          href="/molds"
+          href="/purchases"
           className="inline-flex items-center justify-center bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-semibold text-sm px-8 py-3 rounded-xl transition-colors"
         >
           View My Purchases
