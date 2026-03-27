@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { CheckCircle, XCircle, Download, Loader2 } from "lucide-react"
+import { useCartStore } from "@/store/useCartStore"
 
 type OrderItem = {
   id: string
@@ -17,6 +18,11 @@ function PaymentSuccessContent({ orderId, amount }: { orderId: string | null; am
   const [items, setItems] = useState<OrderItem[]>([])
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
+  const clearCart = useCartStore((s) => s.clearCart)
+
+  useEffect(() => {
+    clearCart()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!orderId) return
