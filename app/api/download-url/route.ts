@@ -67,17 +67,17 @@ export async function POST(req: Request) {
       return generateSignedUrl(key)
     }
 
-    // CASE 3 — Paid mold: check for a completed purchase
-    const { data: purchase } = await supabase
-      .from("purchases")
-      .select("id")
-      .eq("user_id", user.id)
+    // CASE 3 — Paid mold: check for a completed order containing this mold
+    const { data: orderItem } = await supabase
+      .from("order_items")
+      .select("id, orders!inner(user_id, status)")
       .eq("product_type", "mold")
       .eq("product_id", moldId)
-      .eq("payment_status", "completed")
+      .eq("orders.user_id", user.id)
+      .eq("orders.status", "completed")
       .maybeSingle()
 
-    if (purchase) {
+    if (orderItem) {
       return generateSignedUrl(key)
     }
 
