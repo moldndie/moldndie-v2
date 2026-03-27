@@ -34,7 +34,7 @@ export async function getBlogs(): Promise<Blog[]> {
     .select("*, category:blog_categories(id,name,slug,created_at)")
     .order("created_at", { ascending: false })
   if (error) throw dbError(error)
-  return (data ?? []) as Blog[]
+  return (data ?? []) as unknown as Blog[]
 }
 
 export async function getPublishedBlogs(): Promise<Blog[]> {
@@ -72,7 +72,7 @@ export async function getFilteredPublishedBlogs(filters: {
 
   const { data, error } = await query
   if (error) throw dbError(error)
-  return (data ?? []) as Blog[]
+  return (data ?? []) as unknown as Blog[]
 }
 
 export async function getBlogBySlug(slug: string): Promise<Blog | null> {
@@ -84,7 +84,7 @@ export async function getBlogBySlug(slug: string): Promise<Blog | null> {
     .eq("is_published", true)
     .maybeSingle()
   if (error) throw dbError(error)
-  return data as Blog | null
+  return data as unknown as Blog | null
 }
 
 export async function getBlogById(id: string): Promise<Blog> {
@@ -130,7 +130,7 @@ export async function getRelatedBlogs(
       .order("created_at", { ascending: false })
       .limit(3)
     for (const b of data ?? []) {
-      if (!seen.has(b.id)) { seen.add(b.id); results.push(b as Blog) }
+      if (!seen.has(b.id)) { seen.add(b.id); results.push(b as unknown as Blog) }
     }
   }
 
@@ -152,7 +152,7 @@ export async function getRelatedBlogs(
         .order("created_at", { ascending: false })
         .limit(3 - results.length)
       for (const b of data ?? []) {
-        if (!seen.has(b.id)) { seen.add(b.id); results.push(b as Blog) }
+        if (!seen.has(b.id)) { seen.add(b.id); results.push(b as unknown as Blog) }
       }
     }
   }
@@ -177,7 +177,7 @@ export async function getBlogComments(blogId: string): Promise<BlogComment[]> {
     .eq("blog_id", blogId)
     .order("created_at", { ascending: false })
   if (error) throw dbError(error)
-  return (data ?? []) as BlogComment[]
+  return (data ?? []) as unknown as BlogComment[]
 }
 
 export async function getBlogEngagement(
@@ -197,7 +197,7 @@ export async function getBlogEngagement(
   ])
   return {
     likesCount: countResult.count ?? 0,
-    comments: (commentsResult.data ?? []) as BlogComment[],
+    comments: (commentsResult.data ?? []) as unknown as BlogComment[],
   }
 }
 
@@ -219,7 +219,7 @@ export async function addBlogComment(blogId: string, content: string): Promise<B
     .select("id, blog_id, user_id, content, created_at, profile:profiles(first_name, last_name)")
     .single()
   if (error) throw dbError(error)
-  return data as BlogComment
+  return data as unknown as BlogComment
 }
 
 export async function getBlogLikeData(

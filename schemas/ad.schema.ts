@@ -23,7 +23,7 @@ export const adSchema = z.object({
   image_path: z.string().min(1, "Image is required"),
   link: z.string().url("Must be a valid URL (e.g. https://example.com)"),
   target_type: z.enum(["blog", "mold", "event", "supplier", "course", "external"], {
-    required_error: "Target type is required",
+    message: "Target type is required",
   }),
   is_active: z.boolean(),
   starts_at: z.string().optional(),

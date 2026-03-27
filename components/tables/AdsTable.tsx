@@ -14,6 +14,7 @@ import type { Ad, AdTargetType } from "@/types"
 const TARGET_TYPE_LABELS: Record<AdTargetType, string> = {
   blog: "Blog",
   mold: "Mold",
+  course: "Course",
   event: "Event",
   supplier: "Supplier",
   external: "External",
@@ -90,8 +91,8 @@ export function AdsTable() {
       id: "date_range",
       header: "Date Range",
       cell: ({ row }) => {
-        const start = formatDate(row.original.start_date)
-        const end = formatDate(row.original.end_date)
+        const start = formatDate(row.original.starts_at)
+        const end = formatDate(row.original.ends_at)
         if (!start && !end) return <span className="text-zinc-300">—</span>
         return (
           <span className="text-sm text-zinc-600">
