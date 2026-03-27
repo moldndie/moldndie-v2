@@ -134,7 +134,7 @@ export function AdsTable() {
       <DataTable
         columns={columns}
         data={ads}
-        emptyMessage={isLoading ? "Loading…" : "No ads yet."}
+        isLoading={isLoading} emptyMessage="No ads yet."
       />
 
       <AdModal

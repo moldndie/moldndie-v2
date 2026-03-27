@@ -9,6 +9,7 @@ export function useAds() {
   return useQuery({
     queryKey: QUERY_KEYS.ADS,
     queryFn: getAds,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -32,6 +33,15 @@ export function useDeleteAd() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => deleteAd(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.ADS }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: QUERY_KEYS.ADS })
+      const prev = qc.getQueryData(QUERY_KEYS.ADS)
+      qc.setQueryData(QUERY_KEYS.ADS, (old: any[] = []) => old.filter((a) => a.id !== id))
+      return { prev }
+    },
+    onError: (_, __, ctx) => {
+      if (ctx?.prev) qc.setQueryData(QUERY_KEYS.ADS, ctx.prev)
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.ADS }),
   })
 }

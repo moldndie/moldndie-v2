@@ -1,13 +1,14 @@
-export type AdTargetType = "blog" | "mold" | "event" | "supplier" | "external"
+export type AdTargetType = "blog" | "mold" | "event" | "supplier" | "course" | "external"
 
 export interface Ad {
   id: string
   title: string
   image_path: string
-  target_type: AdTargetType
   link: string
+  target_type: AdTargetType
   is_active: boolean
-  start_date: string | null
-  end_date: string | null
+  starts_at: string | null
+  ends_at: string | null
   created_at: string
+  updated_at: string
 }

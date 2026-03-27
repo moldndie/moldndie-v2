@@ -1,6 +1,6 @@
 import { Metadata } from "next"
 import PageHeader from "@/components/dashboard/PageHeader"
-import { AdsTable } from "@/components/tables/AdsTable"
+import { AdsTable } from "@/modules/ad/components/AdsTable"
 
 export const metadata: Metadata = { title: "Ads | Admin" }
 
