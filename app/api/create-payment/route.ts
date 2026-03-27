@@ -20,7 +20,6 @@ async function paymobAuth(): Promise<string> {
     body: JSON.stringify({ api_key: PAYMOB_API_KEY }),
   })
   const authData = await res.json()
-  console.log("AUTH RESPONSE:", JSON.stringify(authData))
   if (!authData.token) throw new Error(`Auth token failed: ${JSON.stringify(authData)}`)
   return authData.token as string
 }
@@ -42,7 +41,6 @@ async function paymobCreateOrder(
     body: JSON.stringify(body),
   })
   const orderData = await res.json()
-  console.log("ORDER RESPONSE:", JSON.stringify(orderData))
   if (!orderData.id) throw new Error(`Paymob order creation failed: ${JSON.stringify(orderData)}`)
   return orderData.id as number
 }
@@ -79,7 +77,6 @@ async function paymobPaymentKey(
     body: JSON.stringify(body),
   })
   const paymentData = await res.json()
-  console.log("PAYMENT KEY RESPONSE:", JSON.stringify(paymentData))
   if (!paymentData.token) throw new Error(`Payment key generation failed: ${JSON.stringify(paymentData)}`)
   return paymentData.token as string
 }
@@ -87,15 +84,9 @@ async function paymobPaymentKey(
 // ── Route handler ──────────────────────────────────────────────────────────
 
 export async function POST(req: Request) {
-  // ── 0. Log ENV (debug) ─────────────────────────────────────────────────
-  console.log("API KEY:", PAYMOB_API_KEY ? `set (length ${PAYMOB_API_KEY.length})` : "MISSING")
-  console.log("INTEGRATION ID:", PAYMOB_INTEGRATION_ID || "MISSING")
-  console.log("IFRAME ID:", PAYMOB_IFRAME_ID || "MISSING")
-
   try {
     // ── 1. Parse & validate body ──────────────────────────────────────────
     const body = await req.json()
-    console.log("[PAYMENT] request body:", JSON.stringify(body))
 
     if (!body.items || !Array.isArray(body.items) || body.items.length === 0) {
       return NextResponse.json({ error: "Invalid items" }, { status: 400 })
@@ -174,7 +165,6 @@ export async function POST(req: Request) {
     // ── 4. Calculate total ────────────────────────────────────────────────
     const totalAmount = validatedItems.reduce((sum, i) => sum + i.price, 0)
     const totalCents = Math.round(totalAmount * 100)
-    console.log("[PAYMENT] total amount:", totalAmount, "cents:", totalCents)
 
     // ── 5. Create order in DB ─────────────────────────────────────────────
     const { data: order, error: orderError } = await admin
@@ -221,17 +211,11 @@ export async function POST(req: Request) {
     if (!paymentToken) throw new Error("paymentToken is empty — cannot build redirect URL")
     if (!PAYMOB_IFRAME_ID) throw new Error("PAYMOB_IFRAME_ID is not set")
     const paymentUrl = `https://accept.paymob.com/api/acceptance/iframes/${PAYMOB_IFRAME_ID}?payment_token=${paymentToken}`
-    console.log("FINAL PAYMENT URL:", paymentUrl)
 
     return NextResponse.json({ paymentUrl })
   } catch (error: any) {
-    console.error("FULL PAYMENT ERROR:", error)
-
     return NextResponse.json(
-      {
-        error: error?.message || "Unknown error",
-        details: error,
-      },
+      { error: error?.message || "Payment processing failed" },
       { status: 500 }
     )
   }

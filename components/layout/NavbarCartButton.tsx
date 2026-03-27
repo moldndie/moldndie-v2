@@ -2,10 +2,11 @@
 
 import Link from "next/link"
 import { ShoppingCart } from "lucide-react"
-import { useCartStore } from "@/store/useCartStore"
+import { useCart } from "@/hooks/queries/useCart"
 
 export default function NavbarCartButton() {
-  const count = useCartStore((s) => s.items.length)
+  const { data: items = [] } = useCart()
+  const count = items.length
 
   return (
     <Link
@@ -15,7 +16,7 @@ export default function NavbarCartButton() {
     >
       <ShoppingCart size={20} />
       {count > 0 && (
-        <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 flex items-center justify-center bg-primary text-white text-[10px] font-bold rounded-full px-1 leading-none">
+        <span className="absolute -top-0.5 -right-0.5 min-w-4 h-4 flex items-center justify-center bg-primary text-white text-[10px] font-bold rounded-full px-1 leading-none">
           {count}
         </span>
       )}

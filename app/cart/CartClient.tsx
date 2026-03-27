@@ -4,21 +4,23 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { Trash2, ShoppingCart, Package, AlertCircle, Loader2 } from "lucide-react"
-import { useCartStore } from "@/store/useCartStore"
+import { useCart, useRemoveFromCart, useClearCart } from "@/hooks/queries/useCart"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 export default function CartClient() {
-  const { items, removeItem, clearCart } = useCartStore()
+  const { data: items = [], isLoading } = useCart()
+  const removeItem = useRemoveFromCart()
+  const clearCart = useClearCart()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
 
-  const total = items.reduce((sum, item) => sum + item.price, 0)
+  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
 
   async function handleCheckout() {
     const cartItems = items
-      .filter((item) => item.id && item.type)
-      .map((item) => ({ id: item.id, type: item.type }))
+      .filter((item) => item.product_id && item.product_type)
+      .map((item) => ({ id: item.product_id, type: item.product_type }))
 
     if (cartItems.length === 0) {
       setCheckoutError("Your cart is empty.")
@@ -42,14 +44,21 @@ export default function CartClient() {
         return
       }
 
-      // Redirect to Paymob hosted checkout
-      console.log("REDIRECTING TO:", data.paymentUrl)
       window.location.href = data.paymentUrl
     } catch {
       setCheckoutError("Network error. Please try again.")
     } finally {
       setIsCheckingOut(false)
     }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-32 text-zinc-400 text-sm gap-2">
+        <Loader2 size={16} className="animate-spin" />
+        Loading cart…
+      </div>
+    )
   }
 
   if (items.length === 0) {
@@ -74,8 +83,9 @@ export default function CartClient() {
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-extrabold text-zinc-900">Your Cart</h1>
         <button
-          onClick={clearCart}
-          className="text-xs text-zinc-400 hover:text-red-500 underline underline-offset-2 transition-colors"
+          onClick={() => clearCart.mutate()}
+          disabled={clearCart.isPending}
+          className="text-xs text-zinc-400 hover:text-red-500 underline underline-offset-2 transition-colors disabled:opacity-50"
         >
           Clear all
         </button>
@@ -87,7 +97,7 @@ export default function CartClient() {
           const imgSrc = item.image ? `${R2_BASE}/${item.image}` : null
           return (
             <li
-              key={`${item.type}-${item.id}`}
+              key={`${item.product_type}-${item.product_id}`}
               className="flex items-center gap-4 bg-white border border-zinc-100 rounded-xl p-4 shadow-sm"
             >
               {/* Thumbnail */}
@@ -110,7 +120,7 @@ export default function CartClient() {
               {/* Info */}
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-zinc-900 truncate">{item.title}</p>
-                <p className="text-xs text-zinc-400 capitalize mt-0.5">{item.type}</p>
+                <p className="text-xs text-zinc-400 capitalize mt-0.5">{item.product_type}</p>
               </div>
 
               {/* Price */}
@@ -120,8 +130,17 @@ export default function CartClient() {
 
               {/* Remove */}
               <button
-                onClick={() => removeItem(item.id, item.type)}
-                className="p-2 text-zinc-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50"
+                onClick={() =>
+                  removeItem.mutate({
+                    product_id: item.product_id,
+                    product_type: item.product_type,
+                  })
+                }
+                disabled={
+                  removeItem.isPending &&
+                  removeItem.variables?.product_id === item.product_id
+                }
+                className="p-2 text-zinc-400 hover:text-red-500 transition-colors rounded-lg hover:bg-red-50 disabled:opacity-40"
                 aria-label={`Remove ${item.title}`}
               >
                 <Trash2 size={16} />

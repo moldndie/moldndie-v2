@@ -68,7 +68,7 @@ export async function GET() {
       ? admin.from("molds").select("id, title, preview_image").in("id", moldIds)
       : Promise.resolve({ data: [], error: null }),
     courseIds.length > 0
-      ? admin.from("courses").select("id, title, thumbnail").in("id", courseIds)
+      ? admin.from("courses").select("id, title, thumbnail_url").in("id", courseIds)
       : Promise.resolve({ data: [], error: null }),
   ])
 
@@ -77,7 +77,7 @@ export async function GET() {
     metaMap.set(m.id, { title: m.title, image: m.preview_image ?? null })
   }
   for (const c of coursesResult.data ?? []) {
-    metaMap.set(c.id, { title: c.title, image: c.thumbnail ?? null })
+    metaMap.set(c.id, { title: c.title, image: c.thumbnail_url ?? null })
   }
 
   // ── 5. Build response ──────────────────────────────────────────────────────
