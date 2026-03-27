@@ -6,7 +6,8 @@ export const courseSchema = z
     description: z.string().optional(),
     is_free: z.boolean(),
     price: z.number(),
-    thumbnail: z.string().optional(),
+    thumbnail_url: z.string().optional(),
+    is_published: z.boolean(),
   })
   .superRefine((data, ctx) => {
     if (!data.is_free && data.price <= 0) {

@@ -1,19 +1,64 @@
 "use client"
 
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient, keepPreviousData } from "@tanstack/react-query"
 import {
   getCourses,
+  getCourseById,
+  getCoursesListing,
   createCourse,
   updateCourse,
   deleteCourse,
+  type CoursesListingParams,
 } from "@/services/course.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { CourseFormValues } from "@/schemas/course.schema"
+
+async function fetchCourseAccess(id: string): Promise<boolean> {
+  const res = await fetch(`/api/courses/${id}/access`)
+  if (!res.ok) return false
+  const json = await res.json()
+  return json.purchased ?? false
+}
+
+export function useCourseById(id: string) {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.COURSES, id],
+    queryFn: () => getCourseById(id),
+    staleTime: 60 * 1000,
+    enabled: !!id,
+  })
+}
+
+export function useCourseAccess(id: string) {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.COURSES, id, "access"],
+    queryFn: () => fetchCourseAccess(id),
+    staleTime: 60 * 1000,
+    enabled: !!id,
+  })
+}
+
+export type { CoursesListingParams }
+
+export function useCoursesListing(params: CoursesListingParams = {}) {
+  return useQuery({
+    queryKey: [
+      "courses", "listing",
+      params.search ?? "",
+      params.priceFilter ?? "all",
+      params.page ?? 1,
+    ],
+    queryFn: () => getCoursesListing(params),
+    placeholderData: keepPreviousData,
+    staleTime: 30 * 1000,
+  })
+}
 
 export function useCourses() {
   return useQuery({
     queryKey: QUERY_KEYS.COURSES,
     queryFn: getCourses,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -38,6 +83,15 @@ export function useDeleteCourse() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => deleteCourse(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.COURSES }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: QUERY_KEYS.COURSES })
+      const prev = qc.getQueryData(QUERY_KEYS.COURSES)
+      qc.setQueryData(QUERY_KEYS.COURSES, (old: any[] = []) => old.filter((c) => c.id !== id))
+      return { prev }
+    },
+    onError: (_, __, ctx) => {
+      if (ctx?.prev) qc.setQueryData(QUERY_KEYS.COURSES, ctx.prev)
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.COURSES }),
   })
 }

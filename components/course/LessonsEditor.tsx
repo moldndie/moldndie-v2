@@ -10,14 +10,14 @@ export interface LocalLesson {
   id?: string // undefined = new, not yet in DB
   title: string
   video_url: string
-  pdf_key: string
+  pdf_url: string
 }
 
 interface FormState {
   index: number | null // null = adding new
   title: string
   video_url: string
-  pdf_key: string
+  pdf_url: string
 }
 
 interface LessonsEditorProps {
@@ -31,13 +31,13 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
   const [formErrors, setFormErrors] = useState<{ title?: string; video_url?: string }>({})
 
   function openAdd() {
-    setForm({ index: null, title: "", video_url: "", pdf_key: "" })
+    setForm({ index: null, title: "", video_url: "", pdf_url: "" })
     setFormErrors({})
   }
 
   function openEdit(index: number) {
     const l = lessons[index]
-    setForm({ index, title: l.title, video_url: l.video_url, pdf_key: l.pdf_key })
+    setForm({ index, title: l.title, video_url: l.video_url, pdf_url: l.pdf_url })
     setFormErrors({})
   }
 
@@ -59,7 +59,7 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
       id: form.index !== null ? lessons[form.index].id : undefined,
       title: form.title.trim(),
       video_url: form.video_url.trim(),
-      pdf_key: form.pdf_key,
+      pdf_url: form.pdf_url,
     }
     if (form.index !== null) {
       onChange(lessons.map((l, i) => (i === form.index ? lesson : l)))
@@ -131,7 +131,7 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
               <span className="flex-1 text-sm font-medium text-zinc-800 line-clamp-1">
                 {lesson.title}
               </span>
-              {lesson.pdf_key && (
+              {lesson.pdf_url && (
                 <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] text-blue-600">
                   PDF
                 </span>
@@ -213,8 +213,8 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
               folder="courses/pdfs"
               accept=".pdf"
               label="Click to upload PDF"
-              existingValue={form.pdf_key || null}
-              onUploadSuccess={({ key }) => setForm((f) => (f ? { ...f, pdf_key: key } : f))}
+              existingValue={form.pdf_url || null}
+              onUploadSuccess={({ key }) => setForm((f) => (f ? { ...f, pdf_url: key } : f))}
               onUploadingChange={onUploadingChange}
             />
           </div>

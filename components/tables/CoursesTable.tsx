@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
+import Link from "next/link"
 import { type ColumnDef } from "@tanstack/react-table"
-import { Pencil, Trash2 } from "lucide-react"
+import { Pencil, Trash2, BookOpen } from "lucide-react"
 import { DataTable } from "./DataTable"
 import { CourseModal } from "@/components/modals/CourseModal"
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal"
@@ -21,12 +22,12 @@ export function CoursesTable() {
 
   const columns: ColumnDef<Course>[] = [
     {
-      id: "thumbnail",
+      id: "thumbnail_url",
       header: "",
       cell: ({ row }) =>
-        row.original.thumbnail ? (
+        row.original.thumbnail_url ? (
           <img
-            src={getFileUrl(row.original.thumbnail)}
+            src={getFileUrl(row.original.thumbnail_url)}
             alt={row.original.title}
             className="size-10 rounded-lg object-cover border border-zinc-100"
           />
@@ -57,6 +58,16 @@ export function CoursesTable() {
       },
     },
     {
+      accessorKey: "is_published",
+      header: "Status",
+      cell: ({ row }) =>
+        row.original.is_published ? (
+          <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">Published</span>
+        ) : (
+          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500">Draft</span>
+        ),
+    },
+    {
       accessorKey: "created_at",
       header: "Created",
       enableSorting: true,
@@ -72,15 +83,24 @@ export function CoursesTable() {
       header: "",
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
+          <Link
+            href={`/dashboard/courses/${row.original.id}`}
+            className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+            title="Manage lessons"
+          >
+            <BookOpen className="size-3.5" />
+          </Link>
           <button
             onClick={() => setEditingCourse(row.original)}
             className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+            title="Edit course"
           >
             <Pencil className="size-3.5" />
           </button>
           <button
             onClick={() => setDeletingCourse(row.original)}
             className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+            title="Delete course"
           >
             <Trash2 className="size-3.5" />
           </button>
@@ -98,7 +118,7 @@ export function CoursesTable() {
       <DataTable
         columns={columns}
         data={courses}
-        emptyMessage={isLoading ? "Loading…" : "No courses yet."}
+        isLoading={isLoading} emptyMessage="No courses yet."
       />
 
       <CourseModal
