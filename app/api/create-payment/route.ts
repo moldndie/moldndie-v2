@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase/admin"
 
 const PAYMOB_API_KEY = process.env.PAYMOB_API_KEY!
 const PAYMOB_INTEGRATION_ID = process.env.PAYMOB_INTEGRATION_ID!
+const PAYMOB_IFRAME_ID = process.env.PAYMOB_IFRAME_ID!
 
 type CartItemInput = {
   id: string
@@ -89,6 +90,7 @@ export async function POST(req: Request) {
   // ── 0. Log ENV (debug) ─────────────────────────────────────────────────
   console.log("API KEY:", PAYMOB_API_KEY ? `set (length ${PAYMOB_API_KEY.length})` : "MISSING")
   console.log("INTEGRATION ID:", PAYMOB_INTEGRATION_ID || "MISSING")
+  console.log("IFRAME ID:", PAYMOB_IFRAME_ID || "MISSING")
 
   try {
     // ── 1. Parse & validate body ──────────────────────────────────────────
@@ -217,7 +219,8 @@ export async function POST(req: Request) {
 
     // ── 11. Return payment URL ────────────────────────────────────────────
     if (!paymentToken) throw new Error("paymentToken is empty — cannot build redirect URL")
-    const paymentUrl = `https://accept.paymob.com/api/acceptance/payments/pay?payment_token=${paymentToken}`
+    if (!PAYMOB_IFRAME_ID) throw new Error("PAYMOB_IFRAME_ID is not set")
+    const paymentUrl = `https://accept.paymob.com/api/acceptance/iframes/${PAYMOB_IFRAME_ID}?payment_token=${paymentToken}`
     console.log("FINAL PAYMENT URL:", paymentUrl)
 
     return NextResponse.json({ paymentUrl })
