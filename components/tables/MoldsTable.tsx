@@ -160,7 +160,7 @@ export function MoldsTable() {
       <DataTable
         columns={columns}
         data={molds}
-        emptyMessage={isLoading ? "Loading…" : "No molds found."}
+        isLoading={isLoading} emptyMessage="No molds found."
       />
 
       <MoldModal

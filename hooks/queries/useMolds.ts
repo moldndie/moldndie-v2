@@ -42,6 +42,7 @@ export function useMolds(params?: MoldsParams) {
   return useQuery({
     queryKey: [...QUERY_KEYS.MOLDS, params ?? {}],
     queryFn: () => getMolds(params),
+    staleTime: 5 * 60 * 1000,
   })
 }
 
@@ -90,6 +91,17 @@ export function useDeleteMold() {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: (id: string) => deleteMold(id),
-    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.MOLDS }),
+    onMutate: async (id) => {
+      await qc.cancelQueries({ queryKey: QUERY_KEYS.MOLDS })
+      const snapshots = qc.getQueriesData({ queryKey: QUERY_KEYS.MOLDS })
+      qc.setQueriesData({ queryKey: QUERY_KEYS.MOLDS }, (old: any) =>
+        Array.isArray(old) ? old.filter((m) => m.id !== id) : old
+      )
+      return { snapshots }
+    },
+    onError: (_, __, ctx) => {
+      ctx?.snapshots.forEach(([key, data]) => qc.setQueryData(key, data))
+    },
+    onSettled: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.MOLDS }),
   })
 }

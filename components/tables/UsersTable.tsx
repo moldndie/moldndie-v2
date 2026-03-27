@@ -237,7 +237,7 @@ export function UsersTable({ currentUserRole }: UsersTableProps) {
       <DataTable
         columns={columns}
         data={data}
-        emptyMessage={isLoading ? "Loading…" : "No users found."}
+        isLoading={isLoading} emptyMessage="No users found."
       />
 
       <UserEditModal

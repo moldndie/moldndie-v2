@@ -147,7 +147,7 @@ export function EventCategoriesTable() {
       <DataTable
         columns={columns}
         data={data}
-        emptyMessage={isLoading ? "Loading…" : "No categories yet."}
+        isLoading={isLoading} emptyMessage="No categories yet."
       />
 
       <EventCategoryModal

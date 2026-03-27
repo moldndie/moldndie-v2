@@ -8,6 +8,7 @@ export function useDashboardStats() {
   return useQuery({
     queryKey: QUERY_KEYS.DASHBOARD,
     queryFn: getDashboardStats,
-    refetchOnWindowFocus: true,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   })
 }

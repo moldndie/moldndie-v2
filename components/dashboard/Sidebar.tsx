@@ -11,6 +11,7 @@ import {
   Truck,
   Megaphone,
   Users,
+  Inbox,
   X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -24,6 +25,7 @@ const navItems = [
   { label: "Suppliers", href: "/dashboard/suppliers", icon: Truck },
   { label: "Ads", href: "/dashboard/ads", icon: Megaphone },
   { label: "Users", href: "/dashboard/users", icon: Users },
+  { label: "Service Requests", href: "/dashboard/service-requests", icon: Inbox },
 ]
 
 interface SidebarProps {

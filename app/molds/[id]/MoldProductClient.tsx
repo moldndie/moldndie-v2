@@ -14,7 +14,7 @@ import {
   CheckCircle,
 } from "lucide-react"
 import { useMoldById, useMoldGallery } from "@/hooks/queries/useMolds"
-import { useCartStore } from "@/store/useCartStore"
+import { useAddToCart, useCartHasItem } from "@/hooks/queries/useCart"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -136,7 +136,9 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
   const [activeMedia, setActiveMedia] = useState<MoldMedia | null>(null)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
-  const { addItem, hasItem } = useCartStore()
+  const [loginError, setLoginError] = useState<string | null>(null)
+  const addToCart = useAddToCart()
+  const inCart = useCartHasItem(moldId, "mold")
 
   if (isLoading) return <SkeletonProductPage />
   if (isError) return <ErrorState />
@@ -181,16 +183,21 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
   }
 
   function handleAddToCart() {
-    addItem({
-      id: mold!.id,
-      title: mold!.title,
-      price: mold!.price ?? 0,
-      type: "mold",
-      image: mold!.preview_image ?? "",
-    })
+    addToCart.mutate(
+      {
+        product_id: mold!.id,
+        product_type: "mold",
+        title: mold!.title,
+        price: mold!.price ?? 0,
+        image: mold!.preview_image ?? "",
+      },
+      {
+        onError: (err) => {
+          if (err.message === "login_required") setLoginError("Please login to add items to cart.")
+        },
+      }
+    )
   }
-
-  const inCart = hasItem(mold!.id, "mold")
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
@@ -292,11 +299,11 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
           {/* Divider */}
           <div className="border-t border-zinc-100" />
 
-          {/* Download error */}
-          {downloadError && (
+          {/* Errors */}
+          {(downloadError || loginError) && (
             <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-3">
               <AlertCircle size={16} className="shrink-0 mt-0.5" />
-              {downloadError}
+              {downloadError ?? loginError}
             </div>
           )}
 
@@ -334,8 +341,10 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
               ? "No account required for free downloads"
               : "Secure checkout · Instant access after payment"}
           </p>
+          
         </div>
       </div>
+         
     </div>
   )
 }
