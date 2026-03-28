@@ -1,44 +1,63 @@
 "use client"
 
-import { Package, BookOpen, Truck, CalendarDays, Megaphone, Users, TrendingUp } from "lucide-react"
+import {
+  Package, BookOpen, Truck, CalendarDays, Megaphone,
+  Users, TrendingUp, DollarSign,
+} from "lucide-react"
 import { useDashboardStats } from "@/hooks/queries/useDashboard"
 
-function StatCard({
-  label,
-  value,
-  icon: Icon,
-}: {
+// ── Color-coded stat card ──────────────────────────────────────────────
+interface StatCardProps {
   label: string
   value: number | undefined
   icon: React.ElementType
-}) {
+  iconBg: string
+  iconColor: string
+  prefix?: string
+  isLoading?: boolean
+}
+
+function StatCard({ label, value, icon: Icon, iconBg, iconColor, prefix, isLoading }: StatCardProps) {
+  const display = isLoading
+    ? null
+    : value === undefined
+      ? "—"
+      : prefix
+        ? `${prefix} ${value.toLocaleString()}`
+        : value.toLocaleString()
+
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-      <div className="flex items-center justify-between mb-3">
-        <p className="text-sm text-gray-500">{label}</p>
-        <Icon className="size-4 text-gray-400" />
+    <div className="group bg-white rounded-xl border border-gray-100 p-5 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 cursor-default">
+      <div className="flex items-start justify-between gap-3">
+        <div className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${iconBg}`}>
+          <Icon size={18} className={iconColor} strokeWidth={1.8} />
+        </div>
+        <div className="flex-1 min-w-0 text-right">
+          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide leading-tight">{label}</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1 leading-none">
+            {display === null
+              ? <span className="inline-block h-7 w-16 bg-gray-100 rounded animate-pulse" />
+              : display}
+          </p>
+        </div>
       </div>
-      <p className="text-xl font-semibold text-gray-900">
+    </div>
+  )
+}
+
+// ── Secondary metric chip ──────────────────────────────────────────────
+function MetricChip({ label, value }: { label: string; value: number | undefined }) {
+  return (
+    <div className="bg-white rounded-xl border border-gray-100 px-5 py-4 shadow-sm flex items-center justify-between gap-4">
+      <p className="text-sm text-gray-500">{label}</p>
+      <p className="text-lg font-semibold text-gray-900">
         {value === undefined ? "—" : value.toLocaleString()}
       </p>
     </div>
   )
 }
 
-function MetricCard({ label, value, currency }: { label: string; value: number | undefined; currency?: boolean }) {
-  const display = value === undefined
-    ? "—"
-    : currency
-      ? `EGP ${value.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
-      : value.toLocaleString()
-  return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className="text-xl font-semibold text-gray-900 mt-1">{display}</p>
-    </div>
-  )
-}
-
+// ── Recent list ────────────────────────────────────────────────────────
 function RecentList({
   title,
   items,
@@ -49,27 +68,23 @@ function RecentList({
   isLoading: boolean
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
-      <h2 className="text-base font-medium text-gray-800 mb-3">{title}</h2>
+    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
+      <h2 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">{title}</h2>
       {isLoading ? (
-        <p className="text-sm text-gray-400 py-2">Loading…</p>
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-4 bg-gray-100 rounded animate-pulse" />
+          ))}
+        </div>
       ) : !items?.length ? (
         <p className="text-sm text-gray-400 py-2">No items yet.</p>
       ) : (
-        <ul>
-          {items.map((item, i) => (
-            <li
-              key={item.id}
-              className={`flex items-center justify-between gap-3 py-2 ${
-                i < items.length - 1 ? "border-b border-gray-100" : ""
-              }`}
-            >
+        <ul className="divide-y divide-gray-50">
+          {items.map((item) => (
+            <li key={item.id} className="flex items-center justify-between gap-3 py-2.5">
               <span className="text-sm text-gray-700 line-clamp-1 flex-1">{item.title}</span>
-              <span className="text-xs text-gray-400 shrink-0">
-                {new Date(item.created_at).toLocaleDateString("en-US", {
-                  month: "short",
-                  day: "numeric",
-                })}
+              <span className="text-xs text-gray-400 shrink-0 tabular-nums">
+                {new Date(item.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
               </span>
             </li>
           ))}
@@ -79,37 +94,120 @@ function RecentList({
   )
 }
 
+// ── Section label ──────────────────────────────────────────────────────
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">{children}</h2>
+  )
+}
+
+// ── Main component ─────────────────────────────────────────────────────
 export default function DashboardStats() {
   const { data, isLoading } = useDashboardStats()
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <StatCard label="Total Molds" value={data?.counts.molds} icon={Package} />
-        <StatCard label="Total Courses" value={data?.counts.courses} icon={BookOpen} />
-        <StatCard label="Total Suppliers" value={data?.counts.suppliers} icon={Truck} />
-        <StatCard label="Total Events" value={data?.counts.events} icon={CalendarDays} />
-        <StatCard label="Total Ads" value={data?.counts.ads} icon={Megaphone} />
-        <StatCard label="Total Users" value={data?.counts.users} icon={Users} />
+    <div className="space-y-8">
+
+      {/* ── Revenue ── */}
+      <div className="space-y-3">
+        <SectionLabel>Revenue</SectionLabel>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <StatCard
+            label="Total Revenue"
+            value={data?.analytics.totalRevenue}
+            icon={DollarSign}
+            iconBg="bg-emerald-50"
+            iconColor="text-emerald-600"
+            prefix="EGP"
+            isLoading={isLoading}
+          />
+          <StatCard
+            label="This Month"
+            value={data?.analytics.monthlyRevenue}
+            icon={TrendingUp}
+            iconBg="bg-emerald-50"
+            iconColor="text-emerald-600"
+            prefix="EGP"
+            isLoading={isLoading}
+          />
+        </div>
       </div>
 
-      {/* Revenue */}
-      <div className="grid grid-cols-2 gap-4">
-        <StatCard label="Total Revenue (EGP)" value={data?.analytics.totalRevenue} icon={TrendingUp} />
-        <StatCard label="This Month Revenue (EGP)" value={data?.analytics.monthlyRevenue} icon={TrendingUp} />
+      {/* ── Content counts ── */}
+      <div className="space-y-3">
+        <SectionLabel>Content</SectionLabel>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <StatCard
+            label="Molds"
+            value={data?.counts.molds}
+            icon={Package}
+            iconBg="bg-orange-50"
+            iconColor="text-orange-500"
+            isLoading={isLoading}
+          />
+          <StatCard
+            label="Courses"
+            value={data?.counts.courses}
+            icon={BookOpen}
+            iconBg="bg-violet-50"
+            iconColor="text-violet-600"
+            isLoading={isLoading}
+          />
+          <StatCard
+            label="Suppliers"
+            value={data?.counts.suppliers}
+            icon={Truck}
+            iconBg="bg-sky-50"
+            iconColor="text-sky-600"
+            isLoading={isLoading}
+          />
+          <StatCard
+            label="Events"
+            value={data?.counts.events}
+            icon={CalendarDays}
+            iconBg="bg-pink-50"
+            iconColor="text-pink-500"
+            isLoading={isLoading}
+          />
+          <StatCard
+            label="Ads"
+            value={data?.counts.ads}
+            icon={Megaphone}
+            iconBg="bg-amber-50"
+            iconColor="text-amber-500"
+            isLoading={isLoading}
+          />
+          <StatCard
+            label="Users"
+            value={data?.counts.users}
+            icon={Users}
+            iconBg="bg-blue-50"
+            iconColor="text-blue-600"
+            isLoading={isLoading}
+          />
+        </div>
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-        <MetricCard label="Free Molds" value={data?.metrics.freeMolds} />
-        <MetricCard label="Paid Molds" value={data?.metrics.paidMolds} />
-        <MetricCard label="Active Ads" value={data?.metrics.activeAds} />
+      {/* ── Quick metrics ── */}
+      <div className="space-y-3">
+        <SectionLabel>Library Breakdown</SectionLabel>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <MetricChip label="Free Molds" value={data?.metrics.freeMolds} />
+          <MetricChip label="Paid Molds" value={data?.metrics.paidMolds} />
+          <MetricChip label="Active Ads" value={data?.metrics.activeAds} />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <RecentList title="Recent Molds" items={data?.recent.molds} isLoading={isLoading} />
-        <RecentList title="Recent Courses" items={data?.recent.courses} isLoading={isLoading} />
-        <RecentList title="Recent Events" items={data?.recent.events} isLoading={isLoading} />
+      {/* ── Recent activity ── */}
+      <div className="space-y-3">
+        <SectionLabel>Recent Activity</SectionLabel>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <RecentList title="Recent Molds" items={data?.recent.molds} isLoading={isLoading} />
+          <RecentList title="Recent Courses" items={data?.recent.courses} isLoading={isLoading} />
+          <RecentList title="Recent Events" items={data?.recent.events} isLoading={isLoading} />
+        </div>
       </div>
+
     </div>
   )
 }
