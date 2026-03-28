@@ -13,6 +13,7 @@ export interface Supplier {
   category_id: string | null
   country: string | null
   address: string | null
+  sponsored: boolean
   created_at: string
   category?: SupplierCategory | null
 }

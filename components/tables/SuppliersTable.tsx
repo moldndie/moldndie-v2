@@ -87,6 +87,18 @@ export function SuppliersTable() {
       },
     },
     {
+      id: "sponsored",
+      header: "Sponsored",
+      cell: ({ row }) =>
+        row.original.sponsored ? (
+          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+            Sponsored
+          </span>
+        ) : (
+          <span className="text-zinc-300">—</span>
+        ),
+    },
+    {
       id: "actions",
       header: "",
       cell: ({ row }) => (

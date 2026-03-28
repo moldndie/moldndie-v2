@@ -32,6 +32,7 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
     register,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors },
   } = useForm<SupplierFormValues>({
@@ -44,8 +45,11 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
       category_id: "",
       country: "",
       address: "",
+      sponsored: false,
     },
   })
+
+  const sponsored = watch("sponsored")
 
   useEffect(() => {
     if (!open) {
@@ -61,6 +65,7 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
         category_id: supplier.category_id ?? "",
         country: supplier.country ?? "",
         address: supplier.address ?? "",
+        sponsored: supplier.sponsored ?? false,
       })
     } else {
       reset({
@@ -71,6 +76,7 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
         category_id: "",
         country: "",
         address: "",
+        sponsored: false,
       })
     }
   }, [open, supplier, reset])
@@ -144,6 +150,28 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Address</label>
           <Input {...register("address")} placeholder="Full address" />
+        </div>
+
+        <div className="flex items-center justify-between rounded-lg border border-zinc-100 bg-zinc-50 px-4 py-3">
+          <div>
+            <p className="text-sm font-medium text-zinc-800">Sponsored</p>
+            <p className="text-xs text-zinc-400">Sponsored suppliers appear first in the listing</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={sponsored}
+            onClick={() => setValue("sponsored", !sponsored, { shouldValidate: true })}
+            className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
+              sponsored ? "bg-primary" : "bg-zinc-200"
+            }`}
+          >
+            <span
+              className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
+                sponsored ? "translate-x-4.5" : "translate-x-0.5"
+              }`}
+            />
+          </button>
         </div>
 
         {mutationError && (

@@ -57,6 +57,7 @@ export async function getSuppliersListing(
   let query = supabase
     .from("suppliers")
     .select("*, category:supplier_categories(id,name)", { count: "exact" })
+    .order("sponsored", { ascending: false })
     .order(col, { ascending: asc })
     .range(from, to)
 
@@ -96,6 +97,7 @@ export async function createSupplier(values: SupplierFormValues): Promise<Suppli
       category_id: values.category_id || null,
       country: values.country ?? null,
       address: values.address ?? null,
+      sponsored: values.sponsored ?? false,
     })
     .select()
     .single()
@@ -116,6 +118,7 @@ export async function updateSupplier(id: string, values: SupplierFormValues): Pr
       category_id: values.category_id || null,
       country: values.country ?? null,
       address: values.address ?? null,
+      sponsored: values.sponsored ?? false,
     })
     .eq("id", id)
     .select()

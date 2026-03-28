@@ -118,6 +118,7 @@ function SupplierCard({
     country: string | null
     website: string | null
     address: string | null
+    sponsored: boolean
     category?: { name: string } | null
   }
   expanded: boolean
@@ -132,7 +133,7 @@ function SupplierCard({
     <motion.div
       variants={cardVariants}
       className={`rounded-xl overflow-hidden border bg-white shadow-sm transition-colors duration-200 ${
-        expanded ? "border-primary shadow-md" : "border-zinc-100 hover:shadow-lg hover:border-zinc-200"
+        expanded ? "border-primary shadow-md" : supplier.sponsored ? "border-amber-200 hover:shadow-lg hover:border-amber-300" : "border-zinc-100 hover:shadow-lg hover:border-zinc-200"
       }`}
     >
       <motion.button
@@ -141,6 +142,11 @@ function SupplierCard({
         transition={{ duration: 0.1 }}
         className="w-full p-5 flex flex-col items-center text-center gap-3"
       >
+        {supplier.sponsored && (
+          <span className="self-start text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 tracking-wide uppercase">
+            Sponsored
+          </span>
+        )}
         <div className="w-14 h-14 rounded-full overflow-hidden bg-zinc-50 border border-zinc-100 shrink-0 relative flex items-center justify-center">
           {logoSrc ? (
             <Image src={logoSrc} alt={supplier.name} fill className="object-contain p-1" sizes="56px" />
