@@ -144,7 +144,7 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
 
           {!isFree && (
             <div className="space-y-1.5">
-              <label className="text-sm font-medium text-zinc-700">Price (USD) *</label>
+              <label className="text-sm font-medium text-zinc-700">Price (EGP) *</label>
               <Input
                 {...register("price", { valueAsNumber: true })}
                 type="number"

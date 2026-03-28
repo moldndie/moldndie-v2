@@ -197,7 +197,7 @@ function LockedLesson({
           className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
         >
           <ShoppingCart size={15} />
-          {price ? `Buy Course — $${price}` : "Buy Course"}
+          {price ? `Buy Course — EGP ${price}` : "Buy Course"}
         </button>
       )}
       <Link

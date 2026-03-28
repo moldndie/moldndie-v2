@@ -294,7 +294,7 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
               <span className="text-3xl font-extrabold text-emerald-600">Free</span>
             ) : (
               <>
-                <span className="text-3xl font-extrabold text-zinc-900">${mold.price}</span>
+                <span className="text-3xl font-extrabold text-zinc-900">EGP {mold.price}</span>
                 <span className="text-sm text-zinc-400">one-time purchase</span>
               </>
             )}
@@ -342,7 +342,7 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
               className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
             >
               <ShoppingCart size={18} />
-              Add to Cart — ${mold.price}
+              Add to Cart — EGP {mold.price}
             </button>
           )}
 

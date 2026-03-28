@@ -178,7 +178,7 @@ export default function CourseDetailClient({ courseId }: { courseId: string }) {
             ) : (
               <>
                 <span className="text-3xl font-extrabold text-zinc-900">
-                  ${course.price}
+                  EGP {course.price}
                 </span>
                 <span className="text-sm text-zinc-400">one-time purchase</span>
               </>
@@ -218,7 +218,7 @@ export default function CourseDetailClient({ courseId }: { courseId: string }) {
                 className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
               >
                 <ShoppingCart size={18} />
-                Buy Course — ${course.price}
+                Buy Course — EGP {course.price}
               </button>
             )
           ) : (
@@ -244,7 +244,7 @@ export default function CourseDetailClient({ courseId }: { courseId: string }) {
                 className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
               >
                 <ShoppingCart size={18} />
-                Buy Course — ${course.price}
+                Buy Course — EGP {course.price}
               </button>
             )
           )}
