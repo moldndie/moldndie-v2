@@ -51,7 +51,7 @@ async function markOrderCompleted(
 ): Promise<Response> {
   const { data: order, error: findError } = await admin
     .from("orders")
-    .select("id, status, user_id")
+    .select("id, status")
     .eq("paymob_order_id", paymobOrderId)
     .maybeSingle()
 
@@ -65,23 +65,6 @@ async function markOrderCompleted(
     .eq("id", order.id)
 
   if (updateError) return new Response("Error", { status: 500 })
-
-  // Insert revenue events for each order item
-  const { data: items } = await admin
-    .from("order_items")
-    .select("product_type, price")
-    .eq("order_id", order.id)
-
-  if (items && items.length > 0) {
-    await admin.from("revenue_events").insert(
-      items.map((item) => ({
-        user_id: order.user_id,
-        order_id: order.id,
-        amount: item.price,
-        type: item.product_type as "course" | "mold",
-      }))
-    )
-  }
 
   return new Response("OK", { status: 200 })
 }

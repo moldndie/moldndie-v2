@@ -18,8 +18,6 @@ export interface DashboardStats {
     activeAds: number
   }
   analytics: {
-    totalVisits: number
-    monthlyVisits: number
     totalRevenue: number
     monthlyRevenue: number
   }
@@ -30,11 +28,6 @@ export interface DashboardStats {
   }
 }
 
-function count(data: unknown, error: unknown): number {
-  if (error) return 0
-  return (data as { count: number } | null)?.count ?? 0
-}
-
 export async function getDashboardStats(): Promise<DashboardStats> {
   const supabase = await createClient()
   const admin = createAdminClient()
@@ -42,20 +35,35 @@ export async function getDashboardStats(): Promise<DashboardStats> {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString()
   const today = now.toISOString().slice(0, 10)
 
+  // ── Fetch all completed order IDs (all-time + this month) in parallel ──────
+  const [completedOrdersAll, completedOrdersMonth] = await Promise.all([
+    admin
+      .from("orders")
+      .select("id")
+      .eq("status", "completed"),
+    admin
+      .from("orders")
+      .select("id")
+      .eq("status", "completed")
+      .gte("created_at", monthStart),
+  ])
+
+  const allOrderIds    = (completedOrdersAll.data ?? []).map((o) => o.id)
+  const monthOrderIds  = (completedOrdersMonth.data ?? []).map((o) => o.id)
+
+  // ── Fetch order_items for completed orders + general counts in parallel ─────
   const [
-    { count: moldsCount, error: e1 },
-    { count: coursesCount, error: e2 },
-    { count: suppliersCount, error: e3 },
-    { count: eventsCount, error: e4 },
-    { count: adsCount, error: e5 },
-    { count: usersCount, error: e6 },
-    { count: freeMoldsCount, error: e7 },
-    { count: paidMoldsCount, error: e8 },
-    { count: activeAdsCount, error: e9 },
-    { count: totalVisitsCount },
-    { count: monthlyVisitsCount },
-    { data: revenueAll },
-    { data: revenueMonth },
+    { count: moldsCount },
+    { count: coursesCount },
+    { count: suppliersCount },
+    { count: eventsCount },
+    { count: adsCount },
+    { count: usersCount },
+    { count: freeMoldsCount },
+    { count: paidMoldsCount },
+    { count: activeAdsCount },
+    { data: itemsAll },
+    { data: itemsMonth },
     { data: recentMolds },
     { data: recentCourses },
     { data: recentEvents },
@@ -66,71 +74,50 @@ export async function getDashboardStats(): Promise<DashboardStats> {
     supabase.from("events").select("*", { count: "exact", head: true }),
     supabase.from("ads").select("*", { count: "exact", head: true }),
     supabase.from("profiles").select("*", { count: "exact", head: true }),
-    supabase
-      .from("molds")
-      .select("*", { count: "exact", head: true })
-      .or("price.is.null,price.eq.0"),
-    supabase
-      .from("molds")
-      .select("*", { count: "exact", head: true })
-      .gt("price", 0),
+    supabase.from("molds").select("*", { count: "exact", head: true }).or("price.is.null,price.eq.0"),
+    supabase.from("molds").select("*", { count: "exact", head: true }).gt("price", 0),
     supabase
       .from("ads")
       .select("*", { count: "exact", head: true })
       .eq("is_active", true)
       .or(`start_date.is.null,start_date.lte.${today}`)
       .or(`end_date.is.null,end_date.gte.${today}`),
-    admin.from("page_views").select("*", { count: "exact", head: true }),
-    admin
-      .from("page_views")
-      .select("*", { count: "exact", head: true })
-      .gte("created_at", monthStart),
-    admin.from("revenue_events").select("amount"),
-    admin.from("revenue_events").select("amount").gte("created_at", monthStart),
-    supabase
-      .from("molds")
-      .select("id, title, created_at")
-      .order("created_at", { ascending: false })
-      .limit(5),
-    supabase
-      .from("courses")
-      .select("id, title, created_at")
-      .order("created_at", { ascending: false })
-      .limit(5),
-    supabase
-      .from("events")
-      .select("id, title, created_at")
-      .order("created_at", { ascending: false })
-      .limit(5),
+    allOrderIds.length > 0
+      ? admin.from("order_items").select("price").in("order_id", allOrderIds)
+      : Promise.resolve({ data: [], error: null }),
+    monthOrderIds.length > 0
+      ? admin.from("order_items").select("price").in("order_id", monthOrderIds)
+      : Promise.resolve({ data: [], error: null }),
+    supabase.from("molds").select("id, title, created_at").order("created_at", { ascending: false }).limit(5),
+    supabase.from("courses").select("id, title, created_at").order("created_at", { ascending: false }).limit(5),
+    supabase.from("events").select("id, title, created_at").order("created_at", { ascending: false }).limit(5),
   ])
 
-  const sumAmount = (rows: { amount: number }[] | null) =>
-    (rows ?? []).reduce((acc, r) => acc + Number(r.amount), 0)
+  const sumPrice = (rows: { price: number }[] | null) =>
+    (rows ?? []).reduce((acc, r) => acc + Number(r.price), 0)
 
   return {
     counts: {
-      molds: moldsCount ?? 0,
-      courses: coursesCount ?? 0,
+      molds:     moldsCount     ?? 0,
+      courses:   coursesCount   ?? 0,
       suppliers: suppliersCount ?? 0,
-      events: eventsCount ?? 0,
-      ads: adsCount ?? 0,
-      users: usersCount ?? 0,
+      events:    eventsCount    ?? 0,
+      ads:       adsCount       ?? 0,
+      users:     usersCount     ?? 0,
     },
     metrics: {
-      freeMolds: freeMoldsCount ?? 0,
-      paidMolds: paidMoldsCount ?? 0,
-      activeAds: activeAdsCount ?? 0,
+      freeMolds:  freeMoldsCount  ?? 0,
+      paidMolds:  paidMoldsCount  ?? 0,
+      activeAds:  activeAdsCount  ?? 0,
     },
     analytics: {
-      totalVisits: totalVisitsCount ?? 0,
-      monthlyVisits: monthlyVisitsCount ?? 0,
-      totalRevenue: sumAmount(revenueAll as { amount: number }[] | null),
-      monthlyRevenue: sumAmount(revenueMonth as { amount: number }[] | null),
+      totalRevenue:   sumPrice(itemsAll   as { price: number }[] | null),
+      monthlyRevenue: sumPrice(itemsMonth as { price: number }[] | null),
     },
     recent: {
-      molds: (recentMolds ?? []) as { id: string; title: string; created_at: string }[],
+      molds:   (recentMolds   ?? []) as { id: string; title: string; created_at: string }[],
       courses: (recentCourses ?? []) as { id: string; title: string; created_at: string }[],
-      events: (recentEvents ?? []) as { id: string; title: string; created_at: string }[],
+      events:  (recentEvents  ?? []) as { id: string; title: string; created_at: string }[],
     },
   }
 }

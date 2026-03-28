@@ -3,7 +3,6 @@ import { Funnel_Display, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Analytics } from "@vercel/analytics/next"
-import { PageViewTracker } from "@/components/analytics/PageViewTracker"
 
 const funnelDisplay = Funnel_Display({
   variable: "--font-sans",
@@ -46,10 +45,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className={`${funnelDisplay.variable} ${geistMono.variable}`}>
       <body className="antialiased">
-        <Providers>
-          <PageViewTracker />
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
         <Analytics />
       </body>
     </html>

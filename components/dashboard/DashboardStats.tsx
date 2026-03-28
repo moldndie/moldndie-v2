@@ -1,6 +1,6 @@
 "use client"
 
-import { Package, BookOpen, Truck, CalendarDays, Megaphone, Users, Eye, TrendingUp } from "lucide-react"
+import { Package, BookOpen, Truck, CalendarDays, Megaphone, Users, TrendingUp } from "lucide-react"
 import { useDashboardStats } from "@/hooks/queries/useDashboard"
 
 function StatCard({
@@ -93,12 +93,10 @@ export default function DashboardStats() {
         <StatCard label="Total Users" value={data?.counts.users} icon={Users} />
       </div>
 
-      {/* Analytics */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <StatCard label="Total Visits" value={data?.analytics.totalVisits} icon={Eye} />
-        <StatCard label="Monthly Visits" value={data?.analytics.monthlyVisits} icon={Eye} />
-        <StatCard label="Total Revenue" value={data?.analytics.totalRevenue} icon={TrendingUp} />
-        <StatCard label="Monthly Revenue" value={data?.analytics.monthlyRevenue} icon={TrendingUp} />
+      {/* Revenue */}
+      <div className="grid grid-cols-2 gap-4">
+        <StatCard label="Total Revenue (EGP)" value={data?.analytics.totalRevenue} icon={TrendingUp} />
+        <StatCard label="This Month Revenue (EGP)" value={data?.analytics.monthlyRevenue} icon={TrendingUp} />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
