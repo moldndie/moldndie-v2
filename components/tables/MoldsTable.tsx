@@ -46,6 +46,7 @@ export function MoldsTable() {
           <img
             src={getFileUrl(row.original.preview_image!)}
             alt={row.original.title}
+            loading="lazy"
             className="size-10 rounded-lg object-cover border border-zinc-100"
           />
         ) : (

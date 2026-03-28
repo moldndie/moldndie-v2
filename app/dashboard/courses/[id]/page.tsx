@@ -1,10 +1,18 @@
+import { Suspense } from "react"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { ChevronLeft } from "lucide-react"
 import { Metadata } from "next"
+import dynamic from "next/dynamic"
 import { getCourseByIdAdmin } from "@/services/course.service"
 import PageHeader from "@/components/dashboard/PageHeader"
-import { LessonsManager } from "@/components/dashboard/courses/LessonsManager"
+
+const LessonsManager = dynamic(
+  () => import("@/components/dashboard/courses/LessonsManager").then((m) => m.LessonsManager),
+  {
+    loading: () => <div className="h-48 rounded-xl bg-gray-100 animate-pulse" />,
+  }
+)
 
 interface Props {
   params: Promise<{ id: string }>
@@ -64,7 +72,9 @@ export default async function CourseEditPage({ params }: Props) {
       <div className="border-t border-zinc-200" />
 
       {/* Lessons section */}
-      <LessonsManager courseId={id} />
+      <Suspense fallback={<div className="h-48 rounded-xl bg-gray-100 animate-pulse" />}>
+        <LessonsManager courseId={id} />
+      </Suspense>
     </div>
   )
 }

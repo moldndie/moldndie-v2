@@ -29,6 +29,7 @@ export function EventsTable() {
           <img
             src={getFileUrl(row.original.image_path)}
             alt={row.original.title}
+            loading="lazy"
             className="size-10 rounded-lg object-cover border border-zinc-100"
           />
         ) : (

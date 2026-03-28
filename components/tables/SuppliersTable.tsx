@@ -29,6 +29,7 @@ export function SuppliersTable() {
           <img
             src={getFileUrl(row.original.logo_path)}
             alt={row.original.name}
+            loading="lazy"
             className="size-10 rounded-lg object-cover border border-zinc-100"
           />
         ) : (

@@ -66,7 +66,8 @@ export function useMoldsListing(params: MoldsListingParams = {}) {
     ],
     queryFn: () => getMoldsListing(params),
     placeholderData: keepPreviousData,
-    staleTime: 30 * 1000,
+    staleTime: 2 * 60 * 1000,
+    refetchOnWindowFocus: false,
   })
 }
 

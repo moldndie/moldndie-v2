@@ -46,6 +46,7 @@ export function AdsTable() {
           <img
             src={getFileUrl(row.original.image_path)}
             alt={row.original.title}
+            loading="lazy"
             className="h-10 w-16 rounded-lg object-cover border border-zinc-100"
           />
         ) : (
