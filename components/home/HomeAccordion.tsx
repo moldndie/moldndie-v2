@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus, Globe, Heart, FileText, GraduationCap, Network } from "lucide-react";
 
 
@@ -61,9 +62,20 @@ export default function HomeAccordion() {
                 <Plus size={16} className="shrink-0 text-zinc-400" />
               )}
             </button>
-            {isOpen && (
-              <p className="pb-5 pl-9 text-sm text-zinc-500 leading-relaxed">{item.content}</p>
-            )}
+            <AnimatePresence initial={false}>
+              {isOpen && (
+                <motion.div
+                  key="content"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.25, ease: "easeInOut" }}
+                  style={{ overflow: "hidden" }}
+                >
+                  <p className="pb-5 pl-9 text-sm text-zinc-500 leading-relaxed">{item.content}</p>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         );
       })}
