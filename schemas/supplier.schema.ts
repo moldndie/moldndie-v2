@@ -8,7 +8,7 @@ export const supplierSchema = z.object({
   category_id: z.string().optional(),
   country: z.string().optional(),
   address: z.string().optional(),
-  sponsored: z.boolean().default(false),
+  sponsored: z.boolean(),
 })
 
 export type SupplierFormValues = z.infer<typeof supplierSchema>
