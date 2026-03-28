@@ -1,6 +1,6 @@
 "use client"
 
-import { Package, BookOpen, Truck, CalendarDays, Megaphone, Users } from "lucide-react"
+import { Package, BookOpen, Truck, CalendarDays, Megaphone, Users, Eye, TrendingUp } from "lucide-react"
 import { useDashboardStats } from "@/hooks/queries/useDashboard"
 
 function StatCard({
@@ -25,13 +25,16 @@ function StatCard({
   )
 }
 
-function MetricCard({ label, value }: { label: string; value: number | undefined }) {
+function MetricCard({ label, value, currency }: { label: string; value: number | undefined; currency?: boolean }) {
+  const display = value === undefined
+    ? "—"
+    : currency
+      ? `EGP ${value.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+      : value.toLocaleString()
   return (
     <div className="bg-white rounded-xl border border-gray-200 p-4 shadow-sm">
       <p className="text-sm text-gray-500">{label}</p>
-      <p className="text-xl font-semibold text-gray-900 mt-1">
-        {value === undefined ? "—" : value.toLocaleString()}
-      </p>
+      <p className="text-xl font-semibold text-gray-900 mt-1">{display}</p>
     </div>
   )
 }
@@ -88,6 +91,14 @@ export default function DashboardStats() {
         <StatCard label="Total Events" value={data?.counts.events} icon={CalendarDays} />
         <StatCard label="Total Ads" value={data?.counts.ads} icon={Megaphone} />
         <StatCard label="Total Users" value={data?.counts.users} icon={Users} />
+      </div>
+
+      {/* Analytics */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <StatCard label="Total Visits" value={data?.analytics.totalVisits} icon={Eye} />
+        <StatCard label="Monthly Visits" value={data?.analytics.monthlyVisits} icon={Eye} />
+        <StatCard label="Total Revenue" value={data?.analytics.totalRevenue} icon={TrendingUp} />
+        <StatCard label="Monthly Revenue" value={data?.analytics.monthlyRevenue} icon={TrendingUp} />
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
