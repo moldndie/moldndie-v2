@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { motion } from "framer-motion"
+import { motion, type Variants } from "framer-motion"
 import {
   BookOpen,
   GraduationCap,
@@ -13,7 +13,7 @@ import HomeAccordion from "@/components/home/HomeAccordion"
 import { Button } from "@/components/ui/button"
 
 // ── Shared variants ────────────────────────────────────────────────────
-const fadeUp = {
+const fadeUp: Variants = {
   hidden: { opacity: 0, y: 18 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
 }
@@ -27,7 +27,7 @@ const scrollReveal = {
   initial: { opacity: 0, y: 16 },
   whileInView: { opacity: 1, y: 0 },
   viewport: { once: true, margin: "-60px" } as const,
-  transition: { duration: 0.35, ease: "easeOut" },
+  transition: { duration: 0.35, ease: "easeOut" as const },
 }
 
 // ── Wireframe Cube ─────────────────────────────────────────────────────
@@ -44,7 +44,7 @@ function WireframeCube() {
       className="w-56 h-56 md:w-72 md:h-72"
       initial={{ opacity: 0, scale: 0.88 }}
       animate={{ opacity: 1, scale: 1 }}
-      transition={{ duration: 0.5, ease: "easeOut", delay: 0.25 }}
+      transition={{ duration: 0.5, ease: "easeOut" as const, delay: 0.25 }}
     >
       <polygon points="120,20 200,60 120,100 40,60" stroke={s} strokeWidth={w} />
       <polygon points="40,60 120,100 120,180 40,140" stroke={s} strokeWidth={w} />
@@ -95,7 +95,7 @@ const offerCards = [
 ]
 
 // ── Card component ─────────────────────────────────────────────────────
-const cardItem = {
+const cardItem: Variants = {
   hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
 }
