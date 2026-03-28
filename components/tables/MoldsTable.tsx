@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { type ColumnDef } from "@tanstack/react-table"
 import { Pencil, Trash2, Search } from "lucide-react"
+import { Select } from "@/components/ui/select"
 import { DataTable } from "./DataTable"
 import { MoldModal } from "@/components/modals/MoldModal"
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal"
@@ -143,15 +144,14 @@ export function MoldsTable() {
             className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-zinc-200 bg-white focus:outline-none focus:ring-2 focus:ring-zinc-300 transition"
           />
         </div>
-        <select
+        <Select
           value={filter}
           onChange={(e) => setFilter(e.target.value as FilterType)}
-          className="rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-600 bg-white focus:outline-none focus:ring-2 focus:ring-zinc-300"
         >
           <option value="all">All</option>
           <option value="free">Free</option>
           <option value="paid">Paid</option>
-        </select>
+        </Select>
         <div className="ml-auto">
           <Button onClick={() => setCreateOpen(true)}>Create Mold</Button>
         </div>

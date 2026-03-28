@@ -2,14 +2,26 @@
 
 import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
+import Link from "next/link"
+import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Search, ChevronLeft, ChevronRight, Building2, MapPin, Globe, MapPinned, ChevronDown } from "lucide-react"
+import { Building2, MapPin, Globe, MapPinned, ChevronDown, Lock } from "lucide-react"
+import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
+import { Pagination } from "@/components/listing/Pagination"
 import { useSuppliersListing, useSupplierCategories } from "@/hooks/queries/useSuppliers"
+import type { SupplierSort } from "@/hooks/queries/useSuppliers"
+import { createClient } from "@/lib/supabase/client"
 
 const PAGE_SIZE = 12
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
-// Animation variants
+const SORT_OPTIONS: { label: string; value: SupplierSort }[] = [
+  { label: "Name: A → Z",    value: "name_asc" },
+  { label: "Name: Z → A",    value: "name_desc" },
+  { label: "Newest",         value: "newest" },
+  { label: "Oldest",         value: "oldest" },
+]
+
 const pageVariants = {
   initial: { opacity: 0, y: 8 },
   animate: { opacity: 1, y: 0, transition: { duration: 0.25 } },
@@ -20,6 +32,24 @@ const gridVariants = {
 const cardVariants = {
   initial: { opacity: 0, y: 12 },
   animate: { opacity: 1, y: 0, transition: { duration: 0.2 } },
+}
+
+// ── Login gate overlay ────────────────────────────────────────
+function LoginGate({ callbackPath }: { callbackPath: string }) {
+  return (
+    <div className="absolute inset-0 flex flex-col items-center justify-center gap-2.5 rounded-b-xl bg-white/80 backdrop-blur-[3px] px-4 py-4 text-center">
+      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-zinc-100">
+        <Lock size={14} className="text-zinc-500" />
+      </div>
+      <p className="text-sm font-semibold text-zinc-800">Sign in to view full details</p>
+      <Link
+        href={`/login?callbackUrl=${encodeURIComponent(callbackPath)}`}
+        className="inline-flex items-center gap-1.5 bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-5 py-1.5 rounded-lg transition-colors"
+      >
+        Log In
+      </Link>
+    </div>
+  )
 }
 
 function SupplierExpandedContent({ supplier }: {
@@ -77,6 +107,8 @@ function SupplierCard({
   supplier,
   expanded,
   onToggle,
+  isLoggedIn,
+  callbackPath,
 }: {
   supplier: {
     id: string
@@ -90,8 +122,11 @@ function SupplierCard({
   }
   expanded: boolean
   onToggle: () => void
+  isLoggedIn: boolean | null
+  callbackPath: string
 }) {
   const logoSrc = supplier.logo_path ? `${R2_BASE}/${supplier.logo_path}` : null
+  const showGate = expanded && isLoggedIn === false
 
   return (
     <motion.div
@@ -134,7 +169,6 @@ function SupplierCard({
         </motion.div>
       </motion.button>
 
-      {/* Animated expand/collapse */}
       <AnimatePresence initial={false}>
         {expanded && (
           <motion.div
@@ -145,7 +179,14 @@ function SupplierCard({
             transition={{ duration: 0.25, ease: "easeInOut" }}
             style={{ overflow: "hidden" }}
           >
-            <SupplierExpandedContent supplier={supplier} />
+            <div className="relative min-h-25">
+              {/* Content — blurred for guests */}
+              <div className={showGate ? "blur-[3px] pointer-events-none select-none" : ""}>
+                <SupplierExpandedContent supplier={supplier} />
+              </div>
+              {/* Login gate overlay */}
+              {showGate && <LoginGate callbackPath={callbackPath} />}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -165,74 +206,67 @@ function SkeletonCard() {
   )
 }
 
-function PillButton({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
-  return (
-    <motion.button
-      onClick={onClick}
-      whileTap={{ scale: 0.95 }}
-      transition={{ duration: 0.1 }}
-      className={`px-4 py-2 rounded-lg text-sm font-medium border transition-colors whitespace-nowrap ${
-        active ? "bg-primary text-white border-primary" : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-300"
-      }`}
-    >
-      {children}
-    </motion.button>
-  )
-}
-
-function Pagination({ currentPage, totalPages, onChange }: { currentPage: number; totalPages: number; onChange: (p: number) => void }) {
-  if (totalPages <= 1) return null
-  const pages: (number | "…")[] = []
-  if (totalPages <= 7) {
-    for (let i = 1; i <= totalPages; i++) pages.push(i)
-  } else {
-    pages.push(1)
-    if (currentPage > 3) pages.push("…")
-    for (let i = Math.max(2, currentPage - 1); i <= Math.min(totalPages - 1, currentPage + 1); i++) pages.push(i)
-    if (currentPage < totalPages - 2) pages.push("…")
-    pages.push(totalPages)
-  }
-  return (
-    <div className="flex items-center justify-center gap-1">
-      <button onClick={() => onChange(currentPage - 1)} disabled={currentPage === 1} className="p-2 rounded-lg border border-zinc-200 text-zinc-500 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors" aria-label="Previous page">
-        <ChevronLeft size={16} />
-      </button>
-      {pages.map((p, i) =>
-        p === "…" ? (
-          <span key={`e-${i}`} className="px-2 text-zinc-400 text-sm select-none">…</span>
-        ) : (
-          <button key={p} onClick={() => onChange(p as number)} className={`min-w-9 h-9 rounded-lg border text-sm font-medium transition-colors ${p === currentPage ? "bg-primary text-white border-primary" : "border-zinc-200 text-zinc-600 hover:bg-zinc-50"}`}>{p}</button>
-        )
-      )}
-      <button onClick={() => onChange(currentPage + 1)} disabled={currentPage === totalPages} className="p-2 rounded-lg border border-zinc-200 text-zinc-500 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors" aria-label="Next page">
-        <ChevronRight size={16} />
-      </button>
-    </div>
-  )
-}
-
 export default function SuppliersListingClient() {
-  const [inputValue, setInputValue]             = useState("")
-  const [searchTerm, setSearchTerm]             = useState("")
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [currentPage, setCurrentPage]           = useState(1)
-  const [expandedId, setExpandedId]             = useState<string | null>(null)
+  const router       = useRouter()
+  const pathname     = usePathname()
+  const searchParams = useSearchParams()
 
+  const [inputValue, setInputValue]             = useState(() => searchParams.get("search") ?? "")
+  const [searchTerm, setSearchTerm]             = useState(() => searchParams.get("search") ?? "")
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(() => searchParams.get("category"))
+  const [sort, setSort]                         = useState<SupplierSort>(() => (searchParams.get("sort") as SupplierSort) ?? "name_asc")
+  const [currentPage, setCurrentPage]           = useState(() => Number(searchParams.get("page")) || 1)
+  const [expandedId, setExpandedId]             = useState<string | null>(null)
+  const [isLoggedIn, setIsLoggedIn]             = useState<boolean | null>(null)
+
+  // Auth check
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session)
+    })
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setIsLoggedIn(!!session)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
+
+  // Debounce search
   useEffect(() => {
     const t = setTimeout(() => { setSearchTerm(inputValue); setCurrentPage(1) }, 300)
     return () => clearTimeout(t)
   }, [inputValue])
 
-  const handleCategoryChange = useCallback((id: string | null) => { setSelectedCategory(id); setCurrentPage(1) }, [])
-  const clearAll = useCallback(() => { setInputValue(""); setSearchTerm(""); setSelectedCategory(null); setCurrentPage(1) }, [])
+  // Sync to URL
+  useEffect(() => {
+    const p = new URLSearchParams()
+    if (searchTerm)              p.set("search",   searchTerm)
+    if (selectedCategory)        p.set("category", selectedCategory)
+    if (sort !== "name_asc")     p.set("sort",     sort)
+    if (currentPage > 1)         p.set("page",     String(currentPage))
+    const qs = p.toString()
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
+  }, [searchTerm, selectedCategory, sort, currentPage, pathname, router])
 
-  const { data, isLoading, isFetching } = useSuppliersListing({ search: searchTerm, categoryId: selectedCategory, page: currentPage, pageSize: PAGE_SIZE })
+  const handleCategoryChange = useCallback((id: string | null) => { setSelectedCategory(id); setCurrentPage(1) }, [])
+  const handleSort           = useCallback((v: string) => { setSort(v as SupplierSort); setCurrentPage(1) }, [])
+  const clearAll             = useCallback(() => {
+    setInputValue(""); setSearchTerm(""); setSelectedCategory(null); setSort("name_asc"); setCurrentPage(1)
+  }, [])
+
+  const { data, isLoading, isFetching } = useSuppliersListing({
+    search: searchTerm,
+    categoryId: selectedCategory,
+    sort,
+    page: currentPage,
+    pageSize: PAGE_SIZE,
+  })
   const { data: categories } = useSupplierCategories()
 
   const suppliers  = data?.data ?? []
   const total      = data?.total ?? 0
   const totalPages = Math.ceil(total / PAGE_SIZE)
-  const hasActiveFilters = !!searchTerm || !!selectedCategory
+  const hasActiveFilters = !!searchTerm || !!selectedCategory || sort !== "name_asc"
 
   const handleToggle = (id: string) => setExpandedId(expandedId === id ? null : id)
 
@@ -241,56 +275,48 @@ export default function SuppliersListingClient() {
       variants={pageVariants}
       initial="initial"
       animate="animate"
-      className="max-w-7xl mx-auto px-6 py-10 space-y-8"
+      className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8"
     >
-      {/* Header */}
       <div>
         <h1 className="text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Suppliers</h1>
         <p className="mt-1 text-sm text-zinc-500">Browse our verified network of mold and die suppliers</p>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
-        <div className="relative flex-1 max-w-md">
-          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
-          <input type="text" value={inputValue} onChange={(e) => setInputValue(e.target.value)} placeholder="Search suppliers…" className="w-full pl-9 pr-4 py-2.5 text-sm border border-zinc-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-colors" />
-        </div>
-        {categories && categories.length > 0 && (
-          <div className="flex items-center gap-2 flex-wrap">
-            <PillButton active={selectedCategory === null} onClick={() => handleCategoryChange(null)}>All</PillButton>
-            {categories.map((cat) => (
-              <PillButton key={cat.id} active={selectedCategory === cat.id} onClick={() => handleCategoryChange(cat.id)}>{cat.name}</PillButton>
-            ))}
-          </div>
-        )}
-      </div>
+      <ListingFiltersBar
+        searchValue={inputValue}
+        onSearchChange={setInputValue}
+        searchPlaceholder="Search suppliers…"
+        sortValue={sort}
+        onSortChange={handleSort}
+        sortOptions={SORT_OPTIONS}
+        categories={categories}
+        categoryValue={selectedCategory ?? ""}
+        onCategoryChange={handleCategoryChange}
+        hasActiveFilters={hasActiveFilters}
+        onClear={clearAll}
+        isFetching={isFetching && !isLoading}
+      />
 
-      {/* Meta */}
       {!isLoading && (
-        <div className="flex items-center justify-between">
-          <p className="text-xs text-zinc-400">
-            {total === 0 ? "No results" : `${total} supplier${total !== 1 ? "s" : ""} found`}
-            {isFetching && !isLoading && <span className="ml-2 text-zinc-300">Updating…</span>}
-          </p>
-          {hasActiveFilters && <button onClick={clearAll} className="text-xs text-primary underline underline-offset-2 hover:opacity-70 transition-opacity">Clear filters</button>}
-        </div>
+        <p className="text-xs text-zinc-400">
+          {total === 0 ? "No results" : `${total} supplier${total !== 1 ? "s" : ""} found`}
+        </p>
       )}
 
-      {/* Grid */}
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : suppliers.length === 0 ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="flex flex-col items-center justify-center py-24 text-center"
-        >
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-24 text-center">
           <Building2 size={48} className="text-zinc-200 mb-4" strokeWidth={1} />
           <p className="text-zinc-500 font-medium">No suppliers found</p>
           <p className="text-zinc-400 text-sm mt-1">Try adjusting your search or filters</p>
-          {hasActiveFilters && <button onClick={clearAll} className="mt-4 text-sm text-primary underline underline-offset-2 hover:opacity-70 transition-opacity">Clear filters</button>}
+          {hasActiveFilters && (
+            <button onClick={clearAll} className="mt-4 text-sm text-primary underline underline-offset-2 hover:opacity-70">
+              Clear all filters
+            </button>
+          )}
         </motion.div>
       ) : (
         <motion.div
@@ -298,7 +324,7 @@ export default function SuppliersListingClient() {
           variants={gridVariants}
           initial="initial"
           animate="animate"
-          className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : "opacity-100"}`}
+          className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}
         >
           {suppliers.map((supplier) => (
             <SupplierCard
@@ -306,12 +332,13 @@ export default function SuppliersListingClient() {
               supplier={supplier}
               expanded={expandedId === supplier.id}
               onToggle={() => handleToggle(supplier.id)}
+              isLoggedIn={isLoggedIn}
+              callbackPath={pathname}
             />
           ))}
         </motion.div>
       )}
 
-      {/* Pagination */}
       {!isLoading && totalPages > 1 && (
         <div className="pt-4">
           <Pagination currentPage={currentPage} totalPages={totalPages} onChange={setCurrentPage} />

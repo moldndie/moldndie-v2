@@ -41,10 +41,13 @@ export async function getPublishedBlogs(): Promise<Blog[]> {
   return getFilteredPublishedBlogs({})
 }
 
+export type BlogSort = "newest" | "oldest" | "title_asc"
+
 export async function getFilteredPublishedBlogs(filters: {
   q?: string
   categoryId?: string
   tagIds?: string[]
+  sort?: BlogSort
 }): Promise<Blog[]> {
   const supabase = createAdminClient()
 
@@ -59,6 +62,13 @@ export async function getFilteredPublishedBlogs(filters: {
     if (tagBlogIds.length === 0) return []
   }
 
+  const orderMap: Record<BlogSort, { col: string; asc: boolean }> = {
+    newest:    { col: "created_at", asc: false },
+    oldest:    { col: "created_at", asc: true  },
+    title_asc: { col: "title",      asc: true  },
+  }
+  const { col, asc } = orderMap[filters.sort ?? "newest"]
+
   let query = supabase
     .from("blogs")
     .select("*, category:blog_categories(id,name,slug,created_at)")
@@ -68,7 +78,7 @@ export async function getFilteredPublishedBlogs(filters: {
   if (filters.categoryId) query = query.eq("category_id", filters.categoryId)
   if (tagBlogIds !== null) query = query.in("id", tagBlogIds)
 
-  query = query.order("created_at", { ascending: false })
+  query = query.order(col, { ascending: asc })
 
   const { data, error } = await query
   if (error) throw dbError(error)

@@ -9,12 +9,13 @@ import {
   updateEvent,
   deleteEvent,
   type EventsListingParams,
+  type EventSort,
 } from "@/services/event.service"
 import { getEventCategories } from "@/services/eventCategory.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { EventFormValues } from "@/schemas/event.schema"
 
-export type { EventsListingParams }
+export type { EventsListingParams, EventSort }
 
 export function useEvents() {
   return useQuery({
@@ -39,6 +40,7 @@ export function useEventsListing(params: EventsListingParams = {}) {
       "events", "listing",
       params.search ?? "",
       params.categoryId ?? null,
+      params.sort ?? "newest",
       params.page ?? 1,
     ],
     queryFn: () => getEventsListing(params),

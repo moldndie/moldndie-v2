@@ -1,6 +1,6 @@
 import Link from "next/link";
 import NavbarUserMenu from "@/components/layout/NavbarUserMenu";
-import NavbarCartButton from "@/components/layout/NavbarCartButton";
+import NavbarMobileMenu from "@/components/layout/NavbarMobileMenu";
 
 const navLinks = [
   { label: "Blogs",     href: "/blogs" },
@@ -28,14 +28,14 @@ function LogoIcon() {
 export default function Navbar() {
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-zinc-100">
-      <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link href="/" className="flex items-center gap-2.5 shrink-0">
           <LogoIcon />
-          <span className="font-bold text-sm tracking-widest text-zinc-900">MOLD N DIE</span>
+          <span className="font-bold text-sm tracking-widest text-zinc-900 hidden sm:inline">MOLD N DIE</span>
         </Link>
 
-        {/* Nav links */}
+        {/* Desktop nav links */}
         <nav className="hidden md:flex items-center gap-8">
           {navLinks.map((link) => (
             <Link
@@ -48,9 +48,9 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Cart + Auth */}
-        <div className="flex items-center gap-2">
-          <NavbarCartButton />
+        {/* Right side: mobile menu + auth */}
+        <div className="flex items-center gap-1">
+          <NavbarMobileMenu />
           <NavbarUserMenu />
         </div>
       </div>

@@ -9,12 +9,13 @@ import {
   updateSupplier,
   deleteSupplier,
   type SuppliersListingParams,
+  type SupplierSort,
 } from "@/services/supplier.service"
 import { getSupplierCategories } from "@/services/supplierCategory.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { SupplierFormValues } from "@/schemas/supplier.schema"
 
-export type { SuppliersListingParams }
+export type { SuppliersListingParams, SupplierSort }
 
 export function useSuppliers() {
   return useQuery({
@@ -39,6 +40,7 @@ export function useSuppliersListing(params: SuppliersListingParams = {}) {
       "suppliers", "listing",
       params.search ?? "",
       params.categoryId ?? null,
+      params.sort ?? "name_asc",
       params.page ?? 1,
     ],
     queryFn: () => getSuppliersListing(params),

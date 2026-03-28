@@ -3,6 +3,8 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter, usePathname } from "next/navigation"
+import { toast } from "sonner"
 import {
   BookOpen,
   Lock,
@@ -92,7 +94,8 @@ export default function CourseDetailClient({ courseId }: { courseId: string }) {
   const { data: purchased, isLoading: accessLoading } = useCourseAccess(courseId)
   const addToCart = useAddToCart()
   const inCart = useCartHasItem(courseId, "course")
-  const [loginError, setLoginError] = useState<string | null>(null)
+  const router = useRouter()
+  const pathname = usePathname()
 
   if (isLoading || accessLoading) return <SkeletonDetail />
   if (isError) return <ErrorState />
@@ -115,7 +118,10 @@ export default function CourseDetailClient({ courseId }: { courseId: string }) {
       },
       {
         onError: (err) => {
-          if (err.message === "login_required") setLoginError("Please login to add items to cart.")
+          if (err.message === "login_required") {
+            toast.info("Please sign in to add items to cart.")
+            router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`)
+          }
         },
       }
     )
@@ -187,14 +193,6 @@ export default function CourseDetailClient({ courseId }: { courseId: string }) {
           )}
 
           <div className="border-t border-zinc-100" />
-
-          {/* Login error */}
-          {loginError && (
-            <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-3">
-              <AlertCircle size={16} className="shrink-0 mt-0.5" />
-              {loginError}
-            </div>
-          )}
 
           {/* CTA */}
           {firstAccessibleLesson ? (

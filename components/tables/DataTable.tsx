@@ -12,6 +12,7 @@ import {
 } from "@tanstack/react-table"
 import { ChevronUp, ChevronDown, ChevronsUpDown } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Select } from "@/components/ui/select"
 
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[]
@@ -132,17 +133,17 @@ export function DataTable<TData>({
               )} of ${data.length}`}
         </span>
         <div className="flex items-center gap-2">
-          <select
+          <Select
             value={pagination.pageSize}
             onChange={(e) =>
               setPagination((p) => ({ ...p, pageSize: Number(e.target.value), pageIndex: 0 }))
             }
-            className="rounded-lg border border-zinc-200 px-2 py-1 text-sm text-zinc-600"
+            className="w-28"
           >
             {[10, 20, 50].map((s) => (
               <option key={s} value={s}>{s} / page</option>
             ))}
-          </select>
+          </Select>
           <button
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}

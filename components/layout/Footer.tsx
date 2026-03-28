@@ -1,14 +1,26 @@
 import Link from "next/link";
 import { Youtube, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
 
-const pages = ["Blog", "Library", "Events", "Suppliers", "Services"];
-const company = ["About Us", "Terms of Use", "Privacy Policy"];
+const pages = [
+  { label: "Blog",      href: "/blogs" },
+  { label: "Library",   href: "/molds" },
+  { label: "Events",    href: "/events" },
+  { label: "Suppliers", href: "/suppliers" },
+  { label: "Services",  href: "/services" },
+];
+
+const company = [
+  { label: "About Us",        href: "/about" },
+  { label: "Privacy Policy",  href: "/privacy-policy" },
+  { label: "Terms of Use",    href: "/terms-of-use" },
+];
+
 const socials = [
-  { icon: Youtube, href: "#", label: "YouTube" },
-  { icon: Facebook, href: "#", label: "Facebook" },
-  { icon: Twitter, href: "#", label: "Twitter" },
+  { icon: Youtube,   href: "#", label: "YouTube" },
+  { icon: Facebook,  href: "#", label: "Facebook" },
+  { icon: Twitter,   href: "#", label: "Twitter" },
   { icon: Instagram, href: "#", label: "Instagram" },
-  { icon: Linkedin, href: "#", label: "LinkedIn" },
+  { icon: Linkedin,  href: "#", label: "LinkedIn" },
 ];
 
 function FooterLogo() {
@@ -34,13 +46,10 @@ export default function Footer() {
           <div>
             <p className="text-xs font-semibold tracking-wider text-white/60 uppercase mb-4">Pages</p>
             <ul className="space-y-2.5">
-              {pages.map((page) => (
-                <li key={page}>
-                  <Link
-                    href={`/${page.toLowerCase().replace(" ", "-")}`}
-                    className="text-sm text-white/80 hover:text-white transition-colors"
-                  >
-                    {page}
+              {pages.map(({ label, href }) => (
+                <li key={href}>
+                  <Link href={href} className="text-sm text-white/80 hover:text-white transition-colors">
+                    {label}
                   </Link>
                 </li>
               ))}
@@ -49,13 +58,10 @@ export default function Footer() {
           <div>
             <p className="text-xs font-semibold tracking-wider text-white/60 uppercase mb-4">Company</p>
             <ul className="space-y-2.5">
-              {company.map((item) => (
-                <li key={item}>
-                  <Link
-                    href={`/${item.toLowerCase().replace(" ", "-")}`}
-                    className="text-sm text-white/80 hover:text-white transition-colors"
-                  >
-                    {item}
+              {company.map(({ label, href }) => (
+                <li key={href}>
+                  <Link href={href} className="text-sm text-white/80 hover:text-white transition-colors">
+                    {label}
                   </Link>
                 </li>
               ))}

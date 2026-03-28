@@ -9,6 +9,7 @@ import {
   updateCourse,
   deleteCourse,
   type CoursesListingParams,
+  type CourseSort,
 } from "@/services/course.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { CourseFormValues } from "@/schemas/course.schema"
@@ -38,7 +39,7 @@ export function useCourseAccess(id: string) {
   })
 }
 
-export type { CoursesListingParams }
+export type { CoursesListingParams, CourseSort }
 
 export function useCoursesListing(params: CoursesListingParams = {}) {
   return useQuery({
@@ -46,6 +47,7 @@ export function useCoursesListing(params: CoursesListingParams = {}) {
       "courses", "listing",
       params.search ?? "",
       params.priceFilter ?? "all",
+      params.sort ?? "newest",
       params.page ?? 1,
     ],
     queryFn: () => getCoursesListing(params),

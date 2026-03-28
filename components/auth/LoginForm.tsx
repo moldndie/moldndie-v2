@@ -14,7 +14,11 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 
-export default function LoginForm() {
+interface LoginFormProps {
+  callbackUrl?: string
+}
+
+export default function LoginForm({ callbackUrl }: LoginFormProps) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
 
@@ -30,7 +34,7 @@ export default function LoginForm() {
       toast.error(result.error);
     } else {
       toast.success("Signed in successfully!");
-      router.push("/");
+      router.push(callbackUrl || "/");
     }
   }
 

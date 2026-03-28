@@ -21,10 +21,15 @@ interface Props {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const blog = await getBlogBySlug(slug)
-  if (!blog) return { title: "Blog Not Found | MoldNdie" }
+  if (!blog) return { title: "Blog Not Found" }
   return {
-    title: `${blog.title} | MoldNdie`,
+    title: blog.title,
     description: blog.introduction ?? undefined,
+    openGraph: {
+      title: blog.title,
+      description: blog.introduction ?? undefined,
+      images: blog.cover_image_path ? [getFileUrl(blog.cover_image_path)] : [],
+    },
   }
 }
 
@@ -32,27 +37,24 @@ function RelatedBlogCard({ blog }: { blog: Blog }) {
   return (
     <Link
       href={`/blogs/${blog.slug}`}
-      className="group flex gap-4 items-start rounded-2xl border border-zinc-100 bg-white p-4 hover:border-zinc-200 hover:shadow-md hover:scale-[1.02] transition-all duration-200 cursor-pointer"
+      className="group flex flex-col rounded-2xl border border-zinc-100 bg-white overflow-hidden hover:border-zinc-200 hover:shadow-md transition-all duration-200"
     >
-      {/* Thumbnail */}
-      <div className="relative w-20 h-20 shrink-0 rounded-xl overflow-hidden bg-zinc-100">
+      <div className="relative aspect-video w-full bg-zinc-100 overflow-hidden">
         {blog.cover_image_path ? (
           <Image
             src={getFileUrl(blog.cover_image_path)}
             alt={blog.title}
             fill
             className="object-cover group-hover:scale-105 transition-transform duration-300"
-            sizes="80px"
+            sizes="(max-width: 768px) 100vw, 33vw"
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <FileText size={22} className="text-zinc-300" strokeWidth={1} />
+            <FileText size={28} className="text-zinc-300" strokeWidth={1} />
           </div>
         )}
       </div>
-
-      {/* Text */}
-      <div className="min-w-0 flex flex-col gap-1.5">
+      <div className="flex flex-col gap-1.5 p-4">
         {blog.category && (
           <span className="inline-block w-fit text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2 py-0.5 rounded-full">
             {blog.category.name}
@@ -62,7 +64,7 @@ function RelatedBlogCard({ blog }: { blog: Blog }) {
           {blog.title}
         </p>
         {blog.introduction && (
-          <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">
+          <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">
             {blog.introduction}
           </p>
         )}
@@ -119,88 +121,94 @@ export default async function BlogDetailPage({ params }: Props) {
           </div>
         )}
 
-        <div className="max-w-5xl mx-auto  py-10 flex justify-between gap-10">
-            {/* Main content */}
-            <article className="flex-1 min-w-0">
-              <Link
-                href="/blogs"
-                className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900 transition-colors mb-6"
-              >
-                <ChevronLeft size={15} />
-                All blogs
-              </Link>
+        {/* ── Article ── */}
+        <article className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
+          <Link
+            href="/blogs"
+            className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900 transition-colors mb-6"
+          >
+            <ChevronLeft size={15} />
+            All blogs
+          </Link>
 
-              <div className="flex flex-wrap items-center gap-2 mb-3">
-                {blog.category && (
-                  <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">
-                    {blog.category.name}
-                  </span>
-                )}
-                <span className="text-xs text-zinc-400">{date}</span>
+          {/* Meta */}
+          <div className="flex flex-wrap items-center gap-2 mb-3">
+            {blog.category && (
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">
+                {blog.category.name}
+              </span>
+            )}
+            <span className="text-xs text-zinc-400">{date}</span>
+          </div>
+
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 leading-tight mb-4">
+            {blog.title}
+          </h1>
+
+          {blog.introduction && (
+            <p className="text-base text-zinc-500 leading-relaxed mb-6 border-l-4 border-primary/30 pl-4">
+              {blog.introduction}
+            </p>
+          )}
+
+          {blogTags.length > 0 && (
+            <div className="flex flex-wrap gap-2 mb-8">
+              {blogTags.map((tag) => (
+                <Link
+                  key={tag.id}
+                  href={`/blogs?tags=${tag.id}`}
+                  className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-600 hover:border-primary hover:bg-primary/5 hover:text-primary transition-colors"
+                >
+                  #{tag.name}
+                </Link>
+              ))}
+            </div>
+          )}
+
+          {blocks.length > 0 && <hr className="border-zinc-100 mb-8" />}
+          {blocks.length > 0 && (
+            <div className="prose prose-zinc prose-sm sm:prose-base max-w-none">
+              <BlockRenderer blocks={blocks} />
+            </div>
+          )}
+
+          {/* Like */}
+          <div className="mt-10 pt-6 border-t border-zinc-100 flex items-center gap-3">
+            <LikeButton
+              blogId={blog.id}
+              initialLiked={likeData.liked}
+              initialCount={likeData.count}
+              isLoggedIn={!!user}
+            />
+            <span className="text-xs text-zinc-400">
+              {likeData.count === 1 ? "1 like" : `${likeData.count} likes`}
+            </span>
+          </div>
+
+          <CommentsSection
+            blogId={blog.id}
+            initialComments={comments}
+            currentUserId={user?.id ?? null}
+          />
+        </article>
+
+        {/* ── Related Articles ── */}
+        {related.length > 0 && (
+          <section className="border-t border-zinc-100 bg-zinc-50">
+            <div className="max-w-3xl mx-auto px-4 sm:px-6 py-12">
+              <h2 className="text-base font-bold text-zinc-900 mb-6">Related Articles</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+                {related.map((r) => (
+                  <RelatedBlogCard key={r.id} blog={r} />
+                ))}
               </div>
+            </div>
+          </section>
+        )}
 
-              <h1 className="text-2xl md:text-3xl font-extrabold text-zinc-900 leading-tight mb-4">
-                {blog.title}
-              </h1>
-
-              {blog.introduction && (
-                <p className="text-base text-zinc-500 leading-relaxed mb-6 border-l-4 border-primary/30 pl-4">
-                  {blog.introduction}
-                </p>
-              )}
-
-              {blogTags.length > 0 && (
-                <div className="flex flex-wrap gap-2 mb-8">
-                  {blogTags.map((tag) => (
-                    <Link
-                      key={tag.id}
-                      href={`/blogs?tags=${tag.id}`}
-                      className="rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-medium text-zinc-600 hover:border-primary hover:bg-primary/5 hover:text-primary transition-colors"
-                    >
-                      #{tag.name}
-                    </Link>
-                  ))}
-                </div>
-              )}
-
-              {blocks.length > 0 && <hr className="border-zinc-100 mb-8" />}
-              {blocks.length > 0 && <BlockRenderer blocks={blocks} />}
-
-              <div className="mt-10 pt-6 border-t border-zinc-100 flex items-center gap-3">
-                <LikeButton
-                  blogId={blog.id}
-                  initialLiked={likeData.liked}
-                  initialCount={likeData.count}
-                  isLoggedIn={!!user}
-                />
-                <span className="text-xs text-zinc-400">
-                  {likeData.count === 1 ? "1 like" : `${likeData.count} likes`}
-                </span>
-              </div>
-
-              <CommentsSection
-                blogId={blog.id}
-                initialComments={comments}
-                currentUserId={user?.id ?? null}
-              />
-            </article>
-
-            {/* Sidebar */}
-            <aside className="max-w-72 lg:w-40 shrink-0">
-              <div className="lg:sticky lg:top-8 space-y-4">
-                {related.length > 0 && (
-                  <div className="space-y-3">
-                    <p className="text-xs font-bold uppercase tracking-wider text-zinc-400">
-                      Related Posts
-                    </p>
-                    {related.map((r) => (
-                      <RelatedBlogCard key={r.id} blog={r} />
-                    ))}
-                  </div>
-                )}
-                <AdSlot type="blog" className="w-full" />
-              </div>
-            </aside>
+        {/* ── Sponsored ── */}
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+          <AdSlot type="blog" className="max-w-md mx-auto" />
         </div>
       </main>
       <Footer />

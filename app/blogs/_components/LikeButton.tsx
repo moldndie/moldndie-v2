@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react"
 import { Heart } from "lucide-react"
+import { usePathname, useRouter } from "next/navigation"
+import { toast } from "sonner"
 import { toggleBlogLike } from "@/services/blog.service"
 
 interface LikeButtonProps {
@@ -15,10 +17,13 @@ export function LikeButton({ blogId, initialLiked, initialCount, isLoggedIn }: L
   const [liked, setLiked] = useState(initialLiked)
   const [count, setCount] = useState(initialCount)
   const [isPending, startTransition] = useTransition()
+  const pathname = usePathname()
+  const router = useRouter()
 
   function handleClick() {
     if (!isLoggedIn) {
-      window.location.href = "/login"
+      toast.info("Please sign in to like this post.")
+      router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`)
       return
     }
 
@@ -33,8 +38,7 @@ export function LikeButton({ blogId, initialLiked, initialCount, isLoggedIn }: L
         const result = await toggleBlogLike(blogId)
         setLiked(result.liked)
         setCount(result.count)
-      } catch (e) {
-        console.error("[LikeButton] toggle failed:", e)
+      } catch {
         // Revert
         setLiked(wasLiked)
         setCount((prev) => (wasLiked ? prev + 1 : prev - 1))

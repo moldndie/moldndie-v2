@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
+import { toast } from "sonner"
 import { useEffect, useRef, useState } from "react"
 import {
   Lock,
@@ -218,6 +219,7 @@ export default function LessonViewerClient({
   lessonId: string
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const { data: course, isLoading, isError } = useCourseById(courseId)
   const { data: purchased, isLoading: accessLoading } = useCourseAccess(courseId)
   const addToCart = useAddToCart()
@@ -267,13 +269,23 @@ export default function LessonViewerClient({
   const pdfUrl = lesson.pdf_url ? `${R2_BASE}/${lesson.pdf_url}` : null
 
   function handleAddToCart() {
-    addToCart.mutate({
-      product_id: courseId,
-      product_type: "course",
-      title: course!.title,
-      price: course!.price ?? 0,
-      image: course!.thumbnail_url ?? "",
-    })
+    addToCart.mutate(
+      {
+        product_id: courseId,
+        product_type: "course",
+        title: course!.title,
+        price: course!.price ?? 0,
+        image: course!.thumbnail_url ?? "",
+      },
+      {
+        onError: (err) => {
+          if (err.message === "login_required") {
+            toast.info("Please sign in to add items to cart.")
+            router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`)
+          }
+        },
+      }
+    )
   }
 
   return (

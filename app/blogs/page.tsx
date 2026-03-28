@@ -5,7 +5,7 @@ import Image from "next/image"
 import { FileText, Heart, MessageSquare } from "lucide-react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { getFilteredPublishedBlogs, getBlogCategories, getBlogTags, getBlogCountsMap } from "@/services/blog.service"
+import { getFilteredPublishedBlogs, getBlogCategories, getBlogTags, getBlogCountsMap, type BlogSort } from "@/services/blog.service"
 import { getFileUrl } from "@/lib/utils"
 import { BlogFiltersBar } from "./_components/BlogFiltersBar"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
@@ -95,8 +95,9 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
   const tagIds = typeof params.tags === "string"
     ? params.tags.split(",").filter(Boolean)
     : undefined
+  const sort = typeof params.sort === "string" ? params.sort : undefined
 
-  const blogs = await getFilteredPublishedBlogs({ q, categoryId, tagIds })
+  const blogs = await getFilteredPublishedBlogs({ q, categoryId, tagIds, sort: sort as BlogSort | undefined })
 
   const [categories, tags, countsMap] = await Promise.all([
     getBlogCategories(),
@@ -125,6 +126,7 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
               currentQ={q ?? ""}
               currentCategory={categoryId ?? ""}
               currentTags={tagIds ?? []}
+              currentSort={sort ?? "newest"}
             />
           </Suspense>
 

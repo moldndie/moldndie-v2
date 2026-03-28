@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { revalidatePath } from "next/cache"
 import type { Mold, MoldCategory } from "@/types"
 import type { MoldFormValues } from "@/schemas/mold.schema"
@@ -18,7 +19,7 @@ export interface MoldsParams {
 }
 
 export async function getMolds(params?: MoldsParams): Promise<Mold[]> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   let query = supabase
     .from("molds")
     .select("*, category:mold_categories(id,name,slug)")
@@ -40,7 +41,7 @@ export async function getMolds(params?: MoldsParams): Promise<Mold[]> {
 }
 
 export async function getMoldById(id: string): Promise<Mold> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from("molds")
     .select("*, category:mold_categories(id,name,slug)")
@@ -51,7 +52,7 @@ export async function getMoldById(id: string): Promise<Mold> {
 }
 
 export async function getMoldCategories(): Promise<MoldCategory[]> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase.from("mold_categories").select("*").order("name")
   if (error) throw dbError(error)
   return (data ?? []) as MoldCategory[]
@@ -75,7 +76,7 @@ export interface MoldsListingResult {
 }
 
 export async function getMoldsListing(params: MoldsListingParams = {}): Promise<MoldsListingResult> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { search, categoryId, priceFilter = "all", sort = "newest", page = 1, pageSize = 12 } = params
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1

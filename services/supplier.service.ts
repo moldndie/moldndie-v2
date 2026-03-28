@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/lib/supabase/server"
+import { createAdminClient } from "@/lib/supabase/admin"
 import { revalidatePath } from "next/cache"
 import type { Supplier } from "@/types"
 import type { SupplierFormValues } from "@/schemas/supplier.schema"
@@ -13,7 +14,7 @@ function dbError(e: unknown): Error {
 }
 
 export async function getSuppliers(): Promise<Supplier[]> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from("suppliers")
     .select("*")
@@ -22,9 +23,12 @@ export async function getSuppliers(): Promise<Supplier[]> {
   return (data ?? []) as Supplier[]
 }
 
+export type SupplierSort = "newest" | "oldest" | "name_asc" | "name_desc"
+
 export interface SuppliersListingParams {
   search?: string
   categoryId?: string | null
+  sort?: SupplierSort
   page?: number
   pageSize?: number
 }
@@ -37,15 +41,23 @@ export interface SuppliersListingResult {
 export async function getSuppliersListing(
   params: SuppliersListingParams = {}
 ): Promise<SuppliersListingResult> {
-  const supabase = await createClient()
-  const { search, categoryId, page = 1, pageSize = 12 } = params
+  const supabase = createAdminClient()
+  const { search, categoryId, sort = "name_asc", page = 1, pageSize = 12 } = params
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
+
+  const orderMap: Record<SupplierSort, { col: string; asc: boolean }> = {
+    newest:   { col: "created_at", asc: false },
+    oldest:   { col: "created_at", asc: true  },
+    name_asc: { col: "name",       asc: true  },
+    name_desc:{ col: "name",       asc: false },
+  }
+  const { col, asc } = orderMap[sort]
 
   let query = supabase
     .from("suppliers")
     .select("*, category:supplier_categories(id,name)", { count: "exact" })
-    .order("name", { ascending: true })
+    .order(col, { ascending: asc })
     .range(from, to)
 
   if (search?.trim()) {
@@ -62,7 +74,7 @@ export async function getSuppliersListing(
 }
 
 export async function getSupplierById(id: string): Promise<Supplier> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from("suppliers")
     .select("*, category:supplier_categories(id,name)")

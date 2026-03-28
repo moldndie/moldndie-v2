@@ -5,6 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { Input } from "@/components/ui/input"
+import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { FileUploadField } from "@/components/forms/FileUploadField"
 import { adSchema, AD_TARGET_TYPES, AD_TARGET_LABELS, type AdFormValues } from "@/schemas/ad.schema"
@@ -99,16 +100,13 @@ export function AdForm({ ad }: AdFormProps) {
       {/* Target type */}
       <div className="space-y-1.5">
         <label className="text-sm font-medium text-zinc-700">Target Type *</label>
-        <select
-          {...register("target_type")}
-          className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
-        >
+        <Select {...register("target_type")}>
           {AD_TARGET_TYPES.map((t) => (
             <option key={t} value={t}>
               {AD_TARGET_LABELS[t]}
             </option>
           ))}
-        </select>
+        </Select>
         {errors.target_type && <p className="text-xs text-red-500">{errors.target_type.message}</p>}
       </div>
 

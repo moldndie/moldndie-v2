@@ -2,6 +2,8 @@
 
 import { useState, useRef, useTransition } from "react"
 import { MessageSquare, Send } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
 import { addBlogComment, type BlogComment } from "@/services/blog.service"
 
 interface CommentsSectionProps {
@@ -30,6 +32,7 @@ export function CommentsSection({ blogId, initialComments, currentUserId }: Comm
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const pathname = usePathname()
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -86,7 +89,13 @@ export function CommentsSection({ blogId, initialComments, currentUserId }: Comm
         </form>
       ) : (
         <p className="mb-8 rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3 text-sm text-zinc-500">
-          Sign in to leave a comment.
+          <Link
+            href={`/login?callbackUrl=${encodeURIComponent(pathname)}`}
+            className="font-medium text-primary hover:underline"
+          >
+            Sign in
+          </Link>{" "}
+          to leave a comment.
         </p>
       )}
 

@@ -3,6 +3,8 @@
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { useRouter, usePathname } from "next/navigation"
+import { toast } from "sonner"
 import {
   Package,
   Play,
@@ -136,9 +138,10 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
   const [activeMedia, setActiveMedia] = useState<MoldMedia | null>(null)
   const [isDownloading, setIsDownloading] = useState(false)
   const [downloadError, setDownloadError] = useState<string | null>(null)
-  const [loginError, setLoginError] = useState<string | null>(null)
   const addToCart = useAddToCart()
   const inCart = useCartHasItem(moldId, "mold")
+  const router = useRouter()
+  const pathname = usePathname()
 
   if (isLoading) return <SkeletonProductPage />
   if (isError) return <ErrorState />
@@ -163,6 +166,11 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
       })
 
       if (!res.ok) {
+        if (res.status === 401) {
+          toast.info("Please sign in to download this file.")
+          router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`)
+          return
+        }
         const err = await res.json().catch(() => ({}))
         setDownloadError(err.error ?? "Download failed. Please try again.")
         return
@@ -193,7 +201,10 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
       },
       {
         onError: (err) => {
-          if (err.message === "login_required") setLoginError("Please login to add items to cart.")
+          if (err.message === "login_required") {
+            toast.info("Please sign in to add items to cart.")
+            router.push(`/login?callbackUrl=${encodeURIComponent(pathname)}`)
+          }
         },
       }
     )
@@ -300,10 +311,10 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
           <div className="border-t border-zinc-100" />
 
           {/* Errors */}
-          {(downloadError || loginError) && (
+          {downloadError && (
             <div className="flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-lg px-4 py-3">
               <AlertCircle size={16} className="shrink-0 mt-0.5" />
-              {downloadError ?? loginError}
+              {downloadError}
             </div>
           )}
 
@@ -338,7 +349,7 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
           {/* Trust note */}
           <p className="text-center text-xs text-zinc-400">
             {isFree
-              ? "No account required for free downloads"
+              ? "Free to download · Sign in required"
               : "Secure checkout · Instant access after payment"}
           </p>
           

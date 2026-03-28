@@ -1,6 +1,5 @@
 "use server"
 
-import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 import { revalidatePath } from "next/cache"
 import type { Course } from "@/types"
@@ -14,10 +13,12 @@ function dbError(e: unknown): Error {
 }
 
 export type CoursePriceFilter = "all" | "free" | "paid"
+export type CourseSort = "newest" | "oldest" | "price_asc" | "price_desc" | "title_asc"
 
 export interface CoursesListingParams {
   search?: string
   priceFilter?: CoursePriceFilter
+  sort?: CourseSort
   page?: number
   pageSize?: number
 }
@@ -30,16 +31,25 @@ export interface CoursesListingResult {
 export async function getCoursesListing(
   params: CoursesListingParams = {}
 ): Promise<CoursesListingResult> {
-  const supabase = await createClient()
-  const { search, priceFilter = "all", page = 1, pageSize = 12 } = params
+  const supabase = createAdminClient()
+  const { search, priceFilter = "all", sort = "newest", page = 1, pageSize = 12 } = params
   const from = (page - 1) * pageSize
   const to   = from + pageSize - 1
+
+  const orderMap: Record<CourseSort, { col: string; asc: boolean }> = {
+    newest:     { col: "created_at", asc: false },
+    oldest:     { col: "created_at", asc: true  },
+    price_asc:  { col: "price",      asc: true  },
+    price_desc: { col: "price",      asc: false },
+    title_asc:  { col: "title",      asc: true  },
+  }
+  const { col, asc } = orderMap[sort]
 
   let query = supabase
     .from("courses")
     .select("id, title, description, price, thumbnail_url, created_at", { count: "exact" })
     .eq("is_published", true)
-    .order("created_at", { ascending: false })
+    .order(col, { ascending: asc })
     .range(from, to)
 
   if (search?.trim()) {
@@ -58,7 +68,7 @@ export async function getCoursesListing(
 }
 
 export async function getCourses(): Promise<Course[]> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from("courses")
     .select("id, title, description, price, thumbnail_url, is_published, created_at")
@@ -68,7 +78,7 @@ export async function getCourses(): Promise<Course[]> {
 }
 
 export async function getCourseById(id: string): Promise<Course> {
-  const supabase = await createClient()
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from("courses")
     .select("*, lessons(*)")
