@@ -56,7 +56,7 @@ export default async function CourseEditPage({ params }: Props) {
           {course.is_published ? "Published" : "Draft"}
         </span>
         <span className="rounded-full bg-zinc-100 px-2.5 py-1 font-medium text-zinc-600">
-          {course.price === null || course.price === 0 ? "Free" : `EGP ${course.price}`}
+          {course.price === null || course.price === 0 ? "Free" : `${course.price} EGP`}
         </span>
       </div>
 

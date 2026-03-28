@@ -54,7 +54,7 @@ export function CoursesTable() {
         if (price === null || price === 0) {
           return <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">Free</span>
         }
-        return <span className="text-zinc-700">EGP {price.toFixed(2)}</span>
+        return <span className="text-zinc-700">{price.toFixed(2)} EGP</span>
       },
     },
     {

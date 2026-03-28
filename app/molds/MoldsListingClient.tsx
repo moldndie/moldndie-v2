@@ -62,7 +62,7 @@ function MoldCard({ mold }: {
         {mold.category && <p className="text-xs text-zinc-400">{mold.category.name}</p>}
         <div className="mt-auto pt-2">
           {isFree ? <span className="text-sm font-bold text-emerald-600">Free</span>
-            : hasPaid ? <span className="text-sm font-bold text-zinc-900">EGP {mold.price}</span>
+            : hasPaid ? <span className="text-sm font-bold text-zinc-900">{mold.price} EGP</span>
             : null}
         </div>
       </div>

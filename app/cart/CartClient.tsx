@@ -125,7 +125,7 @@ export default function CartClient() {
 
               {/* Price */}
               <span className="text-sm font-bold text-zinc-900 shrink-0">
-                EGP {item.price.toFixed(2)}
+                {item.price.toFixed(2)} EGP
               </span>
 
               {/* Remove */}

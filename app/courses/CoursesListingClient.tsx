@@ -77,7 +77,7 @@ function CourseCard({ course }: { course: Course }) {
           {isFree ? (
             <span className="text-sm font-bold text-emerald-600">Free</span>
           ) : (
-            <span className="text-sm font-bold text-zinc-900">EGP {course.price}</span>
+            <span className="text-sm font-bold text-zinc-900">{course.price} EGP</span>
           )}
         </div>
       </div>

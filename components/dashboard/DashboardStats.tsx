@@ -13,17 +13,17 @@ interface StatCardProps {
   icon: React.ElementType
   iconBg: string
   iconColor: string
-  prefix?: string
+  suffix?: string
   isLoading?: boolean
 }
 
-function StatCard({ label, value, icon: Icon, iconBg, iconColor, prefix, isLoading }: StatCardProps) {
+function StatCard({ label, value, icon: Icon, iconBg, iconColor, suffix, isLoading }: StatCardProps) {
   const display = isLoading
     ? null
     : value === undefined
       ? "—"
-      : prefix
-        ? `${prefix} ${value.toLocaleString()}`
+      : suffix
+        ? `${value.toLocaleString()} ${suffix}`
         : value.toLocaleString()
 
   return (
@@ -118,7 +118,7 @@ export default function DashboardStats() {
             icon={DollarSign}
             iconBg="bg-emerald-50"
             iconColor="text-emerald-600"
-            prefix="EGP"
+            suffix="EGP"
             isLoading={isLoading}
           />
           <StatCard
@@ -127,7 +127,7 @@ export default function DashboardStats() {
             icon={TrendingUp}
             iconBg="bg-emerald-50"
             iconColor="text-emerald-600"
-            prefix="EGP"
+            suffix="EGP"
             isLoading={isLoading}
           />
         </div>
