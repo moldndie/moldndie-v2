@@ -10,7 +10,7 @@ import {
   Globe,
 } from "lucide-react"
 import HomeAccordion from "@/components/home/HomeAccordion"
-import { Button } from "@/components/ui/button"
+import { buttonVariants } from "@/components/ui/button"
 
 // ── Shared variants ────────────────────────────────────────────────────
 const fadeUp: Variants = {
@@ -229,12 +229,12 @@ export default function HomeClient() {
             whileTap={{ scale: 0.97 }}
             transition={{ duration: 0.15 }}
           >
-            <Button
-              asChild
-              className="px-12 py-3 h-auto rounded-full text-sm font-semibold tracking-widest uppercase"
+            <Link
+              href="/signup"
+              className={buttonVariants({ className: "px-12 py-3 h-auto rounded-full text-sm font-semibold tracking-widest uppercase" })}
             >
-              <Link href="/signup">Sign Up</Link>
-            </Button>
+              Sign Up
+            </Link>
           </motion.div>
         </div>
       </motion.section>
