@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 
+// Enriched cart item — product data is joined server-side from molds/courses tables
 export type CartItem = {
   id: string
   user_id: string
@@ -18,9 +19,6 @@ export type CartItem = {
 type AddToCartInput = {
   product_id: string
   product_type: "mold" | "course"
-  title: string
-  price: number
-  image?: string
 }
 
 type RemoveFromCartInput = {
@@ -35,7 +33,7 @@ async function fetchCart(): Promise<CartItem[]> {
   return data.items ?? []
 }
 
-async function addToCart(input: AddToCartInput): Promise<CartItem> {
+async function addToCart(input: AddToCartInput): Promise<void> {
   const res = await fetch("/api/cart", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -44,7 +42,6 @@ async function addToCart(input: AddToCartInput): Promise<CartItem> {
   const data = await res.json()
   if (res.status === 401) throw new Error("login_required")
   if (!res.ok) throw new Error(data.error ?? "Failed to add to cart.")
-  return data.item
 }
 
 async function removeFromCart(input: RemoveFromCartInput): Promise<void> {
@@ -83,34 +80,26 @@ export function useAddToCart() {
     onMutate: async (input) => {
       await qc.cancelQueries({ queryKey: QUERY_KEYS.CART })
       const prev = qc.getQueryData<CartItem[]>(QUERY_KEYS.CART)
-      // Optimistically add the item
-      const optimistic: CartItem = {
-        id: `optimistic-${Date.now()}`,
-        user_id: "",
-        product_id: input.product_id,
-        product_type: input.product_type,
-        quantity: 1,
-        title: input.title,
-        price: input.price,
-        image: input.image ?? null,
-        created_at: new Date().toISOString(),
-      }
+      // Optimistically increment quantity if item already exists
       qc.setQueryData<CartItem[]>(QUERY_KEYS.CART, (old = []) => {
         const exists = old.some(
           (i) => i.product_id === input.product_id && i.product_type === input.product_type
         )
-        if (exists) return old.map((i) =>
-          i.product_id === input.product_id && i.product_type === input.product_type
-            ? { ...i, quantity: i.quantity + 1 }
-            : i
-        )
-        return [...old, optimistic]
+        if (exists) {
+          return old.map((i) =>
+            i.product_id === input.product_id && i.product_type === input.product_type
+              ? { ...i, quantity: i.quantity + 1 }
+              : i
+          )
+        }
+        return old
       })
       return { prev }
     },
     onError: (_, __, ctx) => {
       if (ctx?.prev) qc.setQueryData(QUERY_KEYS.CART, ctx.prev)
     },
+    // Always refetch to get enriched product data from server
     onSettled: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.CART }),
   })
 }

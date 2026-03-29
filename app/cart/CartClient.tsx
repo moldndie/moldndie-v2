@@ -157,7 +157,7 @@ export default function CartClient() {
       <div className="space-y-4">
         <div className="flex items-center justify-between text-base">
           <span className="font-semibold text-zinc-700">Total</span>
-          <span className="text-2xl font-extrabold text-zinc-900">${total.toFixed(2)}</span>
+          <span className="text-2xl font-extrabold text-zinc-900">{total.toFixed(2)} EGP</span>
         </div>
 
         {checkoutError && (
@@ -180,7 +180,7 @@ export default function CartClient() {
           ) : (
             <>
               <ShoppingCart size={18} />
-              Checkout — ${total.toFixed(2)}
+              Checkout — {total.toFixed(2)} EGP
             </>
           )}
         </button>

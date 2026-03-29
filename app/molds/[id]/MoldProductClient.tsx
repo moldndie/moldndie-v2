@@ -195,9 +195,6 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
       {
         product_id: mold!.id,
         product_type: "mold",
-        title: mold!.title,
-        price: mold!.price ?? 0,
-        image: mold!.preview_image ?? "",
       },
       {
         onError: (err) => {

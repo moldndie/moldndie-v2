@@ -112,9 +112,6 @@ export default function CourseDetailClient({ courseId }: { courseId: string }) {
       {
         product_id: courseId,
         product_type: "course",
-        title: course!.title,
-        price: course!.price ?? 0,
-        image: course!.thumbnail_url ?? "",
       },
       {
         onError: (err) => {

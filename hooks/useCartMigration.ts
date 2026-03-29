@@ -43,9 +43,6 @@ async function migrateItems(items: LegacyCartItem[]) {
         body: JSON.stringify({
           product_id: item.id,
           product_type: item.type,
-          title: item.title,
-          price: item.price,
-          image: item.image,
         }),
       })
     )
