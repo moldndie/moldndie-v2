@@ -55,21 +55,36 @@ async function markOrderCompleted(
     .eq("paymob_order_id", paymobOrderId)
     .maybeSingle()
 
-  if (findError) return new Response("Error", { status: 500 })
-  if (!order) return new Response("Not found", { status: 200 })
-  if (order.status === "completed") return new Response("OK", { status: 200 })
+  if (findError) {
+    console.error("[webhook] DB lookup error:", findError.message)
+    return new Response("Error", { status: 500 })
+  }
+  if (!order) {
+    console.warn("[webhook] Order not found for paymob_order_id:", paymobOrderId)
+    return new Response("Not found", { status: 200 })
+  }
+  if (order.status === "completed") {
+    console.log("[webhook] Order already completed:", order.id)
+    return new Response("OK", { status: 200 })
+  }
 
   const { error: updateError } = await admin
     .from("orders")
     .update({ status: "completed" })
     .eq("id", order.id)
 
-  if (updateError) return new Response("Error", { status: 500 })
+  if (updateError) {
+    console.error("[webhook] Failed to update order:", updateError.message)
+    return new Response("Error", { status: 500 })
+  }
 
+  console.log("[webhook] Order marked completed:", order.id, "paymob:", paymobOrderId)
   return new Response("OK", { status: 200 })
 }
 
 export async function POST(req: Request) {
+  console.log("[webhook] Received Paymob webhook POST")
+
   // ── 1. Parse payload ───────────────────────────────────────────────────────
   const body = await req.json()
   const data: Record<string, any> = body.obj
@@ -78,10 +93,12 @@ export async function POST(req: Request) {
   const receivedHmac = body.hmac
 
   if (!receivedHmac) {
+    console.warn("[webhook] Missing HMAC — rejecting")
     return new Response("Unauthorized", { status: 403 })
   }
 
   if (!verifyHmac(data, receivedHmac)) {
+    console.warn("[webhook] HMAC mismatch — rejecting")
     return new Response("Unauthorized", { status: 403 })
   }
 
@@ -89,28 +106,15 @@ export async function POST(req: Request) {
   const success = data.success
   const paymobOrderId = data.order?.id
 
+  console.log("[webhook] success=%s paymob_order_id=%s", success, paymobOrderId)
+
   // ── 4. Ignore failed / incomplete payments ────────────────────────────────
   if (success !== true || !paymobOrderId) {
+    console.log("[webhook] Payment not successful — ignoring")
     return new Response("Ignored", { status: 200 })
   }
 
   // ── 5. Find and update order ───────────────────────────────────────────────
   const admin = createAdminClient()
   return markOrderCompleted(admin, String(paymobOrderId))
-}
-
-export async function GET(req: Request) {
-  // ── 1. Extract params from redirect URL ───────────────────────────────────
-  const url = new URL(req.url)
-  const success = url.searchParams.get("success")
-  const orderId = url.searchParams.get("order")
-
-  // ── 2. Ignore failed / missing data ───────────────────────────────────────
-  if (success !== "true" || !orderId) {
-    return new Response("Ignored", { status: 200 })
-  }
-
-  // ── 3. Find and update order ───────────────────────────────────────────────
-  const admin = createAdminClient()
-  return markOrderCompleted(admin, orderId)
 }

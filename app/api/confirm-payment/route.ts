@@ -2,6 +2,8 @@ import { NextResponse } from "next/server"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 
+// POST /api/confirm-payment — read-only status check (does NOT mark orders complete)
+// Order completion is only done by the HMAC-verified Paymob webhook POST.
 export async function POST(req: Request) {
   // ── 1. Auth ───────────────────────────────────────────────────────────────
   const supabase = await createClient()
@@ -23,7 +25,7 @@ export async function POST(req: Request) {
 
   const admin = createAdminClient()
 
-  // ── 3. Find order by paymob_order_id ──────────────────────────────────────
+  // ── 3. Find order — verify it belongs to this user ────────────────────────
   const { data: order, error: findError } = await admin
     .from("orders")
     .select("id, status, user_id")
@@ -42,20 +44,6 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 })
   }
 
-  // ── 4. Skip if already completed ──────────────────────────────────────────
-  if (order.status === "completed") {
-    return NextResponse.json({ ok: true, alreadyCompleted: true })
-  }
-
-  // ── 5. Mark as completed ──────────────────────────────────────────────────
-  const { error: updateError } = await admin
-    .from("orders")
-    .update({ status: "completed" })
-    .eq("id", order.id)
-
-  if (updateError) {
-    return NextResponse.json({ error: updateError.message }, { status: 500 })
-  }
-
-  return NextResponse.json({ ok: true })
+  // ── 4. Return current status only — do NOT modify ─────────────────────────
+  return NextResponse.json({ ok: true, status: order.status })
 }

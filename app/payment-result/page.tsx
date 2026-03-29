@@ -3,7 +3,7 @@
 import { Suspense, useEffect, useRef, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
-import { CheckCircle, XCircle, Download, Loader2, BookOpen } from "lucide-react"
+import { CheckCircle, XCircle, Download, Loader2, BookOpen, Clock } from "lucide-react"
 import { useClearCart } from "@/hooks/queries/useCart"
 
 type OrderItem = {
@@ -35,7 +35,7 @@ function PaymentSuccessContent({
 }) {
   const [items, setItems] = useState<OrderItem[]>([])
   const [confirmed, setConfirmed] = useState(false)
-  const [downloadError, setDownloadError] = useState<string | null>(null)
+  const [timedOut, setTimedOut] = useState(false)
   const clearCart = useClearCart()
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -46,47 +46,33 @@ function PaymentSuccessContent({
   useEffect(() => {
     if (!orderId) return
 
-    async function confirmAndPoll() {
-      // ── 1. Frontend fallback: mark order completed (idempotent) ─────────
+    // Poll until the HMAC-verified webhook marks the order as completed in DB
+    let attempts = 0
+    const MAX_ATTEMPTS = 15 // 30 seconds
+
+    async function check() {
+      attempts++
       try {
-        await fetch("/api/confirm-payment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ paymob_order_id: orderId }),
-        })
+        const { status, items } = await fetchOrderWithStatus(orderId!)
+        setItems(items)
+        if (status === "completed") {
+          setConfirmed(true)
+          if (pollRef.current) clearInterval(pollRef.current)
+        } else if (attempts >= MAX_ATTEMPTS) {
+          setTimedOut(true)
+          if (pollRef.current) clearInterval(pollRef.current)
+        }
       } catch {
-        // non-fatal — polling below will still check status
-      }
-
-      // ── 2. Poll until confirmed ───────────────────────────────────────────
-      let attempts = 0
-      const MAX_ATTEMPTS = 10
-
-      async function check() {
-        attempts++
-        try {
-          const { status, items } = await fetchOrderWithStatus(orderId!)
-          setItems(items)
-          if (status === "completed") {
-            setConfirmed(true)
-            if (pollRef.current) clearInterval(pollRef.current)
-          } else if (attempts >= MAX_ATTEMPTS) {
-            setConfirmed(true)
-            if (pollRef.current) clearInterval(pollRef.current)
-          }
-        } catch {
-          if (attempts >= MAX_ATTEMPTS) {
-            setConfirmed(true)
-            if (pollRef.current) clearInterval(pollRef.current)
-          }
+        if (attempts >= MAX_ATTEMPTS) {
+          setTimedOut(true)
+          if (pollRef.current) clearInterval(pollRef.current)
         }
       }
-
-      check()
-      pollRef.current = setInterval(check, 2000)
     }
 
-    confirmAndPoll()
+    check()
+    pollRef.current = setInterval(check, 2000)
+
     return () => {
       if (pollRef.current) clearInterval(pollRef.current)
     }
@@ -102,21 +88,31 @@ function PaymentSuccessContent({
       <CheckCircle size={72} className="text-emerald-500 mb-6" strokeWidth={1.5} />
       <h1 className="text-2xl font-extrabold text-zinc-900 mb-2">Payment Successful</h1>
       <p className="text-zinc-500 text-sm mb-1">Your order is confirmed.</p>
-      {amount && <p className="text-zinc-400 text-xs mb-8">Amount paid: ${amount}</p>}
+      {amount && <p className="text-zinc-400 text-xs mb-8">Amount paid: {amount} EGP</p>}
       {!amount && <div className="mb-8" />}
 
-      {downloadError && <p className="text-sm text-red-500 mb-4">{downloadError}</p>}
-
       {/* Order confirming indicator */}
-      {!confirmed && (
+      {!confirmed && !timedOut && (
         <div className="flex items-center gap-2 text-zinc-400 text-sm mb-6">
           <Loader2 size={14} className="animate-spin" />
           Confirming your order…
         </div>
       )}
 
+      {/* Timeout — webhook hasn't fired yet; order will be confirmed shortly */}
+      {timedOut && !confirmed && (
+        <div className="flex items-start gap-2 text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm mb-6 max-w-xs text-left">
+          <Clock size={15} className="shrink-0 mt-0.5" />
+          <span>
+            Your payment was received. Access will be granted within a minute — check{" "}
+            <Link href="/my-courses" className="underline font-medium">My Courses</Link> or{" "}
+            <Link href="/purchases" className="underline font-medium">Purchases</Link> shortly.
+          </span>
+        </div>
+      )}
+
       {/* Course items — one "Start Course" button per course */}
-      {hasCourse && (
+      {hasCourse && confirmed && (
         <div className="w-full max-w-xs space-y-3 mb-4">
           {courseItems.map((item) => (
             <div key={item.id} className="flex flex-col items-center gap-2">
@@ -124,54 +120,47 @@ function PaymentSuccessContent({
                 <BookOpen size={14} className="text-zinc-400" />
                 <span className="font-medium truncate max-w-55">{item.title}</span>
               </div>
-              {confirmed ? (
-                <Link
-                  href={`/courses/${item.product_id}`}
-                  className="w-full inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-8 py-3 rounded-xl transition-colors"
-                >
-                  Start Course
-                </Link>
-              ) : (
-                <div className="w-full inline-flex items-center justify-center gap-2 bg-primary/40 text-white font-bold text-sm px-8 py-3 rounded-xl cursor-not-allowed">
-                  <Loader2 size={14} className="animate-spin" />
-                  Start Course
-                </div>
-              )}
+              <Link
+                href={`/courses/${item.product_id}`}
+                className="w-full inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-8 py-3 rounded-xl transition-colors"
+              >
+                Start Course
+              </Link>
             </div>
           ))}
         </div>
       )}
 
-      <div className="flex flex-col gap-3 w-full max-w-xs">
-        {/* Mold: always show Download Purchases when molds are present */}
-        {hasMold && (
+      {(confirmed || timedOut) && (
+        <div className="flex flex-col gap-3 w-full max-w-xs">
+          {hasMold && (
+            <Link
+              href="/purchases"
+              className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-8 py-3 rounded-xl transition-colors"
+            >
+              <Download size={15} />
+              Download Purchases
+            </Link>
+          )}
+
+          {hasCourse && (
+            <Link
+              href="/my-courses"
+              className="inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-semibold text-sm px-8 py-3 rounded-xl transition-colors"
+            >
+              <BookOpen size={15} />
+              My Courses
+            </Link>
+          )}
+
           <Link
             href="/purchases"
-            className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-8 py-3 rounded-xl transition-colors"
+            className="inline-flex items-center justify-center bg-zinc-50 hover:bg-zinc-100 text-zinc-500 text-sm px-8 py-2.5 rounded-xl transition-colors"
           >
-            <Download size={15} />
-            Download Purchases
+            View All Purchases
           </Link>
-        )}
-
-        {/* Course: My Courses link */}
-        {hasCourse && (
-          <Link
-            href="/my-courses"
-            className="inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-semibold text-sm px-8 py-3 rounded-xl transition-colors"
-          >
-            <BookOpen size={15} />
-            My Courses
-          </Link>
-        )}
-
-        <Link
-          href="/purchases"
-          className="inline-flex items-center justify-center bg-zinc-50 hover:bg-zinc-100 text-zinc-500 text-sm px-8 py-2.5 rounded-xl transition-colors"
-        >
-          View All Purchases
-        </Link>
-      </div>
+        </div>
+      )}
     </div>
   )
 }
