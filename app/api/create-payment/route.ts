@@ -14,12 +14,19 @@ type CartItemInput = {
 // ── Paymob helpers ─────────────────────────────────────────────────────────
 
 async function paymobAuth(): Promise<string> {
+  console.log("[paymob] API key present:", !!PAYMOB_API_KEY)
+  console.log("[paymob] API key length:", PAYMOB_API_KEY?.length ?? 0)
+
   const res = await fetch("https://accept.paymob.com/api/auth/tokens", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ api_key: PAYMOB_API_KEY }),
   })
+
+  console.log("[paymob] auth response status:", res.status)
   const authData = await res.json()
+  console.log("[paymob] auth response body:", JSON.stringify(authData))
+
   if (!authData.token) throw new Error(`Auth token failed: ${JSON.stringify(authData)}`)
   return authData.token as string
 }
