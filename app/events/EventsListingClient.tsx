@@ -8,11 +8,12 @@ import { motion, AnimatePresence } from "framer-motion"
 import { CalendarDays, MapPin, MapPinned, ChevronDown, Lock } from "lucide-react"
 import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
+import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { useEventsListing, useEventCategories } from "@/hooks/queries/useEvents"
 import type { EventSort } from "@/hooks/queries/useEvents"
 import { createClient } from "@/lib/supabase/client"
 
-const PAGE_SIZE = 12
+const DEFAULT_PAGE_SIZE = 9
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 const SORT_OPTIONS: { label: string; value: EventSort }[] = [
@@ -201,7 +202,7 @@ function EventCard({
             transition={{ duration: 0.25, ease: "easeInOut" }}
             style={{ overflow: "hidden" }}
           >
-            <div className="relative min-h-[90px]">
+            <div className="relative min-h-22.5">
               {/* Content — blurred for guests */}
               <div className={showGate ? "blur-[3px] pointer-events-none select-none" : ""}>
                 <EventExpandedContent event={event} />
@@ -226,6 +227,7 @@ export default function EventsListingClient() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(() => searchParams.get("category"))
   const [sort, setSort]                         = useState<EventSort>(() => (searchParams.get("sort") as EventSort) ?? "newest")
   const [currentPage, setCurrentPage]           = useState(() => Number(searchParams.get("page")) || 1)
+  const [pageSize, setPageSize]                 = useState(() => Number(searchParams.get("pageSize")) || DEFAULT_PAGE_SIZE)
   const [expandedId, setExpandedId]             = useState<string | null>(null)
   const [isLoggedIn, setIsLoggedIn]             = useState<boolean | null>(null)
 
@@ -250,18 +252,20 @@ export default function EventsListingClient() {
   // Sync to URL
   useEffect(() => {
     const p = new URLSearchParams()
-    if (searchTerm)          p.set("search",   searchTerm)
-    if (selectedCategory)    p.set("category", selectedCategory)
-    if (sort !== "newest")   p.set("sort",     sort)
-    if (currentPage > 1)     p.set("page",     String(currentPage))
+    if (searchTerm)                       p.set("search",   searchTerm)
+    if (selectedCategory)                 p.set("category", selectedCategory)
+    if (sort !== "newest")                p.set("sort",     sort)
+    if (currentPage > 1)                  p.set("page",     String(currentPage))
+    if (pageSize !== DEFAULT_PAGE_SIZE)   p.set("pageSize", String(pageSize))
     const qs = p.toString()
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-  }, [searchTerm, selectedCategory, sort, currentPage, pathname, router])
+  }, [searchTerm, selectedCategory, sort, currentPage, pageSize, pathname, router])
 
   const handleCategoryChange = useCallback((id: string | null) => { setSelectedCategory(id); setCurrentPage(1) }, [])
   const handleSort           = useCallback((v: string) => { setSort(v as EventSort); setCurrentPage(1) }, [])
+  const handlePageSizeChange = useCallback((size: number) => { setPageSize(size); setCurrentPage(1) }, [])
   const clearAll             = useCallback(() => {
-    setInputValue(""); setSearchTerm(""); setSelectedCategory(null); setSort("newest"); setCurrentPage(1)
+    setInputValue(""); setSearchTerm(""); setSelectedCategory(null); setSort("newest"); setCurrentPage(1); setPageSize(DEFAULT_PAGE_SIZE)
   }, [])
 
   const { data, isLoading, isFetching } = useEventsListing({
@@ -269,13 +273,13 @@ export default function EventsListingClient() {
     categoryId: selectedCategory,
     sort,
     page: currentPage,
-    pageSize: PAGE_SIZE,
+    pageSize,
   })
   const { data: categories } = useEventCategories()
 
   const events     = data?.data ?? []
   const total      = data?.total ?? 0
-  const totalPages = Math.ceil(total / PAGE_SIZE)
+  const totalPages = Math.ceil(total / pageSize)
   const hasActiveFilters = !!searchTerm || !!selectedCategory || sort !== "newest"
 
   const handleToggle = (id: string) => setExpandedId(expandedId === id ? null : id)
@@ -288,7 +292,8 @@ export default function EventsListingClient() {
       className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8"
     >
       <div>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Events</h1>
+        <PublicBreadcrumb crumbs={[{ label: "Events" }]} />
+        <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Events</h1>
         <p className="mt-1 text-sm text-zinc-500">Upcoming and past mold &amp; die industry events worldwide</p>
       </div>
 
@@ -315,7 +320,7 @@ export default function EventsListingClient() {
 
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
+          {Array.from({ length: pageSize }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : events.length === 0 ? (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-24 text-center">
@@ -349,9 +354,15 @@ export default function EventsListingClient() {
         </motion.div>
       )}
 
-      {!isLoading && totalPages > 1 && (
+      {!isLoading && (
         <div className="pt-4">
-          <Pagination currentPage={currentPage} totalPages={totalPages} onChange={setCurrentPage} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onChange={setCurrentPage}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </div>
       )}
     </motion.div>

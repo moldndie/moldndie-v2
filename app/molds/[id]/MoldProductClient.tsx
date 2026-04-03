@@ -17,6 +17,7 @@ import {
 } from "lucide-react"
 import { useMoldById, useMoldGallery } from "@/hooks/queries/useMolds"
 import { useAddToCart, useCartHasItem } from "@/hooks/queries/useCart"
+import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -210,14 +211,9 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
   return (
     <div className="max-w-7xl mx-auto px-6 py-10">
       {/* ── Breadcrumb ── */}
-      <nav className="flex items-center gap-2 text-sm text-zinc-400 mb-8">
-        <Link href="/molds" className="flex items-center gap-1 hover:text-zinc-700 transition-colors">
-          <ArrowLeft size={14} />
-          Mold Library
-        </Link>
-        <ChevronLeft size={12} className="-rotate-180" />
-        <span className="text-zinc-600 truncate max-w-50 sm:max-w-none">{mold.title}</span>
-      </nav>
+      <div className="mb-8">
+        <PublicBreadcrumb crumbs={[{ label: "Library", href: "/molds" }, { label: mold.title }]} />
+      </div>
 
       {/* ── 2-column layout ── */}
       <div className="grid grid-cols-1 lg:grid-cols-[55%_45%] gap-10 lg:gap-16">

@@ -5,7 +5,7 @@ import type { SignupInput } from "@/schemas/auth.schema";
 
 export async function signupAction(
   data: SignupInput
-): Promise<{ error?: string; success?: boolean }> {
+): Promise<{ error?: string; success?: boolean; role?: "admin" | "user" }> {
   const supabase = await createClient();
 
   const { data: authData, error } = await supabase.auth.signUp({
@@ -26,5 +26,5 @@ export async function signupAction(
     });
   }
 
-  return { success: true };
+  return { success: true, role: "user" };
 }

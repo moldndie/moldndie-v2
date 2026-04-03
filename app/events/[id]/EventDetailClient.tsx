@@ -6,12 +6,11 @@ import {
   CalendarDays,
   MapPin,
   MapPinned,
-  ArrowLeft,
-  ChevronLeft,
   AlertCircle,
   Tag,
 } from "lucide-react"
 import { useEventById } from "@/hooks/queries/useEvents"
+import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -130,19 +129,9 @@ export default function EventDetailClient({ eventId }: { eventId: string }) {
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
       {/* ── Breadcrumb ── */}
-      <nav className="flex items-center gap-2 text-sm text-zinc-400 mb-8">
-        <Link
-          href="/events"
-          className="flex items-center gap-1 hover:text-zinc-700 transition-colors"
-        >
-          <ArrowLeft size={14} />
-          Events
-        </Link>
-        <ChevronLeft size={12} className="-rotate-180" />
-        <span className="text-zinc-600 truncate max-w-[200px] sm:max-w-none">
-          {event.title}
-        </span>
-      </nav>
+      <div className="mb-8">
+        <PublicBreadcrumb crumbs={[{ label: "Events", href: "/events" }, { label: event.title }]} />
+      </div>
 
       {/* ── Hero image ── */}
       {imgSrc && (

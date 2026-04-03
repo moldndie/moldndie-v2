@@ -8,11 +8,21 @@ import {
   FolderOpen,
   CalendarDays,
   Globe,
+  Wrench,
+  Award,
+  Layers,
+  TrendingUp,
+  GitBranch,
+  Youtube,
+  Facebook,
+  Twitter,
+  Instagram,
+  Linkedin,
+  Mail,
 } from "lucide-react"
-import HomeAccordion from "@/components/home/HomeAccordion"
 import { buttonVariants } from "@/components/ui/button"
 
-// ── Shared variants ────────────────────────────────────────────────────
+// ── Shared variants ────────────────────────────────────────────────────────
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 18 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
@@ -30,7 +40,7 @@ const scrollReveal = {
   transition: { duration: 0.35, ease: "easeOut" as const },
 }
 
-// ── Wireframe Cube ─────────────────────────────────────────────────────
+// ── Wireframe Cube ─────────────────────────────────────────────────────────
 function WireframeCube() {
   const s = "#9B2C2C"
   const w = "1.5"
@@ -65,57 +75,123 @@ function WireframeCube() {
   )
 }
 
-// ── Offer cards data ───────────────────────────────────────────────────
+// ── Offer cards data ───────────────────────────────────────────────────────
 const offerCards = [
   {
     icon: BookOpen,
-    title: "BLOG: Updated Knowledge for Mold & Die Professionals",
+    title: "BLOG",
     desc: "Expert articles and practical guides covering mold and die fundamentals, advanced techniques, and industry innovations — designed to support engineers at every stage while meeting modern tooling standards.",
+    href: "/blogs",
   },
   {
     icon: GraduationCap,
-    title: "ACADEMY: Specialized, End-to-End Tooling Design Courses",
+    title: "ACADEMY",
     desc: "Action-oriented tooling design courses covering the full workflow from DFM to final design, delivered through real case studies with downloadable PDFs, native CAD files, and optional step-by-step videos.",
+    href: "/courses",
   },
   {
     icon: FolderOpen,
-    title: "LIBRARY: Downloadable Molds & Dies Designs",
+    title: "LIBRARY",
     desc: "A growing library of proven 3D mold and die designs based on real case studies. Ready-to-use CAD models help accelerate tooling development with accuracy and efficiency.",
+    href: "/molds",
   },
   {
     icon: CalendarDays,
-    title: "EVENTS: Mold & Die Events Calendar",
+    title: "EVENTS",
     desc: "A global calendar of key mold and die events, including conferences, trade shows, workshops, and summits — helping you stay informed, learn from experts, and expand your industry network.",
+    href: "/events",
   },
   {
     icon: Globe,
-    title: "SUPPLIERS: Mold & Die Industry Global Database",
+    title: "SUPPLIERS",
     desc: "A verified global directory of trusted mold and die suppliers, organized by location and specialization, covering machines, materials, components, software, and tooling services.",
+    href: "/suppliers",
+  },
+  {
+    icon: Wrench,
+    title: "SERVICES",
+    desc: "A vertically integrated suite of engineering services — from product validation and DFM analysis to multi-disciplinary tooling design and turnkey project management.",
+    href: "/services",
   },
 ]
 
-// ── Card component ─────────────────────────────────────────────────────
+// ── Why Choose Us data ─────────────────────────────────────────────────────
+const whyCards = [
+  {
+    icon: Award,
+    title: "Real-World Expertise",
+    desc: "Our content and services are built on hands-on industry experience — not theory. Every resource is crafted to solve real challenges faced by tooling professionals in production environments.",
+  },
+  {
+    icon: Layers,
+    title: "Complete Tooling Ecosystem",
+    desc: "From knowledge resources and structured training to verified suppliers and engineering services, everything you need for mold and die projects is available in one integrated platform.",
+  },
+  {
+    icon: TrendingUp,
+    title: "Always at the Forefront",
+    desc: "We continuously update our content, publish new courses, and expand our databases to keep you ahead of industry trends and emerging manufacturing technologies.",
+  },
+  {
+    icon: GitBranch,
+    title: "End-to-End Vertical Integration",
+    desc: "We cover the full tooling lifecycle — from design and validation through to production and supplier sourcing — giving you a seamless, fully integrated professional workflow.",
+  },
+]
+
+// ── Social links ───────────────────────────────────────────────────────────
+const socials = [
+  { icon: Youtube,   href: "#", label: "YouTube"   },
+  { icon: Facebook,  href: "#", label: "Facebook"  },
+  { icon: Twitter,   href: "#", label: "Twitter"   },
+  { icon: Instagram, href: "#", label: "Instagram" },
+  { icon: Linkedin,  href: "#", label: "LinkedIn"  },
+]
+
+// ── Card animation variant ─────────────────────────────────────────────────
 const cardItem: Variants = {
   hidden: { opacity: 0, y: 16 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: "easeOut" } },
 }
 
-function OfferCard({ icon: Icon, title, desc }: typeof offerCards[0]) {
+// ── Offer Card ─────────────────────────────────────────────────────────────
+function OfferCard({ icon: Icon, title, desc, href }: typeof offerCards[0]) {
+  return (
+    <motion.div variants={cardItem}>
+      <Link
+        href={href}
+        className="group bg-white rounded-xl border border-zinc-100 p-6 flex flex-col gap-3 hover:shadow-md hover:border-zinc-200 transition-all duration-200 h-full"
+      >
+        <Icon size={36} className="text-primary" strokeWidth={1.5} />
+        <h3 className="text-sm font-bold text-primary leading-snug uppercase tracking-wide">{title}</h3>
+        <p className="text-xs text-zinc-500 leading-relaxed">{desc}</p>
+        <span className="mt-auto pt-1 text-xs font-semibold text-primary/70 group-hover:text-primary transition-colors">
+          Explore →
+        </span>
+      </Link>
+    </motion.div>
+  )
+}
+
+// ── Why Card ───────────────────────────────────────────────────────────────
+function WhyCard({ icon: Icon, title, desc }: typeof whyCards[0]) {
   return (
     <motion.div
       variants={cardItem}
-      whileHover={{ scale: 1.02, boxShadow: "0 8px 30px rgba(0,0,0,0.08)" }}
+      whileHover={{ y: -2 }}
       transition={{ duration: 0.18 }}
-      className="bg-white rounded-xl border border-zinc-100 p-6 flex flex-col gap-3 cursor-default"
+      className="bg-white rounded-xl border border-zinc-100 p-6 flex flex-col gap-3"
     >
-      <Icon size={36} className="text-primary" strokeWidth={1.5} />
-      <h3 className="text-sm font-bold text-primary leading-snug">{title}</h3>
+      <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+        <Icon size={20} className="text-primary" strokeWidth={1.5} />
+      </div>
+      <h3 className="text-sm font-bold text-zinc-900">{title}</h3>
       <p className="text-xs text-zinc-500 leading-relaxed">{desc}</p>
     </motion.div>
   )
 }
 
-// ── Main client component ──────────────────────────────────────────────
+// ── Main client component ──────────────────────────────────────────────────
 export default function HomeClient() {
   return (
     <main className="flex-1">
@@ -165,51 +241,73 @@ export default function HomeClient() {
 
       {/* ── What We Offer ── */}
       <section className="bg-zinc-50 py-20 px-6">
-        <div className="max-w-7xl mx-auto space-y-6">
-          {/* Row 1: heading + first 2 cards */}
+        <div className="max-w-7xl mx-auto">
+          {/* Centered title */}
+          <motion.div
+            {...scrollReveal}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl md:text-5xl font-black text-primary uppercase leading-none tracking-tight">
+              What We Offer
+            </h2>
+            <p className="mt-3 text-sm text-zinc-500 max-w-xl mx-auto">
+              Everything a mold and die professional needs — in one place.
+            </p>
+          </motion.div>
+
+          {/* Row 1: BLOG, ACADEMY, LIBRARY */}
           <motion.div
             variants={stagger(0.05)}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"
           >
-            <motion.div variants={fadeUp} className="flex items-center">
-              <h2 className="text-5xl md:text-7xl font-black text-primary uppercase leading-none">
-                What
-                <br />
-                We
-                <br />
-                Offer
-              </h2>
-            </motion.div>
-            {offerCards.slice(0, 2).map((card) => (
+            {offerCards.slice(0, 3).map((card) => (
               <OfferCard key={card.title} {...card} />
             ))}
           </motion.div>
 
-          {/* Row 2: last 3 cards */}
+          {/* Row 2: EVENTS, SUPPLIERS, SERVICES */}
           <motion.div
             variants={stagger(0.05)}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
           >
-            {offerCards.slice(2).map((card) => (
+            {offerCards.slice(3).map((card) => (
               <OfferCard key={card.title} {...card} />
             ))}
           </motion.div>
         </div>
       </section>
 
-      {/* ── Accordion ── */}
-      <motion.section
-        {...scrollReveal}
-        className="max-w-4xl mx-auto px-6 py-20"
-      >
-        <HomeAccordion />
-      </motion.section>
+      {/* ── Why Choose Us ── */}
+      <section className="py-20 px-6">
+        <div className="max-w-7xl mx-auto">
+          <motion.div {...scrollReveal} className="text-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">
+              Why Choose Us
+            </h2>
+            <p className="mt-3 text-sm text-zinc-500 max-w-xl mx-auto">
+              Built by industry professionals, for industry professionals.
+            </p>
+          </motion.div>
+
+          <motion.div
+            variants={stagger(0.07)}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+          >
+            {whyCards.map((card) => (
+              <WhyCard key={card.title} {...card} />
+            ))}
+          </motion.div>
+        </div>
+      </section>
 
       {/* ── Join Community ── */}
       <motion.section
@@ -217,12 +315,20 @@ export default function HomeClient() {
         className="bg-zinc-50 py-20 px-6 text-center"
       >
         <div className="max-w-2xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-bold text-zinc-900">Join our Community</h2>
+          <Link
+            href="/login"
+            className="inline-block group"
+          >
+            <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 group-hover:text-primary transition-colors">
+              Join Our Community
+            </h2>
+          </Link>
           <p className="mt-4 text-sm text-zinc-500 leading-relaxed">
-            Sign up today for exclusive access to new blog posts those mentioning the tooling
-            industry updates, downloadable files, upcoming events, and tooling industry suppliers.
-            Stay informed, stay ahead.
+            Sign up today for exclusive access to new blog posts covering tooling industry updates,
+            downloadable files, upcoming events, and a verified global supplier network.
+            Stay informed, stay ahead — connect with thousands of mold and die professionals worldwide.
           </p>
+
           <motion.div
             className="mt-8 inline-block"
             whileHover={{ scale: 1.04 }}
@@ -230,12 +336,37 @@ export default function HomeClient() {
             transition={{ duration: 0.15 }}
           >
             <Link
-              href="/signup"
+              href="/login"
               className={buttonVariants({ className: "px-12 py-3 h-auto rounded-full text-sm font-semibold tracking-widest uppercase" })}
             >
-              Sign Up
+              Join Now
             </Link>
           </motion.div>
+
+          {/* Social links */}
+          <div className="mt-10 flex items-center justify-center gap-5">
+            {socials.map(({ icon: Icon, href, label }) => (
+              <Link
+                key={label}
+                href={href}
+                aria-label={label}
+                className="w-9 h-9 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-zinc-400 hover:text-primary hover:border-primary transition-colors"
+              >
+                <Icon size={16} />
+              </Link>
+            ))}
+          </div>
+
+          {/* Email */}
+          <div className="mt-6 flex items-center justify-center gap-2 text-sm text-zinc-500">
+            <Mail size={14} className="text-primary" />
+            <a
+              href="mailto:moldndie.eg@gmail.com"
+              className="hover:text-primary transition-colors font-medium"
+            >
+              moldndie.eg@gmail.com
+            </a>
+          </div>
         </div>
       </motion.section>
     </main>

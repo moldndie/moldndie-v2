@@ -1,13 +1,24 @@
 import { NextResponse } from "next/server"
+import { z } from "zod"
 import { createAdminClient } from "@/lib/supabase/admin"
+
+const serviceRequestSchema = z.object({
+  name: z.string().min(2),
+  email: z.string().email(),
+  message: z.string().min(5),
+  phone: z.string().optional().nullable(),
+  service_type: z.string().optional().nullable(),
+})
 
 export async function POST(req: Request) {
   const body = await req.json()
-  const { name, email, phone, service_type, message } = body
+  const result = serviceRequestSchema.safeParse(body)
 
-  if (!name || !email || !message) {
-    return NextResponse.json({ error: "name, email, and message are required" }, { status: 400 })
+  if (!result.success) {
+    return NextResponse.json({ error: "Invalid input" }, { status: 400 })
   }
+
+  const { name, email, phone, service_type, message } = result.data
 
   const admin = createAdminClient()
 

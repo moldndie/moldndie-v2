@@ -4,13 +4,6 @@ import { NextResponse, type NextRequest } from "next/server";
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Routes that must bypass auth entirely — hash-based token exchange cannot
-  // be read server-side, so session checks would always fail and loop.
-  const bypassRoutes = ["/forgot-password", "/reset-password"];
-  if (bypassRoutes.some((r) => pathname.startsWith(r))) {
-    return NextResponse.next();
-  }
-
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -38,12 +31,17 @@ export async function middleware(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Redirect logged-in users away from auth pages
-  const authRoutes = ["/login", "/signup"];
-  if (authRoutes.some((r) => pathname.startsWith(r))) {
-    if (user) {
-      return NextResponse.redirect(new URL("/", request.url));
-    }
+  const isAuthPage =
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/reset-password");
+
+  if (user && isAuthPage) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
+
+  if (isAuthPage) {
     return supabaseResponse;
   }
 

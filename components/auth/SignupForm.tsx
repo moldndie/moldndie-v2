@@ -40,7 +40,11 @@ export default function SignupForm() {
       toast.error(result.error);
     } else {
       toast.success("Account created successfully!");
-      router.push("/dashboard");
+      if (result.role === "admin") {
+        router.push("/dashboard");
+      } else {
+        router.push("/");
+      }
     }
   }
 

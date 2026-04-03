@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { createHash } from "crypto"
 import { createClient } from "@/lib/supabase/server"
 import { createAdminClient } from "@/lib/supabase/admin"
 
@@ -11,23 +12,31 @@ type CartItemInput = {
   type: "mold" | "course"
 }
 
+function generateCartHash(
+  cartItems: Array<{ id: string; type: "mold" | "course"; price: number }>
+): string {
+  const normalizedItems = [...cartItems].sort((a, b) =>
+    `${a.type}:${a.id}`.localeCompare(`${b.type}:${b.id}`)
+  )
+
+  return createHash("sha256")
+    .update(JSON.stringify(normalizedItems))
+    .digest("hex")
+}
+
 // ── Paymob helpers ─────────────────────────────────────────────────────────
 
 async function paymobAuth(): Promise<string> {
-  console.log("[paymob] API key present:", !!PAYMOB_API_KEY)
-  console.log("[paymob] API key length:", PAYMOB_API_KEY?.length ?? 0)
-
   const res = await fetch("https://accept.paymob.com/api/auth/tokens", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ api_key: PAYMOB_API_KEY }),
   })
 
-  console.log("[paymob] auth response status:", res.status)
   const authData = await res.json()
-  console.log("[paymob] auth response body:", JSON.stringify(authData))
 
   if (!authData.token) throw new Error(`Auth token failed: ${JSON.stringify(authData)}`)
+  console.log("Paymob auth success")
   return authData.token as string
 }
 
@@ -172,27 +181,59 @@ export async function POST(req: Request) {
     // ── 4. Calculate total ────────────────────────────────────────────────
     const totalAmount = validatedItems.reduce((sum, i) => sum + i.price, 0)
     const totalCents = Math.round(totalAmount * 100)
+    const cartHash = generateCartHash(validatedItems)
+
+    const { data: existingOrders, error: existingOrderError } = await admin
+      .from("orders")
+      .select("id, payment_url")
+      .eq("user_id", user.id)
+      .eq("cart_hash", cartHash)
+      .eq("status", "pending")
+      .order("created_at", { ascending: false })
+      .limit(1)
+
+    if (existingOrderError) throw new Error(existingOrderError.message)
+
+    const existingOrder = existingOrders?.[0] ?? null
+
+    if (existingOrder?.payment_url) {
+      return NextResponse.json({
+        orderId: existingOrder.id,
+        paymentUrl: existingOrder.payment_url,
+      })
+    }
+
+    let orderId = existingOrder?.id ?? null
 
     // ── 5. Create order in DB ─────────────────────────────────────────────
-    const { data: order, error: orderError } = await admin
-      .from("orders")
-      .insert({ user_id: user.id, total_amount: totalAmount, status: "pending" })
-      .select("id")
-      .single()
+    if (!orderId) {
+      const { data: order, error: orderError } = await admin
+        .from("orders")
+        .insert({
+          user_id: user.id,
+          total_amount: totalAmount,
+          amount_cents: totalCents,
+          cart_hash: cartHash,
+          status: "pending",
+        })
+        .select("id")
+        .single()
 
-    if (orderError || !order) throw new Error(orderError?.message ?? "Order creation failed")
+      if (orderError || !order) throw new Error(orderError?.message ?? "Order creation failed")
+      orderId = order.id
 
-    // ── 6. Insert order_items ─────────────────────────────────────────────
-    const { error: itemsError } = await admin.from("order_items").insert(
-      validatedItems.map((i) => ({
-        order_id: order.id,
-        product_id: i.id,
-        product_type: i.type,
-        price: i.price,
-      }))
-    )
+      // ── 6. Insert order_items ───────────────────────────────────────────
+      const { error: itemsError } = await admin.from("order_items").insert(
+        validatedItems.map((i) => ({
+          order_id: orderId,
+          product_id: i.id,
+          product_type: i.type,
+          price: i.price,
+        }))
+      )
 
-    if (itemsError) throw new Error(itemsError.message)
+      if (itemsError) throw new Error(itemsError.message)
+    }
 
     // ── 7. Paymob: auth token ─────────────────────────────────────────────
     const authToken = await paymobAuth()
@@ -208,21 +249,23 @@ export async function POST(req: Request) {
       user.email ?? "customer@example.com"
     )
 
-    // ── 10. Save paymob_order_id ──────────────────────────────────────────
-    await admin
-      .from("orders")
-      .update({ paymob_order_id: String(paymobOrderId) })
-      .eq("id", order.id)
-
-    // ── 11. Return payment URL ────────────────────────────────────────────
-    if (!paymentToken) throw new Error("paymentToken is empty — cannot build redirect URL")
+    // ── 10. Save paymob_order_id + payment_url ───────────────────────────
     if (!PAYMOB_IFRAME_ID) throw new Error("PAYMOB_IFRAME_ID is not set")
     const paymentUrl = `https://accept.paymob.com/api/acceptance/iframes/${PAYMOB_IFRAME_ID}?payment_token=${paymentToken}`
 
-    return NextResponse.json({ paymentUrl })
-  } catch (error: any) {
+    await admin
+      .from("orders")
+      .update({
+        paymob_order_id: String(paymobOrderId),
+        payment_url: paymentUrl,
+      })
+      .eq("id", orderId)
+
+    return NextResponse.json({ orderId, paymentUrl })
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : "Payment processing failed"
     return NextResponse.json(
-      { error: error?.message || "Payment processing failed" },
+      { error: message },
       { status: 500 }
     )
   }

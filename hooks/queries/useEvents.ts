@@ -42,6 +42,7 @@ export function useEventsListing(params: EventsListingParams = {}) {
       params.categoryId ?? null,
       params.sort ?? "newest",
       params.page ?? 1,
+      params.pageSize ?? 12,
     ],
     queryFn: () => getEventsListing(params),
     placeholderData: keepPreviousData,

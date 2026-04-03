@@ -38,7 +38,8 @@ export async function getBlogs(): Promise<Blog[]> {
 }
 
 export async function getPublishedBlogs(): Promise<Blog[]> {
-  return getFilteredPublishedBlogs({})
+  const { blogs } = await getFilteredPublishedBlogs({ pageSize: 9999 })
+  return blogs
 }
 
 export type BlogSort = "newest" | "oldest" | "title_asc"
@@ -48,8 +49,14 @@ export async function getFilteredPublishedBlogs(filters: {
   categoryId?: string
   tagIds?: string[]
   sort?: BlogSort
-}): Promise<Blog[]> {
+  page?: number
+  pageSize?: number
+}): Promise<{ blogs: Blog[]; total: number }> {
   const supabase = createAdminClient()
+  const page = Math.max(1, filters.page ?? 1)
+  const pageSize = filters.pageSize ?? 9
+  const from = (page - 1) * pageSize
+  const to = from + pageSize - 1
 
   // Tag filter: get matching blog IDs via join table first
   let tagBlogIds: string[] | null = null
@@ -59,7 +66,7 @@ export async function getFilteredPublishedBlogs(filters: {
       .select("blog_id")
       .in("tag_id", filters.tagIds)
     tagBlogIds = [...new Set((relations ?? []).map((r: { blog_id: string }) => r.blog_id))]
-    if (tagBlogIds.length === 0) return []
+    if (tagBlogIds.length === 0) return { blogs: [], total: 0 }
   }
 
   const orderMap: Record<BlogSort, { col: string; asc: boolean }> = {
@@ -71,18 +78,28 @@ export async function getFilteredPublishedBlogs(filters: {
 
   let query = supabase
     .from("blogs")
-    .select("*, category:blog_categories(id,name,slug,created_at)")
+    .select("*, category:blog_categories(id,name,slug,created_at)", { count: "exact" })
     .eq("is_published", true)
 
   if (filters.q) query = query.ilike("title", `%${filters.q}%`)
   if (filters.categoryId) query = query.eq("category_id", filters.categoryId)
   if (tagBlogIds !== null) query = query.in("id", tagBlogIds)
 
-  query = query.order(col, { ascending: asc })
+  query = query.order(col, { ascending: asc }).range(from, to)
 
-  const { data, error } = await query
+  const { data, error, count } = await query
   if (error) throw dbError(error)
-  return (data ?? []) as unknown as Blog[]
+  return { blogs: (data ?? []) as unknown as Blog[], total: count ?? 0 }
+}
+
+export async function getPublishedBlogsCount(): Promise<number> {
+  const supabase = createAdminClient()
+  const { count, error } = await supabase
+    .from("blogs")
+    .select("id", { count: "exact", head: true })
+    .eq("is_published", true)
+  if (error) throw dbError(error)
+  return count ?? 0
 }
 
 export async function getBlogBySlug(slug: string): Promise<Blog | null> {

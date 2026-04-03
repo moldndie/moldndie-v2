@@ -7,12 +7,11 @@ import {
   Globe,
   MapPin,
   MapPinned,
-  ArrowLeft,
-  ChevronLeft,
   AlertCircle,
   Tag,
 } from "lucide-react"
 import { useSupplierById } from "@/hooks/queries/useSuppliers"
+import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -109,17 +108,9 @@ export default function SupplierDetailClient({ supplierId }: { supplierId: strin
   return (
     <div className="max-w-3xl mx-auto px-6 py-10">
       {/* ── Breadcrumb ── */}
-      <nav className="flex items-center gap-2 text-sm text-zinc-400 mb-8">
-        <Link
-          href="/suppliers"
-          className="flex items-center gap-1 hover:text-zinc-700 transition-colors"
-        >
-          <ArrowLeft size={14} />
-          Suppliers
-        </Link>
-        <ChevronLeft size={12} className="-rotate-180" />
-        <span className="text-zinc-600 truncate max-w-[200px] sm:max-w-none">{supplier.name}</span>
-      </nav>
+      <div className="mb-8">
+        <PublicBreadcrumb crumbs={[{ label: "Suppliers", href: "/suppliers" }, { label: supplier.name }]} />
+      </div>
 
       {/* ── Main card ── */}
       <div className="bg-white border border-zinc-100 rounded-2xl shadow-sm overflow-hidden">

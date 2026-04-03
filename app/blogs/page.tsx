@@ -6,9 +6,11 @@ import { FileText, Heart, MessageSquare } from "lucide-react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { getFilteredPublishedBlogs, getBlogCategories, getBlogTags, getBlogCountsMap, type BlogSort } from "@/services/blog.service"
+import { BlogPaginationBar } from "./_components/BlogPaginationBar"
 import { getFileUrl } from "@/lib/utils"
 import { BlogFiltersBar } from "./_components/BlogFiltersBar"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
+import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import type { Blog } from "@/types"
 
 export const metadata: Metadata = {
@@ -88,6 +90,9 @@ interface BlogsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
+const PAGE_SIZE_OPTIONS = [9, 12, 18, 24]
+const DEFAULT_PAGE_SIZE = 9
+
 export default async function BlogsPage({ searchParams }: BlogsPageProps) {
   const params = await searchParams
   const q = typeof params.q === "string" ? params.q : undefined
@@ -96,8 +101,15 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
     ? params.tags.split(",").filter(Boolean)
     : undefined
   const sort = typeof params.sort === "string" ? params.sort : undefined
+  const page = typeof params.page === "string" ? Math.max(1, parseInt(params.page) || 1) : 1
+  const pageSize = typeof params.pageSize === "string"
+    ? (PAGE_SIZE_OPTIONS.includes(parseInt(params.pageSize)) ? parseInt(params.pageSize) : DEFAULT_PAGE_SIZE)
+    : DEFAULT_PAGE_SIZE
 
-  const blogs = await getFilteredPublishedBlogs({ q, categoryId, tagIds, sort: sort as BlogSort | undefined })
+  const { blogs, total } = await getFilteredPublishedBlogs({
+    q, categoryId, tagIds, sort: sort as BlogSort | undefined, page, pageSize,
+  })
+  const totalPages = Math.ceil(total / pageSize)
 
   const [categories, tags, countsMap] = await Promise.all([
     getBlogCategories(),
@@ -111,7 +123,8 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
           <div>
-            <h1 className="text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">
+            <PublicBreadcrumb crumbs={[{ label: "Blogs" }]} />
+            <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">
               Blogs
             </h1>
             <p className="mt-1 text-sm text-zinc-500">
@@ -129,6 +142,12 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
               currentSort={sort ?? "newest"}
             />
           </Suspense>
+
+          {total > 0 && (
+            <p className="text-xs text-zinc-400">
+              {total} blog{total !== 1 ? "s" : ""} found
+            </p>
+          )}
 
           {blogs.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -148,6 +167,15 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
               ))}
             </div>
           )}
+
+          <Suspense>
+            <BlogPaginationBar
+              currentPage={page}
+              totalPages={totalPages}
+              currentPageSize={pageSize}
+              pageSizeOptions={PAGE_SIZE_OPTIONS}
+            />
+          </Suspense>
 
           <div className="pt-4">
             <AdSlotGrid type="blog" className="w-full" />

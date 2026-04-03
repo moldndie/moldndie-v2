@@ -7,10 +7,11 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { Package } from "lucide-react"
 import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
+import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { useMoldsListing, useMoldCategories } from "@/hooks/queries/useMolds"
 import type { PriceFilter, SortOption } from "@/hooks/queries/useMolds"
 
-const PAGE_SIZE = 12
+const DEFAULT_PAGE_SIZE = 9
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 const SORT_OPTIONS: { label: string; value: SortOption }[] = [
@@ -81,6 +82,7 @@ export default function MoldsListingClient() {
   const [priceFilter, setPriceFilter]       = useState<PriceFilter>(() => (searchParams.get("price") as PriceFilter) ?? "all")
   const [sort, setSort]                     = useState<SortOption>(() => (searchParams.get("sort") as SortOption) ?? "newest")
   const [currentPage, setCurrentPage]       = useState(() => Number(searchParams.get("page")) || 1)
+  const [pageSize, setPageSize]             = useState(() => Number(searchParams.get("pageSize")) || DEFAULT_PAGE_SIZE)
 
   // Debounce search
   useEffect(() => {
@@ -91,35 +93,38 @@ export default function MoldsListingClient() {
   // Sync to URL
   useEffect(() => {
     const p = new URLSearchParams()
-    if (searchTerm)              p.set("search",   searchTerm)
-    if (selectedCategory)        p.set("category", selectedCategory)
-    if (priceFilter !== "all")   p.set("price",    priceFilter)
-    if (sort !== "newest")       p.set("sort",     sort)
-    if (currentPage > 1)         p.set("page",     String(currentPage))
+    if (searchTerm)                         p.set("search",   searchTerm)
+    if (selectedCategory)                   p.set("category", selectedCategory)
+    if (priceFilter !== "all")              p.set("price",    priceFilter)
+    if (sort !== "newest")                  p.set("sort",     sort)
+    if (currentPage > 1)                    p.set("page",     String(currentPage))
+    if (pageSize !== DEFAULT_PAGE_SIZE)     p.set("pageSize", String(pageSize))
     const qs = p.toString()
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-  }, [searchTerm, selectedCategory, priceFilter, sort, currentPage, pathname, router])
+  }, [searchTerm, selectedCategory, priceFilter, sort, currentPage, pageSize, pathname, router])
 
   const handleCategoryChange = useCallback((id: string | null) => { setSelectedCategory(id); setCurrentPage(1) }, [])
   const handlePriceFilter    = useCallback((v: PriceFilter)    => { setPriceFilter(v);    setCurrentPage(1) }, [])
   const handleSort           = useCallback((v: string)         => { setSort(v as SortOption); setCurrentPage(1) }, [])
+  const handlePageSizeChange = useCallback((size: number) => { setPageSize(size); setCurrentPage(1) }, [])
   const clearAll             = useCallback(() => {
     setInputValue(""); setSearchTerm(""); setSelectedCategory(null)
-    setPriceFilter("all"); setSort("newest"); setCurrentPage(1)
+    setPriceFilter("all"); setSort("newest"); setCurrentPage(1); setPageSize(DEFAULT_PAGE_SIZE)
   }, [])
 
-  const { data, isLoading, isFetching } = useMoldsListing({ search: searchTerm, categoryId: selectedCategory, priceFilter, sort, page: currentPage, pageSize: PAGE_SIZE })
+  const { data, isLoading, isFetching } = useMoldsListing({ search: searchTerm, categoryId: selectedCategory, priceFilter, sort, page: currentPage, pageSize })
   const { data: categories } = useMoldCategories()
 
   const molds      = data?.data ?? []
   const total      = data?.total ?? 0
-  const totalPages = Math.ceil(total / PAGE_SIZE)
+  const totalPages = Math.ceil(total / pageSize)
   const hasActiveFilters = !!searchTerm || !!selectedCategory || priceFilter !== "all" || sort !== "newest"
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
       <div>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Mold Library</h1>
+        <PublicBreadcrumb crumbs={[{ label: "Library" }]} />
+        <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Mold Library</h1>
         <p className="mt-1 text-sm text-zinc-500">Browse and download professional mold &amp; die designs</p>
       </div>
 
@@ -150,7 +155,7 @@ export default function MoldsListingClient() {
       {/* Grid */}
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
+          {Array.from({ length: pageSize }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : molds.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -167,9 +172,15 @@ export default function MoldsListingClient() {
         </div>
       )}
 
-      {!isLoading && totalPages > 1 && (
+      {!isLoading && (
         <div className="pt-4">
-          <Pagination currentPage={currentPage} totalPages={totalPages} onChange={setCurrentPage} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onChange={setCurrentPage}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </div>
       )}
     </div>

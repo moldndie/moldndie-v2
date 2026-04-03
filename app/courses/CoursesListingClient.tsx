@@ -7,12 +7,13 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { BookOpen } from "lucide-react"
 import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
+import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { useCoursesListing } from "@/hooks/queries/useCourses"
 import type { CourseSort } from "@/hooks/queries/useCourses"
 import type { CoursePriceFilter } from "@/services/course.service"
 import type { Course } from "@/types"
 
-const PAGE_SIZE = 12
+const DEFAULT_PAGE_SIZE = 9
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 const SORT_OPTIONS: { label: string; value: CourseSort }[] = [
@@ -95,6 +96,7 @@ export default function CoursesListingClient() {
   const [priceFilter, setPriceFilter] = useState<CoursePriceFilter>(() => (searchParams.get("price") as CoursePriceFilter) ?? "all")
   const [sort, setSort]               = useState<CourseSort>(() => (searchParams.get("sort") as CourseSort) ?? "newest")
   const [currentPage, setCurrentPage] = useState(() => Number(searchParams.get("page")) || 1)
+  const [pageSize, setPageSize]       = useState(() => Number(searchParams.get("pageSize")) || DEFAULT_PAGE_SIZE)
 
   // Debounce search
   useEffect(() => {
@@ -105,18 +107,20 @@ export default function CoursesListingClient() {
   // Sync to URL
   useEffect(() => {
     const p = new URLSearchParams()
-    if (searchTerm)            p.set("search", searchTerm)
-    if (priceFilter !== "all") p.set("price",  priceFilter)
-    if (sort !== "newest")     p.set("sort",   sort)
-    if (currentPage > 1)       p.set("page",   String(currentPage))
+    if (searchTerm)                       p.set("search",   searchTerm)
+    if (priceFilter !== "all")            p.set("price",    priceFilter)
+    if (sort !== "newest")                p.set("sort",     sort)
+    if (currentPage > 1)                  p.set("page",     String(currentPage))
+    if (pageSize !== DEFAULT_PAGE_SIZE)   p.set("pageSize", String(pageSize))
     const qs = p.toString()
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-  }, [searchTerm, priceFilter, sort, currentPage, pathname, router])
+  }, [searchTerm, priceFilter, sort, currentPage, pageSize, pathname, router])
 
-  const handlePriceFilter = useCallback((v: CoursePriceFilter) => { setPriceFilter(v); setCurrentPage(1) }, [])
-  const handleSort        = useCallback((v: string) => { setSort(v as CourseSort); setCurrentPage(1) }, [])
-  const clearAll          = useCallback(() => {
-    setInputValue(""); setSearchTerm(""); setPriceFilter("all"); setSort("newest"); setCurrentPage(1)
+  const handlePriceFilter    = useCallback((v: CoursePriceFilter) => { setPriceFilter(v); setCurrentPage(1) }, [])
+  const handleSort           = useCallback((v: string) => { setSort(v as CourseSort); setCurrentPage(1) }, [])
+  const handlePageSizeChange = useCallback((size: number) => { setPageSize(size); setCurrentPage(1) }, [])
+  const clearAll             = useCallback(() => {
+    setInputValue(""); setSearchTerm(""); setPriceFilter("all"); setSort("newest"); setCurrentPage(1); setPageSize(DEFAULT_PAGE_SIZE)
   }, [])
 
   const { data, isLoading, isFetching } = useCoursesListing({
@@ -124,18 +128,19 @@ export default function CoursesListingClient() {
     priceFilter,
     sort,
     page: currentPage,
-    pageSize: PAGE_SIZE,
+    pageSize,
   })
 
   const courses    = data?.data ?? []
   const total      = data?.total ?? 0
-  const totalPages = Math.ceil(total / PAGE_SIZE)
+  const totalPages = Math.ceil(total / pageSize)
   const hasActiveFilters = !!searchTerm || priceFilter !== "all" || sort !== "newest"
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
       <div>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Academy</h1>
+        <PublicBreadcrumb crumbs={[{ label: "Academy" }]} />
+        <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Academy</h1>
         <p className="mt-1 text-sm text-zinc-500">Professional mold &amp; die industry courses</p>
       </div>
 
@@ -161,7 +166,7 @@ export default function CoursesListingClient() {
 
       {isLoading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
+          {Array.from({ length: pageSize }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : courses.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -180,9 +185,15 @@ export default function CoursesListingClient() {
         </div>
       )}
 
-      {!isLoading && totalPages > 1 && (
+      {!isLoading && (
         <div className="pt-4">
-          <Pagination currentPage={currentPage} totalPages={totalPages} onChange={setCurrentPage} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onChange={setCurrentPage}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </div>
       )}
     </div>

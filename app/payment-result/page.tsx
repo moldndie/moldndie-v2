@@ -4,7 +4,6 @@ import { Suspense, useEffect, useRef, useState } from "react"
 import { useSearchParams } from "next/navigation"
 import Link from "next/link"
 import { CheckCircle, XCircle, Download, Loader2, BookOpen, Clock } from "lucide-react"
-import { useClearCart } from "@/hooks/queries/useCart"
 
 type OrderItem = {
   id: string
@@ -36,12 +35,7 @@ function PaymentSuccessContent({
   const [items, setItems] = useState<OrderItem[]>([])
   const [confirmed, setConfirmed] = useState(false)
   const [timedOut, setTimedOut] = useState(false)
-  const clearCart = useClearCart()
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  useEffect(() => {
-    clearCart.mutate()
-  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!orderId) return

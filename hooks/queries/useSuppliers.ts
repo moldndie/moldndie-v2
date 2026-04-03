@@ -42,6 +42,7 @@ export function useSuppliersListing(params: SuppliersListingParams = {}) {
       params.categoryId ?? null,
       params.sort ?? "name_asc",
       params.page ?? 1,
+      params.pageSize ?? 12,
     ],
     queryFn: () => getSuppliersListing(params),
     placeholderData: keepPreviousData,

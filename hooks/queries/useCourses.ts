@@ -49,6 +49,7 @@ export function useCoursesListing(params: CoursesListingParams = {}) {
       params.priceFilter ?? "all",
       params.sort ?? "newest",
       params.page ?? 1,
+      params.pageSize ?? 12,
     ],
     queryFn: () => getCoursesListing(params),
     placeholderData: keepPreviousData,

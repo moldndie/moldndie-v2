@@ -2,9 +2,10 @@ import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
-import { ChevronLeft, FileText } from "lucide-react"
+import { FileText } from "lucide-react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
+import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { getBlogBySlug, getRelatedBlogs, getBlogLikeData, getBlogComments } from "@/services/blog.service"
 import { BlockRenderer } from "@/modules/blog/components/BlockRenderer"
 import { getFileUrl } from "@/lib/utils"
@@ -123,13 +124,9 @@ export default async function BlogDetailPage({ params }: Props) {
 
         {/* ── Article ── */}
         <article className="max-w-3xl mx-auto px-4 sm:px-6 py-10">
-          <Link
-            href="/blogs"
-            className="inline-flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-900 transition-colors mb-6"
-          >
-            <ChevronLeft size={15} />
-            All blogs
-          </Link>
+          <div className="mb-6">
+            <PublicBreadcrumb crumbs={[{ label: "Blogs", href: "/blogs" }, { label: blog.title }]} />
+          </div>
 
           {/* Meta */}
           <div className="flex flex-wrap items-center gap-2 mb-3">

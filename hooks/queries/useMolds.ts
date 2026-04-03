@@ -63,6 +63,7 @@ export function useMoldsListing(params: MoldsListingParams = {}) {
       params.priceFilter ?? "all",
       params.sort ?? "newest",
       params.page ?? 1,
+      params.pageSize ?? 12,
     ],
     queryFn: () => getMoldsListing(params),
     placeholderData: keepPreviousData,

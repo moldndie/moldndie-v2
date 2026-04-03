@@ -8,7 +8,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
   if (!user) redirect("/login")
 
   const admin = await isAdmin(user.id)
-  if (!admin) redirect("/login")
+  if (!admin) redirect("/")
 
   const supabase = await createClient()
   const { data: profile } = await supabase

@@ -8,11 +8,12 @@ import { motion, AnimatePresence } from "framer-motion"
 import { Building2, MapPin, Globe, MapPinned, ChevronDown, Lock } from "lucide-react"
 import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
+import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { useSuppliersListing, useSupplierCategories } from "@/hooks/queries/useSuppliers"
 import type { SupplierSort } from "@/hooks/queries/useSuppliers"
 import { createClient } from "@/lib/supabase/client"
 
-const PAGE_SIZE = 12
+const DEFAULT_PAGE_SIZE = 9
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 const SORT_OPTIONS: { label: string; value: SupplierSort }[] = [
@@ -222,6 +223,7 @@ export default function SuppliersListingClient() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(() => searchParams.get("category"))
   const [sort, setSort]                         = useState<SupplierSort>(() => (searchParams.get("sort") as SupplierSort) ?? "name_asc")
   const [currentPage, setCurrentPage]           = useState(() => Number(searchParams.get("page")) || 1)
+  const [pageSize, setPageSize]                 = useState(() => Number(searchParams.get("pageSize")) || DEFAULT_PAGE_SIZE)
   const [expandedId, setExpandedId]             = useState<string | null>(null)
   const [isLoggedIn, setIsLoggedIn]             = useState<boolean | null>(null)
 
@@ -246,18 +248,20 @@ export default function SuppliersListingClient() {
   // Sync to URL
   useEffect(() => {
     const p = new URLSearchParams()
-    if (searchTerm)              p.set("search",   searchTerm)
-    if (selectedCategory)        p.set("category", selectedCategory)
-    if (sort !== "name_asc")     p.set("sort",     sort)
-    if (currentPage > 1)         p.set("page",     String(currentPage))
+    if (searchTerm)                       p.set("search",   searchTerm)
+    if (selectedCategory)                 p.set("category", selectedCategory)
+    if (sort !== "name_asc")              p.set("sort",     sort)
+    if (currentPage > 1)                  p.set("page",     String(currentPage))
+    if (pageSize !== DEFAULT_PAGE_SIZE)   p.set("pageSize", String(pageSize))
     const qs = p.toString()
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-  }, [searchTerm, selectedCategory, sort, currentPage, pathname, router])
+  }, [searchTerm, selectedCategory, sort, currentPage, pageSize, pathname, router])
 
   const handleCategoryChange = useCallback((id: string | null) => { setSelectedCategory(id); setCurrentPage(1) }, [])
   const handleSort           = useCallback((v: string) => { setSort(v as SupplierSort); setCurrentPage(1) }, [])
+  const handlePageSizeChange = useCallback((size: number) => { setPageSize(size); setCurrentPage(1) }, [])
   const clearAll             = useCallback(() => {
-    setInputValue(""); setSearchTerm(""); setSelectedCategory(null); setSort("name_asc"); setCurrentPage(1)
+    setInputValue(""); setSearchTerm(""); setSelectedCategory(null); setSort("name_asc"); setCurrentPage(1); setPageSize(DEFAULT_PAGE_SIZE)
   }, [])
 
   const { data, isLoading, isFetching } = useSuppliersListing({
@@ -265,13 +269,13 @@ export default function SuppliersListingClient() {
     categoryId: selectedCategory,
     sort,
     page: currentPage,
-    pageSize: PAGE_SIZE,
+    pageSize,
   })
   const { data: categories } = useSupplierCategories()
 
   const suppliers  = data?.data ?? []
   const total      = data?.total ?? 0
-  const totalPages = Math.ceil(total / PAGE_SIZE)
+  const totalPages = Math.ceil(total / pageSize)
   const hasActiveFilters = !!searchTerm || !!selectedCategory || sort !== "name_asc"
 
   const handleToggle = (id: string) => setExpandedId(expandedId === id ? null : id)
@@ -284,7 +288,8 @@ export default function SuppliersListingClient() {
       className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8"
     >
       <div>
-        <h1 className="text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Suppliers</h1>
+        <PublicBreadcrumb crumbs={[{ label: "Suppliers" }]} />
+        <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Suppliers</h1>
         <p className="mt-1 text-sm text-zinc-500">Browse our verified network of mold and die suppliers</p>
       </div>
 
@@ -311,7 +316,7 @@ export default function SuppliersListingClient() {
 
       {isLoading ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {Array.from({ length: PAGE_SIZE }).map((_, i) => <SkeletonCard key={i} />)}
+          {Array.from({ length: pageSize }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : suppliers.length === 0 ? (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-24 text-center">
@@ -345,9 +350,15 @@ export default function SuppliersListingClient() {
         </motion.div>
       )}
 
-      {!isLoading && totalPages > 1 && (
+      {!isLoading && (
         <div className="pt-4">
-          <Pagination currentPage={currentPage} totalPages={totalPages} onChange={setCurrentPage} />
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onChange={setCurrentPage}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </div>
       )}
     </motion.div>
