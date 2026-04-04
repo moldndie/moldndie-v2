@@ -123,7 +123,7 @@ export default async function BlogDetailPage({ params }: Props) {
         )}
 
         {/* ── Article ── */}
-        <article className="max-w-5xl mx-auto px-4 sm:px-6 py-10">
+        <article className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
           <div className="mb-6">
             <PublicBreadcrumb crumbs={[{ label: "Blogs", href: "/blogs" }, { label: blog.title }]} />
           </div>
@@ -192,7 +192,7 @@ export default async function BlogDetailPage({ params }: Props) {
         {/* ── Related Articles ── */}
         {related.length > 0 && (
           <section className="border-t border-zinc-100 bg-zinc-50">
-            <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
               <h2 className="text-base font-bold text-zinc-900 mb-6">Related Articles</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
                 {related.map((r) => (
@@ -204,7 +204,7 @@ export default async function BlogDetailPage({ params }: Props) {
         )}
 
         {/* ── Sponsored ── */}
-        <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
           <AdSlot type="blog" className="max-w-md mx-auto" />
         </div>
       </main>

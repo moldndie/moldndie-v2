@@ -64,7 +64,7 @@ function BlockItem({ block }: { block: BlogBlock }) {
       const c = block.content as { url?: string; caption?: string }
       if (!c.url) return null
       return (
-        <figure>
+        <figure className="max-w-2xl mx-auto">
           <img src={c.url} alt={c.caption ?? ""} className="w-full rounded-xl" />
           {c.caption && (
             <figcaption className="mt-2 text-center text-sm text-zinc-500">{c.caption}</figcaption>
@@ -97,7 +97,7 @@ function BlockItem({ block }: { block: BlogBlock }) {
       const c = block.content as { url?: string }
       if (!c.url) return null
       return (
-        <div className="aspect-video w-full overflow-hidden rounded-xl bg-zinc-100">
+        <div className="max-w-2xl mx-auto aspect-video w-full overflow-hidden rounded-xl bg-zinc-100">
           <iframe
             src={toEmbedUrl(c.url)}
             className="w-full h-full"

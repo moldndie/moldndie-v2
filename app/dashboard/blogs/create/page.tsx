@@ -9,7 +9,7 @@ export default async function CreateBlogPage() {
   const [categories, tags] = await Promise.all([getBlogCategories(), getBlogTags()])
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       <PageHeader title="Create Blog" description="Write a new blog post." />
       <BlogForm categories={categories} tags={tags} />
     </div>

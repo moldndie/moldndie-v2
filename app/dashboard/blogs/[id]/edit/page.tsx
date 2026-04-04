@@ -22,7 +22,7 @@ export default async function EditBlogPage({ params }: EditBlogPageProps) {
   if (!blog) notFound()
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6">
       <PageHeader title="Edit Blog" description={`Editing: ${blog.title}`} />
       <BlogForm blog={blog} categories={categories} tags={tags} selectedTagIds={selectedTagIds} />
     </div>
