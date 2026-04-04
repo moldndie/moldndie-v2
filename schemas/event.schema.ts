@@ -8,6 +8,7 @@ export const eventSchema = z.object({
   category_id: z.string().optional(),
   country: z.string().optional(),
   address: z.string().optional(),
+  website: z.string().optional(),
 })
 
 export type EventFormValues = z.infer<typeof eventSchema>

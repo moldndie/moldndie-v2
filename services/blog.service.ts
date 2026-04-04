@@ -411,7 +411,7 @@ export async function deleteBlog(id: string): Promise<void> {
 
 export async function saveBlogBlocks(
   blogId: string,
-  blocks: Omit<BlogBlock, "id" | "blog_id" | "created_at">[]
+  blocks: (Omit<BlogBlock, "id" | "blog_id" | "created_at"> & { layout?: string | null; column_position?: string | null })[]
 ): Promise<void> {
   const supabase = createAdminClient()
   await supabase.from("blog_blocks").delete().eq("blog_id", blogId)

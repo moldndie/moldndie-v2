@@ -14,6 +14,7 @@ import {
   ArrowLeft,
   AlertCircle,
   ShoppingCart,
+  Download,
 } from "lucide-react"
 import { useCourseById, useCourseAccess } from "@/hooks/queries/useCourses"
 import { useAddToCart, useCartHasItem } from "@/hooks/queries/useCart"
@@ -266,7 +267,13 @@ export default function LessonViewerClient({
   const prevAccessible = prevLesson ? hasFullAccess || prevLesson.is_free : false
   const nextAccessible = nextLesson ? hasFullAccess || nextLesson.is_free : false
 
-  const pdfUrl = lesson.pdf_url ? `${R2_BASE}/${lesson.pdf_url}` : null
+  const videoUrl = lesson.video_url ?? (lesson.video_path ? `${R2_BASE}/${lesson.video_path}` : null)
+  const pdfUrl = lesson.pdf_url
+    ? `${R2_BASE}/${lesson.pdf_url}`
+    : lesson.pdf_path
+    ? `${R2_BASE}/${lesson.pdf_path}`
+    : null
+  const fileUrl = lesson.file_path ? `${R2_BASE}/${lesson.file_path}` : null
 
   function handleAddToCart() {
     addToCart.mutate(
@@ -312,8 +319,8 @@ export default function LessonViewerClient({
                 courseId={courseId}
                 onDismiss={() => setVideoEnded(false)}
               />
-            ) : lesson.video_url ? (
-              <VideoPlayer url={lesson.video_url} onEnded={() => setVideoEnded(true)} />
+            ) : videoUrl ? (
+              <VideoPlayer url={videoUrl} onEnded={() => setVideoEnded(true)} />
             ) : (
               <div className="aspect-video w-full rounded-xl bg-zinc-50 border border-zinc-200 flex flex-col items-center justify-center gap-2 text-zinc-400">
                 <BookOpen size={40} strokeWidth={1} />
@@ -347,17 +354,32 @@ export default function LessonViewerClient({
             </span>
           </div>
 
-          {/* PDF download */}
-          {lessonAccessible && pdfUrl && (
-            <a
-              href={pdfUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm font-medium text-zinc-700 bg-zinc-100 hover:bg-zinc-200 px-4 py-2.5 rounded-xl transition-colors"
-            >
-              <FileText size={16} />
-              Download PDF
-            </a>
+          {/* Downloads */}
+          {lessonAccessible && (pdfUrl || fileUrl) && (
+            <div className="flex flex-wrap gap-2">
+              {pdfUrl && (
+                <a
+                  href={pdfUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-zinc-700 bg-zinc-100 hover:bg-zinc-200 px-4 py-2.5 rounded-xl transition-colors"
+                >
+                  <FileText size={16} />
+                  Download PDF
+                </a>
+              )}
+              {fileUrl && (
+                <a
+                  href={fileUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-sm font-medium text-zinc-700 bg-zinc-100 hover:bg-zinc-200 px-4 py-2.5 rounded-xl transition-colors"
+                >
+                  <Download size={16} />
+                  Download Attachment
+                </a>
+              )}
+            </div>
           )}
 
           {/* Prev / Next navigation */}

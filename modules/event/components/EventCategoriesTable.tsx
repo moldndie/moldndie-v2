@@ -37,13 +37,16 @@ export function EventCategoriesTable() {
       const prev = queryClient.getQueryData<EventCategory[]>(QUERY_KEYS.EVENT_CATEGORIES)
       queryClient.setQueryData<EventCategory[]>(QUERY_KEYS.EVENT_CATEGORIES, (old = []) => [
         ...old,
-        { id: `temp-${Date.now()}`, ...values, created_at: new Date().toISOString() },
+        { id: `temp-${Date.now()}`, slug: "", ...values, created_at: new Date().toISOString() },
       ])
       return { prev }
     },
     onError: (e: Error, _, ctx) => {
       queryClient.setQueryData(QUERY_KEYS.EVENT_CATEGORIES, ctx?.prev)
       toast.error(e.message || "Create failed.")
+    },
+    onSuccess: () => {
+      toast.success("Category created.")
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EVENT_CATEGORIES })
@@ -64,6 +67,9 @@ export function EventCategoriesTable() {
     onError: (e: Error, _, ctx) => {
       queryClient.setQueryData(QUERY_KEYS.EVENT_CATEGORIES, ctx?.prev)
       toast.error(e.message || "Update failed.")
+    },
+    onSuccess: () => {
+      toast.success("Category updated.")
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.EVENT_CATEGORIES })

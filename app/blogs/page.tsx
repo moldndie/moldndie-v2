@@ -14,7 +14,7 @@ import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import type { Blog } from "@/types"
 
 export const metadata: Metadata = {
-  title: "Blogs | MoldNdie",
+  title: "Blog | MoldNdie",
   description: "Industry insights, guides, and news from the mold & die world.",
 }
 
@@ -123,9 +123,9 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
       <main className="flex-1">
         <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
           <div>
-            <PublicBreadcrumb crumbs={[{ label: "Blogs" }]} />
+            <PublicBreadcrumb crumbs={[{ label: "Blog" }]} />
             <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">
-              Blogs
+              Blog
             </h1>
             <p className="mt-1 text-sm text-zinc-500">
               Industry insights, guides &amp; news from the mold &amp; die world

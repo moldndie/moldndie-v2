@@ -22,6 +22,8 @@ export interface BlogBlock {
   block_type: BlockType
   content: Record<string, unknown>
   order_index: number
+  layout?: "single" | "two-column" | null
+  column_position?: "left" | "right" | "full" | null
   created_at: string
 }
 

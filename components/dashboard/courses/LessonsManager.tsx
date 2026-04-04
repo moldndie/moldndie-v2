@@ -19,18 +19,20 @@ interface LessonFormState {
   title: string
   video_url: string
   pdf_url: string
+  video_path: string
+  pdf_path: string
+  file_path: string
   order_index: string
   is_free: boolean
 }
 
 interface LessonFormErrors {
   title?: string
-  video_url?: string
   order_index?: string
 }
 
 function emptyForm(nextPosition: number): LessonFormState {
-  return { id: null, title: "", video_url: "", pdf_url: "", order_index: String(nextPosition), is_free: false }
+  return { id: null, title: "", video_url: "", pdf_url: "", video_path: "", pdf_path: "", file_path: "", order_index: String(nextPosition), is_free: false }
 }
 
 function LessonForm({
@@ -48,7 +50,9 @@ function LessonForm({
   onSave: () => void
   isPending: boolean
 }) {
-  const [pdfUploading, setPdfUploading] = useState(false)
+  const [fileUploading, setFileUploading] = useState(false)
+
+  const anyUploading = fileUploading
 
   return (
     <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-5 space-y-4">
@@ -86,24 +90,47 @@ function LessonForm({
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-zinc-600">Video URL *</label>
+        <label className="text-xs font-medium text-zinc-600">Video URL (optional)</label>
         <Input
           value={form.video_url}
           onChange={(e) => onChange({ ...form, video_url: e.target.value })}
           placeholder="https://youtube.com/watch?v=…"
         />
-        {errors.video_url && <p className="text-xs text-red-500">{errors.video_url}</p>}
       </div>
 
       <div className="space-y-1.5">
-        <label className="text-xs font-medium text-zinc-600">PDF (optional)</label>
+        <label className="text-xs font-medium text-zinc-600">Video file (optional)</label>
+        <FileUploadField
+          folder="courses/videos"
+          accept="video/*"
+          label="Click to upload video"
+          existingValue={form.video_path || null}
+          onUploadSuccess={({ key }) => onChange({ ...form, video_path: key })}
+          onUploadingChange={setFileUploading}
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-xs font-medium text-zinc-600">PDF file (optional)</label>
         <FileUploadField
           folder="courses/pdfs"
           accept=".pdf"
           label="Click to upload PDF"
-          existingValue={form.pdf_url || null}
-          onUploadSuccess={({ key }) => onChange({ ...form, pdf_url: key })}
-          onUploadingChange={setPdfUploading}
+          existingValue={form.pdf_path || form.pdf_url || null}
+          onUploadSuccess={({ key }) => onChange({ ...form, pdf_path: key })}
+          onUploadingChange={setFileUploading}
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-xs font-medium text-zinc-600">Attachment file (optional)</label>
+        <FileUploadField
+          folder="courses/files"
+          accept="*"
+          label="Click to upload file"
+          existingValue={form.file_path || null}
+          onUploadSuccess={({ key }) => onChange({ ...form, file_path: key })}
+          onUploadingChange={setFileUploading}
         />
       </div>
 
@@ -133,11 +160,11 @@ function LessonForm({
       </div>
 
       <div className="flex justify-end gap-2 pt-1">
-        <Button type="button" variant="outline" onClick={onClose} disabled={isPending || pdfUploading}>
+        <Button type="button" variant="outline" onClick={onClose} disabled={isPending || anyUploading}>
           Cancel
         </Button>
-        <Button type="button" onClick={onSave} disabled={isPending || pdfUploading}>
-          {pdfUploading ? "Uploading…" : isPending ? "Saving…" : form.id ? "Save Changes" : "Add Lesson"}
+        <Button type="button" onClick={onSave} disabled={isPending || anyUploading}>
+          {anyUploading ? "Uploading…" : isPending ? "Saving…" : form.id ? "Save Changes" : "Add Lesson"}
         </Button>
       </div>
     </div>
@@ -163,18 +190,23 @@ function LessonRow({
 
       <div className="flex-1 min-w-0">
         <p className="text-sm font-medium text-zinc-900 line-clamp-1">{lesson.title}</p>
-        {lesson.video_url && (
+        {(lesson.video_url || lesson.video_path) && (
           <p className="text-xs text-zinc-400 line-clamp-1 flex items-center gap-1 mt-0.5">
             <Video className="size-3 shrink-0" />
-            {lesson.video_url}
+            {lesson.video_url || lesson.video_path}
           </p>
         )}
       </div>
 
       <div className="flex items-center gap-2 shrink-0">
-        {lesson.pdf_url && (
+        {(lesson.pdf_url || lesson.pdf_path) && (
           <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-600">
             PDF
+          </span>
+        )}
+        {lesson.file_path && (
+          <span className="rounded-full bg-violet-50 px-2 py-0.5 text-[10px] font-medium text-violet-600">
+            File
           </span>
         )}
         {lesson.is_free ? (
@@ -230,6 +262,9 @@ export function LessonsManager({ courseId }: { courseId: string }) {
       title: lesson.title,
       video_url: lesson.video_url ?? "",
       pdf_url: lesson.pdf_url ?? "",
+      video_path: lesson.video_path ?? "",
+      pdf_path: lesson.pdf_path ?? "",
+      file_path: lesson.file_path ?? "",
       order_index: String(lesson.order_index),
       is_free: lesson.is_free,
     })
@@ -244,7 +279,6 @@ export function LessonsManager({ courseId }: { courseId: string }) {
   function validate(f: LessonFormState): LessonFormErrors {
     const errs: LessonFormErrors = {}
     if (!f.title.trim()) errs.title = "Title is required"
-    if (!f.video_url.trim()) errs.video_url = "Video URL is required"
     const pos = Number(f.order_index)
     if (f.order_index === "" || isNaN(pos) || pos < 0) errs.order_index = "Must be a number ≥ 0"
     return errs
@@ -259,8 +293,11 @@ export function LessonsManager({ courseId }: { courseId: string }) {
     }
     const input = {
       title: form.title.trim(),
-      video_url: form.video_url.trim(),
+      video_url: form.video_url.trim() || null,
       pdf_url: form.pdf_url || null,
+      video_path: form.video_path || null,
+      pdf_path: form.pdf_path || null,
+      file_path: form.file_path || null,
       order_index: Number(form.order_index),
       is_free: form.is_free,
     }

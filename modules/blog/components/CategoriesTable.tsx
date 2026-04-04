@@ -40,6 +40,9 @@ export function CategoriesTable() {
       queryClient.setQueryData(QUERY_KEYS.BLOG_CATEGORIES, ctx?.prev)
       toast.error(e.message || "Create failed.")
     },
+    onSuccess: () => {
+      toast.success("Category created.")
+    },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BLOG_CATEGORIES })
     },
@@ -59,6 +62,9 @@ export function CategoriesTable() {
     onError: (e: Error, _, ctx) => {
       queryClient.setQueryData(QUERY_KEYS.BLOG_CATEGORIES, ctx?.prev)
       toast.error(e.message || "Update failed.")
+    },
+    onSuccess: () => {
+      toast.success("Category updated.")
     },
     onSettled: () => {
       queryClient.invalidateQueries({ queryKey: QUERY_KEYS.BLOG_CATEGORIES })

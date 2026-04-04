@@ -31,7 +31,7 @@ function SkeletonProductPage() {
   return (
     <div className="max-w-7xl mx-auto px-6 py-10 animate-pulse">
       <div className="h-4 w-32 bg-zinc-200 rounded mb-8" />
-      <div className="grid grid-cols-1 lg:grid-cols-[55%_45%] gap-10 lg:gap-16">
+      <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-10 lg:gap-16">
         {/* Left */}
         <div className="space-y-4">
           <div className="aspect-square bg-zinc-200 rounded-2xl" />
@@ -216,7 +216,7 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
       </div>
 
       {/* ── 2-column layout ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[55%_45%] gap-10 lg:gap-16">
+      <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-10 lg:gap-16">
         {/* ── LEFT: Gallery ── */}
         <div className="space-y-4">
           {/* Main display */}

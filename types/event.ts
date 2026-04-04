@@ -1,6 +1,7 @@
 export interface EventCategory {
   id: string
   name: string
+  slug: string
   created_at: string
 }
 
@@ -13,6 +14,7 @@ export interface Event {
   category_id: string | null
   country: string | null
   address: string | null
+  website: string | null
   created_at: string
   category?: EventCategory | null
 }

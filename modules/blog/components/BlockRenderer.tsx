@@ -4,14 +4,45 @@ interface BlockRendererProps {
   blocks: BlogBlock[]
 }
 
+type Row = BlogBlock | [BlogBlock, BlogBlock | null]
+
 export function BlockRenderer({ blocks }: BlockRendererProps) {
   const sorted = [...blocks].sort((a, b) => a.order_index - b.order_index)
 
+  // Group into rows: pair consecutive left+right two-column blocks
+  const rows: Row[] = []
+  let i = 0
+  while (i < sorted.length) {
+    const block = sorted[i]
+    if (block.layout === "two-column" && block.column_position === "left") {
+      const next = sorted[i + 1]
+      if (next && next.layout === "two-column" && next.column_position === "right") {
+        rows.push([block, next])
+        i += 2
+      } else {
+        rows.push([block, null])
+        i += 1
+      }
+    } else {
+      rows.push(block)
+      i += 1
+    }
+  }
+
   return (
     <div className="space-y-4">
-      {sorted.map((block) => (
-        <BlockItem key={block.id} block={block} />
-      ))}
+      {rows.map((row) => {
+        if (Array.isArray(row)) {
+          const [left, right] = row
+          return (
+            <div key={left.id} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <BlockItem block={left} />
+              {right ? <BlockItem block={right} /> : <div />}
+            </div>
+          )
+        }
+        return <BlockItem key={row.id} block={row} />
+      })}
     </div>
   )
 }

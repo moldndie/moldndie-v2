@@ -94,7 +94,7 @@ function SupplierExpandedContent({ supplier }: {
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="flex items-center justify-center gap-2 w-full bg-zinc-900 hover:bg-zinc-700 text-white font-bold text-sm py-2.5 rounded-xl transition-colors"
+          className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-white font-bold text-sm py-2.5 rounded-xl transition-colors"
         >
           <Globe size={14} />
           Visit Website
@@ -224,7 +224,7 @@ export default function SuppliersListingClient() {
   const [sort, setSort]                         = useState<SupplierSort>(() => (searchParams.get("sort") as SupplierSort) ?? "name_asc")
   const [currentPage, setCurrentPage]           = useState(() => Number(searchParams.get("page")) || 1)
   const [pageSize, setPageSize]                 = useState(() => Number(searchParams.get("pageSize")) || DEFAULT_PAGE_SIZE)
-  const [expandedId, setExpandedId]             = useState<string | null>(null)
+  const [expandedIds, setExpandedIds]           = useState<Record<string, boolean>>({})
   const [isLoggedIn, setIsLoggedIn]             = useState<boolean | null>(null)
 
   // Auth check
@@ -278,7 +278,10 @@ export default function SuppliersListingClient() {
   const totalPages = Math.ceil(total / pageSize)
   const hasActiveFilters = !!searchTerm || !!selectedCategory || sort !== "name_asc"
 
-  const handleToggle = (id: string) => setExpandedId(expandedId === id ? null : id)
+  const handleToggle = (id: string) => setExpandedIds((prev) => ({
+    ...prev,
+    [id]: !prev[id],
+  }))
 
   return (
     <motion.div
@@ -315,7 +318,7 @@ export default function SuppliersListingClient() {
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
           {Array.from({ length: pageSize }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : suppliers.length === 0 ? (
@@ -335,13 +338,13 @@ export default function SuppliersListingClient() {
           variants={gridVariants}
           initial="initial"
           animate="animate"
-          className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}
         >
           {suppliers.map((supplier) => (
             <SupplierCard
               key={supplier.id}
               supplier={supplier}
-              expanded={expandedId === supplier.id}
+              expanded={!!expandedIds[supplier.id]}
               onToggle={() => handleToggle(supplier.id)}
               isLoggedIn={isLoggedIn}
               callbackPath={pathname}

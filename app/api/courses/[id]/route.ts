@@ -20,7 +20,7 @@ export async function GET(
 
   const { data: lessons, error: lessonsError } = await admin
     .from("lessons")
-    .select("id, title, order_index, video_url, pdf_url, is_free")
+    .select("id, title, order_index, video_url, pdf_url, video_path, pdf_path, file_path, is_free")
     .eq("course_id", id)
     .order("order_index")
 

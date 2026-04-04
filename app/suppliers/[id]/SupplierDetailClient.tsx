@@ -194,7 +194,7 @@ export default function SupplierDetailClient({ supplierId }: { supplierId: strin
                 href={supplier.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-zinc-900 hover:bg-zinc-700 text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors"
+                className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors"
               >
                 <Globe size={16} />
                 Visit Website

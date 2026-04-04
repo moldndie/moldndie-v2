@@ -1,6 +1,7 @@
 "use client"
 
-import { ChevronUp, ChevronDown, Trash2, GripVertical } from "lucide-react"
+import { ChevronUp, ChevronDown, Trash2, Type, AlignLeft, ImageIcon, Quote, List, Play, Columns2 } from "lucide-react"
+import { cn } from "@/lib/utils"
 import type { EditorBlock } from "../types"
 import { BlockToolbar } from "./BlockToolbar"
 import { HeadingBlock } from "./blocks/HeadingBlock"
@@ -10,23 +11,23 @@ import { QuoteBlock } from "./blocks/QuoteBlock"
 import { ListBlock } from "./blocks/ListBlock"
 import { VideoBlock } from "./blocks/VideoBlock"
 
-const BLOCK_LABELS: Record<EditorBlock["block_type"], string> = {
-  heading: "Heading",
-  paragraph: "Paragraph",
-  image: "Image",
-  quote: "Quote",
-  list: "List",
-  video: "Video",
+const BLOCK_META: Record<EditorBlock["block_type"], { label: string; icon: React.ElementType; accent: string; badge: string }> = {
+  heading:   { label: "Heading",   icon: Type,       accent: "border-l-blue-400",   badge: "bg-blue-50 text-blue-700" },
+  paragraph: { label: "Paragraph", icon: AlignLeft,  accent: "border-l-zinc-300",   badge: "bg-zinc-100 text-zinc-600" },
+  image:     { label: "Image",     icon: ImageIcon,  accent: "border-l-emerald-400", badge: "bg-emerald-50 text-emerald-700" },
+  quote:     { label: "Quote",     icon: Quote,      accent: "border-l-amber-400",   badge: "bg-amber-50 text-amber-700" },
+  list:      { label: "List",      icon: List,       accent: "border-l-violet-400",  badge: "bg-violet-50 text-violet-700" },
+  video:     { label: "Video",     icon: Play,       accent: "border-l-rose-400",    badge: "bg-rose-50 text-rose-700" },
 }
 
 function getDefaultContent(block_type: EditorBlock["block_type"]): Record<string, unknown> {
   switch (block_type) {
-    case "heading": return { text: "", level: 2 }
+    case "heading":   return { text: "", level: 2 }
     case "paragraph": return { text: "" }
-    case "image": return { url: "", caption: "" }
-    case "quote": return { text: "", author: "" }
-    case "list": return { items: [""] }
-    case "video": return { url: "" }
+    case "image":     return { url: "", caption: "" }
+    case "quote":     return { text: "", author: "" }
+    case "list":      return { items: [""] }
+    case "video":     return { url: "" }
   }
 }
 
@@ -49,6 +50,10 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
 
   function updateBlock(id: string, content: Record<string, unknown>) {
     onChange(value.map((b) => (b.id === id ? { ...b, content } : b)))
+  }
+
+  function patchBlock(id: string, patch: Partial<EditorBlock>) {
+    onChange(value.map((b) => (b.id === id ? { ...b, ...patch } : b)))
   }
 
   function removeBlock(id: string) {
@@ -86,54 +91,134 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {value.length === 0 ? (
-        <div className="rounded-xl border-2 border-dashed border-zinc-200 py-10 text-center text-sm text-zinc-400">
-          Add content blocks below
+        <div className="rounded-xl border-2 border-dashed border-zinc-200 py-12 text-center">
+          <p className="text-sm text-zinc-400">No content blocks yet</p>
+          <p className="mt-1 text-xs text-zinc-300">Use the buttons below to add blocks</p>
         </div>
       ) : (
         <div className="space-y-2">
-          {value.map((block, i) => (
-            <div
-              key={block.id}
-              className="flex gap-2 rounded-xl border border-zinc-200 bg-white p-3 shadow-sm"
-            >
-              <div className="flex shrink-0 flex-col items-center gap-0.5 pt-0.5">
-                <GripVertical className="size-4 text-zinc-300 mb-1" />
-                <button
-                  type="button"
-                  onClick={() => moveBlock(block.id, "up")}
-                  disabled={i === 0}
-                  className="rounded p-0.5 text-zinc-300 hover:text-zinc-600 disabled:opacity-30 transition-colors"
-                >
-                  <ChevronUp className="size-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => moveBlock(block.id, "down")}
-                  disabled={i === value.length - 1}
-                  className="rounded p-0.5 text-zinc-300 hover:text-zinc-600 disabled:opacity-30 transition-colors"
-                >
-                  <ChevronDown className="size-3.5" />
-                </button>
-              </div>
+          {value.map((block, i) => {
+            const meta = BLOCK_META[block.block_type]
+            const Icon = meta.icon
+            const isTwoCol = block.layout === "two-column"
 
-              <div className="min-w-0 flex-1 space-y-2">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
-                  {BLOCK_LABELS[block.block_type]}
-                </span>
-                {renderInput(block)}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => removeBlock(block.id)}
-                className="shrink-0 self-start rounded p-1 text-zinc-300 hover:bg-zinc-50 hover:text-red-500 transition-colors"
+            return (
+              <div
+                key={block.id}
+                className={cn(
+                  "rounded-xl border border-zinc-200 border-l-4 bg-white shadow-sm overflow-hidden",
+                  meta.accent
+                )}
               >
-                <Trash2 className="size-4" />
-              </button>
-            </div>
-          ))}
+                {/* Block header */}
+                <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-100 bg-zinc-50/60">
+                  {/* Type badge */}
+                  <span className={cn("flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold", meta.badge)}>
+                    <Icon className="size-3" />
+                    {meta.label}
+                  </span>
+
+                  {/* Layout controls */}
+                  <div className="flex items-center gap-1 ml-2">
+                    <Columns2 className="size-3 text-zinc-400 shrink-0" />
+                    <button
+                      type="button"
+                      onClick={() => patchBlock(block.id, { layout: null, column_position: null })}
+                      className={cn(
+                        "rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors",
+                        !isTwoCol
+                          ? "bg-zinc-800 text-white"
+                          : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
+                      )}
+                    >
+                      Full
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => patchBlock(block.id, { layout: "two-column", column_position: block.column_position ?? "left" })}
+                      className={cn(
+                        "rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors",
+                        isTwoCol
+                          ? "bg-zinc-800 text-white"
+                          : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
+                      )}
+                    >
+                      ½
+                    </button>
+                    {isTwoCol && (
+                      <>
+                        <span className="text-zinc-200 select-none">·</span>
+                        <button
+                          type="button"
+                          onClick={() => patchBlock(block.id, { column_position: "left" })}
+                          className={cn(
+                            "rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors",
+                            block.column_position === "left"
+                              ? "bg-zinc-800 text-white"
+                              : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
+                          )}
+                        >
+                          Left
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => patchBlock(block.id, { column_position: "right" })}
+                          className={cn(
+                            "rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors",
+                            block.column_position === "right"
+                              ? "bg-zinc-800 text-white"
+                              : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
+                          )}
+                        >
+                          Right
+                        </button>
+                      </>
+                    )}
+                  </div>
+
+                  {/* Spacer */}
+                  <div className="flex-1" />
+
+                  {/* Move + delete */}
+                  <div className="flex items-center gap-0.5">
+                    <button
+                      type="button"
+                      onClick={() => moveBlock(block.id, "up")}
+                      disabled={i === 0}
+                      className="rounded p-1 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+                      title="Move up"
+                    >
+                      <ChevronUp className="size-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => moveBlock(block.id, "down")}
+                      disabled={i === value.length - 1}
+                      className="rounded p-1 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+                      title="Move down"
+                    >
+                      <ChevronDown className="size-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => removeBlock(block.id)}
+                      className="rounded p-1 text-zinc-300 hover:text-red-500 transition-colors ml-0.5"
+                      title="Remove block"
+                    >
+                      <Trash2 className="size-3.5" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Block content */}
+                <div className="p-3">
+                  {renderInput(block)}
+                </div>
+              </div>
+            )
+          })}
         </div>
       )}
       <BlockToolbar onAdd={addBlock} />

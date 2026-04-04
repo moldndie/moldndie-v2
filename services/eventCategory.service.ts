@@ -12,6 +12,29 @@ function dbError(e: unknown): Error {
   return new Error("Database error")
 }
 
+function slugify(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .trim()
+}
+
+async function uniqueSlug(base: string, excludeId?: string): Promise<string> {
+  const admin = createAdminClient()
+  let slug = slugify(base) || "category"
+  let suffix = 0
+  while (true) {
+    let q = admin.from("event_categories").select("id").eq("slug", slug)
+    if (excludeId) q = q.neq("id", excludeId)
+    const { data } = await q.maybeSingle()
+    if (!data) return slug
+    suffix += 1
+    slug = `${slugify(base)}-${suffix}`
+  }
+}
+
 export async function getEventCategories(): Promise<EventCategory[]> {
   const admin = createAdminClient()
   const { data, error } = await admin
@@ -26,9 +49,10 @@ export async function createEventCategory(
   values: EventCategoryFormValues
 ): Promise<EventCategory> {
   const admin = createAdminClient()
+  const slug = await uniqueSlug(values.name)
   const { data, error } = await admin
     .from("event_categories")
-    .insert({ name: values.name })
+    .insert({ name: values.name, slug })
     .select()
     .single()
   if (error) throw dbError(error)
@@ -41,9 +65,10 @@ export async function updateEventCategory(
   values: EventCategoryFormValues
 ): Promise<EventCategory> {
   const admin = createAdminClient()
+  const slug = await uniqueSlug(values.name, id)
   const { data, error } = await admin
     .from("event_categories")
-    .update({ name: values.name })
+    .update({ name: values.name, slug })
     .eq("id", id)
     .select()
     .single()

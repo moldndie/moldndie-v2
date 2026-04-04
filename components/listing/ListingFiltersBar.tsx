@@ -65,7 +65,7 @@ export function ListingFiltersBar({
   onClear,
   isFetching,
 }: ListingFiltersBarProps) {
-  const showCategory = !!categories && categories.length > 0 && !!onCategoryChange
+  const showCategory = !!categories && !!onCategoryChange
   const showPrice    = priceValue !== undefined && !!onPriceChange
 
   return (

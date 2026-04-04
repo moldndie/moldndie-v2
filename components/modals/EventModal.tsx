@@ -44,6 +44,7 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
       category_id: "",
       country: "",
       address: "",
+      website: "",
     },
   })
 
@@ -61,6 +62,7 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
         category_id: event.category_id ?? "",
         country: event.country ?? "",
         address: event.address ?? "",
+        website: event.website ?? "",
       })
     } else {
       reset({
@@ -71,6 +73,7 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
         category_id: "",
         country: "",
         address: "",
+        website: "",
       })
     }
   }, [open, event, reset])
@@ -147,6 +150,11 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Address</label>
           <Input {...register("address")} placeholder="Full address" />
+        </div>
+
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-zinc-700">Website</label>
+          <Input {...register("website")} placeholder="https://example.com" />
         </div>
 
         {mutationError && (

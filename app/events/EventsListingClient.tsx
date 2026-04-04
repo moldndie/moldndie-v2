@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { CalendarDays, MapPin, MapPinned, ChevronDown, Lock } from "lucide-react"
+import { CalendarDays, MapPin, MapPinned, ChevronDown, Lock, Globe } from "lucide-react"
 import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
@@ -71,7 +71,7 @@ function LoginGate({ callbackPath }: { callbackPath: string }) {
 }
 
 function EventExpandedContent({ event }: {
-  event: { event_date: string | null; country: string | null; address: string | null; description: string | null }
+  event: { event_date: string | null; country: string | null; address: string | null; description: string | null; website?: string | null }
 }) {
   return (
     <div className="border-t border-zinc-100 bg-zinc-50/70 px-4 py-4 space-y-3">
@@ -91,10 +91,30 @@ function EventExpandedContent({ event }: {
           {event.address}{event.country ? `, ${event.country}` : ""}
         </div>
       )}
+      {event.website && (
+        <div className="flex items-center gap-2 text-sm text-zinc-500">
+          <Globe size={13} className="text-zinc-400 shrink-0" />
+          <a href={event.website} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:opacity-70">
+            {event.website}
+          </a>
+        </div>
+      )}
       {event.description && (
         <p className="text-sm text-zinc-600 leading-relaxed pt-1 border-t border-zinc-100">
           {event.description}
         </p>
+      )}
+      {event.website && (
+        <a
+          href={event.website}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+          className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-white font-bold text-sm py-2.5 rounded-xl transition-colors"
+        >
+          <Globe size={14} />
+          Visit Website
+        </a>
       )}
     </div>
   )
@@ -128,6 +148,7 @@ function EventCard({
     country: string | null
     address: string | null
     description: string | null
+    website?: string | null
     category?: { name: string } | null
   }
   expanded: boolean
@@ -228,7 +249,7 @@ export default function EventsListingClient() {
   const [sort, setSort]                         = useState<EventSort>(() => (searchParams.get("sort") as EventSort) ?? "newest")
   const [currentPage, setCurrentPage]           = useState(() => Number(searchParams.get("page")) || 1)
   const [pageSize, setPageSize]                 = useState(() => Number(searchParams.get("pageSize")) || DEFAULT_PAGE_SIZE)
-  const [expandedId, setExpandedId]             = useState<string | null>(null)
+  const [expandedIds, setExpandedIds]           = useState<Record<string, boolean>>({})
   const [isLoggedIn, setIsLoggedIn]             = useState<boolean | null>(null)
 
   // Auth check
@@ -282,7 +303,10 @@ export default function EventsListingClient() {
   const totalPages = Math.ceil(total / pageSize)
   const hasActiveFilters = !!searchTerm || !!selectedCategory || sort !== "newest"
 
-  const handleToggle = (id: string) => setExpandedId(expandedId === id ? null : id)
+  const handleToggle = (id: string) => setExpandedIds((prev) => ({
+    ...prev,
+    [id]: !prev[id],
+  }))
 
   return (
     <motion.div
@@ -319,7 +343,7 @@ export default function EventsListingClient() {
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
           {Array.from({ length: pageSize }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : events.length === 0 ? (
@@ -339,13 +363,13 @@ export default function EventsListingClient() {
           variants={gridVariants}
           initial="initial"
           animate="animate"
-          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}
         >
           {events.map((event) => (
             <EventCard
               key={event.id}
               event={event}
-              expanded={expandedId === event.id}
+              expanded={!!expandedIds[event.id]}
               onToggle={() => handleToggle(event.id)}
               isLoggedIn={isLoggedIn}
               callbackPath={pathname}

@@ -25,9 +25,9 @@ const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 // ── Skeleton ──────────────────────────────────────────────────
 function SkeletonDetail() {
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10 animate-pulse">
+    <div className="max-w-7xl mx-auto px-6 py-10 animate-pulse">
       <div className="h-4 w-32 bg-zinc-200 rounded mb-8" />
-      <div className="grid grid-cols-1 lg:grid-cols-[55%_45%] gap-10 lg:gap-16">
+      <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-10 lg:gap-16">
         <div className="space-y-4">
           <div className="aspect-video bg-zinc-200 rounded-2xl" />
           <div className="h-3 w-20 bg-zinc-200 rounded" />
@@ -126,14 +126,14 @@ export default function CourseDetailClient({ courseId }: { courseId: string }) {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-10">
+    <div className="max-w-7xl mx-auto px-6 py-10">
       {/* ── Breadcrumb ── */}
       <div className="mb-8">
         <PublicBreadcrumb crumbs={[{ label: "Academy", href: "/courses" }, { label: course.title }]} />
       </div>
 
       {/* ── 2-column layout ── */}
-      <div className="grid grid-cols-1 lg:grid-cols-[55%_45%] gap-10 lg:gap-12">
+      <div className="grid grid-cols-1 lg:grid-cols-[70%_30%] gap-10 lg:gap-12">
         {/* ── LEFT: Info ── */}
         <div className="space-y-6">
           {/* Thumbnail */}

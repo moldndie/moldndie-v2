@@ -24,7 +24,7 @@ export async function AdSlotGrid({ type, className }: AdSlotGridProps) {
       <p className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400 mb-3 select-none">
         Sponsored
       </p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-1 -mx-1 px-1 scrollbar-hide">
         {ads.map((ad) => (
           <a
             key={ad.id}
@@ -32,7 +32,7 @@ export async function AdSlotGrid({ type, className }: AdSlotGridProps) {
             target="_blank"
             rel="noopener noreferrer sponsored"
             aria-label={ad.title}
-            className="group block rounded-2xl border border-zinc-100 bg-zinc-50 p-3 hover:border-zinc-200 hover:shadow-lg hover:scale-[1.015] transition-all duration-200"
+            className="group block rounded-2xl border border-zinc-100 bg-zinc-50 p-3 hover:border-zinc-200 hover:shadow-lg hover:scale-[1.015] transition-all duration-200 shrink-0 snap-start w-[85vw] sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)]"
           >
             <div className="relative w-full overflow-hidden rounded-xl aspect-video">
               <Image
@@ -40,7 +40,7 @@ export async function AdSlotGrid({ type, className }: AdSlotGridProps) {
                 alt={ad.title}
                 fill
                 className="object-cover group-hover:scale-105 transition-transform duration-300"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 33vw"
               />
             </div>
             {ad.title && (

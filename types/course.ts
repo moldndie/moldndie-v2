@@ -4,6 +4,9 @@ export interface CourseLesson {
   title: string
   video_url: string | null
   pdf_url: string | null
+  video_path: string | null
+  pdf_path: string | null
+  file_path: string | null
   order_index: number
   is_free: boolean
 }

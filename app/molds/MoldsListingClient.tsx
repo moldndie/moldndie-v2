@@ -124,7 +124,7 @@ export default function MoldsListingClient() {
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
       <div>
         <PublicBreadcrumb crumbs={[{ label: "Library" }]} />
-        <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Mold Library</h1>
+        <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Tooling Library</h1>
         <p className="mt-1 text-sm text-zinc-500">Browse and download professional mold &amp; die designs</p>
       </div>
 
@@ -154,7 +154,7 @@ export default function MoldsListingClient() {
 
       {/* Grid */}
       {isLoading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {Array.from({ length: pageSize }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : molds.length === 0 ? (
@@ -167,7 +167,7 @@ export default function MoldsListingClient() {
           )}
         </div>
       ) : (
-        <div className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}>
+        <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}>
           {molds.map((mold) => <MoldCard key={mold.id} mold={mold} />)}
         </div>
       )}

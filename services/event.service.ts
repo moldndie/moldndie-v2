@@ -96,6 +96,7 @@ export async function createEvent(values: EventFormValues): Promise<Event> {
       category_id: values.category_id || null,
       country: values.country ?? null,
       address: values.address ?? null,
+      website: values.website ?? null,
     })
     .select()
     .single()
@@ -116,6 +117,7 @@ export async function updateEvent(id: string, values: EventFormValues): Promise<
       category_id: values.category_id || null,
       country: values.country ?? null,
       address: values.address ?? null,
+      website: values.website ?? null,
     })
     .eq("id", id)
     .select()

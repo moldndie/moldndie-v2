@@ -23,8 +23,11 @@ export async function getLessons(courseId: string): Promise<CourseLesson[]> {
 
 export interface LessonInput {
   title: string
-  video_url: string
+  video_url?: string | null
   pdf_url?: string | null
+  video_path?: string | null
+  pdf_path?: string | null
+  file_path?: string | null
   order_index: number
   is_free: boolean
 }
@@ -39,8 +42,11 @@ export async function createLesson(
     .insert({
       course_id: courseId,
       title: input.title,
-      video_url: input.video_url,
+      video_url: input.video_url ?? null,
       pdf_url: input.pdf_url ?? null,
+      video_path: input.video_path ?? null,
+      pdf_path: input.pdf_path ?? null,
+      file_path: input.file_path ?? null,
       order_index: input.order_index,
       is_free: input.is_free,
     })
@@ -59,8 +65,11 @@ export async function updateLesson(
     .from("lessons")
     .update({
       title: input.title,
-      video_url: input.video_url,
+      video_url: input.video_url ?? null,
       pdf_url: input.pdf_url ?? null,
+      video_path: input.video_path ?? null,
+      pdf_path: input.pdf_path ?? null,
+      file_path: input.file_path ?? null,
       order_index: input.order_index,
       is_free: input.is_free,
     })
@@ -79,7 +88,7 @@ export async function deleteLesson(id: string): Promise<void> {
 
 export async function replaceLessons(
   courseId: string,
-  lessons: { title: string; video_url: string; pdf_url: string | null; order_index: number }[]
+  lessons: { title: string; video_url?: string | null; pdf_url?: string | null; video_path?: string | null; pdf_path?: string | null; file_path?: string | null; order_index: number }[]
 ): Promise<void> {
   const admin = createAdminClient()
   const { error: deleteError } = await admin
