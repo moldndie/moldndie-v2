@@ -9,6 +9,7 @@ export type Profile = {
   created_at: string;
   // Enriched from auth.users
   email?: string | null;
+  email_confirmed_at?: string | null;
 };
 
 export type ProfileUpdateData = {

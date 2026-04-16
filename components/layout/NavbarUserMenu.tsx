@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { LogOut, LayoutDashboard, ChevronDown, ShoppingBag, GraduationCap, ShoppingCart } from "lucide-react"
+import { LogOut, LayoutDashboard, ChevronDown, ShoppingBag, GraduationCap, ShoppingCart, UserCircle } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/hooks/queries/useCart"
@@ -121,7 +121,7 @@ export default function NavbarUserMenu() {
           onClick={() => setOpen((v) => !v)}
           className="flex items-center gap-1.5 cursor-pointer rounded-full p-1 hover:bg-zinc-100 transition-colors"
         >
-          <div className="w-8 h-8 rounded-full bg-zinc-900 text-white flex items-center justify-center text-xs font-semibold shrink-0">
+          <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold shrink-0">
             {initial}
           </div>
           <ChevronDown className={`size-3.5 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`} />
@@ -136,6 +136,14 @@ export default function NavbarUserMenu() {
               )}
               <p className="text-xs text-zinc-400 truncate">{user.email}</p>
             </div>
+            <Link
+              href="/profile"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
+            >
+              <UserCircle className="size-4 text-zinc-400" />
+              My Profile
+            </Link>
             <Link
               href="/my-courses"
               onClick={() => setOpen(false)}

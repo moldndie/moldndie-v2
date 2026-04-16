@@ -17,7 +17,7 @@ import { useCreateBlog, useUpdateBlog } from "@/hooks/queries/useBlog"
 import { saveBlogBlocks, saveBlogTags } from "@/services/blog.service"
 import type { Blog, BlogCategory, BlogTag } from "@/types"
 import type { EditorBlock } from "../types"
-import { BlockEditor } from "./BlockEditor"
+import { SectionLayoutBuilder } from "./SectionLayoutBuilder"
 
 function slugify(text: string) {
   return text
@@ -148,8 +148,8 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
             </div>
 
             <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-zinc-900">Content Blocks</h3>
-              <BlockEditor value={blocks} onChange={setBlocks} />
+              <h3 className="text-sm font-semibold text-zinc-900">Content</h3>
+              <SectionLayoutBuilder value={blocks} onChange={setBlocks} />
             </div>
           </div>
 

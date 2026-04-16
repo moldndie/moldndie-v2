@@ -1,5 +1,7 @@
 import { z } from "zod"
 
+const DIFFICULTY_VALUES = ["simple", "moderate", "difficult", "sophisticated"] as const
+
 export const moldSchema = z
   .object({
     title: z.string().min(1, "Title is required"),
@@ -10,6 +12,7 @@ export const moldSchema = z
     price: z.number(),
     preview_image: z.string().optional(),
     file_key: z.string().min(1, "Please upload a mold file"),
+    difficulty: z.enum(DIFFICULTY_VALUES).nullable().optional(),
   })
   .superRefine((data, ctx) => {
     if (!data.is_free && data.price <= 0) {

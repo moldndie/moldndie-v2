@@ -19,13 +19,13 @@ import { cn } from "@/lib/utils"
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, exact: true },
   { label: "Blogs", href: "/dashboard/blogs", icon: FileText },
-  { label: "Molds", href: "/dashboard/molds", icon: Package },
-  { label: "Courses", href: "/dashboard/courses", icon: BookOpen },
+  { label: "Toolings", href: "/dashboard/molds", icon: Package },
+  { label: "Academy", href: "/dashboard/courses", icon: BookOpen },
   { label: "Events", href: "/dashboard/events", icon: Calendar },
   { label: "Suppliers", href: "/dashboard/suppliers", icon: Truck },
   { label: "Ads", href: "/dashboard/ads", icon: Megaphone },
   { label: "Users", href: "/dashboard/users", icon: Users },
-  { label: "Service Requests", href: "/dashboard/service-requests", icon: Inbox },
+  { label: "Services", href: "/dashboard/service-requests", icon: Inbox },
 ]
 
 interface SidebarProps {
@@ -76,7 +76,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                 className={cn(
                   "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                   active
-                    ? "bg-zinc-900 text-white"
+                    ? "bg-primary text-primary-foreground"
                     : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
                 )}
               >

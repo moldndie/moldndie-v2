@@ -13,14 +13,13 @@ import { useEventsListing, useEventCategories } from "@/hooks/queries/useEvents"
 import type { EventSort } from "@/hooks/queries/useEvents"
 import { createClient } from "@/lib/supabase/client"
 
-const DEFAULT_PAGE_SIZE = 9
+const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 const SORT_OPTIONS: { label: string; value: EventSort }[] = [
-  { label: "Newest",         value: "newest" },
-  { label: "Oldest",         value: "oldest" },
-  { label: "Date: Soonest",  value: "date_asc" },
-  { label: "A → Z",          value: "title_asc" },
+  { label: "Newest",  value: "newest" },
+  { label: "Oldest",  value: "oldest" },
+  { label: "A → Z",   value: "title_asc" },
 ]
 
 const pageVariants = {
@@ -248,7 +247,7 @@ export default function EventsListingClient() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(() => searchParams.get("category"))
   const [sort, setSort]                         = useState<EventSort>(() => (searchParams.get("sort") as EventSort) ?? "newest")
   const [currentPage, setCurrentPage]           = useState(() => Number(searchParams.get("page")) || 1)
-  const [pageSize, setPageSize]                 = useState(() => Number(searchParams.get("pageSize")) || DEFAULT_PAGE_SIZE)
+  const pageSize = DEFAULT_PAGE_SIZE
   const [expandedIds, setExpandedIds]           = useState<Record<string, boolean>>({})
   const [isLoggedIn, setIsLoggedIn]             = useState<boolean | null>(null)
 
@@ -277,16 +276,14 @@ export default function EventsListingClient() {
     if (selectedCategory)                 p.set("category", selectedCategory)
     if (sort !== "newest")                p.set("sort",     sort)
     if (currentPage > 1)                  p.set("page",     String(currentPage))
-    if (pageSize !== DEFAULT_PAGE_SIZE)   p.set("pageSize", String(pageSize))
     const qs = p.toString()
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-  }, [searchTerm, selectedCategory, sort, currentPage, pageSize, pathname, router])
+  }, [searchTerm, selectedCategory, sort, currentPage, pathname, router])
 
   const handleCategoryChange = useCallback((id: string | null) => { setSelectedCategory(id); setCurrentPage(1) }, [])
   const handleSort           = useCallback((v: string) => { setSort(v as EventSort); setCurrentPage(1) }, [])
-  const handlePageSizeChange = useCallback((size: number) => { setPageSize(size); setCurrentPage(1) }, [])
   const clearAll             = useCallback(() => {
-    setInputValue(""); setSearchTerm(""); setSelectedCategory(null); setSort("newest"); setCurrentPage(1); setPageSize(DEFAULT_PAGE_SIZE)
+    setInputValue(""); setSearchTerm(""); setSelectedCategory(null); setSort("newest"); setCurrentPage(1)
   }, [])
 
   const { data, isLoading, isFetching } = useEventsListing({
@@ -384,8 +381,6 @@ export default function EventsListingClient() {
             currentPage={currentPage}
             totalPages={totalPages}
             onChange={setCurrentPage}
-            pageSize={pageSize}
-            onPageSizeChange={handlePageSizeChange}
           />
         </div>
       )}

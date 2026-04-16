@@ -79,7 +79,7 @@ export function FileUploadField({
         </div>
         <div className="h-2 w-full overflow-hidden rounded-full bg-zinc-100">
           <div
-            className="h-full rounded-full bg-zinc-900 transition-all duration-200"
+            className="h-full rounded-full bg-primary transition-all duration-200"
             style={{ width: `${progress}%` }}
           />
         </div>

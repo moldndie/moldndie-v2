@@ -10,8 +10,9 @@ import { Pagination } from "@/components/listing/Pagination"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { useMoldsListing, useMoldCategories } from "@/hooks/queries/useMolds"
 import type { PriceFilter, SortOption } from "@/hooks/queries/useMolds"
+import type { MoldDifficulty } from "@/types/mold"
 
-const DEFAULT_PAGE_SIZE = 9
+const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 const SORT_OPTIONS: { label: string; value: SortOption }[] = [
@@ -34,8 +35,22 @@ function SkeletonCard() {
   )
 }
 
+const DIFFICULTY_LABELS: Record<string, string> = {
+  simple: "Simple",
+  moderate: "Moderate",
+  difficult: "Difficult",
+  sophisticated: "Sophisticated",
+}
+
+const DIFFICULTY_COLORS: Record<string, string> = {
+  simple: "bg-emerald-100 text-emerald-700",
+  moderate: "bg-blue-100 text-blue-700",
+  difficult: "bg-amber-100 text-amber-700",
+  sophisticated: "bg-red-100 text-red-700",
+}
+
 function MoldCard({ mold }: {
-  mold: { id: string; title: string; price: number | null; preview_image: string | null; category?: { name: string } | null }
+  mold: { id: string; title: string; price: number | null; preview_image: string | null; category?: { name: string } | null; difficulty?: string | null }
 }) {
   const isFree = mold.price === 0
   const hasPaid = mold.price !== null && mold.price > 0
@@ -61,10 +76,17 @@ function MoldCard({ mold }: {
       <div className="p-4 flex-1 flex flex-col gap-1">
         <h3 className="text-sm font-semibold text-zinc-900 line-clamp-2 leading-snug group-hover:text-primary transition-colors">{mold.title}</h3>
         {mold.category && <p className="text-xs text-zinc-400">{mold.category.name}</p>}
-        <div className="mt-auto pt-2">
-          {isFree ? <span className="text-sm font-bold text-emerald-600">Free</span>
-            : hasPaid ? <span className="text-sm font-bold text-zinc-900">{mold.price} EGP</span>
-            : null}
+        <div className="mt-auto pt-2 flex items-center justify-between gap-2">
+          <span>
+            {isFree ? <span className="text-sm font-bold text-emerald-600">Free</span>
+              : hasPaid ? <span className="text-sm font-bold text-zinc-900">{mold.price} EGP</span>
+              : null}
+          </span>
+          {mold.difficulty && (
+            <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${DIFFICULTY_COLORS[mold.difficulty] ?? "bg-zinc-100 text-zinc-600"}`}>
+              {DIFFICULTY_LABELS[mold.difficulty] ?? mold.difficulty}
+            </span>
+          )}
         </div>
       </div>
     </Link>
@@ -81,8 +103,9 @@ export default function MoldsListingClient() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(() => searchParams.get("category"))
   const [priceFilter, setPriceFilter]       = useState<PriceFilter>(() => (searchParams.get("price") as PriceFilter) ?? "all")
   const [sort, setSort]                     = useState<SortOption>(() => (searchParams.get("sort") as SortOption) ?? "newest")
+  const [difficulty, setDifficulty]         = useState<MoldDifficulty | "">(() => (searchParams.get("difficulty") as MoldDifficulty) ?? "")
   const [currentPage, setCurrentPage]       = useState(() => Number(searchParams.get("page")) || 1)
-  const [pageSize, setPageSize]             = useState(() => Number(searchParams.get("pageSize")) || DEFAULT_PAGE_SIZE)
+  const pageSize = DEFAULT_PAGE_SIZE
 
   // Debounce search
   useEffect(() => {
@@ -93,32 +116,32 @@ export default function MoldsListingClient() {
   // Sync to URL
   useEffect(() => {
     const p = new URLSearchParams()
-    if (searchTerm)                         p.set("search",   searchTerm)
-    if (selectedCategory)                   p.set("category", selectedCategory)
-    if (priceFilter !== "all")              p.set("price",    priceFilter)
-    if (sort !== "newest")                  p.set("sort",     sort)
-    if (currentPage > 1)                    p.set("page",     String(currentPage))
-    if (pageSize !== DEFAULT_PAGE_SIZE)     p.set("pageSize", String(pageSize))
+    if (searchTerm)                         p.set("search",     searchTerm)
+    if (selectedCategory)                   p.set("category",   selectedCategory)
+    if (priceFilter !== "all")              p.set("price",      priceFilter)
+    if (sort !== "newest")                  p.set("sort",       sort)
+    if (difficulty)                         p.set("difficulty", difficulty)
+    if (currentPage > 1)                    p.set("page",       String(currentPage))
     const qs = p.toString()
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-  }, [searchTerm, selectedCategory, priceFilter, sort, currentPage, pageSize, pathname, router])
+  }, [searchTerm, selectedCategory, priceFilter, sort, difficulty, currentPage, pathname, router])
 
   const handleCategoryChange = useCallback((id: string | null) => { setSelectedCategory(id); setCurrentPage(1) }, [])
   const handlePriceFilter    = useCallback((v: PriceFilter)    => { setPriceFilter(v);    setCurrentPage(1) }, [])
   const handleSort           = useCallback((v: string)         => { setSort(v as SortOption); setCurrentPage(1) }, [])
-  const handlePageSizeChange = useCallback((size: number) => { setPageSize(size); setCurrentPage(1) }, [])
+  const handleDifficulty     = useCallback((v: string)         => { setDifficulty(v as MoldDifficulty | ""); setCurrentPage(1) }, [])
   const clearAll             = useCallback(() => {
     setInputValue(""); setSearchTerm(""); setSelectedCategory(null)
-    setPriceFilter("all"); setSort("newest"); setCurrentPage(1); setPageSize(DEFAULT_PAGE_SIZE)
+    setPriceFilter("all"); setSort("newest"); setDifficulty(""); setCurrentPage(1)
   }, [])
 
-  const { data, isLoading, isFetching } = useMoldsListing({ search: searchTerm, categoryId: selectedCategory, priceFilter, sort, page: currentPage, pageSize })
+  const { data, isLoading, isFetching } = useMoldsListing({ search: searchTerm, categoryId: selectedCategory, priceFilter, sort, difficulty: difficulty || undefined, page: currentPage, pageSize })
   const { data: categories } = useMoldCategories()
 
   const molds      = data?.data ?? []
   const total      = data?.total ?? 0
   const totalPages = Math.ceil(total / pageSize)
-  const hasActiveFilters = !!searchTerm || !!selectedCategory || priceFilter !== "all" || sort !== "newest"
+  const hasActiveFilters = !!searchTerm || !!selectedCategory || priceFilter !== "all" || sort !== "newest" || !!difficulty
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
@@ -144,6 +167,32 @@ export default function MoldsListingClient() {
         onClear={clearAll}
         isFetching={isFetching && !isLoading}
       />
+
+      {/* Difficulty filter */}
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-zinc-500 shrink-0">Difficulty:</span>
+        <div className="flex flex-wrap gap-1">
+          {[
+            { label: "All", value: "" },
+            { label: "Simple", value: "simple" },
+            { label: "Moderate", value: "moderate" },
+            { label: "Difficult", value: "difficult" },
+            { label: "Sophisticated", value: "sophisticated" },
+          ].map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => handleDifficulty(opt.value)}
+              className={`h-8 px-3 rounded-lg border text-xs font-medium transition-colors whitespace-nowrap ${
+                difficulty === opt.value
+                  ? "bg-primary text-white border-primary"
+                  : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {/* Results meta */}
       {!isLoading && (
@@ -178,8 +227,6 @@ export default function MoldsListingClient() {
             currentPage={currentPage}
             totalPages={totalPages}
             onChange={setCurrentPage}
-            pageSize={pageSize}
-            onPageSizeChange={handlePageSizeChange}
           />
         </div>
       )}

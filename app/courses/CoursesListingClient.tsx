@@ -13,7 +13,7 @@ import type { CourseSort } from "@/hooks/queries/useCourses"
 import type { CoursePriceFilter } from "@/services/course.service"
 import type { Course } from "@/types"
 
-const DEFAULT_PAGE_SIZE = 9
+const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 const SORT_OPTIONS: { label: string; value: CourseSort }[] = [
@@ -96,7 +96,7 @@ export default function CoursesListingClient() {
   const [priceFilter, setPriceFilter] = useState<CoursePriceFilter>(() => (searchParams.get("price") as CoursePriceFilter) ?? "all")
   const [sort, setSort]               = useState<CourseSort>(() => (searchParams.get("sort") as CourseSort) ?? "newest")
   const [currentPage, setCurrentPage] = useState(() => Number(searchParams.get("page")) || 1)
-  const [pageSize, setPageSize]       = useState(() => Number(searchParams.get("pageSize")) || DEFAULT_PAGE_SIZE)
+  const pageSize = DEFAULT_PAGE_SIZE
 
   // Debounce search
   useEffect(() => {
@@ -111,16 +111,14 @@ export default function CoursesListingClient() {
     if (priceFilter !== "all")            p.set("price",    priceFilter)
     if (sort !== "newest")                p.set("sort",     sort)
     if (currentPage > 1)                  p.set("page",     String(currentPage))
-    if (pageSize !== DEFAULT_PAGE_SIZE)   p.set("pageSize", String(pageSize))
     const qs = p.toString()
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-  }, [searchTerm, priceFilter, sort, currentPage, pageSize, pathname, router])
+  }, [searchTerm, priceFilter, sort, currentPage, pathname, router])
 
-  const handlePriceFilter    = useCallback((v: CoursePriceFilter) => { setPriceFilter(v); setCurrentPage(1) }, [])
-  const handleSort           = useCallback((v: string) => { setSort(v as CourseSort); setCurrentPage(1) }, [])
-  const handlePageSizeChange = useCallback((size: number) => { setPageSize(size); setCurrentPage(1) }, [])
-  const clearAll             = useCallback(() => {
-    setInputValue(""); setSearchTerm(""); setPriceFilter("all"); setSort("newest"); setCurrentPage(1); setPageSize(DEFAULT_PAGE_SIZE)
+  const handlePriceFilter = useCallback((v: CoursePriceFilter) => { setPriceFilter(v); setCurrentPage(1) }, [])
+  const handleSort        = useCallback((v: string) => { setSort(v as CourseSort); setCurrentPage(1) }, [])
+  const clearAll          = useCallback(() => {
+    setInputValue(""); setSearchTerm(""); setPriceFilter("all"); setSort("newest"); setCurrentPage(1)
   }, [])
 
   const { data, isLoading, isFetching } = useCoursesListing({
@@ -191,8 +189,6 @@ export default function CoursesListingClient() {
             currentPage={currentPage}
             totalPages={totalPages}
             onChange={setCurrentPage}
-            pageSize={pageSize}
-            onPageSizeChange={handlePageSizeChange}
           />
         </div>
       )}

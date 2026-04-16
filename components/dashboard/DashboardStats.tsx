@@ -138,7 +138,7 @@ export default function DashboardStats() {
         <SectionLabel>Content</SectionLabel>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <StatCard
-            label="Molds"
+            label="Toolings"
             value={data?.counts.molds}
             icon={Package}
             iconBg="bg-orange-50"
@@ -146,7 +146,7 @@ export default function DashboardStats() {
             isLoading={isLoading}
           />
           <StatCard
-            label="Courses"
+            label="Academy"
             value={data?.counts.courses}
             icon={BookOpen}
             iconBg="bg-violet-50"
@@ -192,8 +192,8 @@ export default function DashboardStats() {
       <div className="space-y-3">
         <SectionLabel>Library Breakdown</SectionLabel>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <MetricChip label="Free Molds" value={data?.metrics.freeMolds} />
-          <MetricChip label="Paid Molds" value={data?.metrics.paidMolds} />
+          <MetricChip label="Free Toolings" value={data?.metrics.freeMolds} />
+          <MetricChip label="Paid Toolings" value={data?.metrics.paidMolds} />
           <MetricChip label="Active Ads" value={data?.metrics.activeAds} />
         </div>
       </div>
@@ -202,8 +202,8 @@ export default function DashboardStats() {
       <div className="space-y-3">
         <SectionLabel>Recent Activity</SectionLabel>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <RecentList title="Recent Molds" items={data?.recent.molds} isLoading={isLoading} />
-          <RecentList title="Recent Courses" items={data?.recent.courses} isLoading={isLoading} />
+          <RecentList title="Recent Toolings" items={data?.recent.molds} isLoading={isLoading} />
+          <RecentList title="Recent Academy" items={data?.recent.courses} isLoading={isLoading} />
           <RecentList title="Recent Events" items={data?.recent.events} isLoading={isLoading} />
         </div>
       </div>

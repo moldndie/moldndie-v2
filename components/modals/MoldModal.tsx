@@ -9,6 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { FileUploadField } from "@/components/forms/FileUploadField"
+import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { GalleryGrid, type LocalGalleryItem } from "@/components/mold/GalleryGrid"
 import { moldSchema, type MoldFormValues } from "@/schemas/mold.schema"
 import { useCreateMold, useUpdateMold } from "@/hooks/queries/useMolds"
@@ -58,6 +59,7 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
       price: 0,
       preview_image: "",
       file_key: "",
+      difficulty: null,
     },
   })
 
@@ -85,6 +87,7 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
         price: moldIsFree ? 0 : (mold.price ?? 0),
         preview_image: mold.preview_image ?? "",
         file_key: mold.file_key ?? "",
+        difficulty: mold.difficulty ?? null,
       })
       // Load existing gallery
       setGalleryItems([])
@@ -107,6 +110,7 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
         price: 0,
         preview_image: "",
         file_key: "",
+        difficulty: null,
       })
       setGalleryItems([])
       setDeletedItemIds([])
@@ -179,7 +183,7 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
               key={s}
               className={cn(
                 "h-1 flex-1 rounded-full transition-colors",
-                step >= s ? "bg-zinc-900" : "bg-zinc-200"
+                step >= s ? "bg-primary" : "bg-zinc-200"
               )}
             />
           ))}
@@ -199,14 +203,27 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
               <Textarea {...register("description")} placeholder="Describe the mold…" rows={3} />
             </div>
 
-            <div className="space-y-1.5">
-              <label className="text-sm font-medium text-zinc-700">Category</label>
-              <Select {...register("category_id")}>
-                <option value="">— No category —</option>
-                {categories.map((c) => (
-                  <option key={c.id} value={c.id}>{c.name}</option>
-                ))}
-              </Select>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-zinc-700">Category</label>
+                <Select {...register("category_id")}>
+                  <option value="">— No category —</option>
+                  {categories.map((c) => (
+                    <option key={c.id} value={c.id}>{c.name}</option>
+                  ))}
+                </Select>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-sm font-medium text-zinc-700">Difficulty</label>
+                <Select {...register("difficulty")}>
+                  <option value="">— Not set —</option>
+                  <option value="simple">Simple</option>
+                  <option value="moderate">Moderate</option>
+                  <option value="difficult">Difficult</option>
+                  <option value="sophisticated">Sophisticated</option>
+                </Select>
+              </div>
             </div>
 
             {/* Free / Paid toggle */}
@@ -222,7 +239,7 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
                 onClick={handleFreeToggle}
                 className={cn(
                   "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500",
-                  isFree ? "bg-zinc-900" : "bg-zinc-200"
+                  isFree ? "bg-primary" : "bg-zinc-200"
                 )}
               >
                 <span
@@ -250,9 +267,9 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
 
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700">Preview Image</label>
-              <FileUploadField
+              <CroppableFileUploadField
                 folder="molds/previews"
-                accept="image/*"
+                aspect={1}
                 label="Click to upload preview image"
                 existingValue={isEdit ? (mold?.preview_image ?? null) : null}
                 onUploadSuccess={({ key }) => setValue("preview_image", key, { shouldValidate: true })}

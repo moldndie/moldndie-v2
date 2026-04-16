@@ -1,38 +1,25 @@
-import type { Metadata } from "next"
-import { notFound } from "next/navigation"
+import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
 import Image from "next/image"
 import { FileText } from "lucide-react"
-import Navbar from "@/components/layout/Navbar"
-import Footer from "@/components/layout/Footer"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
-import { getBlogBySlug, getRelatedBlogs, getBlogLikeData, getBlogComments } from "@/services/blog.service"
+import { getBlogPreview, getRelatedBlogs, getBlogLikeData, getBlogComments } from "@/services/blog.service"
+import { getCurrentUser, isAdmin } from "@/services/auth.service"
 import { BlockRenderer } from "@/modules/blog/components/BlockRenderer"
 import { getFileUrl } from "@/lib/utils"
-import { LikeButton } from "../_components/LikeButton"
-import { CommentsSection } from "../_components/CommentsSection"
+import { LikeButton } from "@/app/blogs/_components/LikeButton"
+import { CommentsSection } from "@/app/blogs/_components/CommentsSection"
 import { createClient } from "@/lib/supabase/server"
 import { AdSlot } from "@/components/ads/AdSlot"
+import { PreviewBanner } from "./_components/PreviewBanner"
 import type { Blog } from "@/types"
 
 interface Props {
-  params: Promise<{ slug: string }>
+  params: Promise<{ id: string }>
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { slug } = await params
-  const blog = await getBlogBySlug(slug)
-  if (!blog) return { title: "Blog Not Found" }
-  return {
-    title: blog.title,
-    description: blog.introduction ?? undefined,
-    openGraph: {
-      title: blog.title,
-      description: blog.introduction ?? undefined,
-      images: blog.cover_image_path ? [getFileUrl(blog.cover_image_path)] : [],
-    },
-  }
-}
+// No metadata generation — preview pages should not be indexed.
+export const metadata = { robots: "noindex,nofollow" }
 
 function RelatedBlogCard({ blog }: { blog: Blog }) {
   return (
@@ -74,20 +61,29 @@ function RelatedBlogCard({ blog }: { blog: Blog }) {
   )
 }
 
-export default async function BlogDetailPage({ params }: Props) {
-  const { slug } = await params
-  const blog = await getBlogBySlug(slug)
+export default async function BlogPreviewPage({ params }: Props) {
+  // ── Auth gate — admin only ────────────────────────────────────────────────
+  const user = await getCurrentUser()
+  if (!user) redirect("/login")
 
+  const admin = await isAdmin(user.id)
+  if (!admin) redirect("/")
+
+  // ── Data fetching ─────────────────────────────────────────────────────────
+  const { id } = await params
+  const blog = await getBlogPreview(id)
   if (!blog) notFound()
 
   type TagRelation = { tag_id: string; tag: { id: string; name: string; slug: string } | null }
   const tagRelations = ((blog as unknown as { blog_tag_relations?: TagRelation[] })
     .blog_tag_relations ?? [])
   const tagIds = tagRelations.map((r) => r.tag_id)
-  const blogTags = tagRelations.map((r) => r.tag).filter(Boolean) as { id: string; name: string; slug: string }[]
+  const blogTags = tagRelations.map((r) => r.tag).filter(Boolean) as {
+    id: string; name: string; slug: string
+  }[]
 
   const serverClient = await createClient()
-  const { data: { user } } = await serverClient.auth.getUser()
+  const { data: { user: sessionUser } } = await serverClient.auth.getUser()
 
   const [related, likeData, comments] = await Promise.all([
     getRelatedBlogs(blog.id, blog.category_id, tagIds),
@@ -104,54 +100,51 @@ export default async function BlogDetailPage({ params }: Props) {
   const blocks = (blog.blocks ?? []).sort((a, b) => a.order_index - b.order_index)
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
-      <Navbar />
-      <main className="flex-1">
-        {/* Cover image — constrained to content width, natural aspect ratio */}
-        {blog.cover_image_path && (
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-10 pb-2">
-            <div className="rounded-2xl overflow-hidden shadow-sm bg-zinc-50 flex items-center justify-center">
-              <Image
-                src={getFileUrl(blog.cover_image_path)}
-                alt={blog.title}
-                width={0}
-                height={0}
-                sizes="(max-width: 640px) 100vw, (max-width: 1280px) 90vw, 1280px"
-                style={{ width: "100%", height: "auto", maxHeight: 600, objectFit: "contain" }}
-                priority
-              />
-            </div>
-          </div>
-        )}
+    <div className="min-h-screen bg-white pt-10">
+      <PreviewBanner
+        blogId={blog.id}
+        blogSlug={blog.slug}
+        isPublished={blog.is_published}
+      />
 
-        {/* ── Article ── */}
-        <article className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-          <div className="mb-6">
-            <PublicBreadcrumb crumbs={[{ label: "Blogs", href: "/blogs" }, { label: blog.title }]} />
-          </div>
+      <main>
+        {/* ── Article header ── */}
+        <div className="w-fullpx-4 sm:px-6 pt-10">
+          <PublicBreadcrumb
+            crumbs={[
+              { label: "Blogs", href: "/blogs" },
+              { label: blog.title },
+            ]}
+          />
 
-          {/* Meta */}
-          <div className="flex flex-wrap items-center gap-2 mb-3">
+          <div className="flex flex-wrap items-center gap-2.5 mt-6">
             {blog.category && (
-              <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2.5 py-0.5 rounded-full">
+              <span className="text-[10px] font-bold uppercase tracking-wider bg-primary/10 text-primary px-2.5 py-1 rounded-full">
                 {blog.category.name}
               </span>
             )}
             <span className="text-xs text-zinc-400">{date}</span>
+
+            {/* Draft watermark — only visible when unpublished */}
+            {!blog.is_published && (
+              <span className="rounded-full border border-amber-300 bg-amber-50 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-600">
+                Draft — not published
+              </span>
+            )}
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 leading-tight mb-4">
+          <h1 className="mt-3 text-3xl sm:text-4xl font-extrabold text-zinc-900 leading-tight tracking-tight">
             {blog.title}
           </h1>
 
           {blog.introduction && (
-            <p className="text-base text-zinc-500 leading-relaxed mb-6 border-l-4 border-primary/30 pl-4">
+            <p className="mt-4 text-lg text-zinc-500 leading-relaxed">
               {blog.introduction}
             </p>
           )}
 
           {blogTags.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-8">
+            <div className="flex flex-wrap gap-2 mt-5">
               {blogTags.map((tag) => (
                 <Link
                   key={tag.id}
@@ -163,21 +156,40 @@ export default async function BlogDetailPage({ params }: Props) {
               ))}
             </div>
           )}
+        </div>
 
-          {blocks.length > 0 && <hr className="border-zinc-100 mb-8" />}
+        {/* ── Cover image ── */}
+        {blog.cover_image_path && (
+          <div className="w-fullpx-4 sm:px-6 mt-8">
+            <div className="rounded-2xl overflow-hidden shadow-sm bg-zinc-50">
+              <Image
+                src={getFileUrl(blog.cover_image_path)}
+                alt={blog.title}
+                width={0}
+                height={0}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 90vw, 896px"
+                style={{ width: "100%", height: "auto", maxHeight: 560, objectFit: "contain" }}
+                priority
+              />
+            </div>
+          </div>
+        )}
+
+        {/* ── Article body ── */}
+        <article className="w-fullpx-4 sm:px-6 py-10">
           {blocks.length > 0 && (
-            <div className="prose prose-zinc prose-sm sm:prose-base max-w-none">
+            <div className="prose prose-zinc prose-base max-w-none">
               <BlockRenderer blocks={blocks} />
             </div>
           )}
 
-          {/* Like */}
-          <div className="mt-10 pt-6 border-t border-zinc-100 flex items-center gap-3">
+          {/* Like — functional even in preview */}
+          <div className="mt-12 pt-6 border-t border-zinc-100 flex items-center gap-3">
             <LikeButton
               blogId={blog.id}
               initialLiked={likeData.liked}
               initialCount={likeData.count}
-              isLoggedIn={!!user}
+              isLoggedIn={!!sessionUser}
             />
             <span className="text-xs text-zinc-400">
               {likeData.count === 1 ? "1 like" : `${likeData.count} likes`}
@@ -187,15 +199,15 @@ export default async function BlogDetailPage({ params }: Props) {
           <CommentsSection
             blogId={blog.id}
             initialComments={comments}
-            currentUserId={user?.id ?? null}
+            currentUserId={sessionUser?.id ?? null}
           />
         </article>
 
         {/* ── Related Articles ── */}
         {related.length > 0 && (
-          <section className="border-t border-zinc-100 bg-zinc-50">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
-              <h2 className="text-base font-bold text-zinc-900 mb-6">Related Articles</h2>
+          <section className="border-t border-zinc-100 bg-zinc-50/60">
+            <div className="w-fullpx-4 sm:px-6 py-12">
+              <h2 className="text-lg font-bold text-zinc-900 mb-6">Related Articles</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
                 {related.map((r) => (
                   <RelatedBlogCard key={r.id} blog={r} />
@@ -205,12 +217,11 @@ export default async function BlogDetailPage({ params }: Props) {
           </section>
         )}
 
-        {/* ── Sponsored ── */}
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+        {/* ── Ad slot ── */}
+        <div className="w-fullpx-4 sm:px-6 py-8">
           <AdSlot type="blog" className="max-w-md mx-auto" />
         </div>
       </main>
-      <Footer />
     </div>
   )
 }

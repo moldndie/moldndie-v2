@@ -8,7 +8,7 @@ import { Modal } from "@/components/ui/modal"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
-import { FileUploadField } from "@/components/forms/FileUploadField"
+import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { courseSchema, type CourseFormValues } from "@/schemas/course.schema"
 import { useCreateCourse, useUpdateCourse } from "@/hooks/queries/useCourses"
 import { cn } from "@/lib/utils"
@@ -158,9 +158,9 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700">Thumbnail</label>
-            <FileUploadField
+            <CroppableFileUploadField
               folder="courses/thumbnails"
-              accept="image/*"
+              aspect={16 / 9}
               label="Click to upload thumbnail"
               existingValue={isEdit ? (course?.thumbnail_url ?? null) : null}
               onUploadSuccess={({ key }) => setValue("thumbnail_url", key, { shouldValidate: true })}

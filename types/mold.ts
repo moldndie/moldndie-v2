@@ -13,6 +13,8 @@ export interface MoldGalleryItem {
   position: number
 }
 
+export type MoldDifficulty = "simple" | "moderate" | "difficult" | "sophisticated"
+
 export interface Mold {
   id: string
   title: string
@@ -21,6 +23,7 @@ export interface Mold {
   price: number | null
   preview_image: string | null
   file_key: string | null
+  difficulty: MoldDifficulty | null
   created_at: string
   category?: MoldCategory | null
   gallery?: MoldGalleryItem[]

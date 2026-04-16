@@ -1,11 +1,12 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { SignupInput } from "@/schemas/auth.schema";
 
 export async function signupAction(
   data: SignupInput
-): Promise<{ error?: string; success?: boolean; role?: "admin" | "user" }> {
+): Promise<{ error?: string; success?: boolean; role?: "admin" | "user"; emailVerificationSent?: boolean }> {
   const supabase = await createClient();
 
   const { data: authData, error } = await supabase.auth.signUp({
@@ -13,10 +14,18 @@ export async function signupAction(
     password: data.password,
   });
 
-  if (error) return { error: error.message };
+  if (error) {
+    if (error.message.toLowerCase().includes("already registered") || error.message.toLowerCase().includes("already been registered")) {
+      return { error: "An account with this email already exists." };
+    }
+    return { error: error.message };
+  }
 
   if (authData.user) {
-    await supabase.from("profiles").upsert({
+    // Use admin client to bypass RLS — the user may not have a session yet
+    // (e.g. if email confirmation is required) so the regular client would fail.
+    const admin = createAdminClient();
+    await admin.from("profiles").upsert({
       id: authData.user.id,
       first_name: data.first_name,
       last_name: data.last_name,
@@ -26,5 +35,7 @@ export async function signupAction(
     });
   }
 
-  return { success: true, role: "user" };
+  // If Supabase requires email confirmation, no session is created yet.
+  const emailVerificationSent = !authData.session;
+  return { success: true, role: "user", emailVerificationSent };
 }

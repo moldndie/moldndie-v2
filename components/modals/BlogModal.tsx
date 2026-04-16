@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { FileUploadField } from "@/components/forms/FileUploadField"
+import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { blogSchema, type BlogFormValues } from "@/schemas/blog.schema"
 import { useCreateBlog, useUpdateBlog } from "@/hooks/queries/useBlog"
 import { saveBlogBlocks } from "@/services/blog.service"
@@ -176,9 +176,9 @@ export function BlogModal({ open, onClose, blog, categories, onSuccess }: BlogMo
         {/* Cover image */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Cover Image</label>
-          <FileUploadField
+          <CroppableFileUploadField
             folder="blogs/covers"
-            accept="image/*"
+            aspect={21 / 9}
             label="Click to upload cover image"
             existingValue={isEdit ? (blog?.cover_image_path ?? null) : null}
             onUploadSuccess={({ key }) => setValue("cover_image_path", key, { shouldValidate: true })}

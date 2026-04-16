@@ -7,3 +7,11 @@ export interface EditorBlock {
   layout?: "single" | "two-column" | null
   column_position?: "left" | "right" | "full" | null
 }
+
+export interface Section {
+  id: string
+  type: "full-width" | "two-column"
+  block?: EditorBlock   // full-width sections
+  left?: EditorBlock    // two-column sections
+  right?: EditorBlock   // two-column sections
+}

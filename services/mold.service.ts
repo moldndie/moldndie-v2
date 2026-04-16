@@ -61,11 +61,14 @@ export async function getMoldCategories(): Promise<MoldCategory[]> {
 export type PriceFilter = "all" | "free" | "paid"
 export type SortOption = "newest" | "oldest" | "price_asc" | "price_desc" | "title_asc"
 
+export type DifficultyFilter = "simple" | "moderate" | "difficult" | "sophisticated" | ""
+
 export interface MoldsListingParams {
   search?: string
   categoryId?: string | null
   priceFilter?: PriceFilter
   sort?: SortOption
+  difficulty?: DifficultyFilter
   page?: number
   pageSize?: number
 }
@@ -77,7 +80,7 @@ export interface MoldsListingResult {
 
 export async function getMoldsListing(params: MoldsListingParams = {}): Promise<MoldsListingResult> {
   const supabase = createAdminClient()
-  const { search, categoryId, priceFilter = "all", sort = "newest", page = 1, pageSize = 12 } = params
+  const { search, categoryId, priceFilter = "all", sort = "newest", difficulty, page = 1, pageSize = 12 } = params
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
 
@@ -110,6 +113,10 @@ export async function getMoldsListing(params: MoldsListingParams = {}): Promise<
     query = query.gt("price", 0)
   }
 
+  if (difficulty) {
+    query = query.eq("difficulty", difficulty)
+  }
+
   const { data, error, count } = await query
   if (error) throw dbError(error)
   return { data: (data ?? []) as Mold[], total: count ?? 0 }
@@ -127,6 +134,7 @@ export async function createMold(values: MoldFormValues): Promise<Mold> {
       price: values.is_free ? 0 : values.price,
       preview_image: values.preview_image ?? null,
       file_key: values.file_key,
+      difficulty: values.difficulty ?? null,
     })
     .select()
     .single()
@@ -146,6 +154,7 @@ export async function updateMold(id: string, values: MoldFormValues): Promise<Mo
       price: values.is_free ? 0 : values.price,
       preview_image: values.preview_image ?? null,
       file_key: values.file_key,
+      difficulty: values.difficulty ?? null,
     })
     .eq("id", id)
     .select()

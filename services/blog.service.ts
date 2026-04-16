@@ -102,6 +102,31 @@ export async function getPublishedBlogsCount(): Promise<number> {
   return count ?? 0
 }
 
+// Fetch full blog data by ID without the is_published filter — for admin preview only.
+// Includes tag relations so the preview page can render tags identically to the public page.
+export async function getBlogPreview(id: string): Promise<Blog | null> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from("blogs")
+    .select("*, category:blog_categories(id,name,slug,created_at), blocks:blog_blocks(*), blog_tag_relations(tag_id, tag:blog_tags(id,name,slug))")
+    .eq("id", id)
+    .maybeSingle()
+  if (error) throw dbError(error)
+  return data as unknown as Blog | null
+}
+
+// Toggle the published status of a blog — used by the admin dashboard and preview banner.
+export async function setBlogPublished(id: string, published: boolean): Promise<void> {
+  const supabase = createAdminClient()
+  const { error } = await supabase
+    .from("blogs")
+    .update({ is_published: published })
+    .eq("id", id)
+  if (error) throw dbError(error)
+  revalidatePath("/dashboard/blogs")
+  revalidatePath("/blogs")
+}
+
 export async function getBlogBySlug(slug: string): Promise<Blog | null> {
   const supabase = createAdminClient()
   const { data, error } = await supabase

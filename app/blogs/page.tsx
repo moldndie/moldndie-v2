@@ -90,8 +90,7 @@ interface BlogsPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }
 
-const PAGE_SIZE_OPTIONS = [9, 12, 18, 24]
-const DEFAULT_PAGE_SIZE = 9
+const DEFAULT_PAGE_SIZE = 6
 
 export default async function BlogsPage({ searchParams }: BlogsPageProps) {
   const params = await searchParams
@@ -102,9 +101,7 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
     : undefined
   const sort = typeof params.sort === "string" ? params.sort : undefined
   const page = typeof params.page === "string" ? Math.max(1, parseInt(params.page) || 1) : 1
-  const pageSize = typeof params.pageSize === "string"
-    ? (PAGE_SIZE_OPTIONS.includes(parseInt(params.pageSize)) ? parseInt(params.pageSize) : DEFAULT_PAGE_SIZE)
-    : DEFAULT_PAGE_SIZE
+  const pageSize = DEFAULT_PAGE_SIZE
 
   const { blogs, total } = await getFilteredPublishedBlogs({
     q, categoryId, tagIds, sort: sort as BlogSort | undefined, page, pageSize,
@@ -172,8 +169,6 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
             <BlogPaginationBar
               currentPage={page}
               totalPages={totalPages}
-              currentPageSize={pageSize}
-              pageSizeOptions={PAGE_SIZE_OPTIONS}
             />
           </Suspense>
 

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, MailWarning } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -21,6 +21,7 @@ interface LoginFormProps {
 export default function LoginForm({ callbackUrl }: LoginFormProps) {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState<string | null>(null);
 
   const {
     register,
@@ -29,9 +30,14 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
   } = useForm<LoginInput>({ resolver: zodResolver(loginSchema) });
 
   async function onSubmit(data: LoginInput) {
+    setUnverifiedEmail(null);
     const result = await loginAction(data);
     if (result.error) {
-      toast.error(result.error);
+      if (result.unverified) {
+        setUnverifiedEmail(data.email);
+      } else {
+        toast.error(result.error);
+      }
     } else {
       toast.success("Signed in successfully!");
       router.push(callbackUrl || "/");
@@ -40,6 +46,15 @@ export default function LoginForm({ callbackUrl }: LoginFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+      {unverifiedEmail && (
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
+          <MailWarning className="mt-0.5 size-4 shrink-0 text-amber-600" />
+          <div className="text-sm text-amber-800">
+            <p className="font-medium">Email not verified</p>
+            <p className="mt-0.5">Please verify your email before continuing.</p>
+          </div>
+        </div>
+      )}
       {/* Email */}
       <div className="space-y-1.5">
         <Label htmlFor="email">Email</Label>

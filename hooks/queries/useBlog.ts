@@ -1,7 +1,7 @@
 "use client"
 
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { getBlogs, createBlog, updateBlog, deleteBlog } from "@/services/blog.service"
+import { getBlogs, createBlog, updateBlog, deleteBlog, setBlogPublished } from "@/services/blog.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { BlogFormValues } from "@/schemas/blog.schema"
 
@@ -26,6 +26,15 @@ export function useUpdateBlog() {
   return useMutation({
     mutationFn: ({ id, values }: { id: string; values: BlogFormValues }) =>
       updateBlog(id, values),
+    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.BLOGS }),
+  })
+}
+
+export function useSetBlogPublished() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, published }: { id: string; published: boolean }) =>
+      setBlogPublished(id, published),
     onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.BLOGS }),
   })
 }

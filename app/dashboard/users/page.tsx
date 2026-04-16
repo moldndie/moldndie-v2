@@ -23,7 +23,7 @@ export default async function UsersPage() {
   return (
     <div className="space-y-6">
       <PageHeader title="Users" description="Manage platform users." />
-      <UsersTable currentUserRole={currentUserRole} />
+      <UsersTable currentUserRole={currentUserRole} currentUserId={currentUser?.id} />
     </div>
   )
 }

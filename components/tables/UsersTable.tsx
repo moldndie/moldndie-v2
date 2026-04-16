@@ -3,33 +3,61 @@
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { type ColumnDef } from "@tanstack/react-table"
-import { Pencil, UserX, UserCheck, UserPlus } from "lucide-react"
+import {
+  Pencil,
+  UserX,
+  UserCheck,
+  UserPlus,
+  MailCheck,
+  Send,
+  KeyRound,
+  Trash2,
+} from "lucide-react"
 import { toast } from "sonner"
 import { DataTable } from "./DataTable"
 import { UserEditModal } from "@/components/modals/UserEditModal"
 import { UserCreateModal } from "@/components/modals/UserCreateModal"
 import { DeactivateUserModal } from "@/components/modals/DeactivateUserModal"
+import { DeleteUserModal } from "@/components/modals/DeleteUserModal"
 import { Button } from "@/components/ui/button"
 import { countries } from "@/lib/countries"
-import { getUsers, updateUser, deactivateUser, reactivateUser, createUser } from "@/services/user.service"
+import {
+  getUsers,
+  updateUser,
+  deactivateUser,
+  reactivateUser,
+  createUser,
+  resendVerificationEmail,
+  resetPasswordForUser,
+  deleteUser,
+} from "@/services/user.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { Profile } from "@/types"
 import type { UserEditValues, UserCreateValues } from "@/schemas/user.schema"
 
+
+// ---------------------------------------------------------------------------
+// Main table
+// ---------------------------------------------------------------------------
+
 interface UsersTableProps {
   currentUserRole: "admin" | "user"
+  currentUserId?: string
 }
 
-export function UsersTable({ currentUserRole }: UsersTableProps) {
+export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) {
   const queryClient = useQueryClient()
   const [editingUser, setEditingUser] = useState<Profile | null>(null)
   const [togglingUser, setTogglingUser] = useState<Profile | null>(null)
+  const [deletingUser, setDeletingUser] = useState<Profile | null>(null)
   const [creating, setCreating] = useState(false)
 
   const { data = [], isLoading } = useQuery({
     queryKey: QUERY_KEYS.USERS,
     queryFn: getUsers,
   })
+
+  // ---- mutations -----------------------------------------------------------
 
   const updateMutation = useMutation({
     mutationFn: ({ id, values }: { id: string; values: UserEditValues }) =>
@@ -63,18 +91,16 @@ export function UsersTable({ currentUserRole }: UsersTableProps) {
       queryClient.setQueryData(QUERY_KEYS.USERS, ctx?.prev)
       toast.error(e.message || "Update failed.")
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS })
-    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS }),
   })
 
   const createMutation = useMutation({
     mutationFn: (values: UserCreateValues) => createUser(values),
     onSuccess: (newUser) => {
       queryClient.setQueryData<Profile[]>(QUERY_KEYS.USERS, (old = []) => [newUser, ...old])
-      toast.success("User created.")
+      toast.success("Invitation sent.")
     },
-    onError: (e: Error) => toast.error(e.message || "Failed to create user."),
+    onError: (e: Error) => toast.error(e.message || "Failed to invite user."),
     onSettled: () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS }),
   })
 
@@ -89,14 +115,41 @@ export function UsersTable({ currentUserRole }: UsersTableProps) {
       )
       return { prev }
     },
+    onSuccess: (_, { isActive }) => {
+      toast.success(isActive ? "User deactivated." : "User reactivated.")
+    },
     onError: (e: Error, _, ctx) => {
       queryClient.setQueryData(QUERY_KEYS.USERS, ctx?.prev)
       toast.error(e.message || "Action failed.")
     },
-    onSettled: () => {
-      queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS })
-    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS }),
   })
+
+  const resendMutation = useMutation({
+    mutationFn: (email: string) => resendVerificationEmail(email),
+    onSuccess: () => toast.success("Verification email resent."),
+    onError: (e: Error) => toast.error(e.message || "Failed to resend email."),
+  })
+
+  const resetPasswordMutation = useMutation({
+    mutationFn: (email: string) => resetPasswordForUser(email),
+    onSuccess: () => toast.success("Password reset email sent."),
+    onError: (e: Error) => toast.error(e.message || "Failed to send reset email."),
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: (id: string) => deleteUser(id, currentUserId ?? ""),
+    onSuccess: (_, id) => {
+      queryClient.setQueryData<Profile[]>(QUERY_KEYS.USERS, (old = []) =>
+        old.filter((u) => u.id !== id)
+      )
+      toast.success("User deleted.")
+    },
+    onError: (e: Error) => toast.error(e.message || "Delete failed."),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: QUERY_KEYS.USERS }),
+  })
+
+  // ---- columns -------------------------------------------------------------
 
   const columns: ColumnDef<Profile>[] = [
     {
@@ -107,7 +160,7 @@ export function UsersTable({ currentUserRole }: UsersTableProps) {
         const name = [first_name, last_name].filter(Boolean).join(" ")
         return (
           <div className="flex items-center gap-3">
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-zinc-900 text-xs font-semibold text-white">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
               {(name || "?")[0].toUpperCase()}
             </div>
             <span className="font-medium text-zinc-900">{name || "—"}</span>
@@ -176,6 +229,21 @@ export function UsersTable({ currentUserRole }: UsersTableProps) {
         ),
     },
     {
+      id: "verified",
+      header: "Email Verified",
+      cell: ({ row }) =>
+        row.original.email_confirmed_at ? (
+          <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+            <MailCheck className="size-3" />
+            Verified
+          </span>
+        ) : (
+          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+            Pending
+          </span>
+        ),
+    },
+    {
       accessorKey: "created_at",
       header: "Created At",
       enableSorting: true,
@@ -191,32 +259,72 @@ export function UsersTable({ currentUserRole }: UsersTableProps) {
       header: "",
       cell: ({ row }) => {
         const user = row.original
+        const isSelf = user.id === currentUserId
+        const hasEmail = !!user.email
+        const isVerified = !!user.email_confirmed_at
+
         return (
           <div className="flex items-center justify-end gap-1">
+            {/* Edit */}
             <button
               onClick={() => setEditingUser(user)}
-              title="Edit user"
-              className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+              title="Edit"
+              className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700"
             >
               <Pencil className="size-3.5" />
             </button>
+
+            {/* Deactivate / Reactivate */}
             {user.is_active ? (
               <button
                 onClick={() => setTogglingUser(user)}
-                title="Deactivate user"
-                className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+                disabled={isSelf}
+                title={isSelf ? "You cannot deactivate your own account." : "Deactivate"}
+                className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
               >
                 <UserX className="size-3.5" />
               </button>
             ) : (
               <button
                 onClick={() => setTogglingUser(user)}
-                title="Reactivate user"
-                className="rounded-md p-1.5 text-zinc-400 hover:bg-green-50 hover:text-green-600 transition-colors"
+                title="Reactivate"
+                className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-green-50 hover:text-green-600"
               >
                 <UserCheck className="size-3.5" />
               </button>
             )}
+
+            {/* Reset Password */}
+            <button
+              onClick={() => { if (hasEmail) resetPasswordMutation.mutate(user.email!) }}
+              disabled={!hasEmail || resetPasswordMutation.isPending}
+              title={hasEmail ? "Send password reset email" : "No email on file"}
+              className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <KeyRound className="size-3.5" />
+            </button>
+
+            {/* Resend Verification — hidden once verified */}
+            {!isVerified && (
+              <button
+                onClick={() => { if (hasEmail) resendMutation.mutate(user.email!) }}
+                disabled={resendMutation.isPending}
+                title="Resend verification email"
+                className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-amber-50 hover:text-amber-600 disabled:opacity-40"
+              >
+                <Send className="size-3.5" />
+              </button>
+            )}
+
+            {/* Delete */}
+            <button
+              onClick={() => setDeletingUser(user)}
+              disabled={isSelf}
+              title={isSelf ? "You cannot delete your own account." : "Delete permanently"}
+              className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              <Trash2 className="size-3.5" />
+            </button>
           </div>
         )
       },
@@ -229,7 +337,7 @@ export function UsersTable({ currentUserRole }: UsersTableProps) {
         <div className="flex justify-end mb-4">
           <Button onClick={() => setCreating(true)}>
             <UserPlus className="size-4 mr-2" />
-            Create User
+            Invite User
           </Button>
         </div>
       )}
@@ -237,7 +345,8 @@ export function UsersTable({ currentUserRole }: UsersTableProps) {
       <DataTable
         columns={columns}
         data={data}
-        isLoading={isLoading} emptyMessage="No users found."
+        isLoading={isLoading}
+        emptyMessage="No users found."
       />
 
       <UserEditModal
@@ -260,10 +369,20 @@ export function UsersTable({ currentUserRole }: UsersTableProps) {
         onClose={() => setTogglingUser(null)}
         user={togglingUser}
         onConfirm={() =>
-          toggleMutation.mutateAsync({ id: togglingUser!.id, isActive: togglingUser!.is_active })
+          toggleMutation.mutateAsync({
+            id: togglingUser!.id,
+            isActive: togglingUser!.is_active,
+          })
         }
         isPending={toggleMutation.isPending}
         onSuccess={() => setTogglingUser(null)}
+      />
+
+      <DeleteUserModal
+        open={!!deletingUser}
+        onClose={() => setDeletingUser(null)}
+        user={deletingUser}
+        onConfirm={() => deleteMutation.mutateAsync(deletingUser!.id)}
       />
     </>
   )

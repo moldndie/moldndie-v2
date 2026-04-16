@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { FileUploadField } from "@/components/forms/FileUploadField"
+import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { supplierSchema, type SupplierFormValues } from "@/schemas/supplier.schema"
 import { useCreateSupplier, useUpdateSupplier, useSupplierCategories } from "@/hooks/queries/useSuppliers"
 import type { Supplier } from "@/types"
@@ -113,9 +113,9 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Logo</label>
-          <FileUploadField
+          <CroppableFileUploadField
             folder="suppliers/logos"
-            accept="image/*"
+            aspect={1}
             label="Click to upload supplier logo"
             existingValue={isEdit ? (supplier?.logo_path ?? null) : null}
             onUploadSuccess={({ key }) => setValue("logo_path", key, { shouldValidate: true })}

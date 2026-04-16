@@ -1,12 +1,16 @@
 "use client"
 
 import { useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Modal } from "@/components/ui/modal"
 import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import CountrySelectField from "@/components/ui/CountrySelectField"
+import PhoneInputField from "@/components/ui/PhoneInputField"
+import type { Country as LibCountry } from "@/lib/countries"
+import type { Country as PhoneCountry } from "react-phone-number-input"
 import { userCreateSchema, type UserCreateValues } from "@/schemas/user.schema"
 
 interface UserCreateModalProps {
@@ -18,15 +22,17 @@ interface UserCreateModalProps {
 export function UserCreateModal({ open, onClose, onSave }: UserCreateModalProps) {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>("EG")
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm<UserCreateValues>({
     resolver: zodResolver(userCreateSchema),
-    defaultValues: { email: "", password: "", role: "user" },
+    defaultValues: { email: "", first_name: "", last_name: "", phone: "", country_code: "", role: "user" },
   })
 
   async function onSubmit(values: UserCreateValues) {
@@ -50,20 +56,69 @@ export function UserCreateModal({ open, onClose, onSave }: UserCreateModalProps)
   }
 
   return (
-    <Modal open={open} onClose={handleClose} title="Create User" size="md">
+    <Modal open={open} onClose={handleClose} title="Invite User" size="md">
+      <p className="mb-4 text-sm text-zinc-500">
+        An invitation email will be sent so the user can set their own password.
+      </p>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+        {/* Name */}
+        <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-zinc-700">First Name *</label>
+            <Input {...register("first_name")} placeholder="John" />
+            {errors.first_name && <p className="text-xs text-red-500">{errors.first_name.message}</p>}
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-zinc-700">Last Name *</label>
+            <Input {...register("last_name")} placeholder="Doe" />
+            {errors.last_name && <p className="text-xs text-red-500">{errors.last_name.message}</p>}
+          </div>
+        </div>
+
+        {/* Email */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Email *</label>
           <Input {...register("email")} type="email" placeholder="user@example.com" />
           {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
         </div>
 
+        {/* Country */}
         <div className="space-y-1.5">
-          <label className="text-sm font-medium text-zinc-700">Password *</label>
-          <Input {...register("password")} type="password" placeholder="Min. 6 characters" />
-          {errors.password && <p className="text-xs text-red-500">{errors.password.message}</p>}
+          <label className="text-sm font-medium text-zinc-700">Country</label>
+          <Controller
+            control={control}
+            name="country_code"
+            render={({ field }) => (
+              <CountrySelectField
+                name="country_code"
+                value={field.value ?? ""}
+                onChange={(country: LibCountry | null) => {
+                  field.onChange(country?.code ?? "")
+                  if (country) setPhoneCountry(country.code as PhoneCountry)
+                }}
+                placeholder="Select country"
+              />
+            )}
+          />
         </div>
 
+        {/* Phone */}
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-zinc-700">Phone</label>
+          <Controller
+            control={control}
+            name="phone"
+            render={({ field }) => (
+              <PhoneInputField
+                value={field.value ?? ""}
+                onChange={field.onChange}
+                defaultCountry={phoneCountry}
+              />
+            )}
+          />
+        </div>
+
+        {/* Role */}
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Role</label>
           <Select {...register("role")}>
@@ -80,7 +135,7 @@ export function UserCreateModal({ open, onClose, onSave }: UserCreateModalProps)
             Cancel
           </Button>
           <Button type="submit" disabled={saving}>
-            {saving ? "Creating…" : "Create User"}
+            {saving ? "Sending invite…" : "Send Invite"}
           </Button>
         </div>
       </form>

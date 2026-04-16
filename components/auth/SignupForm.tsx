@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, User, Mail, Lock } from "lucide-react";
+import { Eye, EyeOff, User, Mail, Lock, MailCheck } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -23,6 +23,7 @@ export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [phoneCountry, setPhoneCountry] = useState<PhoneCountry>("EG");
+  const [emailSent, setEmailSent] = useState(false);
 
   const {
     register,
@@ -38,6 +39,8 @@ export default function SignupForm() {
     const result = await signupAction(data);
     if (result.error) {
       toast.error(result.error);
+    } else if (result.emailVerificationSent) {
+      setEmailSent(true);
     } else {
       toast.success("Account created successfully!");
       if (result.role === "admin") {
@@ -46,6 +49,25 @@ export default function SignupForm() {
         router.push("/");
       }
     }
+  }
+
+  if (emailSent) {
+    return (
+      <div className="flex flex-col items-center gap-5 py-6 text-center">
+        <div className="flex size-14 items-center justify-center rounded-full bg-primary/10">
+          <MailCheck className="size-7 text-primary" />
+        </div>
+        <div className="space-y-1.5">
+          <h2 className="text-xl font-semibold text-zinc-900">Check your email</h2>
+          <p className="text-sm text-zinc-500">
+            Please check your email to verify your account before signing in.
+          </p>
+        </div>
+        <Link href="/login" className="text-sm font-semibold text-primary hover:underline">
+          Back to sign in
+        </Link>
+      </div>
+    );
   }
 
   return (

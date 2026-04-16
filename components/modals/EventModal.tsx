@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
-import { FileUploadField } from "@/components/forms/FileUploadField"
+import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { eventSchema, type EventFormValues } from "@/schemas/event.schema"
 import { useCreateEvent, useUpdateEvent, useEventCategories } from "@/hooks/queries/useEvents"
 import type { Event } from "@/types"
@@ -110,9 +110,9 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Image *</label>
-          <FileUploadField
+          <CroppableFileUploadField
             folder="events/images"
-            accept="image/*"
+            aspect={16 / 9}
             label="Click to upload event image"
             existingValue={isEdit ? (event?.image_path ?? null) : null}
             onUploadSuccess={({ key }) => setValue("image_path", key, { shouldValidate: true })}

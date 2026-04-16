@@ -3,10 +3,10 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { type ColumnDef } from "@tanstack/react-table"
-import { Pencil, Trash2, Plus, BarChart2 } from "lucide-react"
+import { Pencil, Trash2, Plus, BarChart2, Eye, Globe, EyeOff } from "lucide-react"
 import { DataTable } from "@/components/tables/DataTable"
 import { Button } from "@/components/ui/button"
-import { useBlogs, useDeleteBlog } from "@/hooks/queries/useBlog"
+import { useBlogs, useDeleteBlog, useSetBlogPublished } from "@/hooks/queries/useBlog"
 import { EngagementModal } from "./EngagementModal"
 import type { Blog } from "@/types"
 
@@ -14,7 +14,9 @@ export function BlogTable() {
   const router = useRouter()
   const { data = [], isLoading } = useBlogs()
   const deleteMutation = useDeleteBlog()
+  const publishMutation = useSetBlogPublished()
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [togglingId, setTogglingId] = useState<string | null>(null)
   const [engagementBlog, setEngagementBlog] = useState<Blog | null>(null)
 
   async function handleDelete(id: string) {
@@ -26,6 +28,17 @@ export function BlogTable() {
       alert(e instanceof Error ? e.message : "Delete failed")
     } finally {
       setDeletingId(null)
+    }
+  }
+
+  async function handleTogglePublish(id: string, currentlyPublished: boolean) {
+    setTogglingId(id)
+    try {
+      await publishMutation.mutateAsync({ id, published: !currentlyPublished })
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "Failed to update status")
+    } finally {
+      setTogglingId(null)
     }
   }
 
@@ -87,30 +100,68 @@ export function BlogTable() {
     {
       id: "actions",
       header: "",
-      cell: ({ row }) => (
-        <div className="flex items-center justify-end gap-1">
-          <button
-            onClick={() => setEngagementBlog(row.original)}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
-            title="View engagement"
-          >
-            <BarChart2 className="size-3.5" />
-          </button>
-          <button
-            onClick={() => router.push(`/dashboard/blogs/${row.original.id}/edit`)}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
-          >
-            <Pencil className="size-3.5" />
-          </button>
-          <button
-            onClick={() => handleDelete(row.original.id)}
-            disabled={deletingId === row.original.id}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-40"
-          >
-            <Trash2 className="size-3.5" />
-          </button>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const blog = row.original
+        const isToggling = togglingId === blog.id
+
+        return (
+          <div className="flex items-center justify-end gap-1">
+            {/* Analytics */}
+            <button
+              onClick={() => setEngagementBlog(blog)}
+              className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+              title="View engagement"
+            >
+              <BarChart2 className="size-3.5" />
+            </button>
+
+            {/* Preview — opens full frontend preview in new tab */}
+            <button
+              onClick={() => window.open(`/blogs/preview/${blog.id}`, "_blank")}
+              className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+              title="Preview"
+            >
+              <Eye className="size-3.5" />
+            </button>
+
+            {/* Edit */}
+            <button
+              onClick={() => router.push(`/dashboard/blogs/${blog.id}/edit`)}
+              className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+              title="Edit"
+            >
+              <Pencil className="size-3.5" />
+            </button>
+
+            {/* Publish / Unpublish */}
+            <button
+              onClick={() => handleTogglePublish(blog.id, blog.is_published)}
+              disabled={isToggling}
+              className={[
+                "rounded-md p-1.5 transition-colors disabled:opacity-40",
+                blog.is_published
+                  ? "text-green-600 hover:bg-red-50 hover:text-red-600"
+                  : "text-zinc-400 hover:bg-green-50 hover:text-green-600",
+              ].join(" ")}
+              title={blog.is_published ? "Unpublish" : "Publish"}
+            >
+              {blog.is_published
+                ? <Globe className="size-3.5" />
+                : <EyeOff className="size-3.5" />}
+            </button>
+
+            {/* Delete */}
+            <button
+              onClick={() => handleDelete(blog.id)}
+              disabled={deletingId === blog.id}
+              className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-40"
+              title="Delete"
+            >
+              <Trash2 className="size-3.5" />
+            </button>
+          </div>
+        )
+      },
     },
   ]
 
@@ -122,7 +173,12 @@ export function BlogTable() {
           Create Blog
         </Button>
       </div>
-      <DataTable columns={columns} data={data} isLoading={isLoading} emptyMessage="No blog posts yet." />
+      <DataTable
+        columns={columns}
+        data={data}
+        isLoading={isLoading}
+        emptyMessage="No blog posts yet."
+      />
 
       <EngagementModal
         open={!!engagementBlog}
