@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { Youtube, Facebook, Instagram } from "lucide-react";
 
 const pages = [
@@ -54,19 +55,6 @@ const socials = [
   },
 ];
 
-function FooterLogo() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="16" cy="16" r="15" stroke="white" strokeWidth="2" fill="none" />
-      <circle cx="16" cy="16" r="8" stroke="white" strokeWidth="1.5" fill="none" />
-      <circle cx="16" cy="16" r="3" fill="white" />
-      <line x1="16" y1="1" x2="16" y2="7" stroke="white" strokeWidth="1.5" />
-      <line x1="16" y1="25" x2="16" y2="31" stroke="white" strokeWidth="1.5" />
-      <line x1="1" y1="16" x2="7" y2="16" stroke="white" strokeWidth="1.5" />
-      <line x1="25" y1="16" x2="31" y2="16" stroke="white" strokeWidth="1.5" />
-    </svg>
-  );
-}
 
 export default function Footer() {
   return (
@@ -103,9 +91,8 @@ export default function Footer() {
         {/* Bottom row */}
         <div className="border-t border-white/20 pt-8">
           <div className="flex items-center justify-between mb-6">
-            <div className="flex items-center gap-2.5">
-              <FooterLogo />
-              <span className="font-bold text-sm tracking-widest">MOLD N DIE</span>
+            <div className="flex items-center">
+              <Image src="/assets/logo-white.png" alt="Mold N Die" width={120} height={40} className="h-10 w-auto" />
             </div>
             <div className="flex items-center gap-4">
               {socials.map(({ icon: Icon, href, label }) => (

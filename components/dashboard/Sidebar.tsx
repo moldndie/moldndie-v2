@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { usePathname } from "next/navigation"
 import {
   LayoutDashboard,
@@ -55,7 +56,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       >
         {/* Logo */}
         <div className="flex h-16 items-center justify-between px-6 border-b border-zinc-200 shrink-0">
-          <span className="text-lg font-bold tracking-tight text-zinc-900">Moldndie</span>
+          <Image src="/assets/logo-black.png" alt="Mold N Die" width={100} height={32} className="h-8 w-auto" />
           <button
             onClick={onClose}
             className="lg:hidden rounded-md p-1 text-zinc-500 hover:bg-zinc-100"
