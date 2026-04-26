@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation"
 import { cn } from "@/lib/utils"
 
 const TABS = [
-  { label: "Molds", value: "molds" },
+  { label: "Toolings", value: "molds" },
   { label: "Categories", value: "categories" },
 ]
 

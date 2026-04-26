@@ -5,7 +5,7 @@ import { MoldsTable } from "@/components/tables/MoldsTable"
 import { MoldCategoriesTable } from "@/modules/mold/components/MoldCategoriesTable"
 import { MoldTabs } from "@/modules/mold/components/MoldTabs"
 
-export const metadata: Metadata = { title: "Molds | Admin" }
+export const metadata: Metadata = { title: "Library | Admin" }
 
 interface MoldsPageProps {
   searchParams: Promise<{ tab?: string }>
@@ -16,7 +16,7 @@ export default async function MoldsPage({ searchParams }: MoldsPageProps) {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="Molds" description="Manage mold listings and categories." />
+      <PageHeader title="Library" description="Manage tooling listings and categories." />
 
       <Suspense>
         <MoldTabs />

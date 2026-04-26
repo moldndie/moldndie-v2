@@ -154,14 +154,14 @@ export function MoldsTable() {
           <option value="paid">Paid</option>
         </Select>
         <div className="ml-auto">
-          <Button onClick={() => setCreateOpen(true)}>Create Mold</Button>
+          <Button onClick={() => setCreateOpen(true)}>Create Tooling</Button>
         </div>
       </div>
 
       <DataTable
         columns={columns}
         data={molds}
-        isLoading={isLoading} emptyMessage="No molds found."
+        isLoading={isLoading} emptyMessage="No toolings found."
       />
 
       <MoldModal

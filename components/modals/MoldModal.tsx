@@ -171,7 +171,7 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
   }
 
   const mutationError = createMold.error ?? updateMold.error
-  const modalTitle = `${isEdit ? "Edit" : "Create"} Mold${step === 2 ? " — Gallery" : ""}`
+  const modalTitle = `${isEdit ? "Edit" : "Create"} Tooling${step === 2 ? " — Gallery" : ""}`
 
   return (
     <Modal open={open} onClose={onClose} title={modalTitle} size="lg">
@@ -348,7 +348,7 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
                       ? "Saving…"
                       : isEdit
                         ? "Save Changes"
-                        : "Create Mold"}
+                        : "Create Tooling"}
                 </Button>
               </div>
             </div>
