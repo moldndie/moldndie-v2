@@ -12,6 +12,7 @@ const navLinks = [
   { label: "Events",    href: "/events" },
   { label: "Suppliers", href: "/suppliers" },
   { label: "Services",  href: "/services" },
+  { label: "Tools",     href: "/tools" },
 ]
 
 export default function NavbarMobileMenu() {

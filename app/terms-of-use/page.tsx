@@ -68,8 +68,8 @@ export default function TermsOfUsePage() {
               </ul>
               <p className="mt-3">
                 For refund requests, contact us at{" "}
-                <a href="mailto:mold.n.diee@gmail.com" className="text-primary hover:underline font-medium">
-                  mold.n.diee@gmail.com
+                <a href="mailto:moldndie.eg@gmail.com" className="text-primary hover:underline font-medium">
+                  moldndie.eg@gmail.com
                 </a>{" "}
                 within 7 days of purchase.
               </p>
@@ -115,8 +115,8 @@ export default function TermsOfUsePage() {
               <h2 className="text-lg font-bold text-zinc-900 mb-3">10. Contact</h2>
               <p>
                 For any questions regarding these Terms, contact us at{" "}
-                <a href="mailto:mold.n.diee@gmail.com" className="text-primary hover:underline font-medium">
-                  mold.n.diee@gmail.com
+                <a href="mailto:moldndie.eg@gmail.com" className="text-primary hover:underline font-medium">
+                  moldndie.eg@gmail.com
                 </a>
               </p>
             </section>

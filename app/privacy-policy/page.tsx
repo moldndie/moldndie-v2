@@ -84,8 +84,8 @@ export default function PrivacyPolicyPage() {
               </ul>
               <p className="mt-3">
                 To exercise these rights, contact us at{" "}
-                <a href="mailto:mold.n.diee@gmail.com" className="text-primary hover:underline font-medium">
-                  mold.n.diee@gmail.com
+                <a href="mailto:moldndie.eg@gmail.com" className="text-primary hover:underline font-medium">
+                  moldndie.eg@gmail.com
                 </a>
               </p>
             </section>
@@ -94,8 +94,8 @@ export default function PrivacyPolicyPage() {
               <h2 className="text-lg font-bold text-zinc-900 mb-3">7. Contact</h2>
               <p>
                 If you have questions about this Privacy Policy, please reach out at{" "}
-                <a href="mailto:mold.n.diee@gmail.com" className="text-primary hover:underline font-medium">
-                  mold.n.diee@gmail.com
+                <a href="mailto:moldndie.eg@gmail.com" className="text-primary hover:underline font-medium">
+                  moldndie.eg@gmail.com
                 </a>
               </p>
             </section>

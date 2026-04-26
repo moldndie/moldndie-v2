@@ -104,6 +104,7 @@ type FormState = {
   phone: string
   service_type: string
   message: string
+  _hp: string
 }
 
 const EMPTY_FORM: FormState = {
@@ -112,6 +113,7 @@ const EMPTY_FORM: FormState = {
   phone: "",
   service_type: "",
   message: "",
+  _hp: "",
 }
 
 // ── Service Card ──────────────────────────────────────────────────────────
@@ -517,6 +519,18 @@ export default function ServicesPage() {
                             </div>
                           </div>
                         </div>
+
+                        {/* Honeypot — hidden from users, traps bots */}
+                        <input
+                          type="text"
+                          name="_hp"
+                          value={form._hp}
+                          onChange={handleChange}
+                          tabIndex={-1}
+                          autoComplete="off"
+                          aria-hidden="true"
+                          style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+                        />
 
                         {/* Message */}
                         <div>
