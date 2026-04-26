@@ -1,4 +1,4 @@
-export type AdTargetType = "blog" | "mold" | "event" | "supplier" | "course" | "external"
+export type AdTargetType = "blog" | "mold" | "event" | "supplier" | "course" | "global" | "external"
 
 export interface Ad {
   id: string

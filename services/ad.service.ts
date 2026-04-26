@@ -25,7 +25,11 @@ export async function getAds(): Promise<Ad[]> {
 async function fetchActiveAds(type: AdTargetType): Promise<Ad[]> {
   const supabase = createAdminClient()
   const now = new Date().toISOString()
-  const targetTypes = type === "external" ? ["external"] : [type, "external"]
+  // "global" and "external" ads appear on every page type
+  const alwaysIncluded = ["global", "external"]
+  const targetTypes = alwaysIncluded.includes(type)
+    ? [type]
+    : [type, ...alwaysIncluded]
   const { data, error } = await supabase
     .from("ads")
     .select("*")
