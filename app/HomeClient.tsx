@@ -191,8 +191,34 @@ function WhyCard({ icon: Icon, title, desc }: typeof whyCards[0]) {
   )
 }
 
+// ── Counter chip ───────────────────────────────────────────────────────────
+function CounterChip({ value, label }: { value: string; label: string }) {
+  return (
+    <div className="flex flex-col items-center gap-1.5 px-8 py-6 bg-white rounded-2xl border border-zinc-100 shadow-sm hover:shadow-md transition-shadow">
+      <span className="text-3xl md:text-4xl font-black text-primary tabular-nums">{value}</span>
+      <span className="text-xs font-semibold uppercase tracking-widest text-zinc-500">{label}</span>
+    </div>
+  )
+}
+
 // ── Main client component ──────────────────────────────────────────────────
-export default function HomeClient() {
+interface HomeClientProps {
+  counters?: {
+    toolings?: string
+    courses?:  string
+    users?:    string
+    events?:   string
+  }
+}
+
+export default function HomeClient({ counters = {} }: HomeClientProps) {
+  const counterEntries = [
+    { key: "toolings", label: "Toolings",   value: counters.toolings },
+    { key: "courses",  label: "Courses",    value: counters.courses  },
+    { key: "users",    label: "Members",    value: counters.users    },
+    { key: "events",   label: "Events",     value: counters.events   },
+  ].filter((c) => c.value && c.value.trim() !== "")
+
   return (
     <main className="flex-1">
       {/* ── Hero ── */}
@@ -308,6 +334,38 @@ export default function HomeClient() {
           </motion.div>
         </div>
       </section>
+
+      {/* ── Counters / Social Proof ── */}
+      {counterEntries.length > 0 && (
+        <section className="bg-zinc-950 py-16 px-6">
+          <div className="max-w-4xl mx-auto">
+            <motion.p
+              {...scrollReveal}
+              className="text-center text-xs font-bold uppercase tracking-widest text-zinc-500 mb-8"
+            >
+              By the numbers
+            </motion.p>
+            <motion.div
+              variants={stagger(0.08)}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-40px" }}
+              className={`grid gap-4 ${
+                counterEntries.length === 1 ? "grid-cols-1 max-w-xs mx-auto"
+                : counterEntries.length === 2 ? "grid-cols-2 max-w-md mx-auto"
+                : counterEntries.length === 3 ? "grid-cols-3"
+                : "grid-cols-2 sm:grid-cols-4"
+              }`}
+            >
+              {counterEntries.map((c) => (
+                <motion.div key={c.key} variants={cardItem}>
+                  <CounterChip value={c.value!} label={c.label} />
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* ── Join Community ── */}
       <motion.section
