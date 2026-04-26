@@ -13,20 +13,24 @@ import {
   Megaphone,
   Users,
   Inbox,
+  Settings2,
+  Calculator,
   X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 
 const navItems = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard, exact: true },
-  { label: "Blogs", href: "/dashboard/blogs", icon: FileText },
-  { label: "Toolings", href: "/dashboard/molds", icon: Package },
+  { label: "Blog", href: "/dashboard/blogs", icon: FileText },
+  { label: "Library", href: "/dashboard/molds", icon: Package },
   { label: "Academy", href: "/dashboard/courses", icon: BookOpen },
   { label: "Events", href: "/dashboard/events", icon: Calendar },
   { label: "Suppliers", href: "/dashboard/suppliers", icon: Truck },
   { label: "Ads", href: "/dashboard/ads", icon: Megaphone },
   { label: "Users", href: "/dashboard/users", icon: Users },
   { label: "Services", href: "/dashboard/service-requests", icon: Inbox },
+  { label: "Calculators", href: "/dashboard/calculators", icon: Calculator },
+  { label: "Site Content", href: "/dashboard/site-content", icon: Settings2 },
 ]
 
 interface SidebarProps {
