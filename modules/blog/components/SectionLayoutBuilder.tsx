@@ -4,7 +4,7 @@ import { useState } from "react"
 import {
   ChevronUp, ChevronDown, Trash2, Plus, X, ArrowLeft,
   AlignLeft, ImageIcon, Quote, List, Play, Type,
-  Columns2, LayoutTemplate,
+  Columns2, LayoutTemplate, Paperclip,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { BlockType } from "@/types/blog"
@@ -16,6 +16,8 @@ import { ImageBlock } from "./blocks/ImageBlock"
 import { QuoteBlock } from "./blocks/QuoteBlock"
 import { ListBlock } from "./blocks/ListBlock"
 import { VideoBlock } from "./blocks/VideoBlock"
+import { FileBlock } from "./blocks/FileBlock"
+import type { FileContent } from "./blocks/FileBlock"
 
 // ─── Block type catalogue ─────────────────────────────────────────────────────
 
@@ -67,6 +69,13 @@ const BLOCK_TYPES: {
     icon: Type,
     badge: "bg-blue-50 text-blue-700 border-blue-200",
     pill: "border-blue-200 hover:border-blue-500 hover:bg-blue-50",
+  },
+  {
+    type: "file",
+    label: "File",
+    icon: Paperclip,
+    badge: "bg-teal-50 text-teal-700 border-teal-200",
+    pill: "border-teal-200 hover:border-teal-500 hover:bg-teal-50",
   },
 ]
 
@@ -566,6 +575,8 @@ function BlockInput({
       return <ListBlock      value={block.content as { items: string[] }}                 onChange={h} />
     case "video":
       return <VideoBlock     value={block.content as { url: string }}                     onChange={h} />
+    case "file":
+      return <FileBlock      value={block.content as unknown as FileContent}              onChange={h} />
     default:
       return null
   }

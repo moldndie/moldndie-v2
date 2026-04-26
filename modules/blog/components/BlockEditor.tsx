@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronUp, ChevronDown, Trash2, Type, AlignLeft, ImageIcon, Quote, List, Play, Columns2 } from "lucide-react"
+import { ChevronUp, ChevronDown, Trash2, Type, AlignLeft, ImageIcon, Quote, List, Play, Columns2, Paperclip } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { EditorBlock } from "../types"
 import { BlockToolbar } from "./BlockToolbar"
@@ -10,6 +10,8 @@ import { ImageBlock } from "./blocks/ImageBlock"
 import { QuoteBlock } from "./blocks/QuoteBlock"
 import { ListBlock } from "./blocks/ListBlock"
 import { VideoBlock } from "./blocks/VideoBlock"
+import { FileBlock } from "./blocks/FileBlock"
+import type { FileContent } from "./blocks/FileBlock"
 
 const BLOCK_META: Record<EditorBlock["block_type"], { label: string; icon: React.ElementType; accent: string; badge: string }> = {
   heading:   { label: "Heading",   icon: Type,       accent: "border-l-blue-400",   badge: "bg-blue-50 text-blue-700" },
@@ -18,6 +20,7 @@ const BLOCK_META: Record<EditorBlock["block_type"], { label: string; icon: React
   quote:     { label: "Quote",     icon: Quote,      accent: "border-l-amber-400",   badge: "bg-amber-50 text-amber-700" },
   list:      { label: "List",      icon: List,       accent: "border-l-violet-400",  badge: "bg-violet-50 text-violet-700" },
   video:     { label: "Video",     icon: Play,       accent: "border-l-rose-400",    badge: "bg-rose-50 text-rose-700" },
+  file:      { label: "File",      icon: Paperclip,  accent: "border-l-teal-400",    badge: "bg-teal-50 text-teal-700" },
 }
 
 function getDefaultContent(block_type: EditorBlock["block_type"]): Record<string, unknown> {
@@ -28,6 +31,7 @@ function getDefaultContent(block_type: EditorBlock["block_type"]): Record<string
     case "quote":     return { text: "", author: "" }
     case "list":      return { items: [""] }
     case "video":     return { url: "" }
+    case "file":      return { file_path: "", file_name: "", file_type: "" }
   }
 }
 
@@ -87,6 +91,8 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
         return <ListBlock value={block.content as { items: string[] }} onChange={h} />
       case "video":
         return <VideoBlock value={block.content as { url: string }} onChange={h} />
+      case "file":
+        return <FileBlock value={block.content as unknown as FileContent} onChange={h} />
     }
   }
 

@@ -1,6 +1,6 @@
 import type { Profile } from "./profile"
 
-export type BlockType = "heading" | "paragraph" | "image" | "quote" | "list" | "video"
+export type BlockType = "heading" | "paragraph" | "image" | "quote" | "list" | "video" | "file"
 
 export interface BlogCategory {
   id: string
