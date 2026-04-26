@@ -29,6 +29,8 @@ function authorName(profile: BlogComment["profile"]) {
 export function CommentsSection({ blogId, initialComments, currentUserId }: CommentsSectionProps) {
   const [comments, setComments] = useState<BlogComment[]>(initialComments)
   const [content, setContent] = useState("")
+  const [honeypot, setHoneypot] = useState("")
+  const [lastSubmit, setLastSubmit] = useState(0)
   const [error, setError] = useState<string | null>(null)
   const [isPending, startTransition] = useTransition()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -38,7 +40,16 @@ export function CommentsSection({ blogId, initialComments, currentUserId }: Comm
     e.preventDefault()
     const text = content.trim()
     if (!text) return
+    // Honeypot — bots fill hidden fields
+    if (honeypot) return
+    // Rate limit — 15 s between submissions
+    const now = Date.now()
+    if (now - lastSubmit < 15_000) {
+      setError("Please wait a moment before posting again.")
+      return
+    }
     setError(null)
+    setLastSubmit(now)
 
     startTransition(async () => {
       try {
@@ -65,6 +76,16 @@ export function CommentsSection({ blogId, initialComments, currentUserId }: Comm
       {/* Form */}
       {currentUserId ? (
         <form onSubmit={handleSubmit} className="mb-8 space-y-3">
+          {/* Honeypot — visually hidden, only bots fill this */}
+          <input
+            type="text"
+            value={honeypot}
+            onChange={(e) => setHoneypot(e.target.value)}
+            tabIndex={-1}
+            aria-hidden="true"
+            autoComplete="off"
+            style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
+          />
           <textarea
             ref={textareaRef}
             value={content}

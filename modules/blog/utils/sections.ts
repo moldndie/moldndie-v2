@@ -11,6 +11,7 @@ export function getDefaultContent(block_type: BlockType): Record<string, unknown
     case "quote":     return { text: "", author: "" }
     case "list":      return { items: [""] }
     case "video":     return { url: "" }
+    case "file":      return { file_path: "", file_name: "", file_type: "" }
   }
 }
 

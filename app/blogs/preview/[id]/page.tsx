@@ -112,7 +112,7 @@ export default async function BlogPreviewPage({ params }: Props) {
         <div className="w-fullpx-4 sm:px-6 pt-10">
           <PublicBreadcrumb
             crumbs={[
-              { label: "Blogs", href: "/blogs" },
+              { label: "Blog", href: "/blogs" },
               { label: blog.title },
             ]}
           />

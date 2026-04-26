@@ -11,6 +11,7 @@ import { BlockRenderer } from "@/modules/blog/components/BlockRenderer"
 import { getFileUrl } from "@/lib/utils"
 import { LikeButton } from "../_components/LikeButton"
 import { CommentsSection } from "../_components/CommentsSection"
+import { ShareButtons } from "../_components/ShareButtons"
 import { createClient } from "@/lib/supabase/server"
 import { AdSlot } from "@/components/ads/AdSlot"
 import type { Blog } from "@/types"
@@ -127,7 +128,7 @@ export default async function BlogDetailPage({ params }: Props) {
         {/* ── Article ── */}
         <article className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
           <div className="mb-6">
-            <PublicBreadcrumb crumbs={[{ label: "Blogs", href: "/blogs" }, { label: blog.title }]} />
+            <PublicBreadcrumb crumbs={[{ label: "Blog", href: "/blogs" }, { label: blog.title }]} />
           </div>
 
           {/* Meta */}
@@ -171,17 +172,23 @@ export default async function BlogDetailPage({ params }: Props) {
             </div>
           )}
 
-          {/* Like */}
-          <div className="mt-10 pt-6 border-t border-zinc-100 flex items-center gap-3">
-            <LikeButton
-              blogId={blog.id}
-              initialLiked={likeData.liked}
-              initialCount={likeData.count}
-              isLoggedIn={!!user}
+          {/* Like + Share */}
+          <div className="mt-10 pt-6 border-t border-zinc-100 space-y-4">
+            <div className="flex items-center gap-3">
+              <LikeButton
+                blogId={blog.id}
+                initialLiked={likeData.liked}
+                initialCount={likeData.count}
+                isLoggedIn={!!user}
+              />
+              <span className="text-xs text-zinc-400">
+                {likeData.count === 1 ? "1 like" : `${likeData.count} likes`}
+              </span>
+            </div>
+            <ShareButtons
+              url={`${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/blogs/${blog.slug}`}
+              title={blog.title}
             />
-            <span className="text-xs text-zinc-400">
-              {likeData.count === 1 ? "1 like" : `${likeData.count} likes`}
-            </span>
           </div>
 
           <CommentsSection

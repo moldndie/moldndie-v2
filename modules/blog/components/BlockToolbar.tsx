@@ -1,6 +1,6 @@
 "use client"
 
-import { Type, AlignLeft, ImageIcon, Quote, List, Play } from "lucide-react"
+import { Type, AlignLeft, ImageIcon, Quote, List, Play, Paperclip } from "lucide-react"
 import type { EditorBlock } from "../types"
 
 const BLOCK_OPTIONS: { block_type: EditorBlock["block_type"]; label: string; icon: React.ElementType }[] = [
@@ -10,6 +10,7 @@ const BLOCK_OPTIONS: { block_type: EditorBlock["block_type"]; label: string; ico
   { block_type: "quote",     label: "Quote",     icon: Quote },
   { block_type: "list",      label: "List",      icon: List },
   { block_type: "video",     label: "Video",     icon: Play },
+  { block_type: "file",      label: "File",      icon: Paperclip },
 ]
 
 interface BlockToolbarProps {
