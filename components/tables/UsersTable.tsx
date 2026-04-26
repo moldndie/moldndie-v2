@@ -12,6 +12,7 @@ import {
   Send,
   KeyRound,
   Trash2,
+  Search,
 } from "lucide-react"
 import { toast } from "sonner"
 import { DataTable } from "./DataTable"
@@ -45,16 +46,32 @@ interface UsersTableProps {
   currentUserId?: string
 }
 
+type StatusFilter = "all" | "active" | "inactive" | "verified" | "pending"
+
 export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) {
   const queryClient = useQueryClient()
   const [editingUser, setEditingUser] = useState<Profile | null>(null)
   const [togglingUser, setTogglingUser] = useState<Profile | null>(null)
   const [deletingUser, setDeletingUser] = useState<Profile | null>(null)
   const [creating, setCreating] = useState(false)
+  const [search, setSearch] = useState("")
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all")
 
   const { data = [], isLoading } = useQuery({
     queryKey: QUERY_KEYS.USERS,
     queryFn: getUsers,
+  })
+
+  const filtered = data.filter((u) => {
+    const name = [u.first_name, u.last_name].filter(Boolean).join(" ").toLowerCase()
+    const email = (u.email ?? "").toLowerCase()
+    const q = search.toLowerCase().trim()
+    if (q && !name.includes(q) && !email.includes(q)) return false
+    if (statusFilter === "active" && !u.is_active) return false
+    if (statusFilter === "inactive" && u.is_active) return false
+    if (statusFilter === "verified" && !u.email_confirmed_at) return false
+    if (statusFilter === "pending" && u.email_confirmed_at) return false
+    return true
   })
 
   // ---- mutations -----------------------------------------------------------
@@ -333,18 +350,41 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
 
   return (
     <>
-      {currentUserRole === "admin" && (
-        <div className="flex justify-end mb-4">
-          <Button onClick={() => setCreating(true)}>
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="relative flex-1 min-w-45 max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-zinc-400 pointer-events-none" />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name or email…"
+            className="w-full pl-8 pr-3 py-2 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+          />
+        </div>
+        <select
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+          className="h-9 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white"
+        >
+          <option value="all">All users</option>
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+          <option value="verified">Verified</option>
+          <option value="pending">Pending verification</option>
+        </select>
+        <span className="text-xs text-zinc-400 ml-1">{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
+        {currentUserRole === "admin" && (
+          <Button onClick={() => setCreating(true)} className="ml-auto">
             <UserPlus className="size-4 mr-2" />
             Invite User
           </Button>
-        </div>
-      )}
+        )}
+      </div>
 
       <DataTable
         columns={columns}
-        data={data}
+        data={filtered}
         isLoading={isLoading}
         emptyMessage="No users found."
       />

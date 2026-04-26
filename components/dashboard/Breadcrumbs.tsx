@@ -7,13 +7,15 @@ import { ChevronRight } from "lucide-react"
 const labelMap: Record<string, string> = {
   admin: "Admin",
   dashboard: "Dashboard",
-  blogs: "Blogs",
-  molds: "Molds",
-  courses: "Courses",
+  blogs: "Blog",
+  molds: "Library",
+  courses: "Academy",
   events: "Events",
   suppliers: "Suppliers",
   ads: "Ads",
   users: "Users",
+  "service-requests": "Services",
+  "site-content": "Site Content",
   create: "Create",
   edit: "Edit",
 }

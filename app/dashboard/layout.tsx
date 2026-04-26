@@ -13,15 +13,17 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
   const supabase = await createClient()
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, avatar_url")
+    .select("first_name, last_name")
     .eq("id", user.id)
     .single()
+
+  const displayName = [profile?.first_name, profile?.last_name].filter(Boolean).join(" ") || null
 
   return (
     <DashboardLayout
       user={{
         email: user.email,
-        displayName: profile?.full_name ?? null,
+        displayName,
       }}
     >
       {children}
