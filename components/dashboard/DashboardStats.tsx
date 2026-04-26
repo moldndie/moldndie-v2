@@ -27,16 +27,16 @@ function StatCard({ label, value, icon: Icon, iconBg, iconColor, suffix, isLoadi
         : value.toLocaleString()
 
   return (
-    <div className="group bg-white rounded-xl border border-gray-100 p-5 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 cursor-default">
+    <div className="group bg-white rounded-xl border border-zinc-100 p-5 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 cursor-default">
       <div className="flex items-start justify-between gap-3">
         <div className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${iconBg}`}>
           <Icon size={18} className={iconColor} strokeWidth={1.8} />
         </div>
         <div className="flex-1 min-w-0 text-right">
-          <p className="text-xs font-medium text-gray-400 uppercase tracking-wide leading-tight">{label}</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1 leading-none">
+          <p className="text-xs font-medium text-zinc-400 uppercase tracking-wide leading-tight">{label}</p>
+          <p className="text-2xl font-bold text-zinc-900 mt-1 leading-none">
             {display === null
-              ? <span className="inline-block h-7 w-16 bg-gray-100 rounded animate-pulse" />
+              ? <span className="inline-block h-7 w-16 bg-zinc-100 rounded animate-pulse" />
               : display}
           </p>
         </div>
@@ -48,9 +48,9 @@ function StatCard({ label, value, icon: Icon, iconBg, iconColor, suffix, isLoadi
 // ── Secondary metric chip ──────────────────────────────────────────────
 function MetricChip({ label, value }: { label: string; value: number | undefined }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 px-5 py-4 shadow-sm flex items-center justify-between gap-4">
-      <p className="text-sm text-gray-500">{label}</p>
-      <p className="text-lg font-semibold text-gray-900">
+    <div className="bg-white rounded-xl border border-zinc-100 px-5 py-4 shadow-sm flex items-center justify-between gap-4">
+      <p className="text-sm text-zinc-500">{label}</p>
+      <p className="text-lg font-semibold text-zinc-900">
         {value === undefined ? "—" : value.toLocaleString()}
       </p>
     </div>
@@ -68,22 +68,22 @@ function RecentList({
   isLoading: boolean
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-100 p-5 shadow-sm">
-      <h2 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wide">{title}</h2>
+    <div className="bg-white rounded-xl border border-zinc-100 p-5 shadow-sm">
+      <h2 className="text-sm font-semibold text-zinc-700 mb-4 uppercase tracking-wide">{title}</h2>
       {isLoading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-4 bg-gray-100 rounded animate-pulse" />
+            <div key={i} className="h-4 bg-zinc-100 rounded animate-pulse" />
           ))}
         </div>
       ) : !items?.length ? (
-        <p className="text-sm text-gray-400 py-2">No items yet.</p>
+        <p className="text-sm text-zinc-400 py-2">No items yet.</p>
       ) : (
-        <ul className="divide-y divide-gray-50">
+        <ul className="divide-y divide-zinc-50">
           {items.map((item) => (
             <li key={item.id} className="flex items-center justify-between gap-3 py-2.5">
-              <span className="text-sm text-gray-700 line-clamp-1 flex-1">{item.title}</span>
-              <span className="text-xs text-gray-400 shrink-0 tabular-nums">
+              <span className="text-sm text-zinc-700 line-clamp-1 flex-1">{item.title}</span>
+              <span className="text-xs text-zinc-400 shrink-0 tabular-nums">
                 {new Date(item.created_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}
               </span>
             </li>
@@ -97,7 +97,7 @@ function RecentList({
 // ── Section label ──────────────────────────────────────────────────────
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="text-xs font-semibold text-gray-400 uppercase tracking-widest">{children}</h2>
+    <h2 className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">{children}</h2>
   )
 }
 

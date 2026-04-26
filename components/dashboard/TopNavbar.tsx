@@ -43,7 +43,7 @@ export default function TopNavbar({ user, onMenuClick }: TopNavbarProps) {
         </div>
 
         {/* Avatar */}
-        <div className="flex size-8 items-center justify-center rounded-full bg-zinc-900 text-xs font-semibold text-white select-none">
+        <div className="flex size-8 items-center justify-center rounded-full bg-primary text-xs font-semibold text-white select-none">
           {initials}
         </div>
 
