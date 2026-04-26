@@ -13,10 +13,11 @@ import type { Ad, AdTargetType } from "@/types"
 
 const TARGET_TYPE_LABELS: Record<AdTargetType, string> = {
   blog: "Blog",
-  mold: "Mold",
-  course: "Course",
-  event: "Event",
-  supplier: "Supplier",
+  mold: "Library",
+  course: "Academy",
+  event: "Events",
+  supplier: "Suppliers",
+  global: "Global",
   external: "External",
 }
 
