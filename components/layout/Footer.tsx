@@ -107,7 +107,7 @@ export default async function Footer() {
           {/* ── Col 1: Brand ── */}
           <div className="space-y-4 sm:col-span-2 lg:col-span-1">
             <Image
-              src="/assets/logo-white.png"
+              src="/assets/logo-white-v2.png"
               alt="Mold N Die"
               width={130}
               height={44}

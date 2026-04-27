@@ -60,7 +60,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       >
         {/* Logo */}
         <div className="flex h-16 items-center justify-between px-6 border-b border-zinc-200 shrink-0">
-          <Image src="/assets/logo-black.png" alt="Mold N Die" width={100} height={32} className="h-8 w-auto" />
+          <Image src="/assets/logo-black-v2.png" alt="Mold N Die" width={100} height={32} className="h-8 w-auto" />
           <button
             onClick={onClose}
             className="lg:hidden rounded-md p-1 text-zinc-500 hover:bg-zinc-100"
