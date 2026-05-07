@@ -8,17 +8,11 @@ import {
   FolderOpen,
   CalendarDays,
   Globe,
-  Wrench,
+  Calculator,
   Award,
   Layers,
   TrendingUp,
   GitBranch,
-  Youtube,
-  Facebook,
-  Twitter,
-  Instagram,
-  Linkedin,
-  Mail,
 } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 
@@ -108,10 +102,10 @@ const offerCards = [
     href: "/suppliers",
   },
   {
-    icon: Wrench,
-    title: "SERVICES",
-    desc: "A vertically integrated suite of engineering services — from product validation and DFM analysis to multi-disciplinary tooling design and turnkey project management.",
-    href: "/services",
+    icon: Calculator,
+    title: "ENGINEERING",
+    desc: "Our Engineering Calculators section offers free, high-accuracy tools to streamline the design of injection molds, pressure die-casting molds, and sheet metal dies. By bridging the gap between theoretical design and shop-floor reality.",
+    href: "/tools",
   },
 ]
 
@@ -137,15 +131,6 @@ const whyCards = [
     title: "End-to-End Vertical Integration",
     desc: "We cover the full tooling lifecycle — from design and validation through to production and supplier sourcing — giving you a seamless, fully integrated professional workflow.",
   },
-]
-
-// ── Social links ───────────────────────────────────────────────────────────
-const socials = [
-  { icon: Youtube,   href: "#", label: "YouTube"   },
-  { icon: Facebook,  href: "#", label: "Facebook"  },
-  { icon: Twitter,   href: "#", label: "Twitter"   },
-  { icon: Instagram, href: "#", label: "Instagram" },
-  { icon: Linkedin,  href: "#", label: "LinkedIn"  },
 ]
 
 // ── Card animation variant ─────────────────────────────────────────────────
@@ -400,31 +385,6 @@ export default function HomeClient({ counters = {} }: HomeClientProps) {
               Join Now
             </Link>
           </motion.div>
-
-          {/* Social links */}
-          <div className="mt-10 flex items-center justify-center gap-5">
-            {socials.map(({ icon: Icon, href, label }) => (
-              <Link
-                key={label}
-                href={href}
-                aria-label={label}
-                className="w-9 h-9 rounded-full bg-white border border-zinc-200 flex items-center justify-center text-zinc-400 hover:text-primary hover:border-primary transition-colors"
-              >
-                <Icon size={16} />
-              </Link>
-            ))}
-          </div>
-
-          {/* Email */}
-          <div className="mt-6 flex items-center justify-center gap-2 text-sm text-zinc-500">
-            <Mail size={14} className="text-primary" />
-            <a
-              href="mailto:moldndie.eg@gmail.com"
-              className="hover:text-primary transition-colors font-medium"
-            >
-              moldndie.eg@gmail.com
-            </a>
-          </div>
         </div>
       </motion.section>
     </main>

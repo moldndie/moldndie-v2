@@ -2,11 +2,11 @@
 
 import { useRef, useState } from "react"
 import { Upload, X } from "lucide-react"
-import { uploadImage, type StorageBucket } from "@/services/upload.service"
+import { uploadFileToR2 } from "@/services/upload.service"
 import { cn } from "@/lib/utils"
 
 interface ImageUploadProps {
-  bucket: StorageBucket
+  bucket: string
   value?: string
   onChange: (url: string) => void
   onClear?: () => void
@@ -28,8 +28,8 @@ export function ImageUpload({ bucket, value, onChange, onClear, className }: Ima
     setError(null)
     setUploading(true)
     try {
-      const url = await uploadImage(bucket, file)
-      onChange(url)
+      const result = await uploadFileToR2(bucket, file)
+      onChange(result.url)
     } catch {
       setError("Upload failed. Please try again.")
     } finally {

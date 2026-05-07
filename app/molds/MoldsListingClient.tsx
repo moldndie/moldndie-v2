@@ -9,15 +9,12 @@ import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { useMoldsListing, useMoldCategories } from "@/hooks/queries/useMolds"
-import type { PriceFilter, SortOption } from "@/hooks/queries/useMolds"
-import type { MoldDifficulty } from "@/types/mold"
+import type { SortOption } from "@/hooks/queries/useMolds"
 
 const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 const SORT_OPTIONS: { label: string; value: SortOption }[] = [
-  { label: "Newest",             value: "newest" },
-  { label: "Oldest",             value: "oldest" },
   { label: "Price: Low → High",  value: "price_asc" },
   { label: "Price: High → Low",  value: "price_desc" },
   { label: "A → Z",              value: "title_asc" },
@@ -101,9 +98,7 @@ export default function MoldsListingClient() {
   const [inputValue, setInputValue]         = useState(() => searchParams.get("search") ?? "")
   const [searchTerm, setSearchTerm]         = useState(() => searchParams.get("search") ?? "")
   const [selectedCategory, setSelectedCategory] = useState<string | null>(() => searchParams.get("category"))
-  const [priceFilter, setPriceFilter]       = useState<PriceFilter>(() => (searchParams.get("price") as PriceFilter) ?? "all")
-  const [sort, setSort]                     = useState<SortOption>(() => (searchParams.get("sort") as SortOption) ?? "newest")
-  const [difficulty, setDifficulty]         = useState<MoldDifficulty | "">(() => (searchParams.get("difficulty") as MoldDifficulty) ?? "")
+  const [sort, setSort]                     = useState<SortOption>(() => (searchParams.get("sort") as SortOption) ?? "price_asc")
   const [currentPage, setCurrentPage]       = useState(() => Number(searchParams.get("page")) || 1)
   const pageSize = DEFAULT_PAGE_SIZE
 
@@ -116,38 +111,34 @@ export default function MoldsListingClient() {
   // Sync to URL
   useEffect(() => {
     const p = new URLSearchParams()
-    if (searchTerm)                         p.set("search",     searchTerm)
-    if (selectedCategory)                   p.set("category",   selectedCategory)
-    if (priceFilter !== "all")              p.set("price",      priceFilter)
-    if (sort !== "newest")                  p.set("sort",       sort)
-    if (difficulty)                         p.set("difficulty", difficulty)
-    if (currentPage > 1)                    p.set("page",       String(currentPage))
+    if (searchTerm)                         p.set("search",   searchTerm)
+    if (selectedCategory)                   p.set("category", selectedCategory)
+    if (sort !== "price_asc")               p.set("sort",     sort)
+    if (currentPage > 1)                    p.set("page",     String(currentPage))
     const qs = p.toString()
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-  }, [searchTerm, selectedCategory, priceFilter, sort, difficulty, currentPage, pathname, router])
+  }, [searchTerm, selectedCategory, sort, currentPage, pathname, router])
 
   const handleCategoryChange = useCallback((id: string | null) => { setSelectedCategory(id); setCurrentPage(1) }, [])
-  const handlePriceFilter    = useCallback((v: PriceFilter)    => { setPriceFilter(v);    setCurrentPage(1) }, [])
   const handleSort           = useCallback((v: string)         => { setSort(v as SortOption); setCurrentPage(1) }, [])
-  const handleDifficulty     = useCallback((v: string)         => { setDifficulty(v as MoldDifficulty | ""); setCurrentPage(1) }, [])
   const clearAll             = useCallback(() => {
     setInputValue(""); setSearchTerm(""); setSelectedCategory(null)
-    setPriceFilter("all"); setSort("newest"); setDifficulty(""); setCurrentPage(1)
+    setSort("price_asc"); setCurrentPage(1)
   }, [])
 
-  const { data, isLoading, isFetching } = useMoldsListing({ search: searchTerm, categoryId: selectedCategory, priceFilter, sort, difficulty: difficulty || undefined, page: currentPage, pageSize })
+  const { data, isLoading, isFetching } = useMoldsListing({ search: searchTerm, categoryId: selectedCategory, sort, page: currentPage, pageSize })
   const { data: categories } = useMoldCategories()
 
   const molds      = data?.data ?? []
   const total      = data?.total ?? 0
   const totalPages = Math.ceil(total / pageSize)
-  const hasActiveFilters = !!searchTerm || !!selectedCategory || priceFilter !== "all" || sort !== "newest" || !!difficulty
+  const hasActiveFilters = !!searchTerm || !!selectedCategory || sort !== "price_asc"
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
       <div>
         <PublicBreadcrumb crumbs={[{ label: "Library" }]} />
-        <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Tooling Library</h1>
+        <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Library</h1>
         <p className="mt-1 text-sm text-zinc-500">Browse and download professional mold &amp; die designs</p>
       </div>
 
@@ -161,38 +152,10 @@ export default function MoldsListingClient() {
         categories={categories}
         categoryValue={selectedCategory ?? ""}
         onCategoryChange={handleCategoryChange}
-        priceValue={priceFilter}
-        onPriceChange={handlePriceFilter}
         hasActiveFilters={hasActiveFilters}
         onClear={clearAll}
         isFetching={isFetching && !isLoading}
       />
-
-      {/* Difficulty filter */}
-      <div className="flex items-center gap-2">
-        <span className="text-sm text-zinc-500 shrink-0">Difficulty:</span>
-        <div className="flex flex-wrap gap-1">
-          {[
-            { label: "All", value: "" },
-            { label: "Simple", value: "simple" },
-            { label: "Moderate", value: "moderate" },
-            { label: "Difficult", value: "difficult" },
-            { label: "Sophisticated", value: "sophisticated" },
-          ].map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => handleDifficulty(opt.value)}
-              className={`h-8 px-3 rounded-lg border text-xs font-medium transition-colors whitespace-nowrap ${
-                difficulty === opt.value
-                  ? "bg-primary text-white border-primary"
-                  : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400"
-              }`}
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-      </div>
 
       {/* Results meta */}
       {!isLoading && (

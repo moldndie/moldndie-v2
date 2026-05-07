@@ -14,11 +14,14 @@ function dbError(e: unknown): Error {
 
 export type CoursePriceFilter = "all" | "free" | "paid"
 export type CourseSort = "newest" | "oldest" | "price_asc" | "price_desc" | "title_asc"
+export type TraineeLevel = "beginner" | "intermediate" | "expert"
 
 export interface CoursesListingParams {
   search?: string
   priceFilter?: CoursePriceFilter
   sort?: CourseSort
+  categoryId?: string | null
+  traineeLevel?: TraineeLevel | ""
   page?: number
   pageSize?: number
 }
@@ -32,7 +35,7 @@ export async function getCoursesListing(
   params: CoursesListingParams = {}
 ): Promise<CoursesListingResult> {
   const supabase = createAdminClient()
-  const { search, priceFilter = "all", sort = "newest", page = 1, pageSize = 12 } = params
+  const { search, priceFilter = "all", sort = "newest", categoryId, traineeLevel, page = 1, pageSize = 12 } = params
   const from = (page - 1) * pageSize
   const to   = from + pageSize - 1
 
@@ -47,7 +50,7 @@ export async function getCoursesListing(
 
   let query = supabase
     .from("courses")
-    .select("id, title, description, price, thumbnail_url, created_at", { count: "exact" })
+    .select("id, title, description, price, thumbnail_url, category_id, trainee_level, created_at", { count: "exact" })
     .eq("is_published", true)
     .order(col, { ascending: asc })
     .range(from, to)
@@ -60,6 +63,14 @@ export async function getCoursesListing(
     query = query.eq("price", 0)
   } else if (priceFilter === "paid") {
     query = query.gt("price", 0)
+  }
+
+  if (categoryId) {
+    query = query.eq("category_id", categoryId)
+  }
+
+  if (traineeLevel) {
+    query = query.eq("trainee_level", traineeLevel)
   }
 
   const { data, error, count } = await query

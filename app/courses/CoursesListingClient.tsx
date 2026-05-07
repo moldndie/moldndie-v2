@@ -8,20 +8,24 @@ import { BookOpen } from "lucide-react"
 import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
-import { useCoursesListing } from "@/hooks/queries/useCourses"
-import type { CourseSort } from "@/hooks/queries/useCourses"
-import type { CoursePriceFilter } from "@/services/course.service"
+import { useCoursesListing, useAcademyCategories } from "@/hooks/queries/useCourses"
+import type { CourseSort, CoursesListingParams } from "@/hooks/queries/useCourses"
+import type { TraineeLevel } from "@/services/course.service"
 import type { Course } from "@/types"
 
 const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 const SORT_OPTIONS: { label: string; value: CourseSort }[] = [
-  { label: "Newest",            value: "newest" },
-  { label: "Oldest",            value: "oldest" },
   { label: "Price: Low → High", value: "price_asc" },
   { label: "Price: High → Low", value: "price_desc" },
   { label: "A → Z",             value: "title_asc" },
+]
+
+const TRAINEE_LEVELS: { label: string; value: TraineeLevel | "" }[] = [
+  { label: "Beginner",     value: "beginner" },
+  { label: "Intermediate", value: "intermediate" },
+  { label: "Expert",       value: "expert" },
 ]
 
 function SkeletonCard() {
@@ -41,6 +45,12 @@ function SkeletonCard() {
 function CourseCard({ course }: { course: Course }) {
   const imgSrc = course.thumbnail_url ? `${R2_BASE}/${course.thumbnail_url}` : null
   const isFree = course.price === null || course.price === 0
+
+  const levelColors: Record<string, string> = {
+    beginner:     "bg-emerald-100 text-emerald-700",
+    intermediate: "bg-blue-100 text-blue-700",
+    expert:       "bg-amber-100 text-amber-700",
+  }
 
   return (
     <Link
@@ -74,11 +84,16 @@ function CourseCard({ course }: { course: Course }) {
         {course.description && (
           <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">{course.description}</p>
         )}
-        <div className="mt-auto pt-2">
+        <div className="mt-auto pt-2 flex items-center justify-between gap-2">
           {isFree ? (
             <span className="text-sm font-bold text-emerald-600">Free</span>
           ) : (
             <span className="text-sm font-bold text-zinc-900">{course.price} EGP</span>
+          )}
+          {course.trainee_level && (
+            <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${levelColors[course.trainee_level] ?? "bg-zinc-100 text-zinc-600"}`}>
+              {course.trainee_level}
+            </span>
           )}
         </div>
       </div>
@@ -91,48 +106,54 @@ export default function CoursesListingClient() {
   const pathname     = usePathname()
   const searchParams = useSearchParams()
 
-  const [inputValue, setInputValue]   = useState(() => searchParams.get("search") ?? "")
-  const [searchTerm, setSearchTerm]   = useState(() => searchParams.get("search") ?? "")
-  const [priceFilter, setPriceFilter] = useState<CoursePriceFilter>(() => (searchParams.get("price") as CoursePriceFilter) ?? "all")
-  const [sort, setSort]               = useState<CourseSort>(() => (searchParams.get("sort") as CourseSort) ?? "newest")
-  const [currentPage, setCurrentPage] = useState(() => Number(searchParams.get("page")) || 1)
+  const [inputValue, setInputValue]         = useState(() => searchParams.get("search") ?? "")
+  const [searchTerm, setSearchTerm]         = useState(() => searchParams.get("search") ?? "")
+  const [sort, setSort]                     = useState<CourseSort>(() => (searchParams.get("sort") as CourseSort) ?? "price_asc")
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(() => searchParams.get("category"))
+  const [traineeLevel, setTraineeLevel]     = useState<TraineeLevel | "">(() => (searchParams.get("level") as TraineeLevel) ?? "")
+  const [currentPage, setCurrentPage]       = useState(() => Number(searchParams.get("page")) || 1)
   const pageSize = DEFAULT_PAGE_SIZE
 
-  // Debounce search
   useEffect(() => {
     const t = setTimeout(() => { setSearchTerm(inputValue); setCurrentPage(1) }, 300)
     return () => clearTimeout(t)
   }, [inputValue])
 
-  // Sync to URL
   useEffect(() => {
     const p = new URLSearchParams()
     if (searchTerm)                       p.set("search",   searchTerm)
-    if (priceFilter !== "all")            p.set("price",    priceFilter)
-    if (sort !== "newest")                p.set("sort",     sort)
+    if (sort !== "price_asc")             p.set("sort",     sort)
+    if (selectedCategory)                 p.set("category", selectedCategory)
+    if (traineeLevel)                     p.set("level",    traineeLevel)
     if (currentPage > 1)                  p.set("page",     String(currentPage))
     const qs = p.toString()
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-  }, [searchTerm, priceFilter, sort, currentPage, pathname, router])
+  }, [searchTerm, sort, selectedCategory, traineeLevel, currentPage, pathname, router])
 
-  const handlePriceFilter = useCallback((v: CoursePriceFilter) => { setPriceFilter(v); setCurrentPage(1) }, [])
-  const handleSort        = useCallback((v: string) => { setSort(v as CourseSort); setCurrentPage(1) }, [])
-  const clearAll          = useCallback(() => {
-    setInputValue(""); setSearchTerm(""); setPriceFilter("all"); setSort("newest"); setCurrentPage(1)
+  const handleSort           = useCallback((v: string) => { setSort(v as CourseSort); setCurrentPage(1) }, [])
+  const handleCategoryChange = useCallback((id: string | null) => { setSelectedCategory(id); setCurrentPage(1) }, [])
+  const handleTraineeLevel   = useCallback((v: string) => { setTraineeLevel(v as TraineeLevel | ""); setCurrentPage(1) }, [])
+  const clearAll             = useCallback(() => {
+    setInputValue(""); setSearchTerm(""); setSort("price_asc")
+    setSelectedCategory(null); setTraineeLevel(""); setCurrentPage(1)
   }, [])
 
-  const { data, isLoading, isFetching } = useCoursesListing({
+  const params: CoursesListingParams = {
     search: searchTerm,
-    priceFilter,
     sort,
+    categoryId: selectedCategory,
+    traineeLevel: traineeLevel || undefined,
     page: currentPage,
     pageSize,
-  })
+  }
+
+  const { data, isLoading, isFetching } = useCoursesListing(params)
+  const { data: categories = [] } = useAcademyCategories()
 
   const courses    = data?.data ?? []
   const total      = data?.total ?? 0
   const totalPages = Math.ceil(total / pageSize)
-  const hasActiveFilters = !!searchTerm || priceFilter !== "all" || sort !== "newest"
+  const hasActiveFilters = !!searchTerm || sort !== "price_asc" || !!selectedCategory || !!traineeLevel
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
@@ -149,12 +170,34 @@ export default function CoursesListingClient() {
         sortValue={sort}
         onSortChange={handleSort}
         sortOptions={SORT_OPTIONS}
-        priceValue={priceFilter}
-        onPriceChange={handlePriceFilter}
+        categories={categories.length > 0 ? categories : undefined}
+        categoryValue={selectedCategory ?? ""}
+        onCategoryChange={categories.length > 0 ? handleCategoryChange : undefined}
+        categoryPlaceholder="All categories"
         hasActiveFilters={hasActiveFilters}
         onClear={clearAll}
         isFetching={isFetching && !isLoading}
       />
+
+      {/* Trainee level filter */}
+      <div className="flex items-center gap-2">
+        <span className="text-sm text-zinc-500 shrink-0">Level:</span>
+        <div className="flex flex-wrap gap-1">
+          {TRAINEE_LEVELS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => handleTraineeLevel(traineeLevel === opt.value ? "" : opt.value)}
+              className={`h-8 px-3 rounded-lg border text-xs font-medium transition-colors whitespace-nowrap ${
+                traineeLevel === opt.value
+                  ? "bg-primary text-white border-primary"
+                  : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       {!isLoading && (
         <p className="text-xs text-zinc-400">

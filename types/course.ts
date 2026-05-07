@@ -26,6 +26,8 @@ export interface Course {
   thumbnail_url: string | null
   intro_video: string | null
   is_published: boolean
+  category_id: string | null
+  trainee_level: string | null
   created_at: string
   lessons?: CourseLesson[]
   resources?: CourseResource[]

@@ -11,6 +11,8 @@ export interface Event {
   description: string | null
   image_path: string | null
   event_date: string | null
+  start_date: string | null
+  end_date: string | null
   category_id: string | null
   country: string | null
   address: string | null

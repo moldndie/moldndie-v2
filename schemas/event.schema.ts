@@ -5,6 +5,8 @@ export const eventSchema = z.object({
   description: z.string().optional(),
   image_path: z.string().min(1, "Image is required"),
   event_date: z.string().optional(),
+  start_date: z.string().optional(),
+  end_date: z.string().optional(),
   category_id: z.string().optional(),
   country: z.string().optional(),
   address: z.string().optional(),

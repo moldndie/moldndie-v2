@@ -17,9 +17,8 @@ const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 const SORT_OPTIONS: { label: string; value: EventSort }[] = [
-  { label: "Newest",  value: "newest" },
-  { label: "Oldest",  value: "oldest" },
-  { label: "A → Z",   value: "title_asc" },
+  { label: "Country A → Z", value: "country_asc" },
+  { label: "A → Z",         value: "title_asc" },
 ]
 
 const pageVariants = {
@@ -70,13 +69,21 @@ function LoginGate({ callbackPath }: { callbackPath: string }) {
 }
 
 function EventExpandedContent({ event }: {
-  event: { event_date: string | null; country: string | null; address: string | null; description: string | null; website?: string | null }
+  event: { event_date: string | null; start_date: string | null; end_date: string | null; country: string | null; address: string | null; description: string | null; website?: string | null }
 }) {
+  const displayStart = event.start_date || event.event_date
+  const displayEnd = event.end_date
+
   return (
     <div className="border-t border-zinc-100 bg-zinc-50/70 px-4 py-4 space-y-3">
       <div className="flex items-center gap-2 text-sm text-zinc-700">
         <CalendarDays size={13} className="text-zinc-400 shrink-0" />
-        <span className="font-medium">{formatEventDateLong(event.event_date)}</span>
+        <span className="font-medium">
+          {formatEventDateLong(displayStart)}
+          {displayEnd && displayEnd !== displayStart && (
+            <> &rarr; {formatEventDate(displayEnd)}</>
+          )}
+        </span>
       </div>
       {event.country && (
         <div className="flex items-center gap-2 text-sm text-zinc-500">
@@ -144,6 +151,8 @@ function EventCard({
     title: string
     image_path: string | null
     event_date: string | null
+    start_date: string | null
+    end_date: string | null
     country: string | null
     address: string | null
     description: string | null
@@ -155,9 +164,10 @@ function EventCard({
   isLoggedIn: boolean | null
   callbackPath: string
 }) {
-  const imgSrc   = event.image_path ? `${R2_BASE}/${event.image_path}` : null
-  const upcoming = isUpcoming(event.event_date)
-  const showGate = expanded && isLoggedIn === false
+  const imgSrc       = event.image_path ? `${R2_BASE}/${event.image_path}` : null
+  const displayDate  = event.start_date || event.event_date
+  const upcoming     = isUpcoming(displayDate)
+  const showGate     = expanded && isLoggedIn === false
 
   return (
     <motion.div
@@ -174,13 +184,13 @@ function EventCard({
       >
         <div className="aspect-video relative bg-zinc-50 overflow-hidden shrink-0">
           {imgSrc ? (
-            <Image src={imgSrc} alt={event.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+            <Image src={imgSrc} alt={event.title} fill className="object-cover object-center" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <CalendarDays size={36} className="text-zinc-300" strokeWidth={1} />
             </div>
           )}
-          {event.event_date && (
+          {displayDate && (
             <span className={`absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full tracking-wider uppercase ${upcoming ? "bg-emerald-500 text-white" : "bg-zinc-600 text-white"}`}>
               {upcoming ? "Upcoming" : "Past"}
             </span>
@@ -190,7 +200,10 @@ function EventCard({
         <div className="p-4 flex-1 flex flex-col gap-1.5">
           <div className="flex items-center gap-1.5 text-xs text-primary font-semibold">
             <CalendarDays size={12} className="shrink-0" />
-            {formatEventDate(event.event_date)}
+            {formatEventDate(displayDate)}
+            {event.end_date && event.end_date !== displayDate && (
+              <> &ndash; {formatEventDate(event.end_date)}</>
+            )}
           </div>
           <h3 className={`text-sm font-bold leading-snug line-clamp-2 transition-colors ${expanded ? "text-primary" : "text-zinc-900"}`}>
             {event.title}
@@ -225,7 +238,7 @@ function EventCard({
             <div className="relative min-h-22.5">
               {/* Content — blurred for guests */}
               <div className={showGate ? "blur-[3px] pointer-events-none select-none" : ""}>
-                <EventExpandedContent event={event} />
+                <EventExpandedContent event={{ ...event, start_date: event.start_date, end_date: event.end_date }} />
               </div>
               {/* Login gate overlay */}
               {showGate && <LoginGate callbackPath={callbackPath} />}
@@ -245,7 +258,7 @@ export default function EventsListingClient() {
   const [inputValue, setInputValue]             = useState(() => searchParams.get("search") ?? "")
   const [searchTerm, setSearchTerm]             = useState(() => searchParams.get("search") ?? "")
   const [selectedCategory, setSelectedCategory] = useState<string | null>(() => searchParams.get("category"))
-  const [sort, setSort]                         = useState<EventSort>(() => (searchParams.get("sort") as EventSort) ?? "newest")
+  const [sort, setSort]                         = useState<EventSort>(() => (searchParams.get("sort") as EventSort) ?? "country_asc")
   const [currentPage, setCurrentPage]           = useState(() => Number(searchParams.get("page")) || 1)
   const pageSize = DEFAULT_PAGE_SIZE
   const [expandedIds, setExpandedIds]           = useState<Record<string, boolean>>({})
@@ -272,10 +285,10 @@ export default function EventsListingClient() {
   // Sync to URL
   useEffect(() => {
     const p = new URLSearchParams()
-    if (searchTerm)                       p.set("search",   searchTerm)
-    if (selectedCategory)                 p.set("category", selectedCategory)
-    if (sort !== "newest")                p.set("sort",     sort)
-    if (currentPage > 1)                  p.set("page",     String(currentPage))
+    if (searchTerm)                          p.set("search",   searchTerm)
+    if (selectedCategory)                    p.set("category", selectedCategory)
+    if (sort !== "country_asc")              p.set("sort",     sort)
+    if (currentPage > 1)                     p.set("page",     String(currentPage))
     const qs = p.toString()
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
   }, [searchTerm, selectedCategory, sort, currentPage, pathname, router])
@@ -283,7 +296,7 @@ export default function EventsListingClient() {
   const handleCategoryChange = useCallback((id: string | null) => { setSelectedCategory(id); setCurrentPage(1) }, [])
   const handleSort           = useCallback((v: string) => { setSort(v as EventSort); setCurrentPage(1) }, [])
   const clearAll             = useCallback(() => {
-    setInputValue(""); setSearchTerm(""); setSelectedCategory(null); setSort("newest"); setCurrentPage(1)
+    setInputValue(""); setSearchTerm(""); setSelectedCategory(null); setSort("country_asc"); setCurrentPage(1)
   }, [])
 
   const { data, isLoading, isFetching } = useEventsListing({
@@ -298,7 +311,7 @@ export default function EventsListingClient() {
   const events     = data?.data ?? []
   const total      = data?.total ?? 0
   const totalPages = Math.ceil(total / pageSize)
-  const hasActiveFilters = !!searchTerm || !!selectedCategory || sort !== "newest"
+  const hasActiveFilters = !!searchTerm || !!selectedCategory || sort !== "country_asc"
 
   const handleToggle = (id: string) => setExpandedIds((prev) => ({
     ...prev,

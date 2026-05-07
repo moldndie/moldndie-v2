@@ -4,13 +4,13 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 
 const navLinks = [
-  { label: "Blog",      href: "/blogs" },
-  { label: "Library",   href: "/molds" },
-  { label: "Academy",   href: "/courses" },
-  { label: "Events",    href: "/events" },
-  { label: "Suppliers", href: "/suppliers" },
-  { label: "Services",  href: "/services" },
-  { label: "Tools",     href: "/tools" },
+  { label: "Blog",        href: "/blogs" },
+  { label: "Library",     href: "/molds" },
+  { label: "Academy",     href: "/courses" },
+  { label: "Events",      href: "/events" },
+  { label: "Suppliers",   href: "/suppliers" },
+  { label: "Engineering", href: "/tools" },
+  { label: "Services",    href: "/services" },
 ]
 
 export default function NavbarLinks() {

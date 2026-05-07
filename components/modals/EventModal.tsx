@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { eventSchema, type EventFormValues } from "@/schemas/event.schema"
 import { useCreateEvent, useUpdateEvent, useEventCategories } from "@/hooks/queries/useEvents"
+import { countries } from "@/lib/countries"
 import type { Event } from "@/types"
 
 interface EventModalProps {
@@ -41,6 +42,8 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
       description: "",
       image_path: "",
       event_date: "",
+      start_date: "",
+      end_date: "",
       category_id: "",
       country: "",
       address: "",
@@ -59,6 +62,8 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
         description: event.description ?? "",
         image_path: event.image_path ?? "",
         event_date: event.event_date ? event.event_date.slice(0, 10) : "",
+        start_date: event.start_date ? event.start_date.slice(0, 10) : "",
+        end_date: event.end_date ? event.end_date.slice(0, 10) : "",
         category_id: event.category_id ?? "",
         country: event.country ?? "",
         address: event.address ?? "",
@@ -70,6 +75,8 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
         description: "",
         image_path: "",
         event_date: "",
+        start_date: "",
+        end_date: "",
         category_id: "",
         country: "",
         address: "",
@@ -125,10 +132,20 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
 
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-700">Date</label>
+            <label className="text-sm font-medium text-zinc-700">Start Date</label>
+            <Input {...register("start_date")} type="date" />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-zinc-700">End Date</label>
+            <Input {...register("end_date")} type="date" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-zinc-700">Date (Legacy)</label>
             <Input {...register("event_date")} type="date" />
           </div>
-
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700">Category</label>
             <Select {...register("category_id")}>
@@ -144,7 +161,17 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Country</label>
-          <Input {...register("country")} placeholder="e.g. Egypt" />
+          <Select {...register("country")}>
+            <option value="">— Select country —</option>
+            {countries
+              .slice()
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((c) => (
+                <option key={c.code} value={c.name}>
+                  {c.name}
+                </option>
+              ))}
+          </Select>
         </div>
 
         <div className="space-y-1.5">

@@ -23,7 +23,7 @@ export async function getEvents(): Promise<Event[]> {
   return (data ?? []) as Event[]
 }
 
-export type EventSort = "newest" | "oldest" | "date_asc" | "title_asc"
+export type EventSort = "newest" | "oldest" | "date_asc" | "title_asc" | "country_asc"
 
 export interface EventsListingParams {
   search?: string
@@ -47,10 +47,11 @@ export async function getEventsListing(
   const to = from + pageSize - 1
 
   const orderMap: Record<EventSort, { col: string; asc: boolean }> = {
-    newest:    { col: "created_at", asc: false },
-    oldest:    { col: "created_at", asc: true  },
-    date_asc:  { col: "event_date", asc: true  },
-    title_asc: { col: "title",      asc: true  },
+    newest:      { col: "created_at", asc: false },
+    oldest:      { col: "created_at", asc: true  },
+    date_asc:    { col: "event_date", asc: true  },
+    title_asc:   { col: "title",      asc: true  },
+    country_asc: { col: "country",    asc: true  },
   }
   const { col, asc } = orderMap[sort]
 
@@ -93,6 +94,8 @@ export async function createEvent(values: EventFormValues): Promise<Event> {
       description: values.description ?? null,
       image_path: values.image_path,
       event_date: values.event_date ?? null,
+      start_date: values.start_date ?? null,
+      end_date: values.end_date ?? null,
       category_id: values.category_id || null,
       country: values.country ?? null,
       address: values.address ?? null,
@@ -114,6 +117,8 @@ export async function updateEvent(id: string, values: EventFormValues): Promise<
       description: values.description ?? null,
       image_path: values.image_path,
       event_date: values.event_date ?? null,
+      start_date: values.start_date ?? null,
+      end_date: values.end_date ?? null,
       category_id: values.category_id || null,
       country: values.country ?? null,
       address: values.address ?? null,

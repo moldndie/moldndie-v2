@@ -1,6 +1,6 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Phone, Mail, MapPin, Clock, MessageCircle, Youtube, Facebook, Instagram, Linkedin, Twitter } from "lucide-react"
+import { Phone, Mail, MapPin, Clock, MessageCircle, Youtube, Facebook, Instagram, Linkedin } from "lucide-react"
 import { getSiteSettings } from "@/services/siteSettings.service"
 import type { SiteSettings } from "@/services/siteSettings.service"
 
@@ -10,8 +10,8 @@ const pages = [
   { label: "Academy",           href: "/courses" },
   { label: "Events",            href: "/events" },
   { label: "Suppliers",         href: "/suppliers" },
+  { label: "Engineering",       href: "/tools" },
   { label: "Services",          href: "/services" },
-  { label: "Engineering Tools", href: "/tools" },
 ]
 
 const company = [
@@ -85,17 +85,15 @@ export default async function Footer() {
   const s = settings as Record<string, string>
 
   const socialLinks = [
-    { icon: Facebook,     href: s.social_facebook,  label: "Facebook" },
-    { icon: Instagram,    href: s.social_instagram, label: "Instagram" },
-    { icon: Youtube,      href: s.social_youtube,   label: "YouTube" },
-    { icon: PinterestIcon,href: s.social_pinterest, label: "Pinterest" },
-    { icon: Linkedin,     href: s.social_linkedin,  label: "LinkedIn" },
-    { icon: Twitter,      href: s.social_twitter,   label: "Twitter / X" },
+    { icon: Linkedin,      href: s.social_linkedin,  label: "LinkedIn",  hoverClass: "hover:text-[#0A66C2]" },
+    { icon: Facebook,      href: s.social_facebook,  label: "Facebook",  hoverClass: "hover:text-[#1877F2]" },
+    { icon: Youtube,       href: s.social_youtube,   label: "YouTube",   hoverClass: "hover:text-[#FF0000]" },
+    { icon: PinterestIcon, href: s.social_pinterest, label: "Pinterest", hoverClass: "hover:text-[#BD081C]" },
+    { icon: Instagram,     href: s.social_instagram, label: "Instagram", hoverClass: "hover:text-pink-500" },
   ].filter((item) => item.href)
 
   const hasContact =
-    s.contact_phone || s.contact_email || s.contact_address ||
-    s.contact_hours || s.contact_whatsapp
+    s.contact_phone || s.contact_email || s.contact_address || s.contact_hours
 
   return (
     <footer className="bg-[#5C1515] text-white">
@@ -159,6 +157,13 @@ export default async function Footer() {
                     {s.contact_phone}
                   </ContactRow>
                 )}
+                <ContactRow
+                  icon={MessageCircle}
+                  href="https://wa.me/201120060658"
+                  newTab
+                >
+                  WhatsApp
+                </ContactRow>
                 {s.contact_email && (
                   <ContactRow icon={Mail} href={`mailto:${s.contact_email}`}>
                     {s.contact_email}
@@ -178,15 +183,6 @@ export default async function Footer() {
                     {s.contact_hours}
                   </ContactRow>
                 )}
-                {s.contact_whatsapp && (
-                  <ContactRow
-                    icon={MessageCircle}
-                    href={`https://wa.me/${s.contact_whatsapp.replace(/\D/g, "")}`}
-                    newTab
-                  >
-                    WhatsApp
-                  </ContactRow>
-                )}
               </div>
             ) : (
               <p className="text-sm text-white/40 italic">Contact info coming soon.</p>
@@ -195,14 +191,14 @@ export default async function Footer() {
             {/* Social icons */}
             {socialLinks.length > 0 && (
               <div className="flex items-center gap-3.5 mt-5">
-                {socialLinks.map(({ icon: Icon, href, label }) => (
+                {socialLinks.map(({ icon: Icon, href, label, hoverClass }) => (
                   <a
                     key={label}
                     href={href}
                     aria-label={label}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-white/50 hover:text-white transition-colors"
+                    className={`text-white/50 transition-colors ${hoverClass}`}
                   >
                     <Icon size={17} />
                   </a>

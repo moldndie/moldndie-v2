@@ -20,7 +20,9 @@ export default function EventsPage() {
         </Suspense>
         <div className="max-w-7xl mx-auto px-6 pb-12">
           <hr className="border-zinc-100 mb-8" />
-          <AdSlotGrid type="event" className="w-full" />
+          <Suspense fallback={null}>
+            <AdSlotGrid type="event" className="w-full" />
+          </Suspense>
         </div>
       </main>
       <Footer />

@@ -65,7 +65,7 @@ export function ToolsClient({ dbCalculators, categories }: Props) {
       {/* Hero */}
       <section className="bg-zinc-950 text-white py-16 px-6">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-4"><PublicBreadcrumb crumbs={[{ label: "Engineering Tools" }]} /></div>
+          <div className="mb-4"><PublicBreadcrumb crumbs={[{ label: "Engineering" }]} /></div>
           <div className="flex items-center gap-3 mb-4">
             <div className="flex size-10 items-center justify-center rounded-xl bg-primary/20"><Calculator size={20} className="text-primary" /></div>
             <span className="text-xs font-bold uppercase tracking-widest text-primary">Free Tools</span>
@@ -100,12 +100,13 @@ export function ToolsClient({ dbCalculators, categories }: Props) {
 
           <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <input type="text" value={dbSearch} onChange={(e) => setDbSearch(e.target.value)} placeholder="Search calculators…" className="flex-1 rounded-lg border border-zinc-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
-            <div className="flex gap-2 flex-wrap">
-              <button onClick={() => setDbCat("all")} className={cn("rounded-full px-4 py-1.5 text-sm font-medium transition-colors", dbCat === "all" ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200")}>All</button>
-              {categories.map((cat) => (
-                <button key={cat.id} onClick={() => setDbCat(cat.id)} className={cn("rounded-full px-4 py-1.5 text-sm font-medium transition-colors", dbCat === cat.id ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200")}>{cat.name}</button>
-              ))}
-            </div>
+            {categories.length > 0 && (
+              <div className="flex gap-2 flex-wrap">
+                {categories.map((cat) => (
+                  <button key={cat.id} onClick={() => setDbCat(dbCat === cat.id ? "all" : cat.id)} className={cn("rounded-full px-4 py-1.5 text-sm font-medium transition-colors", dbCat === cat.id ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200")}>{cat.name}</button>
+                ))}
+              </div>
+            )}
           </div>
 
           {filteredDb.length > 0 ? (

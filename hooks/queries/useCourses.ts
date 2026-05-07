@@ -11,6 +11,7 @@ import {
   type CoursesListingParams,
   type CourseSort,
 } from "@/services/course.service"
+import { getAcademyCategories } from "@/services/academyCategory.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { CourseFormValues } from "@/schemas/course.schema"
 
@@ -48,6 +49,8 @@ export function useCoursesListing(params: CoursesListingParams = {}) {
       params.search ?? "",
       params.priceFilter ?? "all",
       params.sort ?? "newest",
+      params.categoryId ?? null,
+      params.traineeLevel ?? "",
       params.page ?? 1,
       params.pageSize ?? 12,
     ],
@@ -55,6 +58,14 @@ export function useCoursesListing(params: CoursesListingParams = {}) {
     placeholderData: keepPreviousData,
     staleTime: 2 * 60 * 1000,
     refetchOnWindowFocus: false,
+  })
+}
+
+export function useAcademyCategories() {
+  return useQuery({
+    queryKey: QUERY_KEYS.ACADEMY_CATEGORIES,
+    queryFn: getAcademyCategories,
+    staleTime: 5 * 60 * 1000,
   })
 }
 
