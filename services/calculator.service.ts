@@ -28,6 +28,83 @@ export async function getCategories(): Promise<CalcCategory[]> {
   return data ?? []
 }
 
+export async function getAllCategories(): Promise<CalcCategory[]> {
+  const { data, error } = await createAdminClient()
+    .from("calculator_categories")
+    .select("*")
+    .order("sort_order")
+  if (error) throw dbErr(error)
+  return data ?? []
+}
+
+function calcCategorySlug(name: string): string {
+  return name.toLowerCase().replace(/[^a-z0-9\s-]/g, "").replace(/\s+/g, "-").replace(/-+/g, "-").trim() || "category"
+}
+
+export async function createCalcCategory(payload: {
+  name: string
+  slug?: string
+  description?: string | null
+  sort_order?: number
+  is_active?: boolean
+}): Promise<CalcCategory> {
+  const slug = payload.slug || calcCategorySlug(payload.name)
+  const { data, error } = await createAdminClient()
+    .from("calculator_categories")
+    .insert({ name: payload.name, slug, description: payload.description ?? null, sort_order: payload.sort_order ?? 0, is_active: payload.is_active ?? true })
+    .select()
+    .single()
+  if (error) throw dbErr(error)
+  revalidatePath("/dashboard/calculators")
+  revalidatePath("/tools")
+  return data as CalcCategory
+}
+
+export async function updateCalcCategory(id: string, payload: {
+  name?: string
+  slug?: string
+  description?: string | null
+  sort_order?: number
+  is_active?: boolean
+}): Promise<void> {
+  const updates: Record<string, unknown> = { ...payload, updated_at: new Date().toISOString() }
+  if (payload.name && !payload.slug) updates.slug = calcCategorySlug(payload.name)
+  const { error } = await createAdminClient()
+    .from("calculator_categories")
+    .update(updates)
+    .eq("id", id)
+  if (error) throw dbErr(error)
+  revalidatePath("/dashboard/calculators")
+  revalidatePath("/tools")
+}
+
+export async function deleteCalcCategory(id: string): Promise<void> {
+  const { count } = await createAdminClient()
+    .from("calculators")
+    .select("id", { count: "exact", head: true })
+    .eq("category_id", id)
+  if (count && count > 0) {
+    throw new Error(`Cannot delete: ${count} calculator${count > 1 ? "s use" : " uses"} this category.`)
+  }
+  const { error } = await createAdminClient()
+    .from("calculator_categories")
+    .delete()
+    .eq("id", id)
+  if (error) throw dbErr(error)
+  revalidatePath("/dashboard/calculators")
+  revalidatePath("/tools")
+}
+
+export async function toggleCalcCategoryActive(id: string, active: boolean): Promise<void> {
+  const { error } = await createAdminClient()
+    .from("calculator_categories")
+    .update({ is_active: active, updated_at: new Date().toISOString() })
+    .eq("id", id)
+  if (error) throw dbErr(error)
+  revalidatePath("/dashboard/calculators")
+  revalidatePath("/tools")
+}
+
 // ── Calculators list ──────────────────────────────────────────────────────────
 
 export async function getCalculators(opts?: {

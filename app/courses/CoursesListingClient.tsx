@@ -148,7 +148,8 @@ export default function CoursesListingClient() {
   }
 
   const { data, isLoading, isFetching } = useCoursesListing(params)
-  const { data: categories = [] } = useAcademyCategories()
+  const { data: allCategories = [] } = useAcademyCategories()
+  const categories = allCategories.filter((c) => c.is_active)
 
   const courses    = data?.data ?? []
   const total      = data?.total ?? 0

@@ -174,7 +174,7 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
 
           <div className="pt-4">
             <Suspense fallback={null}>
-              <AdSlotGrid type="blog" className="w-full" />
+              <AdSlotGrid page="blog" className="w-full" />
             </Suspense>
           </div>
         </div>

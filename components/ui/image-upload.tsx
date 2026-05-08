@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react"
 import { Upload, X } from "lucide-react"
-import { uploadFileToR2 } from "@/services/upload.service"
+import { uploadFileToR2, getR2Url } from "@/services/upload.service"
 import { cn } from "@/lib/utils"
 
 interface ImageUploadProps {
@@ -29,7 +29,7 @@ export function ImageUpload({ bucket, value, onChange, onClear, className }: Ima
     setUploading(true)
     try {
       const result = await uploadFileToR2(bucket, file)
-      onChange(result.url)
+      onChange(getR2Url(result.key))
     } catch {
       setError("Upload failed. Please try again.")
     } finally {

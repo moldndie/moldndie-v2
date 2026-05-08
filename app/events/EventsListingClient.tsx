@@ -172,7 +172,7 @@ function EventCard({
   return (
     <motion.div
       variants={cardVariants}
-      className={`rounded-xl overflow-hidden border bg-white shadow-sm transition-colors duration-200 flex flex-col ${
+      className={`rounded-xl overflow-hidden border bg-white shadow-sm transition-colors duration-200 flex flex-col h-full ${
         expanded ? "border-primary shadow-md" : "border-zinc-100 hover:shadow-lg hover:border-zinc-200"
       }`}
     >
@@ -353,7 +353,7 @@ export default function EventsListingClient() {
       )}
 
       {isLoading ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch">
           {Array.from({ length: pageSize }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : events.length === 0 ? (
@@ -373,7 +373,7 @@ export default function EventsListingClient() {
           variants={gridVariants}
           initial="initial"
           animate="animate"
-          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}
         >
           {events.map((event) => (
             <EventCard

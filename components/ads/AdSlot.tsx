@@ -1,17 +1,16 @@
 import Image from "next/image"
 import { getAdForPlacement } from "@/services/ad.service"
 import { getFileUrl } from "@/lib/utils"
-import type { AdTargetType } from "@/types"
 
 interface AdSlotProps {
-  type: AdTargetType
+  page: string
   className?: string
 }
 
-export async function AdSlot({ type, className }: AdSlotProps) {
+export async function AdSlot({ page, className }: AdSlotProps) {
   let ad
   try {
-    ad = await getAdForPlacement(type)
+    ad = await getAdForPlacement(page)
   } catch {
     return null
   }

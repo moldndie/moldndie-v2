@@ -133,7 +133,7 @@ function SupplierCard({
   return (
     <motion.div
       variants={cardVariants}
-      className={`rounded-xl overflow-hidden border bg-white shadow-sm transition-colors duration-200 ${
+      className={`rounded-xl overflow-hidden border bg-white shadow-sm transition-colors duration-200 flex flex-col h-full ${
         expanded ? "border-primary shadow-md" : supplier.sponsored ? "border-amber-200 hover:shadow-lg hover:border-amber-300" : "border-zinc-100 hover:shadow-lg hover:border-zinc-200"
       }`}
     >
@@ -141,7 +141,7 @@ function SupplierCard({
         onClick={onToggle}
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.1 }}
-        className="w-full p-5 flex flex-col items-center text-center gap-3"
+        className="w-full flex-1 p-5 flex flex-col items-center text-center gap-3"
       >
         {supplier.sponsored && (
           <span className="self-start text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 tracking-wide uppercase">
@@ -336,7 +336,7 @@ export default function SuppliersListingClient() {
           variants={gridVariants}
           initial="initial"
           animate="animate"
-          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}
         >
           {suppliers.map((supplier) => (
             <SupplierCard

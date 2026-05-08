@@ -219,7 +219,7 @@ export default async function BlogPreviewPage({ params }: Props) {
 
         {/* ── Ad slot ── */}
         <div className="w-fullpx-4 sm:px-6 py-8">
-          <AdSlot type="blog" className="max-w-md mx-auto" />
+          <AdSlot page="blog" className="max-w-md mx-auto" />
         </div>
       </main>
     </div>

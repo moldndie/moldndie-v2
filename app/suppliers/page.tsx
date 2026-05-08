@@ -21,7 +21,7 @@ export default function SuppliersPage() {
         <div className="max-w-7xl mx-auto px-6 pb-12">
           <hr className="border-zinc-100 mb-8" />
           <Suspense fallback={null}>
-            <AdSlotGrid type="supplier" className="w-full" />
+            <AdSlotGrid page="suppliers" className="w-full" />
           </Suspense>
         </div>
       </main>

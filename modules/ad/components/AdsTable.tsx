@@ -6,12 +6,16 @@ import { Pencil, Trash2, Plus } from "lucide-react"
 import { DataTable } from "@/components/tables/DataTable"
 import { Button } from "@/components/ui/button"
 import { useAds, useDeleteAd } from "@/hooks/queries/useAds"
-import { AD_TARGET_LABELS } from "@/schemas/ad.schema"
+import { AD_PAGE_OPTIONS } from "@/schemas/ad.schema"
 import type { Ad } from "@/types"
 
 function formatDate(iso: string | null) {
   if (!iso) return "—"
   return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })
+}
+
+function pageLabel(value: string): string {
+  return AD_PAGE_OPTIONS.find((o) => o.value === value)?.label ?? value
 }
 
 export function AdsTable() {
@@ -38,13 +42,16 @@ export function AdsTable() {
       ),
     },
     {
-      accessorKey: "target_type",
-      header: "Placement",
-      enableSorting: true,
+      accessorKey: "target_pages",
+      header: "Pages",
       cell: ({ row }) => (
-        <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
-          {AD_TARGET_LABELS[row.original.target_type] ?? row.original.target_type}
-        </span>
+        <div className="flex flex-wrap gap-1">
+          {(row.original.target_pages ?? []).map((page) => (
+            <span key={page} className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
+              {pageLabel(page)}
+            </span>
+          ))}
+        </div>
       ),
     },
     {

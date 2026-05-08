@@ -40,7 +40,7 @@ export async function POST(req: Request) {
 
     const uploadUrl = await getSignedUrl(r2, command, { expiresIn: 60 })
 
-    const fileUrl = `https://${process.env.R2_ACCOUNT_ID}.r2.cloudflarestorage.com/${process.env.R2_BUCKET_NAME}/${key}`
+    const fileUrl = `${process.env.NEXT_PUBLIC_R2_BASE_URL}/${key}`
 
     return NextResponse.json({ uploadUrl, fileUrl, key })
   } catch {

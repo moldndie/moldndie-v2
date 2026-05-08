@@ -9,16 +9,14 @@ import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal"
 import { Button } from "@/components/ui/button"
 import { useAds, useDeleteAd } from "@/hooks/queries/useAds"
 import { getFileUrl, cn } from "@/lib/utils"
-import type { Ad, AdTargetType } from "@/types"
+import { AD_PAGE_OPTIONS } from "@/schemas/ad.schema"
+import type { Ad } from "@/types"
 
-const TARGET_TYPE_LABELS: Record<AdTargetType, string> = {
-  blog: "Blog",
-  mold: "Library",
-  course: "Academy",
-  event: "Events",
-  supplier: "Suppliers",
-  global: "Global",
-  external: "External",
+function pageLabels(pages: string[]): string {
+  if (!pages || pages.length === 0) return "—"
+  return pages
+    .map((p) => AD_PAGE_OPTIONS.find((o) => o.value === p)?.label ?? p)
+    .join(", ")
 }
 
 function formatDate(date: string | null) {
@@ -65,12 +63,10 @@ export function AdsTable() {
       ),
     },
     {
-      id: "target_type",
-      header: "Target Type",
+      id: "target_pages",
+      header: "Pages",
       cell: ({ row }) => (
-        <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
-          {TARGET_TYPE_LABELS[row.original.target_type]}
-        </span>
+        <span className="text-xs text-zinc-600">{pageLabels(row.original.target_pages)}</span>
       ),
     },
     {

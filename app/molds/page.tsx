@@ -22,7 +22,7 @@ export default function MoldsPage() {
         <div className="max-w-7xl mx-auto px-6 pb-12">
           <hr className="border-zinc-100 mb-8" />
           <Suspense fallback={null}>
-            <AdSlotGrid type="mold" className="w-full" />
+            <AdSlotGrid page="library" className="w-full" />
           </Suspense>
         </div>
       </main>

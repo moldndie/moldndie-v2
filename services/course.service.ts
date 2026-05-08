@@ -115,16 +115,19 @@ export async function createCourse(values: CourseFormValues): Promise<Course> {
   const { data, error } = await supabase
     .from("courses")
     .insert({
-      title: values.title,
-      description: values.description ?? null,
-      price: values.is_free ? 0 : values.price,
+      title:         values.title,
+      description:   values.description ?? null,
+      price:         values.is_free ? 0 : values.price,
       thumbnail_url: values.thumbnail_url ?? null,
-      is_published: values.is_published,
+      is_published:  values.is_published,
+      category_id:   values.category_id ?? null,
+      trainee_level: values.trainee_level ?? null,
     })
     .select()
     .single()
   if (error) throw dbError(error)
   revalidatePath("/dashboard/courses")
+  revalidatePath("/courses")
   return data as Course
 }
 
@@ -133,17 +136,20 @@ export async function updateCourse(id: string, values: CourseFormValues): Promis
   const { data, error } = await supabase
     .from("courses")
     .update({
-      title: values.title,
-      description: values.description ?? null,
-      price: values.is_free ? 0 : values.price,
+      title:         values.title,
+      description:   values.description ?? null,
+      price:         values.is_free ? 0 : values.price,
       thumbnail_url: values.thumbnail_url ?? null,
-      is_published: values.is_published,
+      is_published:  values.is_published,
+      category_id:   values.category_id ?? null,
+      trainee_level: values.trainee_level ?? null,
     })
     .eq("id", id)
     .select()
     .single()
   if (error) throw dbError(error)
   revalidatePath("/dashboard/courses")
+  revalidatePath("/courses")
   return data as Course
 }
 

@@ -1,32 +1,15 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useForm, Controller } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Modal } from "@/components/ui/modal"
 import { Input } from "@/components/ui/input"
-import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { FileUploadField } from "@/components/forms/FileUploadField"
-import { adSchema, type AdFormValues } from "@/schemas/ad.schema"
+import { adSchema, AD_PAGE_OPTIONS, type AdFormValues } from "@/schemas/ad.schema"
 import { useCreateAd, useUpdateAd } from "@/hooks/queries/useAds"
 import type { Ad } from "@/types"
-
-const TARGET_TYPE_LABELS: Record<string, string> = {
-  blog: "Blog",
-  mold: "Mold",
-  event: "Event",
-  supplier: "Supplier",
-  external: "External",
-}
-
-const LINK_PLACEHOLDERS: Record<string, string> = {
-  blog: "Blog slug or ID",
-  mold: "Mold slug or ID",
-  event: "Event slug or ID",
-  supplier: "Supplier slug or ID",
-  external: "https://example.com",
-}
 
 interface AdModalProps {
   open: boolean
@@ -46,7 +29,7 @@ export function AdModal({ open, onClose, ad, onSuccess }: AdModalProps) {
     register,
     handleSubmit,
     setValue,
-    watch,
+    control,
     reset,
     formState: { errors },
   } = useForm<AdFormValues>({
@@ -54,15 +37,13 @@ export function AdModal({ open, onClose, ad, onSuccess }: AdModalProps) {
     defaultValues: {
       title: "",
       image_path: "",
-      target_type: "external",
+      target_pages: [],
       link: "",
       is_active: true,
       starts_at: "",
       ends_at: "",
     },
   })
-
-  const targetType = watch("target_type")
 
   useEffect(() => {
     if (!open) {
@@ -73,7 +54,7 @@ export function AdModal({ open, onClose, ad, onSuccess }: AdModalProps) {
       reset({
         title: ad.title,
         image_path: ad.image_path,
-        target_type: ad.target_type,
+        target_pages: ad.target_pages ?? [],
         link: ad.link,
         is_active: ad.is_active,
         starts_at: ad.starts_at ? ad.starts_at.slice(0, 10) : "",
@@ -83,7 +64,7 @@ export function AdModal({ open, onClose, ad, onSuccess }: AdModalProps) {
       reset({
         title: "",
         image_path: "",
-        target_type: "external",
+        target_pages: [],
         link: "",
         is_active: true,
         starts_at: "",
@@ -132,28 +113,63 @@ export function AdModal({ open, onClose, ad, onSuccess }: AdModalProps) {
           )}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-700">Target Type *</label>
-            <Select {...register("target_type")}>
-              <option value="blog">Blog</option>
-              <option value="mold">Mold</option>
-              <option value="event">Event</option>
-              <option value="supplier">Supplier</option>
-              <option value="external">External</option>
-            </Select>
-          </div>
+        <div className="space-y-1.5">
+          <label className="text-sm font-medium text-zinc-700">Destination URL *</label>
+          <Input {...register("link")} placeholder="https://example.com" type="url" />
+          {errors.link && <p className="text-xs text-red-500">{errors.link.message}</p>}
+        </div>
 
-          <div className="space-y-1.5">
-            <label className="text-sm font-medium text-zinc-700">
-              {targetType === "external" ? "URL *" : "Link *"}
-            </label>
-            <Input
-              {...register("link")}
-              placeholder={LINK_PLACEHOLDERS[targetType] ?? "Link"}
-            />
-            {errors.link && <p className="text-xs text-red-500">{errors.link.message}</p>}
-          </div>
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-zinc-700">Target Pages *</label>
+          <Controller
+            name="target_pages"
+            control={control}
+            render={({ field }) => (
+              <div className="grid grid-cols-2 gap-1.5">
+                {AD_PAGE_OPTIONS.map((opt) => {
+                  const checked = field.value.includes(opt.value)
+                  return (
+                    <label
+                      key={opt.value}
+                      className={`flex items-center gap-2 cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs transition-colors ${
+                        checked
+                          ? "border-primary bg-primary/5 text-primary font-medium"
+                          : "border-zinc-200 text-zinc-600 hover:border-zinc-400"
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        className="sr-only"
+                        checked={checked}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            field.onChange([...field.value, opt.value])
+                          } else {
+                            field.onChange(field.value.filter((v) => v !== opt.value))
+                          }
+                        }}
+                      />
+                      <span
+                        className={`flex h-3.5 w-3.5 shrink-0 items-center justify-center rounded border ${
+                          checked ? "border-primary bg-primary text-white" : "border-zinc-300"
+                        }`}
+                      >
+                        {checked && (
+                          <svg className="h-2 w-2" viewBox="0 0 10 10" fill="none">
+                            <path d="M1.5 5L4 7.5L8.5 2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                          </svg>
+                        )}
+                      </span>
+                      {opt.label}
+                    </label>
+                  )
+                })}
+              </div>
+            )}
+          />
+          {errors.target_pages && (
+            <p className="text-xs text-red-500">{errors.target_pages.message}</p>
+          )}
         </div>
 
         <div className="grid grid-cols-2 gap-4">

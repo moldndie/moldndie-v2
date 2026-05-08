@@ -23,7 +23,7 @@ export default async function EventDetailPage({
         <EventDetailClient eventId={id} />
         <div className="max-w-7xl mx-auto px-6 pb-12">
           <hr className="border-zinc-100 mb-8" />
-          <AdSlotGrid type="event" className="w-full" />
+          <AdSlotGrid page="events" className="w-full" />
         </div>
       </main>
       <Footer />

@@ -6,16 +6,22 @@ interface BlockRendererProps {
   blocks: BlogBlock[]
 }
 
-type Row = BlogBlock | [BlogBlock, BlogBlock | null]
+type TwoColRow = [BlogBlock | null, BlogBlock | null]
+type Row = BlogBlock | TwoColRow
 
 export function BlockRenderer({ blocks }: BlockRendererProps) {
   const sorted = [...blocks].sort((a, b) => a.order_index - b.order_index)
 
-  // Group into rows: pair consecutive left+right two-column blocks
+  // Group into rows:
+  // - Consecutive left+right two-column blocks → paired row
+  // - Orphaned left two-column → [left, null]
+  // - Orphaned right two-column → [null, right]
+  // - All other blocks → standalone row
   const rows: Row[] = []
   let i = 0
   while (i < sorted.length) {
     const block = sorted[i]
+
     if (block.layout === "two-column" && block.column_position === "left") {
       const next = sorted[i + 1]
       if (next && next.layout === "two-column" && next.column_position === "right") {
@@ -25,6 +31,10 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
         rows.push([block, null])
         i += 1
       }
+    } else if (block.layout === "two-column" && block.column_position === "right") {
+      // Orphaned right — preserve right column position with empty left
+      rows.push([null, block])
+      i += 1
     } else {
       rows.push(block)
       i += 1
@@ -36,10 +46,11 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
       {rows.map((row) => {
         if (Array.isArray(row)) {
           const [left, right] = row
+          const key = left?.id ?? right?.id ?? String(Math.random())
           return (
-            <div key={left.id} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <BlockItem block={left} />
-              {right ? <BlockItem block={right} /> : <div />}
+            <div key={key} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>{left ? <BlockItem block={left} /> : null}</div>
+              <div>{right ? <BlockItem block={right} /> : null}</div>
             </div>
           )
         }
@@ -64,7 +75,7 @@ function BlockItem({ block }: { block: BlogBlock }) {
     }
     case "image": {
       const c = block.content as { url?: string; caption?: string }
-      if (!c.url) return null
+      if (!c.url || c.url.includes("r2.cloudflarestorage.com")) return null
       return (
         <figure className="max-w-2xl mx-auto">
           <img src={c.url} alt={c.caption ?? ""} className="w-full rounded-xl" />
