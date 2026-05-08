@@ -22,4 +22,4 @@ export type {
 } from "./purchase"
 export type { Event, EventCategory } from "./event"
 export type { Supplier, SupplierCategory } from "./supplier"
-export type { Ad, AdTargetType } from "./ad"
+export type { Ad } from "./ad"

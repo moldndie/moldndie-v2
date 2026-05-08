@@ -11,7 +11,14 @@ import {
   type CoursesListingParams,
   type CourseSort,
 } from "@/services/course.service"
-import { getAcademyCategories } from "@/services/academyCategory.service"
+import {
+  getAcademyCategories,
+  createAcademyCategory,
+  updateAcademyCategory,
+  deleteAcademyCategory,
+  toggleAcademyCategoryActive,
+  type AcademyCategoryPayload,
+} from "@/services/academyCategory.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { CourseFormValues } from "@/schemas/course.schema"
 
@@ -108,5 +115,40 @@ export function useDeleteCourse() {
       if (ctx?.prev) qc.setQueryData(QUERY_KEYS.COURSES, ctx.prev)
     },
     onSettled: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.COURSES }),
+  })
+}
+
+// Academy category mutations
+export function useCreateAcademyCategory() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (payload: AcademyCategoryPayload) => createAcademyCategory(payload),
+    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.ACADEMY_CATEGORIES }),
+  })
+}
+
+export function useUpdateAcademyCategory() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, payload }: { id: string; payload: AcademyCategoryPayload }) =>
+      updateAcademyCategory(id, payload),
+    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.ACADEMY_CATEGORIES }),
+  })
+}
+
+export function useDeleteAcademyCategory() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) => deleteAcademyCategory(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.ACADEMY_CATEGORIES }),
+  })
+}
+
+export function useToggleAcademyCategoryActive() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ id, active }: { id: string; active: boolean }) =>
+      toggleAcademyCategoryActive(id, active),
+    onSuccess: () => qc.invalidateQueries({ queryKey: QUERY_KEYS.ACADEMY_CATEGORIES }),
   })
 }

@@ -25,6 +25,7 @@ export function makeBlock(block_type: BlockType): EditorBlock {
 
 // ─── Flat blocks → Sections ───────────────────────────────────────────────────
 // Pairs consecutive left+right two-column blocks into a single Section.
+// Handles orphaned right-only blocks by preserving their column position.
 // Everything else becomes a full-width Section.
 
 export function blocksToSections(blocks: EditorBlock[]): Section[] {
@@ -52,6 +53,14 @@ export function blocksToSections(blocks: EditorBlock[]): Section[] {
         type: "full-width",
         block: { ...block, layout: null, column_position: null },
       })
+    } else if (block.layout === "two-column" && block.column_position === "right") {
+      // Orphaned right-only block — preserve in right column with empty left
+      sections.push({
+        id: `sec-${block.id}`,
+        type: "two-column",
+        left: undefined,
+        right: block,
+      })
     } else {
       sections.push({
         id: `sec-${block.id}`,
@@ -68,6 +77,7 @@ export function blocksToSections(blocks: EditorBlock[]): Section[] {
 // ─── Sections → Flat blocks ───────────────────────────────────────────────────
 // Expands sections back into the flat block array expected by the DB.
 // order_index is assigned by position in the array.
+// Preserves right-only two-column blocks with their column_position.
 
 export function sectionsToBlocks(sections: Section[]): EditorBlock[] {
   const blocks: EditorBlock[] = []

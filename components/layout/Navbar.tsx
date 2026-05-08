@@ -10,7 +10,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center shrink-0">
-          <Image src="/assets/logo-black-v2.png" alt="Mold N Die" width={120} height={40} className="h-10 w-auto" />
+          <Image src="/assets/logo-black-updated.png" alt="Mold N Die" width={120} height={40} className="h-10 w-auto" />
         </Link>
 
         {/* Desktop nav links */}

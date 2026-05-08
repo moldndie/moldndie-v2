@@ -10,9 +10,15 @@ import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { courseSchema, type CourseFormValues } from "@/schemas/course.schema"
-import { useCreateCourse, useUpdateCourse } from "@/hooks/queries/useCourses"
+import { useCreateCourse, useUpdateCourse, useAcademyCategories } from "@/hooks/queries/useCourses"
 import { cn } from "@/lib/utils"
 import type { Course } from "@/types"
+
+const TRAINEE_LEVELS = [
+  { label: "Beginner",     value: "beginner" },
+  { label: "Intermediate", value: "intermediate" },
+  { label: "Expert",       value: "expert" },
+] as const
 
 interface CourseModalProps {
   open: boolean
@@ -28,6 +34,8 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
   const updateCourse = useUpdateCourse()
   const isPending = createCourse.isPending || updateCourse.isPending
 
+  const { data: categories = [] } = useAcademyCategories()
+
   const [thumbnailUploading, setThumbnailUploading] = useState(false)
 
   const {
@@ -40,17 +48,21 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
   } = useForm<CourseFormValues>({
     resolver: zodResolver(courseSchema),
     defaultValues: {
-      title: "",
-      description: "",
-      is_free: true,
-      price: 0,
+      title:         "",
+      description:   "",
+      is_free:       true,
+      price:         0,
       thumbnail_url: "",
-      is_published: false,
+      is_published:  false,
+      category_id:   null,
+      trainee_level: null,
     },
   })
 
-  const isFree = watch("is_free")
-  const isPublished = watch("is_published")
+  const isFree       = watch("is_free")
+  const isPublished  = watch("is_published")
+  const categoryId   = watch("category_id")
+  const traineeLevel = watch("trainee_level")
 
   useEffect(() => {
     if (!open) {
@@ -61,15 +73,20 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
     if (course) {
       const courseIsFree = course.price === null || course.price === 0
       reset({
-        title: course.title,
-        description: course.description ?? "",
-        is_free: courseIsFree,
-        price: courseIsFree ? 0 : (course.price ?? 0),
+        title:         course.title,
+        description:   course.description ?? "",
+        is_free:       courseIsFree,
+        price:         courseIsFree ? 0 : (course.price ?? 0),
         thumbnail_url: course.thumbnail_url ?? "",
-        is_published: course.is_published ?? false,
+        is_published:  course.is_published ?? false,
+        category_id:   course.category_id ?? null,
+        trainee_level: (course.trainee_level as CourseFormValues["trainee_level"]) ?? null,
       })
     } else {
-      reset({ title: "", description: "", is_free: true, price: 0, thumbnail_url: "", is_published: false })
+      reset({
+        title: "", description: "", is_free: true, price: 0,
+        thumbnail_url: "", is_published: false, category_id: null, trainee_level: null,
+      })
     }
   }, [open, course, reset])
 
@@ -115,6 +132,50 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700">Description</label>
             <Textarea {...register("description")} placeholder="What will students learn…" rows={3} />
+          </div>
+
+          {/* Category */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-zinc-700">Category</label>
+            <select
+              value={categoryId ?? ""}
+              onChange={(e) =>
+                setValue("category_id", e.target.value || null, { shouldValidate: true })
+              }
+              className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white"
+            >
+              <option value="">No category</option>
+              {categories
+                .filter((c) => c.is_active)
+                .map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+
+          {/* Trainee level */}
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-zinc-700">Level</label>
+            <select
+              value={traineeLevel ?? ""}
+              onChange={(e) =>
+                setValue(
+                  "trainee_level",
+                  (e.target.value as CourseFormValues["trainee_level"]) || null,
+                  { shouldValidate: true }
+                )
+              }
+              className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white"
+            >
+              <option value="">No level</option>
+              {TRAINEE_LEVELS.map((l) => (
+                <option key={l.value} value={l.value}>
+                  {l.label}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Free / Paid toggle */}

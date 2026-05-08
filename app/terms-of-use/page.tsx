@@ -57,22 +57,87 @@ export default function TermsOfUsePage() {
             </section>
 
             <section>
-              <h2 className="text-lg font-bold text-zinc-900 mb-3">5. Refund Policy</h2>
-              <p className="mb-3">
-                Because MoldNDie delivers digital content that is accessible immediately upon purchase, all sales
-                are final and non-refundable unless:
+              <h2 className="text-lg font-bold text-zinc-900 mb-3">5. Replacement, Cancellation, and Refund Policy</h2>
+              <p className="mb-6">
+                At moldndie.com, we strive to provide world-class training materials. Because our offerings are
+                digital content, the following terms apply:
               </p>
-              <ul className="space-y-2 list-disc list-inside text-zinc-600">
-                <li>The content is materially different from its description.</li>
-                <li>A technical error prevented you from accessing the content after a confirmed payment.</li>
-              </ul>
-              <p className="mt-3">
-                For refund requests, contact us at{" "}
-                <a href="mailto:moldndie.eg@gmail.com" className="text-primary hover:underline font-medium">
-                  moldndie.eg@gmail.com
-                </a>{" "}
-                within 7 days of purchase.
-              </p>
+
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-base font-semibold text-zinc-800 mb-2">
+                    5.1 Library and Academy Materials
+                  </h3>
+                  <p className="text-sm text-zinc-500 italic mb-3">
+                    (for example, 3D Files, PDFs, Video Courses, etc.)
+                  </p>
+                  <p className="mb-3">
+                    Due to the nature of digital content, all sales of downloadable files and video access are final.
+                  </p>
+                  <ul className="space-y-3 list-none">
+                    <li className="flex items-start gap-2">
+                      <span className="mt-0.5 text-primary font-bold shrink-0">•</span>
+                      <span>
+                        <strong className="text-zinc-900">No Replacement or Refunds:</strong> Once a file is
+                        downloaded or a video is accessed, we cannot &ldquo;reclaim&rdquo; the product; therefore,
+                        we do not offer either replacements or refunds.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="mt-0.5 text-primary font-bold shrink-0">•</span>
+                      <span>
+                        <strong className="text-zinc-900">File Integrity:</strong> If you experience technical
+                        issues or a corrupted file, please contact us within{" "}
+                        <strong>7 days of purchase</strong>. We will ensure you receive a functional replacement
+                        immediately.
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div>
+                  <h3 className="text-base font-semibold text-zinc-800 mb-3">
+                    5.2 How to Request a Refund or Support
+                  </h3>
+                  <p className="mb-3">
+                    To initiate a discussion regarding a service refund or a technical issue with a download, please
+                    follow these steps:
+                  </p>
+                  <ul className="space-y-3 list-none">
+                    <li className="flex items-start gap-2">
+                      <span className="mt-0.5 text-primary font-bold shrink-0">*</span>
+                      <span>
+                        <strong className="text-zinc-900">Email:</strong>{" "}
+                        <a href="mailto:moldndie.eg@gmail.com" className="text-primary hover:underline font-medium">
+                          moldndie.eg@gmail.com
+                        </a>
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="mt-0.5 text-primary font-bold shrink-0">*</span>
+                      <span>
+                        <strong className="text-zinc-900">Subject Line:</strong> Refund Request &mdash; [Your Order
+                        Number/Project Name]
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="mt-0.5 text-primary font-bold shrink-0">*</span>
+                      <span>
+                        <strong className="text-zinc-900">Details:</strong> Please include a brief description of
+                        why you are seeking a refund or the specific technical issue you are facing.
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="mt-0.5 text-primary font-bold shrink-0">*</span>
+                      <span>
+                        <strong className="text-zinc-900">Note:</strong> Refunds will be processed via the original
+                        payment method (Bank Transfer, Credit Card, Instapay, etc.) within{" "}
+                        <strong>14 business days</strong> of approval through our payment gateway (Paymob).
+                      </span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
             </section>
 
             <section>

@@ -2,7 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/admin"
 import { revalidatePath } from "next/cache"
-import type { Ad, AdTargetType } from "@/types"
+import type { Ad } from "@/types"
 import type { AdFormValues } from "@/schemas/ad.schema"
 
 function dbError(e: unknown): Error {
@@ -22,18 +22,13 @@ export async function getAds(): Promise<Ad[]> {
   return (data ?? []) as Ad[]
 }
 
-async function fetchActiveAds(type: AdTargetType): Promise<Ad[]> {
+async function fetchActiveAds(page: string): Promise<Ad[]> {
   const supabase = createAdminClient()
   const now = new Date().toISOString()
-  // "global" and "external" ads appear on every page type
-  const alwaysIncluded = ["global", "external"]
-  const targetTypes = alwaysIncluded.includes(type)
-    ? [type]
-    : [type, ...alwaysIncluded]
   const { data, error } = await supabase
     .from("ads")
     .select("*")
-    .in("target_type", targetTypes)
+    .or(`target_pages.cs.{${page}},target_pages.cs.{global}`)
     .eq("is_active", true)
     .or(`starts_at.is.null,starts_at.lte.${now}`)
     .or(`ends_at.is.null,ends_at.gte.${now}`)
@@ -41,7 +36,6 @@ async function fetchActiveAds(type: AdTargetType): Promise<Ad[]> {
   return (data ?? []) as Ad[]
 }
 
-// Shuffle an array in-place (Fisher-Yates)
 function shuffle<T>(arr: T[]): T[] {
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
@@ -50,14 +44,14 @@ function shuffle<T>(arr: T[]): T[] {
   return arr
 }
 
-export async function getAdForPlacement(type: AdTargetType): Promise<Ad | null> {
-  const ads = await fetchActiveAds(type)
+export async function getAdForPlacement(page: string): Promise<Ad | null> {
+  const ads = await fetchActiveAds(page)
   if (ads.length === 0) return null
   return ads[Math.floor(Math.random() * ads.length)]
 }
 
-export async function getAdsForPlacement(type: AdTargetType, count: number): Promise<Ad[]> {
-  const ads = await fetchActiveAds(type)
+export async function getAdsForPlacement(page: string, count: number): Promise<Ad[]> {
+  const ads = await fetchActiveAds(page)
   if (ads.length === 0) return []
   return shuffle(ads).slice(0, count)
 }
@@ -77,7 +71,7 @@ export async function createAd(values: AdFormValues): Promise<Ad> {
       title: values.title,
       image_path: values.image_path,
       link: values.link,
-      target_type: values.target_type,
+      target_pages: values.target_pages,
       is_active: values.is_active,
       starts_at: values.starts_at || null,
       ends_at: values.ends_at || null,
@@ -97,7 +91,7 @@ export async function updateAd(id: string, values: AdFormValues): Promise<Ad> {
       title: values.title,
       image_path: values.image_path,
       link: values.link,
-      target_type: values.target_type,
+      target_pages: values.target_pages,
       is_active: values.is_active,
       starts_at: values.starts_at || null,
       ends_at: values.ends_at || null,

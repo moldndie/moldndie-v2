@@ -101,11 +101,16 @@ export function ToolsClient({ dbCalculators, categories }: Props) {
           <div className="flex flex-col sm:flex-row gap-3 mb-6">
             <input type="text" value={dbSearch} onChange={(e) => setDbSearch(e.target.value)} placeholder="Search calculators…" className="flex-1 rounded-lg border border-zinc-200 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary" />
             {categories.length > 0 && (
-              <div className="flex gap-2 flex-wrap">
+              <select
+                value={dbCat}
+                onChange={(e) => setDbCat(e.target.value)}
+                className="rounded-lg border border-zinc-200 px-3 py-2 text-sm text-zinc-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary sm:w-48"
+              >
+                <option value="all">All categories</option>
                 {categories.map((cat) => (
-                  <button key={cat.id} onClick={() => setDbCat(dbCat === cat.id ? "all" : cat.id)} className={cn("rounded-full px-4 py-1.5 text-sm font-medium transition-colors", dbCat === cat.id ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200")}>{cat.name}</button>
+                  <option key={cat.id} value={cat.id}>{cat.name}</option>
                 ))}
-              </div>
+              </select>
             )}
           </div>
 
