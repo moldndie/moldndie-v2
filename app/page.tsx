@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import HomeClient from "./HomeClient"
 import { getSiteSettings } from "@/services/siteSettings.service"
+import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 
 export const metadata: Metadata = {
   title: "MoldNdie — Mold & Die Design Resources",
@@ -28,6 +29,9 @@ export default async function HomePage() {
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <HomeClient counters={counters} />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <AdSlotGrid page="homepage" />
+      </div>
       <Footer />
     </div>
   )

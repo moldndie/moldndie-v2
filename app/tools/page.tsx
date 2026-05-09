@@ -3,6 +3,7 @@ import { ToolsClient } from "./ToolsClient"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { getCalculators, getCategories } from "@/services/calculator.service"
+import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 
 export const metadata: Metadata = {
   title: "Engineering Tools | MoldNDie",
@@ -21,6 +22,9 @@ export default async function ToolsPage() {
       <Navbar />
       <main className="flex-1">
         <ToolsClient dbCalculators={dbCalculators} categories={categories} />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <AdSlotGrid page="engineering" />
+        </div>
       </main>
       <Footer />
     </div>
