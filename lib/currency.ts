@@ -2,22 +2,52 @@ import { createAdminClient } from "@/lib/supabase/admin"
 
 export type CurrencyCode = "USD" | "EGP"
 
+// Hardcoded fallback — used when both live API and DB are unavailable.
+// Update periodically if the rate drifts significantly.
+export const FALLBACK_RATES: Record<string, number> = {
+  "USD_EGP": 49.5,
+  "EGP_USD": 1 / 49.5,
+}
+
 // ── Exchange rate fetch (server-side only) ────────────────────────────────────
 
 let _cachedRates: Record<string, number> | null = null
 let _cacheTs = 0
-const CACHE_TTL = 5 * 60 * 1000 // 5 minutes
+const CACHE_TTL = 60 * 60 * 1000 // 1 hour
 
 export async function getExchangeRates(): Promise<Record<string, number>> {
   if (_cachedRates && Date.now() - _cacheTs < CACHE_TTL) return _cachedRates
 
+  // 1. Live API — Frankfurter (free, no key required)
+  try {
+    const controller = new AbortController()
+    const timer = setTimeout(() => controller.abort(), 5000)
+    const res = await fetch(
+      "https://api.frankfurter.app/latest?from=USD&to=EGP",
+      { signal: controller.signal, cache: "no-store" }
+    )
+    clearTimeout(timer)
+    if (res.ok) {
+      const data = await res.json()
+      if (typeof data?.rates?.EGP === "number") {
+        const usdToEgp: number = data.rates.EGP
+        _cachedRates = { "USD_EGP": usdToEgp, "EGP_USD": 1 / usdToEgp }
+        _cacheTs = Date.now()
+        return _cachedRates
+      }
+    }
+  } catch {
+    // fall through to DB
+  }
+
+  // 2. Supabase exchange_rates table
   try {
     const supabase = createAdminClient()
     const { data } = await supabase
       .from("exchange_rates")
       .select("from_currency, to_currency, rate")
 
-    if (data) {
+    if (data && data.length > 0) {
       const map: Record<string, number> = {}
       for (const row of data) {
         map[`${row.from_currency}_${row.to_currency}`] = row.rate
@@ -27,10 +57,11 @@ export async function getExchangeRates(): Promise<Record<string, number>> {
       return map
     }
   } catch {
-    // graceful degradation
+    // fall through to hardcoded fallback
   }
 
-  return {}
+  // 3. Hardcoded fallback — never returns empty
+  return FALLBACK_RATES
 }
 
 // ── Client-side utility ───────────────────────────────────────────────────────

@@ -99,12 +99,13 @@ export default function CourseDetailClient({ courseId }: { courseId: string }) {
   const inCart = useCartHasItem(courseId, "course")
   const router = useRouter()
   const pathname = usePathname()
+  // Must be called unconditionally before any early returns (Rules of Hooks)
+  const { currency, rates } = useCurrency()
 
   if (isLoading || accessLoading) return <SkeletonDetail />
   if (isError) return <ErrorState />
   if (!course) return <NotFoundState />
 
-  const { currency, rates } = useCurrency()
   const { text: priceText, isFree } = displayPrice(course.price, "EGP", currency, rates)
   const hasAccess = isFree || !!purchased
   const lessons = [...(course.lessons ?? [])].sort((a, b) => a.order_index - b.order_index)
@@ -146,7 +147,7 @@ export default function CourseDetailClient({ courseId }: { courseId: string }) {
                 src={thumbnailSrc}
                 alt={course.title}
                 fill
-                className="object-cover"
+                className="object-contain"
                 sizes="(max-width: 1024px) 100vw, 55vw"
                 priority
               />

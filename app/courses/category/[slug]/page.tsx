@@ -9,6 +9,7 @@ import Footer from "@/components/layout/Footer"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { Pagination } from "@/components/listing/Pagination"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
+import { PriceTag } from "@/components/pricing/PriceTag"
 import { getAcademyCategoryBySlug } from "@/services/academyCategory.service"
 import { getCoursesListing } from "@/services/course.service"
 import type { Course } from "@/types"
@@ -51,7 +52,7 @@ function CourseCard({ course }: { course: Course }) {
             src={imgSrc}
             alt={course.title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-contain group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         ) : (
@@ -73,11 +74,7 @@ function CourseCard({ course }: { course: Course }) {
           <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">{course.description}</p>
         )}
         <div className="mt-auto pt-2 flex items-center justify-between gap-2">
-          {isFree ? (
-            <span className="text-sm font-bold text-emerald-600">Free</span>
-          ) : (
-            <span className="text-sm font-bold text-zinc-900">{course.price} EGP</span>
-          )}
+          <PriceTag amount={course.price} />
           {course.trainee_level && (
             <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${levelColors[course.trainee_level] ?? "bg-zinc-100 text-zinc-600"}`}>
               {course.trainee_level}

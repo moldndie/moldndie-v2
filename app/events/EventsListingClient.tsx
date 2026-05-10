@@ -184,7 +184,7 @@ function EventCard({
       >
         <div className="aspect-video relative bg-zinc-50 overflow-hidden shrink-0">
           {imgSrc ? (
-            <Image src={imgSrc} alt={event.title} fill className="object-cover object-center" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+            <Image src={imgSrc} alt={event.title} fill className="object-contain" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <CalendarDays size={36} className="text-zinc-300" strokeWidth={1} />

@@ -111,7 +111,7 @@ export default function CartClient() {
                     src={imgSrc}
                     alt={item.title}
                     fill
-                    className="object-cover"
+                    className="object-contain"
                     sizes="64px"
                   />
                 ) : (

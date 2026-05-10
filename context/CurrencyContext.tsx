@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useEffect, useState, useCallback, type ReactNode } from "react"
-import type { CurrencyCode } from "@/lib/currency"
+import { FALLBACK_RATES, type CurrencyCode } from "@/lib/currency"
 
 const STORAGE_KEY = "mnd_currency"
 const DEFAULT: CurrencyCode = "EGP"
@@ -15,12 +15,13 @@ interface CurrencyContextValue {
 const CurrencyContext = createContext<CurrencyContextValue>({
   currency: DEFAULT,
   setCurrency: () => undefined,
-  rates: {},
+  rates: FALLBACK_RATES,
 })
 
 export function CurrencyProvider({ children }: { children: ReactNode }) {
   const [currency, setCurrencyState] = useState<CurrencyCode>(DEFAULT)
-  const [rates, setRates] = useState<Record<string, number>>({})
+  // Seed with fallback rates so prices convert immediately — updated with live rates after fetch
+  const [rates, setRates] = useState<Record<string, number>>(FALLBACK_RATES)
 
   // Read persisted currency on mount (client-only)
   useEffect(() => {
@@ -30,12 +31,12 @@ export function CurrencyProvider({ children }: { children: ReactNode }) {
     } catch {}
   }, [])
 
-  // Fetch exchange rates once on mount
+  // Fetch live exchange rates on mount; silently keeps fallback if fetch fails
   useEffect(() => {
     fetch("/api/exchange-rates")
       .then((r) => r.json())
       .then((data) => {
-        if (data?.rates) setRates(data.rates)
+        if (data?.rates && Object.keys(data.rates).length > 0) setRates(data.rates)
       })
       .catch(() => {})
   }, [])

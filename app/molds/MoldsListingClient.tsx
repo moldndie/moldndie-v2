@@ -62,7 +62,7 @@ function MoldCard({ mold }: {
     >
       <div className="aspect-square relative bg-zinc-50 overflow-hidden">
         {imgSrc ? (
-          <Image src={imgSrc} alt={mold.title} fill className="object-cover group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw" />
+          <Image src={imgSrc} alt={mold.title} fill className="object-contain group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw" />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
             <Package size={40} className="text-zinc-300" strokeWidth={1} />
