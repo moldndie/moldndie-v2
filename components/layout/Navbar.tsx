@@ -3,6 +3,7 @@ import Image from "next/image";
 import NavbarUserMenu from "@/components/layout/NavbarUserMenu";
 import NavbarMobileMenu from "@/components/layout/NavbarMobileMenu";
 import NavbarLinks from "@/components/layout/NavbarLinks";
+import { CurrencySelector } from "@/components/layout/CurrencySelector";
 
 export default function Navbar() {
   return (
@@ -16,8 +17,9 @@ export default function Navbar() {
         {/* Desktop nav links */}
         <NavbarLinks />
 
-        {/* Right side: mobile menu + auth */}
-        <div className="flex items-center gap-1">
+        {/* Right side: currency + mobile menu + auth */}
+        <div className="flex items-center gap-2">
+          <CurrencySelector />
           <NavbarMobileMenu />
           <NavbarUserMenu />
         </div>

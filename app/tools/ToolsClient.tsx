@@ -73,7 +73,7 @@ export function ToolsClient({ dbCalculators, categories }: Props) {
           <h1 className="text-3xl md:text-5xl font-black uppercase leading-tight tracking-tight mb-4">
             Engineering <span className="text-primary">Calculators</span>
           </h1>
-          <p className="text-sm text-zinc-400 max-w-xl">Practical online calculators for mold and die engineers. No sign-in required. Results are for reference — always verify with your material datasheet.</p>
+          <p className="text-sm text-zinc-400 max-w-xl">Our Engineering Calculators section offers free, high-accuracy tools to streamline the design of injection molds, pressure die-casting molds, and sheet metal dies. By bridging the gap between theoretical design and shop-floor reality.</p>
         </div>
       </section>
 

@@ -12,13 +12,11 @@ function dbError(e: unknown): Error {
   return new Error("Database error")
 }
 
-export type CoursePriceFilter = "all" | "free" | "paid"
 export type CourseSort = "newest" | "oldest" | "price_asc" | "price_desc" | "title_asc"
 export type TraineeLevel = "beginner" | "intermediate" | "expert"
 
 export interface CoursesListingParams {
   search?: string
-  priceFilter?: CoursePriceFilter
   sort?: CourseSort
   categoryId?: string | null
   traineeLevel?: TraineeLevel | ""
@@ -35,7 +33,7 @@ export async function getCoursesListing(
   params: CoursesListingParams = {}
 ): Promise<CoursesListingResult> {
   const supabase = createAdminClient()
-  const { search, priceFilter = "all", sort = "newest", categoryId, traineeLevel, page = 1, pageSize = 12 } = params
+  const { search, sort = "newest", categoryId, traineeLevel, page = 1, pageSize = 12 } = params
   const from = (page - 1) * pageSize
   const to   = from + pageSize - 1
 
@@ -57,12 +55,6 @@ export async function getCoursesListing(
 
   if (search?.trim()) {
     query = query.ilike("title", `%${search.trim()}%`)
-  }
-
-  if (priceFilter === "free") {
-    query = query.eq("price", 0)
-  } else if (priceFilter === "paid") {
-    query = query.gt("price", 0)
   }
 
   if (categoryId) {
