@@ -178,7 +178,7 @@ export function BlogModal({ open, onClose, blog, categories, onSuccess }: BlogMo
           <label className="text-sm font-medium text-zinc-700">Cover Image</label>
           <CroppableFileUploadField
             folder="blogs/covers"
-            aspect={21 / 9}
+            aspect={16 / 9}
             label="Click to upload cover image"
             existingValue={isEdit ? (blog?.cover_image_path ?? null) : null}
             onUploadSuccess={({ key }) => setValue("cover_image_path", key, { shouldValidate: true })}

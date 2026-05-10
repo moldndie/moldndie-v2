@@ -6,7 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { Modal } from "@/components/ui/modal"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { FileUploadField } from "@/components/forms/FileUploadField"
+import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { adSchema, AD_PAGE_OPTIONS, type AdFormValues } from "@/schemas/ad.schema"
 import { useCreateAd, useUpdateAd } from "@/hooks/queries/useAds"
 import type { Ad } from "@/types"
@@ -100,9 +100,9 @@ export function AdModal({ open, onClose, ad, onSuccess }: AdModalProps) {
 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Image *</label>
-          <FileUploadField
+          <CroppableFileUploadField
             folder="ads/images"
-            accept="image/*"
+            aspect={16 / 9}
             label="Click to upload ad image"
             existingValue={isEdit ? (ad?.image_path ?? null) : null}
             onUploadSuccess={({ key }) => setValue("image_path", key, { shouldValidate: true })}

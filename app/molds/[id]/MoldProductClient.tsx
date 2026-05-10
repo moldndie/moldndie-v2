@@ -126,7 +126,7 @@ function Thumbnail({
           src={`${R2_BASE}/${media.key}`}
           alt={`${title} thumbnail ${index + 1}`}
           fill
-          className="object-cover"
+          className="object-contain"
           sizes="64px"
         />
       )}
@@ -145,6 +145,8 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
   const inCart = useCartHasItem(moldId, "mold")
   const router = useRouter()
   const pathname = usePathname()
+  // Must be called unconditionally before any early returns (Rules of Hooks)
+  const { currency, rates } = useCurrency()
 
   if (isLoading) return <SkeletonProductPage />
   if (isError) return <ErrorState />
@@ -156,7 +158,6 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
   const mainMedia: MoldMedia | null =
     activeMedia ?? (mold.preview_image ? { key: mold.preview_image, type: "image" } : null)
 
-  const { currency, rates } = useCurrency()
   const { text: priceText, isFree } = displayPrice(mold.price, "EGP", currency, rates)
 
   async function handleDownload() {

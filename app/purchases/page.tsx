@@ -14,6 +14,8 @@ import {
   Box,
 } from "lucide-react"
 import type { PurchasedItem } from "@/app/api/orders/completed/route"
+import { useCurrency } from "@/context/CurrencyContext"
+import { displayPrice } from "@/lib/currency"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -56,6 +58,7 @@ export default function PurchasesPage() {
   const [fetchError, setFetchError] = useState<string | null>(null)
   const [downloading, setDownloading] = useState<string | null>(null)
   const [downloadErrors, setDownloadErrors] = useState<Record<string, string>>({})
+  const { currency, rates } = useCurrency()
 
   useEffect(() => {
     fetch("/api/orders/completed")
@@ -178,7 +181,7 @@ export default function PurchasesPage() {
                   {formatDate(order.purchased_at)}
                 </p>
                 <p className="text-xs text-zinc-400 mt-0.5">
-                  {order.items.length} {order.items.length === 1 ? "item" : "items"} · ${order.total.toFixed(2)}
+                  {order.items.length} {order.items.length === 1 ? "item" : "items"} · {displayPrice(order.total, "EGP", currency, rates).text}
                 </p>
               </div>
               <span className="inline-flex items-center gap-1.5 bg-emerald-50 text-emerald-700 border border-emerald-100 text-xs font-semibold px-3 py-1 rounded-full">
@@ -203,7 +206,7 @@ export default function PurchasesPage() {
                           src={imgSrc}
                           alt={item.title}
                           fill
-                          className="object-cover"
+                          className="object-contain"
                           sizes="56px"
                         />
                       ) : (
