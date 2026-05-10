@@ -58,7 +58,6 @@ export async function getMoldCategories(): Promise<MoldCategory[]> {
   return (data ?? []) as MoldCategory[]
 }
 
-export type PriceFilter = "all" | "free" | "paid"
 export type SortOption = "newest" | "oldest" | "price_asc" | "price_desc" | "title_asc"
 
 export type DifficultyFilter = "simple" | "moderate" | "difficult" | "sophisticated" | ""
@@ -66,7 +65,6 @@ export type DifficultyFilter = "simple" | "moderate" | "difficult" | "sophistica
 export interface MoldsListingParams {
   search?: string
   categoryId?: string | null
-  priceFilter?: PriceFilter
   sort?: SortOption
   difficulty?: DifficultyFilter
   page?: number
@@ -80,7 +78,7 @@ export interface MoldsListingResult {
 
 export async function getMoldsListing(params: MoldsListingParams = {}): Promise<MoldsListingResult> {
   const supabase = createAdminClient()
-  const { search, categoryId, priceFilter = "all", sort = "newest", difficulty, page = 1, pageSize = 12 } = params
+  const { search, categoryId, sort = "newest", difficulty, page = 1, pageSize = 12 } = params
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
 
@@ -105,12 +103,6 @@ export async function getMoldsListing(params: MoldsListingParams = {}): Promise<
 
   if (categoryId) {
     query = query.eq("category_id", categoryId)
-  }
-
-  if (priceFilter === "free") {
-    query = query.eq("price", 0)
-  } else if (priceFilter === "paid") {
-    query = query.gt("price", 0)
   }
 
   if (difficulty) {

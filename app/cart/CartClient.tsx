@@ -5,6 +5,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { Trash2, ShoppingCart, Package, AlertCircle, Loader2 } from "lucide-react"
 import { useCart, useRemoveFromCart, useClearCart } from "@/hooks/queries/useCart"
+import { useCurrency } from "@/context/CurrencyContext"
+import { displayPrice, formatPrice } from "@/lib/currency"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -12,10 +14,12 @@ export default function CartClient() {
   const { data: items = [], isLoading } = useCart()
   const removeItem = useRemoveFromCart()
   const clearCart = useClearCart()
+  const { currency, rates } = useCurrency()
   const [isCheckingOut, setIsCheckingOut] = useState(false)
   const [checkoutError, setCheckoutError] = useState<string | null>(null)
 
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const totalEGP = items.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const { text: totalText } = displayPrice(totalEGP, "EGP", currency, rates)
 
   async function handleCheckout() {
     const cartItems = items
@@ -125,7 +129,7 @@ export default function CartClient() {
 
               {/* Price */}
               <span className="text-sm font-bold text-zinc-900 shrink-0">
-                {item.price.toFixed(2)} EGP
+                {displayPrice(item.price, "EGP", currency, rates).text}
               </span>
 
               {/* Remove */}
@@ -157,7 +161,7 @@ export default function CartClient() {
       <div className="space-y-4">
         <div className="flex items-center justify-between text-base">
           <span className="font-semibold text-zinc-700">Total</span>
-          <span className="text-2xl font-extrabold text-zinc-900">{total.toFixed(2)} EGP</span>
+          <span className="text-2xl font-extrabold text-zinc-900">{totalText}</span>
         </div>
 
         {checkoutError && (
@@ -180,7 +184,7 @@ export default function CartClient() {
           ) : (
             <>
               <ShoppingCart size={18} />
-              Checkout — {total.toFixed(2)} EGP
+              Checkout — {totalText}
             </>
           )}
         </button>

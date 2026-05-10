@@ -12,6 +12,8 @@ import { useCoursesListing, useAcademyCategories } from "@/hooks/queries/useCour
 import type { CourseSort, CoursesListingParams } from "@/hooks/queries/useCourses"
 import type { TraineeLevel } from "@/services/course.service"
 import type { Course } from "@/types"
+import { useCurrency } from "@/context/CurrencyContext"
+import { displayPrice } from "@/lib/currency"
 
 const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
@@ -43,8 +45,9 @@ function SkeletonCard() {
 }
 
 function CourseCard({ course }: { course: Course }) {
+  const { currency, rates } = useCurrency()
+  const { text: priceText, isFree } = displayPrice(course.price, "EGP", currency, rates)
   const imgSrc = course.thumbnail_url ? `${R2_BASE}/${course.thumbnail_url}` : null
-  const isFree = course.price === null || course.price === 0
 
   const levelColors: Record<string, string> = {
     beginner:     "bg-emerald-100 text-emerald-700",
@@ -85,11 +88,9 @@ function CourseCard({ course }: { course: Course }) {
           <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">{course.description}</p>
         )}
         <div className="mt-auto pt-2 flex items-center justify-between gap-2">
-          {isFree ? (
-            <span className="text-sm font-bold text-emerald-600">Free</span>
-          ) : (
-            <span className="text-sm font-bold text-zinc-900">{course.price} EGP</span>
-          )}
+          <span className={`text-sm font-bold ${isFree ? "text-emerald-600" : "text-zinc-900"}`}>
+            {priceText}
+          </span>
           {course.trainee_level && (
             <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${levelColors[course.trainee_level] ?? "bg-zinc-100 text-zinc-600"}`}>
               {course.trainee_level}

@@ -54,7 +54,6 @@ export function useCoursesListing(params: CoursesListingParams = {}) {
     queryKey: [
       "courses", "listing",
       params.search ?? "",
-      params.priceFilter ?? "all",
       params.sort ?? "newest",
       params.categoryId ?? null,
       params.traineeLevel ?? "",

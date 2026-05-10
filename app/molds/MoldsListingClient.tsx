@@ -10,6 +10,8 @@ import { Pagination } from "@/components/listing/Pagination"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { useMoldsListing, useMoldCategories } from "@/hooks/queries/useMolds"
 import type { SortOption } from "@/hooks/queries/useMolds"
+import { useCurrency } from "@/context/CurrencyContext"
+import { displayPrice } from "@/lib/currency"
 
 const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
@@ -49,8 +51,8 @@ const DIFFICULTY_COLORS: Record<string, string> = {
 function MoldCard({ mold }: {
   mold: { id: string; title: string; price: number | null; preview_image: string | null; category?: { name: string } | null; difficulty?: string | null }
 }) {
-  const isFree = mold.price === 0
-  const hasPaid = mold.price !== null && mold.price > 0
+  const { currency, rates } = useCurrency()
+  const { text: priceText, isFree } = displayPrice(mold.price, "EGP", currency, rates)
   const imgSrc = mold.preview_image ? `${R2_BASE}/${mold.preview_image}` : null
 
   return (
@@ -74,10 +76,8 @@ function MoldCard({ mold }: {
         <h3 className="text-sm font-semibold text-zinc-900 line-clamp-2 leading-snug group-hover:text-primary transition-colors">{mold.title}</h3>
         {mold.category && <p className="text-xs text-zinc-400">{mold.category.name}</p>}
         <div className="mt-auto pt-2 flex items-center justify-between gap-2">
-          <span>
-            {isFree ? <span className="text-sm font-bold text-emerald-600">Free</span>
-              : hasPaid ? <span className="text-sm font-bold text-zinc-900">{mold.price} EGP</span>
-              : null}
+          <span className={`text-sm font-bold ${isFree ? "text-emerald-600" : "text-zinc-900"}`}>
+            {priceText}
           </span>
           {mold.difficulty && (
             <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${DIFFICULTY_COLORS[mold.difficulty] ?? "bg-zinc-100 text-zinc-600"}`}>

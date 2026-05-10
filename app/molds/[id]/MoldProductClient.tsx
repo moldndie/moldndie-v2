@@ -18,6 +18,8 @@ import {
 import { useMoldById, useMoldGallery } from "@/hooks/queries/useMolds"
 import { useAddToCart, useCartHasItem } from "@/hooks/queries/useCart"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
+import { useCurrency } from "@/context/CurrencyContext"
+import { displayPrice } from "@/lib/currency"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -154,7 +156,8 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
   const mainMedia: MoldMedia | null =
     activeMedia ?? (mold.preview_image ? { key: mold.preview_image, type: "image" } : null)
 
-  const isFree = mold.price === null || mold.price === 0
+  const { currency, rates } = useCurrency()
+  const { text: priceText, isFree } = displayPrice(mold.price, "EGP", currency, rates)
 
   async function handleDownload() {
     setIsDownloading(true)
@@ -296,14 +299,10 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
 
           {/* Price block */}
           <div className="flex items-center gap-3">
-            {isFree ? (
-              <span className="text-3xl font-extrabold text-emerald-600">Free</span>
-            ) : (
-              <>
-                <span className="text-3xl font-extrabold text-zinc-900">{mold.price} EGP</span>
-                <span className="text-sm text-zinc-400">one-time purchase</span>
-              </>
-            )}
+            <span className={`text-3xl font-extrabold ${isFree ? "text-emerald-600" : "text-zinc-900"}`}>
+              {priceText}
+            </span>
+            {!isFree && <span className="text-sm text-zinc-400">one-time purchase</span>}
           </div>
 
           {/* Description */}
@@ -348,7 +347,7 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
               className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
             >
               <ShoppingCart size={18} />
-              Add to Cart — {mold.price} EGP
+              Add to Cart — {priceText}
             </button>
           )}
 

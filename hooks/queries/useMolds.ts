@@ -11,7 +11,6 @@ import {
   deleteMold,
   type MoldsParams,
   type MoldsListingParams,
-  type PriceFilter,
   type SortOption,
   type DifficultyFilter,
 } from "@/services/mold.service"
@@ -19,7 +18,7 @@ import { getGalleryItems } from "@/services/moldGallery.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { MoldFormValues } from "@/schemas/mold.schema"
 
-export type { MoldsParams, MoldsListingParams, PriceFilter, SortOption, DifficultyFilter }
+export type { MoldsParams, MoldsListingParams, SortOption, DifficultyFilter }
 
 export function useMoldById(id: string) {
   return useQuery({
@@ -61,7 +60,6 @@ export function useMoldsListing(params: MoldsListingParams = {}) {
       "molds", "listing",
       params.search ?? "",
       params.categoryId ?? null,
-      params.priceFilter ?? "all",
       params.sort ?? "newest",
       params.difficulty ?? "",
       params.page ?? 1,

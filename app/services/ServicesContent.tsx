@@ -111,7 +111,11 @@ function ServiceCard({ service, index }: { service: ServiceOffering; index: numb
 
 // ── Main Content ──────────────────────────────────────────────────────────
 export default function ServicesContent({ services }: { services: ServiceOffering[] }) {
-  const serviceTypes = services.map((s) => s.title)
+  // Show only Turnkey Project Management; backend stays fully dynamic
+  const visibleServices = services.filter((s) =>
+    s.title.toLowerCase().includes("turnkey")
+  )
+  const serviceTypes = visibleServices.map((s) => s.title)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -258,7 +262,7 @@ export default function ServicesContent({ services }: { services: ServiceOfferin
             viewport={{ once: true, margin: "-80px" }}
             className="space-y-20 md:space-y-28"
           >
-            {services.map((service, i) => (
+            {visibleServices.map((service, i) => (
               <ServiceCard key={service.id} service={service} index={i} />
             ))}
           </motion.div>
@@ -309,7 +313,7 @@ export default function ServicesContent({ services }: { services: ServiceOfferin
               </p>
 
               <div className="space-y-5">
-                {services.map((s) => (
+                {visibleServices.map((s) => (
                   <div key={s.id} className="flex items-start gap-3">
                     <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                       <FolderKanban size={16} className="text-primary" strokeWidth={1.5} />

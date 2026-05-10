@@ -38,7 +38,7 @@ export async function AdSlotStack({ page, count = 2, className }: AdSlotStackPro
                 src={getFileUrl(ad.image_path)}
                 alt={ad.title}
                 fill
-                className="object-cover group-hover:scale-105 transition-transform duration-300"
+                className="object-contain group-hover:scale-105 transition-transform duration-300"
                 sizes="240px"
               />
             </div>
