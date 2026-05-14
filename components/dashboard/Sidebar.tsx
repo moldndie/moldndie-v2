@@ -16,7 +16,7 @@ import {
   Settings2,
   Calculator,
   Briefcase,
-  Tag,
+  LayoutPanelTop,
   X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -38,7 +38,7 @@ const navItems: NavItem[] = [
   { label: "Dashboard",        href: "/dashboard",                   icon: LayoutDashboard, exact: true },
   { label: "Blog",             href: "/dashboard/blogs",             icon: FileText },
   { label: "Library",          href: "/dashboard/molds",             icon: Package },
-  { label: "Academy", href: "/dashboard/courses", icon: BookOpen },
+  { label: "Academy",          href: "/dashboard/courses",           icon: BookOpen },
   { label: "Events",           href: "/dashboard/events",            icon: Calendar },
   { label: "Suppliers",        href: "/dashboard/suppliers",         icon: Truck },
   { label: "Ads",              href: "/dashboard/ads",               icon: Megaphone },
@@ -46,7 +46,23 @@ const navItems: NavItem[] = [
   { label: "Service Requests", href: "/dashboard/service-requests",  icon: Inbox },
   { label: "Services",         href: "/dashboard/services",          icon: Briefcase },
   { label: "Calculators",      href: "/dashboard/calculators",       icon: Calculator },
-  { label: "Site Content",     href: "/dashboard/site-content",      icon: Settings2 },
+  {
+    label: "Homepage",
+    href: "/dashboard/homepage/hero-carousel",
+    icon: LayoutPanelTop,
+    children: [
+      { label: "Hero Carousel", href: "/dashboard/homepage/hero-carousel" },
+    ],
+  },
+  {
+    label: "Site Content",
+    href: "/dashboard/site-content",
+    icon: Settings2,
+    children: [
+      { label: "General Settings", href: "/dashboard/site-content" },
+      { label: "CMS Pages",        href: "/dashboard/cms-pages" },
+    ],
+  },
 ]
 
 interface SidebarProps {
