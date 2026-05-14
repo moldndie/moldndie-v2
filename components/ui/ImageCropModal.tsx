@@ -58,6 +58,9 @@ export function ImageCropModal({
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
   const [processing, setProcessing] = useState(false)
 
+  const MIN_ZOOM = 0.4
+  const MAX_ZOOM = 3
+
   const onCropComplete = useCallback((_: Area, croppedPixels: Area) => {
     setCroppedAreaPixels(croppedPixels)
   }, [])
@@ -100,7 +103,10 @@ export function ImageCropModal({
             image={imageSrc}
             crop={crop}
             zoom={zoom}
+            minZoom={MIN_ZOOM}
+            maxZoom={MAX_ZOOM}
             aspect={aspect}
+            restrictPosition={false}
             onCropChange={setCrop}
             onZoomChange={setZoom}
             onCropComplete={onCropComplete}
@@ -112,8 +118,8 @@ export function ImageCropModal({
           <ZoomOut size={14} className="text-zinc-400 shrink-0" />
           <input
             type="range"
-            min={1}
-            max={3}
+            min={MIN_ZOOM}
+            max={MAX_ZOOM}
             step={0.05}
             value={zoom}
             onChange={(e) => setZoom(Number(e.target.value))}
@@ -121,6 +127,11 @@ export function ImageCropModal({
           />
           <ZoomIn size={14} className="text-zinc-400 shrink-0" />
         </div>
+
+        {/* Hint */}
+        <p className="px-5 pt-3 text-[11px] text-zinc-400 text-center">
+          Drag to reposition · Zoom out to capture more of the image
+        </p>
 
         {/* Actions */}
         <div className="flex justify-end gap-3 px-5 py-4">

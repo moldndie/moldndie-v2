@@ -1,7 +1,6 @@
 import { z } from "zod"
 
 export const AD_PAGE_OPTIONS: { value: string; label: string }[] = [
-  { value: "global",      label: "Global (all pages)" },
   { value: "homepage",    label: "Homepage" },
   { value: "blog",        label: "Blog" },
   { value: "academy",     label: "Academy" },

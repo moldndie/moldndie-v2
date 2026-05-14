@@ -31,7 +31,6 @@ export function AdForm({ ad }: AdFormProps) {
     handleSubmit,
     setValue,
     control,
-    watch,
     formState: { errors },
   } = useForm<AdFormValues>({
     resolver: zodResolver(adSchema),
@@ -45,8 +44,6 @@ export function AdForm({ ad }: AdFormProps) {
       ends_at: ad?.ends_at ? ad.ends_at.slice(0, 16) : "",
     },
   })
-
-  const selectedPages = watch("target_pages")
 
   async function onSubmit(values: AdFormValues) {
     setSubmitError(null)
@@ -150,11 +147,6 @@ export function AdForm({ ad }: AdFormProps) {
             </div>
           )}
         />
-        {selectedPages.includes("global") && (
-          <p className="text-xs text-amber-600 bg-amber-50 rounded-lg px-3 py-2">
-            Global ads appear on every page of the site.
-          </p>
-        )}
         {errors.target_pages && (
           <p className="text-xs text-red-500">{errors.target_pages.message}</p>
         )}
