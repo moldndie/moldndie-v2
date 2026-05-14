@@ -31,7 +31,7 @@ export function DeleteUserModal({ open, onClose, user, onConfirm }: DeleteUserMo
   }
 
   async function handleDelete() {
-    if (confirm !== "DELETE") return
+    if (confirm.toLowerCase() !== "delete") return
     setLoading(true)
     setError(null)
     try {
@@ -63,12 +63,12 @@ export function DeleteUserModal({ open, onClose, user, onConfirm }: DeleteUserMo
         {/* Confirmation input */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-zinc-700">
-            Type <span className="font-mono font-bold text-red-600">DELETE</span> to confirm
+            Type <span className="font-mono font-bold text-red-600">delete</span> to confirm
           </label>
           <Input
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
-            placeholder="DELETE"
+            placeholder="delete"
             autoComplete="off"
             className="font-mono"
           />
@@ -85,7 +85,7 @@ export function DeleteUserModal({ open, onClose, user, onConfirm }: DeleteUserMo
           <Button
             type="button"
             variant="destructive"
-            disabled={confirm !== "DELETE" || loading}
+            disabled={confirm.toLowerCase() !== "delete" || loading}
             onClick={handleDelete}
           >
             {loading ? "Deleting…" : "Delete Permanently"}
