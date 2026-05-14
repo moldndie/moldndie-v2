@@ -15,6 +15,9 @@ import {
   GitBranch,
 } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
+import HeroCarousel from "@/components/home/HeroCarousel"
+import type { HeroSlide } from "@/services/heroSlides.service"
+import { isValidImageUrl } from "@/lib/heroSlides.constants"
 
 // ── Shared variants ────────────────────────────────────────────────────────
 const fadeUp: Variants = {
@@ -194,9 +197,14 @@ interface HomeClientProps {
     users?:    string
     events?:   string
   }
+  heroSlides?: HeroSlide[]
 }
 
-export default function HomeClient({ counters = {} }: HomeClientProps) {
+export default function HomeClient({ counters = {}, heroSlides = [] }: HomeClientProps) {
+  // Drop any slide whose image_url is not a real absolute/root-relative URL.
+  // This prevents Next/Image errors from bare relative paths or stale DB values.
+  const validSlides = heroSlides.filter((s) => isValidImageUrl(s.image_url))
+
   const counterEntries = [
     { key: "toolings", label: "Toolings",   value: counters.toolings },
     { key: "courses",  label: "Courses",    value: counters.courses  },
@@ -206,39 +214,44 @@ export default function HomeClient({ counters = {} }: HomeClientProps) {
 
   return (
     <main className="flex-1">
-      {/* ── Hero ── */}
-      <section className="text-center px-6 pt-20 pb-12 max-w-4xl mx-auto">
-        <motion.div
-          variants={stagger(0)}
-          initial="hidden"
-          animate="visible"
-          className="flex flex-col items-center"
-        >
-          <motion.h1
-            variants={fadeUp}
-            className="text-4xl md:text-6xl font-extrabold text-primary uppercase leading-tight tracking-tight"
-          >
-            Start Your Journey with MoldNdie
-          </motion.h1>
-
-          <motion.p
-            variants={fadeUp}
-            className="mt-4 text-xs md:text-sm font-semibold tracking-widest text-zinc-400 uppercase max-w-2xl mx-auto"
-          >
-            The ultimate resource for plastic injection mold, metal die-casting mold, and sheet
-            metal die design and manufacture know-how
-          </motion.p>
-
+      {/* ── Hero: carousel when valid slides exist, fallback otherwise ── */}
+      {validSlides.length > 0 ? (
+        <HeroCarousel slides={validSlides} />
+      ) : (
+        <section className="text-center px-6 pt-20 pb-12 max-w-4xl mx-auto">
           <motion.div
-            variants={fadeUp}
-            className="flex justify-center mt-10"
+            variants={stagger(0)}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col items-center"
           >
-            <WireframeCube />
-          </motion.div>
-        </motion.div>
-      </section>
+            <motion.h1
+              variants={fadeUp}
+              className="text-4xl md:text-6xl font-extrabold text-primary uppercase leading-tight tracking-tight"
+            >
+              Start Your Journey with MoldNdie
+            </motion.h1>
 
-      {/* ── Description ── */}
+            <motion.p
+              variants={fadeUp}
+              className="mt-4 text-xs md:text-sm font-semibold tracking-widest text-zinc-400 uppercase max-w-2xl mx-auto"
+            >
+              The ultimate resource for plastic injection mold, metal die-casting mold, and sheet
+              metal die design and manufacture know-how
+            </motion.p>
+
+            <motion.div
+              variants={fadeUp}
+              className="flex justify-center mt-10"
+            >
+              <WireframeCube />
+            </motion.div>
+          </motion.div>
+        </section>
+      )}
+
+      {/* ── Description — only shown when no carousel images exist ── */}
+      {validSlides.length === 0 && (
       <motion.section
         {...scrollReveal}
         className="max-w-4xl mx-auto px-6 pb-20 text-center"
@@ -249,6 +262,7 @@ export default function HomeClient({ counters = {} }: HomeClientProps) {
           Molds, Metal Pressure Die-casting Molds, and Sheet Metal Dies.
         </p>
       </motion.section>
+      )}
 
       {/* ── What We Offer ── */}
       <section className="bg-zinc-50 py-20 px-6">
