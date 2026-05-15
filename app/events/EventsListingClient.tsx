@@ -18,7 +18,7 @@ const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 const SORT_OPTIONS: { label: string; value: EventSort }[] = [
   { label: "Country A → Z", value: "country_asc" },
-  { label: "A → Z",         value: "title_asc" },
+  { label: "Event A → Z",   value: "title_asc" },
 ]
 
 const pageVariants = {

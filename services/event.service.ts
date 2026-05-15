@@ -23,7 +23,7 @@ export async function getEvents(): Promise<Event[]> {
   return (data ?? []) as Event[]
 }
 
-export type EventSort = "newest" | "oldest" | "date_asc" | "title_asc" | "country_asc"
+export type EventSort = "country_asc" | "title_asc"
 
 export interface EventsListingParams {
   search?: string
@@ -42,16 +42,13 @@ export async function getEventsListing(
   params: EventsListingParams = {}
 ): Promise<EventsListingResult> {
   const supabase = createAdminClient()
-  const { search, categoryId, sort = "newest", page = 1, pageSize = 12 } = params
+  const { search, categoryId, sort = "country_asc", page = 1, pageSize = 12 } = params
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
 
   const orderMap: Record<EventSort, { col: string; asc: boolean }> = {
-    newest:      { col: "created_at", asc: false },
-    oldest:      { col: "created_at", asc: true  },
-    date_asc:    { col: "event_date", asc: true  },
-    title_asc:   { col: "title",      asc: true  },
-    country_asc: { col: "country",    asc: true  },
+    country_asc: { col: "country", asc: true },
+    title_asc:   { col: "title",   asc: true },
   }
   const { col, asc } = orderMap[sort]
 
