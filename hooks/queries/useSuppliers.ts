@@ -40,7 +40,7 @@ export function useSuppliersListing(params: SuppliersListingParams = {}) {
       "suppliers", "listing",
       params.search ?? "",
       params.categoryId ?? null,
-      params.sort ?? "name_asc",
+      params.sort ?? "none",
       params.page ?? 1,
       params.pageSize ?? 12,
     ],

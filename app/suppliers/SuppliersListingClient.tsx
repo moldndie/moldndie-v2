@@ -17,10 +17,11 @@ const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 const SORT_OPTIONS: { label: string; value: SupplierSort }[] = [
-  { label: "Name: A → Z",    value: "name_asc" },
-  { label: "Name: Z → A",    value: "name_desc" },
-  { label: "Newest",         value: "newest" },
-  { label: "Oldest",         value: "oldest" },
+  { label: "None",                    value: "none" },
+  { label: "Company Name A → Z",      value: "name_asc" },
+  { label: "Company Name Z → A",      value: "name_desc" },
+  { label: "Product or Service A → Z", value: "service_asc" },
+  { label: "Country of Origin A → Z", value: "country_asc" },
 ]
 
 const pageVariants = {
@@ -221,7 +222,7 @@ export default function SuppliersListingClient() {
   const [inputValue, setInputValue]             = useState(() => searchParams.get("search") ?? "")
   const [searchTerm, setSearchTerm]             = useState(() => searchParams.get("search") ?? "")
   const [selectedCategory, setSelectedCategory] = useState<string | null>(() => searchParams.get("category"))
-  const [sort, setSort]                         = useState<SupplierSort>(() => (searchParams.get("sort") as SupplierSort) ?? "name_asc")
+  const [sort, setSort]                         = useState<SupplierSort>(() => (searchParams.get("sort") as SupplierSort) ?? "none")
   const [currentPage, setCurrentPage]           = useState(() => Number(searchParams.get("page")) || 1)
   const pageSize = DEFAULT_PAGE_SIZE
   const [expandedIds, setExpandedIds]           = useState<Record<string, boolean>>({})
@@ -250,7 +251,7 @@ export default function SuppliersListingClient() {
     const p = new URLSearchParams()
     if (searchTerm)                       p.set("search",   searchTerm)
     if (selectedCategory)                 p.set("category", selectedCategory)
-    if (sort !== "name_asc")              p.set("sort",     sort)
+    if (sort !== "none")                  p.set("sort",     sort)
     if (currentPage > 1)                  p.set("page",     String(currentPage))
     const qs = p.toString()
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
@@ -259,7 +260,7 @@ export default function SuppliersListingClient() {
   const handleCategoryChange = useCallback((id: string | null) => { setSelectedCategory(id); setCurrentPage(1) }, [])
   const handleSort           = useCallback((v: string) => { setSort(v as SupplierSort); setCurrentPage(1) }, [])
   const clearAll             = useCallback(() => {
-    setInputValue(""); setSearchTerm(""); setSelectedCategory(null); setSort("name_asc"); setCurrentPage(1)
+    setInputValue(""); setSearchTerm(""); setSelectedCategory(null); setSort("none"); setCurrentPage(1)
   }, [])
 
   const { data, isLoading, isFetching } = useSuppliersListing({
@@ -274,7 +275,7 @@ export default function SuppliersListingClient() {
   const suppliers  = data?.data ?? []
   const total      = data?.total ?? 0
   const totalPages = Math.ceil(total / pageSize)
-  const hasActiveFilters = !!searchTerm || !!selectedCategory || sort !== "name_asc"
+  const hasActiveFilters = !!searchTerm || !!selectedCategory || sort !== "none"
 
   const handleToggle = (id: string) => setExpandedIds((prev) => ({
     ...prev,

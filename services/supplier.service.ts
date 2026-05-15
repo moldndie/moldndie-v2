@@ -23,7 +23,7 @@ export async function getSuppliers(): Promise<Supplier[]> {
   return (data ?? []) as Supplier[]
 }
 
-export type SupplierSort = "newest" | "oldest" | "name_asc" | "name_desc"
+export type SupplierSort = "none" | "name_asc" | "name_desc" | "service_asc" | "country_asc"
 
 export interface SuppliersListingParams {
   search?: string
@@ -42,24 +42,28 @@ export async function getSuppliersListing(
   params: SuppliersListingParams = {}
 ): Promise<SuppliersListingResult> {
   const supabase = createAdminClient()
-  const { search, categoryId, sort = "name_asc", page = 1, pageSize = 12 } = params
+  const { search, categoryId, sort = "none", page = 1, pageSize = 12 } = params
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
 
-  const orderMap: Record<SupplierSort, { col: string; asc: boolean }> = {
-    newest:   { col: "created_at", asc: false },
-    oldest:   { col: "created_at", asc: true  },
-    name_asc: { col: "name",       asc: true  },
-    name_desc:{ col: "name",       asc: false },
+  const orderMap: Record<Exclude<SupplierSort, "none">, { col: string; asc: boolean; referencedTable?: string }> = {
+    name_asc:    { col: "name",    asc: true  },
+    name_desc:   { col: "name",    asc: false },
+    service_asc: { col: "name",    asc: true,  referencedTable: "supplier_categories" },
+    country_asc: { col: "country", asc: true  },
   }
-  const { col, asc } = orderMap[sort]
 
   let query = supabase
     .from("suppliers")
     .select("*, category:supplier_categories(id,name)", { count: "exact" })
     .order("sponsored", { ascending: false })
-    .order(col, { ascending: asc })
-    .range(from, to)
+
+  if (sort !== "none") {
+    const { col, asc: ascending, referencedTable } = orderMap[sort]
+    query = referencedTable
+      ? query.order(col, { ascending, referencedTable })
+      : query.order(col, { ascending })
+  }
 
   if (search?.trim()) {
     query = query.ilike("name", `%${search.trim()}%`)
@@ -68,6 +72,8 @@ export async function getSuppliersListing(
   if (categoryId) {
     query = query.eq("category_id", categoryId)
   }
+
+  query = query.range(from, to)
 
   const { data, error, count } = await query
   if (error) throw dbError(error)
