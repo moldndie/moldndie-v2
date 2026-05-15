@@ -40,7 +40,7 @@ export function useEventsListing(params: EventsListingParams = {}) {
       "events", "listing",
       params.search ?? "",
       params.categoryId ?? null,
-      params.sort ?? "newest",
+      params.sort ?? "country_asc",
       params.page ?? 1,
       params.pageSize ?? 12,
     ],
