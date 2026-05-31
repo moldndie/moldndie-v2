@@ -16,6 +16,8 @@ import {
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import { Modal } from "@/components/ui/modal"
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal"
+import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
+import IconPicker from "@/components/dashboard/IconPicker"
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -30,6 +32,7 @@ const EMPTY_FORM: ServiceOfferingFormValues = {
   description: "",
   highlights: [""],
   image: "",
+  icon: "",
   is_active: true,
   is_egypt_only: true,
   sort_order: 0,
@@ -49,10 +52,14 @@ function ServiceForm({
   error: string | null
 }) {
   const [form, setForm] = useState<ServiceOfferingFormValues>(initial)
+  const [imageUploading, setImageUploading] = useState(false)
+  // formKey remounts the upload field when form resets (edit → create switch)
+  const [uploadKey, setUploadKey] = useState(0)
   const isNew = !initial.title
 
   useEffect(() => {
     setForm(initial)
+    setUploadKey((k) => k + 1)
   }, [initial])
 
   function set<K extends keyof ServiceOfferingFormValues>(key: K, value: ServiceOfferingFormValues[K]) {
@@ -157,6 +164,29 @@ function ServiceForm({
         </div>
       </div>
 
+      {/* Image upload — 4:3 */}
+      <div>
+        <label className={labelCls}>Service Image (4:3)</label>
+        <CroppableFileUploadField
+          key={`service-img-${uploadKey}`}
+          folder="services/images"
+          aspect={4 / 3}
+          label="Click to upload service image (4:3)"
+          existingValue={form.image || null}
+          onUploadSuccess={({ url }) => set("image", url)}
+          onUploadingChange={setImageUploading}
+        />
+      </div>
+
+      {/* Icon picker */}
+      <div>
+        <label className={labelCls}>Service Icon</label>
+        <IconPicker
+          value={form.icon ?? ""}
+          onChange={(name: string) => set("icon", name)}
+        />
+      </div>
+
       <div>
         <label className={labelCls}>Sort Order</label>
         <input
@@ -197,11 +227,11 @@ function ServiceForm({
       <div className="flex gap-3 pt-1">
         <button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || imageUploading}
           className="flex-1 inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 text-white font-bold text-sm py-2.5 rounded-xl transition-colors"
         >
-          {isPending && <Loader2 size={14} className="animate-spin" />}
-          {isPending ? "Saving…" : "Save Service"}
+          {(isPending || imageUploading) && <Loader2 size={14} className="animate-spin" />}
+          {imageUploading ? "Uploading…" : isPending ? "Saving…" : "Save Service"}
         </button>
       </div>
     </form>
@@ -213,7 +243,6 @@ function ServiceForm({
 export default function ServicesManagementClient() {
   const qc = useQueryClient()
 
-  // Modal state
   const [createOpen, setCreateOpen] = useState(false)
   const [editingService, setEditingService] = useState<ServiceOffering | null>(null)
   const [deletingService, setDeletingService] = useState<ServiceOffering | null>(null)
@@ -293,13 +322,11 @@ export default function ServicesManagementClient() {
 
   const maxOrder = services.reduce((acc, s) => Math.max(acc, s.sort_order), 0)
 
-  // Form initial values for create
   const createInitial: ServiceOfferingFormValues = {
     ...EMPTY_FORM,
     sort_order: maxOrder + 1,
   }
 
-  // Form initial values for edit
   const editInitial: ServiceOfferingFormValues = editingService
     ? {
         title:         editingService.title,
@@ -308,6 +335,7 @@ export default function ServicesManagementClient() {
         description:   editingService.description ?? "",
         highlights:    (editingService.highlights ?? []).length > 0 ? editingService.highlights! : [""],
         image:         editingService.image ?? "",
+        icon:          editingService.icon ?? "",
         is_active:     editingService.is_active,
         is_egypt_only: editingService.is_egypt_only,
         sort_order:    editingService.sort_order,
@@ -446,7 +474,6 @@ export default function ServicesManagementClient() {
       >
         <ServiceForm
           initial={createInitial}
-
           onSave={handleCreate}
           isPending={createMut.isPending}
           error={formError}
@@ -462,7 +489,6 @@ export default function ServicesManagementClient() {
       >
         <ServiceForm
           initial={editInitial}
-
           onSave={handleUpdate}
           isPending={updateMut.isPending}
           error={formError}

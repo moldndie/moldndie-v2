@@ -23,11 +23,12 @@ export async function getSuppliers(): Promise<Supplier[]> {
   return (data ?? []) as Supplier[]
 }
 
-export type SupplierSort = "none" | "name_asc" | "name_desc" | "service_asc" | "country_asc"
+export type SupplierSort = "service_asc" | "name_asc" | "country_asc"
 
 export interface SuppliersListingParams {
   search?: string
   categoryId?: string | null
+  country?: string | null
   sort?: SupplierSort
   page?: number
   pageSize?: number
@@ -42,15 +43,14 @@ export async function getSuppliersListing(
   params: SuppliersListingParams = {}
 ): Promise<SuppliersListingResult> {
   const supabase = createAdminClient()
-  const { search, categoryId, sort = "none", page = 1, pageSize = 12 } = params
+  const { search, categoryId, country, sort = "service_asc", page = 1, pageSize = 12 } = params
   const from = (page - 1) * pageSize
   const to = from + pageSize - 1
 
-  const orderMap: Record<Exclude<SupplierSort, "none">, { col: string; asc: boolean; referencedTable?: string }> = {
-    name_asc:    { col: "name",    asc: true  },
-    name_desc:   { col: "name",    asc: false },
-    service_asc: { col: "name",    asc: true,  referencedTable: "supplier_categories" },
-    country_asc: { col: "country", asc: true  },
+  const orderMap: Record<SupplierSort, { col: string; asc: boolean; referencedTable?: string }> = {
+    service_asc: { col: "name", asc: true, referencedTable: "supplier_categories" },
+    name_asc:    { col: "name", asc: true },
+    country_asc: { col: "country", asc: true },
   }
 
   let query = supabase
@@ -58,12 +58,10 @@ export async function getSuppliersListing(
     .select("*, category:supplier_categories(id,name)", { count: "exact" })
     .order("sponsored", { ascending: false })
 
-  if (sort !== "none") {
-    const { col, asc: ascending, referencedTable } = orderMap[sort]
-    query = referencedTable
-      ? query.order(col, { ascending, referencedTable })
-      : query.order(col, { ascending })
-  }
+  const { col, asc: ascending, referencedTable } = orderMap[sort]
+  query = referencedTable
+    ? query.order(col, { ascending, referencedTable })
+    : query.order(col, { ascending })
 
   if (search?.trim()) {
     query = query.ilike("name", `%${search.trim()}%`)
@@ -73,11 +71,26 @@ export async function getSuppliersListing(
     query = query.eq("category_id", categoryId)
   }
 
+  if (country) {
+    query = query.eq("country", country)
+  }
+
   query = query.range(from, to)
 
   const { data, error, count } = await query
   if (error) throw dbError(error)
   return { data: (data ?? []) as Supplier[], total: count ?? 0 }
+}
+
+export async function getSupplierCountries(): Promise<string[]> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from("suppliers")
+    .select("country")
+    .not("country", "is", null)
+  if (error) throw dbError(error)
+  const names = (data ?? []).map((r: { country: string | null }) => r.country).filter(Boolean) as string[]
+  return [...new Set(names)].sort()
 }
 
 export async function getSupplierById(id: string): Promise<Supplier> {

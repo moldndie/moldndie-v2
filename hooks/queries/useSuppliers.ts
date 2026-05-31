@@ -5,6 +5,7 @@ import {
   getSuppliers,
   getSuppliersListing,
   getSupplierById,
+  getSupplierCountries,
   createSupplier,
   updateSupplier,
   deleteSupplier,
@@ -40,7 +41,8 @@ export function useSuppliersListing(params: SuppliersListingParams = {}) {
       "suppliers", "listing",
       params.search ?? "",
       params.categoryId ?? null,
-      params.sort ?? "none",
+      params.country ?? null,
+      params.sort ?? "service_asc",
       params.page ?? 1,
       params.pageSize ?? 12,
     ],
@@ -56,6 +58,14 @@ export function useSupplierCategories() {
     queryKey: QUERY_KEYS.SUPPLIER_CATEGORIES,
     queryFn: getSupplierCategories,
     staleTime: 5 * 60 * 1000,
+  })
+}
+
+export function useSupplierCountries() {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.SUPPLIERS, "countries"],
+    queryFn: getSupplierCountries,
+    staleTime: 10 * 60 * 1000,
   })
 }
 

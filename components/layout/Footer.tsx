@@ -18,7 +18,6 @@ const company = [
   { label: "About Us",       href: "/about" },
   { label: "Privacy Policy", href: "/privacy-policy" },
   { label: "Terms of Use",   href: "/terms-of-use" },
-  { label: "Refund Policy",  href: "/refund-policy" },
 ]
 
 function PinterestIcon({ size = 18 }: { size?: number }) {
@@ -105,11 +104,12 @@ export default async function Footer() {
           {/* ── Col 1: Brand ── */}
           <div className="space-y-4 sm:col-span-2 lg:col-span-1">
             <Image
-              src="/assets/logo-white-updated.png"
+              src={s.logo_footer || "/assets/logo-white-updated.png"}
               alt="Mold N Die"
               width={130}
               height={44}
               className="h-11 w-auto"
+              unoptimized={!!s.logo_footer}
             />
             {s.footer_tagline && (
               <p className="text-sm text-white/60 leading-relaxed max-w-55">

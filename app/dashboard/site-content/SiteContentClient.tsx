@@ -1,10 +1,12 @@
 "use client"
 
 import { useState, useTransition } from "react"
+import Image from "next/image"
 import { toast } from "sonner"
-import { Save, Phone, Mail, MapPin, Clock, Globe, MessageCircle, Share2, Type, BarChart3 } from "lucide-react"
+import { Save, Phone, Mail, MapPin, Clock, Globe, MessageCircle, Share2, Type, BarChart3, ImageIcon } from "lucide-react"
 import { upsertSiteSettings } from "@/services/siteSettings.service"
 import type { SiteSettings } from "@/services/siteSettings.service"
+import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { cn } from "@/lib/utils"
 
 const TABS = [
@@ -12,6 +14,7 @@ const TABS = [
   { id: "social",   label: "Social Links" },
   { id: "homepage", label: "Homepage" },
   { id: "counters", label: "Counters" },
+  { id: "branding", label: "Branding" },
 ] as const
 
 type TabId = (typeof TABS)[number]["id"]
@@ -73,6 +76,8 @@ export default function SiteContentClient({ initialSettings }: Props) {
   const [activeTab, setActiveTab] = useState<TabId>("contact")
   const [settings, setSettings] = useState<SiteSettings>(initialSettings)
   const [isPending, startTransition] = useTransition()
+  // Increments to remount upload fields after save, forcing them to reflect new values
+  const [brandingKey, setBrandingKey] = useState(0)
 
   function handleChange(key: keyof SiteSettings, value: string) {
     setSettings((prev) => ({ ...prev, [key]: value }))
@@ -82,6 +87,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
     startTransition(async () => {
       try {
         await upsertSiteSettings(settings)
+        setBrandingKey((k) => k + 1)
         toast.success("Settings saved and live.")
       } catch (e) {
         toast.error((e as Error).message || "Failed to save settings.")
@@ -230,65 +236,225 @@ export default function SiteContentClient({ initialSettings }: Props) {
         )}
 
         {activeTab === "homepage" && (
-          <div className="space-y-5">
-            <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">Homepage Content</h3>
-            <Field
-              label="Hero Title"
-              icon={<Type className="size-3.5" />}
-              name="hero_title"
-              value={v("hero_title")}
-              onChange={handleChange}
-              placeholder="Start Your Journey with MoldNdie"
-              hint="Main headline shown in the hero section"
-            />
-            <TextareaField
-              label="Hero Subtitle"
-              icon={<Type className="size-3.5" />}
-              name="hero_subtitle"
-              value={v("hero_subtitle")}
-              onChange={handleChange}
-              placeholder="The ultimate resource for plastic injection mold…"
-              hint="Short tagline below the hero title"
-            />
-            <Field
-              label="Footer CTA Text"
-              icon={<Type className="size-3.5" />}
-              name="footer_cta_text"
-              value={v("footer_cta_text")}
-              onChange={handleChange}
-              placeholder="Join Our Community"
-              hint="Heading text in the 'Join Community' section"
-            />
-            <TextareaField
-              label="Footer Tagline"
-              icon={<Type className="size-3.5" />}
-              name="footer_tagline"
-              value={v("footer_tagline")}
-              onChange={handleChange}
-              placeholder="The ultimate resource for mold and die engineering professionals."
-              hint="Short tagline shown in the footer brand column"
-            />
-            <div className="pt-2 border-t border-zinc-100">
-              <h4 className="text-xs font-bold text-zinc-600 uppercase tracking-wide mb-3">Why Choose Us Section</h4>
-              <div className="space-y-4">
-                <Field
-                  label="Section Title"
-                  icon={<Type className="size-3.5" />}
-                  name="why_title"
-                  value={v("why_title")}
-                  onChange={handleChange}
-                  placeholder="Why Choose Us"
-                />
-                <TextareaField
-                  label="Section Body"
-                  icon={<Type className="size-3.5" />}
-                  name="why_body"
-                  value={v("why_body")}
-                  onChange={handleChange}
-                  placeholder="Brief description shown below the Why Choose Us heading…"
-                  hint="Optional paragraph beneath the section title"
-                />
-              </div>
+          <div className="space-y-6">
+            <div className="space-y-4">
+              <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">Hero Section (Fallback)</h3>
+              <p className="text-xs text-zinc-400">Shown when no hero carousel slides are active.</p>
+              <Field
+                label="Hero Title"
+                icon={<Type className="size-3.5" />}
+                name="hero_title"
+                value={v("hero_title")}
+                onChange={handleChange}
+                placeholder="Start Your Journey with MoldNdie"
+                hint="Main headline shown in the hero section"
+              />
+              <TextareaField
+                label="Hero Subtitle"
+                icon={<Type className="size-3.5" />}
+                name="hero_subtitle"
+                value={v("hero_subtitle")}
+                onChange={handleChange}
+                placeholder="The ultimate resource for plastic injection mold…"
+                hint="Short tagline below the hero title"
+              />
+              <TextareaField
+                label="Hero Description"
+                icon={<Type className="size-3.5" />}
+                name="hero_description"
+                value={v("hero_description")}
+                onChange={handleChange}
+                placeholder="We provide educational content, updated know-how…"
+                hint="Longer paragraph below the hero graphic"
+              />
+            </div>
+
+            <div className="pt-2 border-t border-zinc-100 space-y-4">
+              <h4 className="text-xs font-bold text-zinc-600 uppercase tracking-wide">What We Offer Section</h4>
+              <Field
+                label="Section Title"
+                icon={<Type className="size-3.5" />}
+                name="offer_section_title"
+                value={v("offer_section_title")}
+                onChange={handleChange}
+                placeholder="What We Offer"
+              />
+              <Field
+                label="Section Subtitle"
+                icon={<Type className="size-3.5" />}
+                name="offer_section_subtitle"
+                value={v("offer_section_subtitle")}
+                onChange={handleChange}
+                placeholder="Everything a mold and die professional needs — in one place."
+              />
+            </div>
+
+            <div className="pt-2 border-t border-zinc-100 space-y-4">
+              <h4 className="text-xs font-bold text-zinc-600 uppercase tracking-wide">Why Choose Us Section</h4>
+              <Field
+                label="Section Title"
+                icon={<Type className="size-3.5" />}
+                name="why_title"
+                value={v("why_title")}
+                onChange={handleChange}
+                placeholder="Why Choose Us"
+              />
+              <TextareaField
+                label="Section Subtitle"
+                icon={<Type className="size-3.5" />}
+                name="why_subtitle"
+                value={v("why_subtitle")}
+                onChange={handleChange}
+                placeholder="Built by industry professionals, for industry professionals."
+              />
+              <TextareaField
+                label="Section Body"
+                icon={<Type className="size-3.5" />}
+                name="why_body"
+                value={v("why_body")}
+                onChange={handleChange}
+                placeholder="Optional longer paragraph beneath the subtitle…"
+                hint="Optional paragraph beneath the section subtitle"
+              />
+            </div>
+
+            <div className="pt-2 border-t border-zinc-100 space-y-4">
+              <h4 className="text-xs font-bold text-zinc-600 uppercase tracking-wide">Join Community Section</h4>
+              <Field
+                label="Section Title"
+                icon={<Type className="size-3.5" />}
+                name="join_title"
+                value={v("join_title")}
+                onChange={handleChange}
+                placeholder="Join Our Community"
+              />
+              <TextareaField
+                label="Description"
+                icon={<Type className="size-3.5" />}
+                name="join_description"
+                value={v("join_description")}
+                onChange={handleChange}
+                placeholder="Sign up today for exclusive access to new blog posts…"
+                hint="Paragraph text below the Join Community heading"
+              />
+            </div>
+
+            <div className="pt-2 border-t border-zinc-100 space-y-4">
+              <h4 className="text-xs font-bold text-zinc-600 uppercase tracking-wide">Footer</h4>
+              <Field
+                label="Footer CTA Text"
+                icon={<Type className="size-3.5" />}
+                name="footer_cta_text"
+                value={v("footer_cta_text")}
+                onChange={handleChange}
+                placeholder="Join Our Community"
+                hint="Heading text in the 'Join Community' section (legacy field)"
+              />
+              <TextareaField
+                label="Footer Tagline"
+                icon={<Type className="size-3.5" />}
+                name="footer_tagline"
+                value={v("footer_tagline")}
+                onChange={handleChange}
+                placeholder="The ultimate resource for mold and die engineering professionals."
+                hint="Short tagline shown in the footer brand column"
+              />
+            </div>
+          </div>
+        )}
+
+        {activeTab === "branding" && (
+          <div className="space-y-8">
+            <div>
+              <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide mb-1">Branding &amp; Logos</h3>
+              <p className="text-xs text-zinc-400">Upload logos used across the site. Images are cropped before upload. Leave unchanged to keep the current logo.</p>
+            </div>
+
+            {/* Navbar Logo */}
+            <div className="space-y-3">
+              <label className="flex items-center gap-1.5 text-sm font-medium text-zinc-700">
+                <ImageIcon className="size-3.5 text-zinc-400" />
+                Navbar Logo
+              </label>
+              {v("logo_navbar") && (
+                <div className="flex items-center gap-3 rounded-lg border border-zinc-100 bg-zinc-50 px-4 py-3">
+                  <span className="text-xs text-zinc-500">Current:</span>
+                  <Image
+                    src={v("logo_navbar")}
+                    alt="Current navbar logo"
+                    width={120}
+                    height={40}
+                    className="h-10 w-auto object-contain"
+                    unoptimized
+                  />
+                </div>
+              )}
+              <CroppableFileUploadField
+                key={`logo-navbar-${brandingKey}`}
+                folder="branding"
+                aspect={4}
+                label="Upload navbar logo (4:1 wide)"
+                onUploadSuccess={({ url }) => handleChange("logo_navbar", url)}
+              />
+              <p className="text-xs text-zinc-400">Recommended: transparent PNG, ~480×120px</p>
+            </div>
+
+            {/* Footer Logo */}
+            <div className="space-y-3">
+              <label className="flex items-center gap-1.5 text-sm font-medium text-zinc-700">
+                <ImageIcon className="size-3.5 text-zinc-400" />
+                Footer Logo
+              </label>
+              {v("logo_footer") && (
+                <div className="flex items-center gap-3 rounded-lg border border-zinc-100 bg-zinc-800 px-4 py-3">
+                  <span className="text-xs text-zinc-400">Current:</span>
+                  <Image
+                    src={v("logo_footer")}
+                    alt="Current footer logo"
+                    width={130}
+                    height={44}
+                    className="h-11 w-auto object-contain"
+                    unoptimized
+                  />
+                </div>
+              )}
+              <CroppableFileUploadField
+                key={`logo-footer-${brandingKey}`}
+                folder="branding"
+                aspect={4}
+                label="Upload footer logo (4:1 wide, white version)"
+                onUploadSuccess={({ url }) => handleChange("logo_footer", url)}
+              />
+              <p className="text-xs text-zinc-400">Recommended: white transparent PNG for the dark footer background</p>
+            </div>
+
+            {/* Favicon */}
+            <div className="space-y-3">
+              <label className="flex items-center gap-1.5 text-sm font-medium text-zinc-700">
+                <ImageIcon className="size-3.5 text-zinc-400" />
+                Favicon
+              </label>
+              {v("logo_favicon") && (
+                <div className="flex items-center gap-3 rounded-lg border border-zinc-100 bg-zinc-50 px-4 py-3">
+                  <span className="text-xs text-zinc-500">Current:</span>
+                  <Image
+                    src={v("logo_favicon")}
+                    alt="Current favicon"
+                    width={32}
+                    height={32}
+                    className="size-8 object-contain"
+                    unoptimized
+                  />
+                </div>
+              )}
+              <CroppableFileUploadField
+                key={`logo-favicon-${brandingKey}`}
+                folder="branding"
+                aspect={1}
+                label="Upload favicon (1:1 square)"
+                onUploadSuccess={({ url }) => handleChange("logo_favicon", url)}
+              />
+              <p className="text-xs text-zinc-400">Recommended: 512×512px PNG or ICO. Changes require a site redeploy to take effect in browser tabs.</p>
             </div>
           </div>
         )}

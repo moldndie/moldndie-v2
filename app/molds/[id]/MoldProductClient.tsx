@@ -273,25 +273,14 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
 
         {/* ── RIGHT: Details (sticky on desktop) ── */}
         <div className="lg:sticky lg:top-24 lg:self-start space-y-6">
-          {/* Category + Difficulty */}
-          <div className="flex flex-wrap items-center gap-2">
-            {mold.category && (
+          {/* Category */}
+          {mold.category && (
+            <div>
               <span className="inline-block text-xs font-semibold text-primary uppercase tracking-widest">
                 {mold.category.name}
               </span>
-            )}
-            {mold.difficulty && (
-              <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${
-                mold.difficulty === "simple"       ? "bg-emerald-100 text-emerald-700" :
-                mold.difficulty === "moderate"     ? "bg-blue-100 text-blue-700" :
-                mold.difficulty === "difficult"    ? "bg-amber-100 text-amber-700" :
-                mold.difficulty === "sophisticated"? "bg-red-100 text-red-700" :
-                "bg-zinc-100 text-zinc-600"
-              }`}>
-                {mold.difficulty.charAt(0).toUpperCase() + mold.difficulty.slice(1)}
-              </span>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Title */}
           <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 leading-tight">

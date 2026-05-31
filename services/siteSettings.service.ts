@@ -1,7 +1,7 @@
 "use server"
 
 import { createAdminClient } from "@/lib/supabase/admin"
-import { revalidatePath } from "next/cache"
+import { revalidatePath, unstable_noStore as noStore } from "next/cache"
 
 export type SiteSettingKey =
   | "contact_phone"
@@ -18,14 +18,23 @@ export type SiteSettingKey =
   | "social_twitter"
   | "hero_title"
   | "hero_subtitle"
+  | "hero_description"
   | "footer_cta_text"
   | "footer_tagline"
   | "counter_toolings"
   | "counter_courses"
   | "counter_users"
   | "counter_events"
+  | "offer_section_title"
+  | "offer_section_subtitle"
   | "why_title"
+  | "why_subtitle"
   | "why_body"
+  | "join_title"
+  | "join_description"
+  | "logo_navbar"
+  | "logo_footer"
+  | "logo_favicon"
 
 export type SiteSettings = Partial<Record<SiteSettingKey, string>>
 
@@ -37,6 +46,7 @@ function dbError(e: unknown): Error {
 }
 
 export async function getSiteSettings(): Promise<SiteSettings> {
+  noStore()
   const admin = createAdminClient()
   const { data, error } = await admin
     .from("site_settings")

@@ -34,22 +34,8 @@ function SkeletonCard() {
   )
 }
 
-const DIFFICULTY_LABELS: Record<string, string> = {
-  simple: "Simple",
-  moderate: "Moderate",
-  difficult: "Difficult",
-  sophisticated: "Sophisticated",
-}
-
-const DIFFICULTY_COLORS: Record<string, string> = {
-  simple: "bg-emerald-100 text-emerald-700",
-  moderate: "bg-blue-100 text-blue-700",
-  difficult: "bg-amber-100 text-amber-700",
-  sophisticated: "bg-red-100 text-red-700",
-}
-
 function MoldCard({ mold }: {
-  mold: { id: string; title: string; price: number | null; preview_image: string | null; category?: { name: string } | null; difficulty?: string | null }
+  mold: { id: string; title: string; price: number | null; preview_image: string | null; category?: { name: string } | null }
 }) {
   const { currency, rates } = useCurrency()
   const { text: priceText, isFree } = displayPrice(mold.price, "EGP", currency, rates)
@@ -79,11 +65,6 @@ function MoldCard({ mold }: {
           <span className={`text-sm font-bold ${isFree ? "text-emerald-600" : "text-zinc-900"}`}>
             {priceText}
           </span>
-          {mold.difficulty && (
-            <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${DIFFICULTY_COLORS[mold.difficulty] ?? "bg-zinc-100 text-zinc-600"}`}>
-              {DIFFICULTY_LABELS[mold.difficulty] ?? mold.difficulty}
-            </span>
-          )}
         </div>
       </div>
     </Link>

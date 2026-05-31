@@ -14,7 +14,15 @@ interface ImageCropModalProps {
   originalFileName?: string
 }
 
-async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<File> {
+function isPng(fileName: string): boolean {
+  return fileName.toLowerCase().endsWith(".png")
+}
+
+async function getCroppedImg(
+  imageSrc: string,
+  pixelCrop: Area,
+  outputType: "image/jpeg" | "image/png",
+): Promise<File> {
   const image = new window.Image()
   image.src = imageSrc
   await new Promise<void>((resolve, reject) => {
@@ -26,6 +34,14 @@ async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<File> {
   canvas.width = pixelCrop.width
   canvas.height = pixelCrop.height
   const ctx = canvas.getContext("2d")!
+
+  if (outputType === "image/jpeg") {
+    // JPEG has no alpha channel — fill white so transparency becomes white, not black
+    ctx.fillStyle = "#ffffff"
+    ctx.fillRect(0, 0, canvas.width, canvas.height)
+  }
+  // PNG: canvas default is transparent — no fill needed
+
   ctx.drawImage(
     image,
     pixelCrop.x,
@@ -35,14 +51,21 @@ async function getCroppedImg(imageSrc: string, pixelCrop: Area): Promise<File> {
     0,
     0,
     pixelCrop.width,
-    pixelCrop.height
+    pixelCrop.height,
   )
 
+  const ext = outputType === "image/png" ? "png" : "jpg"
+  const quality = outputType === "image/jpeg" ? 0.92 : undefined
+
   return new Promise<File>((resolve, reject) => {
-    canvas.toBlob((blob) => {
-      if (!blob) { reject(new Error("Canvas is empty")); return }
-      resolve(new File([blob], "cropped.jpg", { type: "image/jpeg" }))
-    }, "image/jpeg", 0.92)
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) { reject(new Error("Canvas is empty")); return }
+        resolve(new File([blob], `cropped.${ext}`, { type: outputType }))
+      },
+      outputType,
+      quality,
+    )
   })
 }
 
@@ -61,6 +84,11 @@ export function ImageCropModal({
   const MIN_ZOOM = 0.4
   const MAX_ZOOM = 3
 
+  // Preserve PNG transparency; everything else becomes JPEG
+  const outputType: "image/jpeg" | "image/png" = isPng(originalFileName)
+    ? "image/png"
+    : "image/jpeg"
+
   const onCropComplete = useCallback((_: Area, croppedPixels: Area) => {
     setCroppedAreaPixels(croppedPixels)
   }, [])
@@ -69,13 +97,15 @@ export function ImageCropModal({
     if (!croppedAreaPixels) return
     setProcessing(true)
     try {
-      const file = await getCroppedImg(imageSrc, croppedAreaPixels)
-      const namedFile = new File([file], originalFileName.replace(/\.[^.]+$/, ".jpg"), {
-        type: "image/jpeg",
-      })
+      const file = await getCroppedImg(imageSrc, croppedAreaPixels, outputType)
+      const ext = outputType === "image/png" ? ".png" : ".jpg"
+      const namedFile = new File(
+        [file],
+        originalFileName.replace(/\.[^.]+$/, ext),
+        { type: outputType },
+      )
       onCropDone(namedFile)
     } catch {
-      // fallback: cancel
       onCancel()
     } finally {
       setProcessing(false)
@@ -131,6 +161,9 @@ export function ImageCropModal({
         {/* Hint */}
         <p className="px-5 pt-3 text-[11px] text-zinc-400 text-center">
           Drag to reposition · Zoom out to capture more of the image
+          {outputType === "image/png" && (
+            <span className="ml-1 text-blue-500">· PNG transparency preserved</span>
+          )}
         </p>
 
         {/* Actions */}

@@ -2,24 +2,16 @@
 
 import Link from "next/link"
 import { motion, type Variants } from "framer-motion"
-import {
-  BookOpen,
-  GraduationCap,
-  FolderOpen,
-  CalendarDays,
-  Globe,
-  Calculator,
-  Award,
-  Layers,
-  TrendingUp,
-  GitBranch,
-} from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 import HeroCarousel from "@/components/home/HeroCarousel"
 import type { HeroSlide } from "@/services/heroSlides.service"
+import type { HomeOfferItem } from "@/services/homeOfferItems.service"
+import type { HomeWhyCard } from "@/services/homeWhyCards.service"
+import type { SiteSettings } from "@/services/siteSettings.service"
 import { isValidImageUrl } from "@/lib/heroSlides.constants"
+import { DynamicIcon } from "@/lib/icons"
 
-// ── Shared variants ────────────────────────────────────────────────────────
+// ── Animation variants ─────────────────────────────────────────────────────
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 18 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.35, ease: "easeOut" } },
@@ -72,70 +64,6 @@ function WireframeCube() {
   )
 }
 
-// ── Offer cards data ───────────────────────────────────────────────────────
-const offerCards = [
-  {
-    icon: BookOpen,
-    title: "BLOG",
-    desc: "Expert articles and practical guides covering mold and die fundamentals, advanced techniques, and industry innovations — designed to support engineers at every stage while meeting modern tooling standards.",
-    href: "/blogs",
-  },
-  {
-    icon: GraduationCap,
-    title: "ACADEMY",
-    desc: "Action-oriented tooling design courses covering the full workflow from DFM to final design, delivered through real case studies with downloadable PDFs, native CAD files, and optional step-by-step videos.",
-    href: "/courses",
-  },
-  {
-    icon: FolderOpen,
-    title: "LIBRARY",
-    desc: "A growing library of proven 3D mold and die designs based on real case studies. Ready-to-use CAD models help accelerate tooling development with accuracy and efficiency.",
-    href: "/molds",
-  },
-  {
-    icon: CalendarDays,
-    title: "EVENTS",
-    desc: "A global calendar of key mold and die events, including conferences, trade shows, workshops, and summits — helping you stay informed, learn from experts, and expand your industry network.",
-    href: "/events",
-  },
-  {
-    icon: Globe,
-    title: "SUPPLIERS",
-    desc: "A verified global directory of trusted mold and die suppliers, organized by location and specialization, covering machines, materials, components, software, and tooling services.",
-    href: "/suppliers",
-  },
-  {
-    icon: Calculator,
-    title: "ENGINEERING",
-    desc: "Our Engineering Calculators section offers free, high-accuracy tools to streamline the design of injection molds, pressure die-casting molds, and sheet metal dies. By bridging the gap between theoretical design and shop-floor reality.",
-    href: "/tools",
-  },
-]
-
-// ── Why Choose Us data ─────────────────────────────────────────────────────
-const whyCards = [
-  {
-    icon: Award,
-    title: "Real-World Expertise",
-    desc: "Our content and services are built on hands-on industry experience — not theory. Every resource is crafted to solve real challenges faced by tooling professionals in production environments.",
-  },
-  {
-    icon: Layers,
-    title: "Complete Tooling Ecosystem",
-    desc: "From knowledge resources and structured training to verified suppliers and engineering services, everything you need for mold and die projects is available in one integrated platform.",
-  },
-  {
-    icon: TrendingUp,
-    title: "Always at the Forefront",
-    desc: "We continuously update our content, publish new courses, and expand our databases to keep you ahead of industry trends and emerging manufacturing technologies.",
-  },
-  {
-    icon: GitBranch,
-    title: "End-to-End Vertical Integration",
-    desc: "We cover the full tooling lifecycle — from design and validation through to production and supplier sourcing — giving you a seamless, fully integrated professional workflow.",
-  },
-]
-
 // ── Card animation variant ─────────────────────────────────────────────────
 const cardItem: Variants = {
   hidden: { opacity: 0, y: 16 },
@@ -143,26 +71,32 @@ const cardItem: Variants = {
 }
 
 // ── Offer Card ─────────────────────────────────────────────────────────────
-function OfferCard({ icon: Icon, title, desc, href }: typeof offerCards[0]) {
-  return (
+function OfferCard({ item }: { item: HomeOfferItem }) {
+  const content = (
     <motion.div variants={cardItem}>
-      <Link
-        href={href}
-        className="group bg-white rounded-xl border border-zinc-100 p-6 flex flex-col gap-3 hover:shadow-md hover:border-zinc-200 transition-all duration-200 h-full"
-      >
-        <Icon size={36} className="text-primary" strokeWidth={1.5} />
-        <h3 className="text-sm font-bold text-primary leading-snug uppercase tracking-wide">{title}</h3>
-        <p className="text-xs text-zinc-500 leading-relaxed">{desc}</p>
-        <span className="mt-auto pt-1 text-xs font-semibold text-primary/70 group-hover:text-primary transition-colors">
-          Explore →
-        </span>
-      </Link>
+      <div className="group bg-white rounded-xl border border-zinc-100 p-6 flex flex-col gap-3 hover:shadow-md hover:border-zinc-200 transition-all duration-200 h-full">
+        <DynamicIcon name={item.icon} size={36} strokeWidth={1.5} className="text-primary" />
+        <h3 className="text-sm font-bold text-primary leading-snug uppercase tracking-wide">{item.title}</h3>
+        {item.description && (
+          <p className="text-xs text-zinc-500 leading-relaxed">{item.description}</p>
+        )}
+        {item.button_text && (
+          <span className="mt-auto pt-1 text-xs font-semibold text-primary/70 group-hover:text-primary transition-colors">
+            {item.button_text} →
+          </span>
+        )}
+      </div>
     </motion.div>
   )
+
+  if (item.button_url) {
+    return <Link href={item.button_url}>{content}</Link>
+  }
+  return content
 }
 
 // ── Why Card ───────────────────────────────────────────────────────────────
-function WhyCard({ icon: Icon, title, desc }: typeof whyCards[0]) {
+function WhyCard({ card }: { card: HomeWhyCard }) {
   return (
     <motion.div
       variants={cardItem}
@@ -171,10 +105,12 @@ function WhyCard({ icon: Icon, title, desc }: typeof whyCards[0]) {
       className="bg-white rounded-xl border border-zinc-100 p-6 flex flex-col gap-3"
     >
       <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
-        <Icon size={20} className="text-primary" strokeWidth={1.5} />
+        <DynamicIcon name={card.icon} size={20} strokeWidth={1.5} className="text-primary" />
       </div>
-      <h3 className="text-sm font-bold text-zinc-900">{title}</h3>
-      <p className="text-xs text-zinc-500 leading-relaxed">{desc}</p>
+      <h3 className="text-sm font-bold text-zinc-900">{card.title}</h3>
+      {card.description && (
+        <p className="text-xs text-zinc-500 leading-relaxed">{card.description}</p>
+      )}
     </motion.div>
   )
 }
@@ -189,7 +125,7 @@ function CounterChip({ value, label }: { value: string; label: string }) {
   )
 }
 
-// ── Main client component ──────────────────────────────────────────────────
+// ── Main component ─────────────────────────────────────────────────────────
 interface HomeClientProps {
   counters?: {
     toolings?: string
@@ -198,11 +134,18 @@ interface HomeClientProps {
     events?:   string
   }
   heroSlides?: HeroSlide[]
+  offerItems?: HomeOfferItem[]
+  whyCards?: HomeWhyCard[]
+  settings?: SiteSettings
 }
 
-export default function HomeClient({ counters = {}, heroSlides = [] }: HomeClientProps) {
-  // Drop any slide whose image_url is not a real absolute/root-relative URL.
-  // This prevents Next/Image errors from bare relative paths or stale DB values.
+export default function HomeClient({
+  counters = {},
+  heroSlides = [],
+  offerItems = [],
+  whyCards = [],
+  settings = {},
+}: HomeClientProps) {
   const validSlides = heroSlides.filter((s) => isValidImageUrl(s.image_url))
 
   const counterEntries = [
@@ -212,9 +155,22 @@ export default function HomeClient({ counters = {}, heroSlides = [] }: HomeClien
     { key: "events",   label: "Events",     value: counters.events   },
   ].filter((c) => c.value && c.value.trim() !== "")
 
+  const heroTitle       = settings.hero_title       || "Start Your Journey with MoldNdie"
+  const heroSubtitle    = settings.hero_subtitle     || "The ultimate resource for plastic injection mold, metal die-casting mold, and sheet metal die design and manufacture know-how"
+  const heroDescription = settings.hero_description  || "We provide educational content, updated know-how, professional resources, and action oriented training, specifically for the key areas of manufacturing: Plastic Injection Molds, Metal Pressure Die-casting Molds, and Sheet Metal Dies."
+
+  const offerTitle    = settings.offer_section_title    || "What We Offer"
+  const offerSubtitle = settings.offer_section_subtitle || "Everything a mold and die professional needs — in one place."
+
+  const whyTitle    = settings.why_title    || "Why Choose Us"
+  const whySubtitle = settings.why_subtitle || "Built by industry professionals, for industry professionals."
+
+  const joinTitle       = settings.join_title       || settings.footer_cta_text || "Join Our Community"
+  const joinDescription = settings.join_description || "Sign up today for exclusive access to new blog posts covering tooling industry updates, downloadable files, upcoming events, and a verified global supplier network. Stay informed, stay ahead — connect with thousands of mold and die professionals worldwide."
+
   return (
     <main className="flex-1">
-      {/* ── Hero: carousel when valid slides exist, fallback otherwise ── */}
+      {/* ── Hero ── */}
       {validSlides.length > 0 ? (
         <HeroCarousel slides={validSlides} />
       ) : (
@@ -229,15 +185,14 @@ export default function HomeClient({ counters = {}, heroSlides = [] }: HomeClien
               variants={fadeUp}
               className="text-4xl md:text-6xl font-extrabold text-primary uppercase leading-tight tracking-tight"
             >
-              Start Your Journey with MoldNdie
+              {heroTitle}
             </motion.h1>
 
             <motion.p
               variants={fadeUp}
               className="mt-4 text-xs md:text-sm font-semibold tracking-widest text-zinc-400 uppercase max-w-2xl mx-auto"
             >
-              The ultimate resource for plastic injection mold, metal die-casting mold, and sheet
-              metal die design and manufacture know-how
+              {heroSubtitle}
             </motion.p>
 
             <motion.div
@@ -250,89 +205,77 @@ export default function HomeClient({ counters = {}, heroSlides = [] }: HomeClien
         </section>
       )}
 
-      {/* ── Description — only shown when no carousel images exist ── */}
+      {/* ── Description (fallback only) ── */}
       {validSlides.length === 0 && (
-      <motion.section
-        {...scrollReveal}
-        className="max-w-4xl mx-auto px-6 pb-20 text-center"
-      >
-        <p className="text-sm md:text-base text-zinc-600 leading-relaxed">
-          We provide educational content, updated know-how, professional resources, and action
-          oriented training, specifically for the key areas of manufacturing: Plastic Injection
-          Molds, Metal Pressure Die-casting Molds, and Sheet Metal Dies.
-        </p>
-      </motion.section>
+        <motion.section
+          {...scrollReveal}
+          className="max-w-4xl mx-auto px-6 pb-20 text-center"
+        >
+          <p className="text-sm md:text-base text-zinc-600 leading-relaxed">
+            {heroDescription}
+          </p>
+        </motion.section>
       )}
 
       {/* ── What We Offer ── */}
-      <section className="bg-zinc-50 py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          {/* Centered title */}
-          <motion.div
-            {...scrollReveal}
-            className="text-center mb-12"
-          >
-            <h2 className="text-4xl md:text-5xl font-black text-primary uppercase leading-none tracking-tight">
-              What We Offer
-            </h2>
-            <p className="mt-3 text-sm text-zinc-500 max-w-xl mx-auto">
-              Everything a mold and die professional needs — in one place.
-            </p>
-          </motion.div>
+      {offerItems.length > 0 && (
+        <section className="bg-zinc-50 py-20 px-6">
+          <div className="max-w-7xl mx-auto">
+            <motion.div {...scrollReveal} className="text-center mb-12">
+              <h2 className="text-4xl md:text-5xl font-black text-primary uppercase leading-none tracking-tight">
+                {offerTitle}
+              </h2>
+              {offerSubtitle && (
+                <p className="mt-3 text-sm text-zinc-500 max-w-xl mx-auto">
+                  {offerSubtitle}
+                </p>
+              )}
+            </motion.div>
 
-          {/* Row 1: BLOG, ACADEMY, LIBRARY */}
-          <motion.div
-            variants={stagger(0.05)}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-6"
-          >
-            {offerCards.slice(0, 3).map((card) => (
-              <OfferCard key={card.title} {...card} />
-            ))}
-          </motion.div>
-
-          {/* Row 2: EVENTS, SUPPLIERS, SERVICES */}
-          <motion.div
-            variants={stagger(0.05)}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-          >
-            {offerCards.slice(3).map((card) => (
-              <OfferCard key={card.title} {...card} />
-            ))}
-          </motion.div>
-        </div>
-      </section>
+            <motion.div
+              variants={stagger(0.05)}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+            >
+              {offerItems.map((item) => (
+                <OfferCard key={item.id} item={item} />
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* ── Why Choose Us ── */}
-      <section className="py-20 px-6">
-        <div className="max-w-7xl mx-auto">
-          <motion.div {...scrollReveal} className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">
-              Why Choose Us
-            </h2>
-            <p className="mt-3 text-sm text-zinc-500 max-w-xl mx-auto">
-              Built by industry professionals, for industry professionals.
-            </p>
-          </motion.div>
+      {whyCards.length > 0 && (
+        <section className="py-20 px-6">
+          <div className="max-w-7xl mx-auto">
+            <motion.div {...scrollReveal} className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">
+                {whyTitle}
+              </h2>
+              {whySubtitle && (
+                <p className="mt-3 text-sm text-zinc-500 max-w-xl mx-auto">
+                  {whySubtitle}
+                </p>
+              )}
+            </motion.div>
 
-          <motion.div
-            variants={stagger(0.07)}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: "-60px" }}
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
-          >
-            {whyCards.map((card) => (
-              <WhyCard key={card.title} {...card} />
-            ))}
-          </motion.div>
-        </div>
-      </section>
+            <motion.div
+              variants={stagger(0.07)}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+              className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6"
+            >
+              {whyCards.map((card) => (
+                <WhyCard key={card.id} card={card} />
+              ))}
+            </motion.div>
+          </div>
+        </section>
+      )}
 
       {/* ── Counters / Social Proof ── */}
       {counterEntries.length > 0 && (
@@ -372,19 +315,16 @@ export default function HomeClient({ counters = {}, heroSlides = [] }: HomeClien
         className="bg-zinc-50 py-20 px-6 text-center"
       >
         <div className="max-w-2xl mx-auto">
-          <Link
-            href="/login"
-            className="inline-block group"
-          >
+          <Link href="/login" className="inline-block group">
             <h2 className="text-3xl md:text-4xl font-bold text-zinc-900 group-hover:text-primary transition-colors">
-              Join Our Community
+              {joinTitle}
             </h2>
           </Link>
-          <p className="mt-4 text-sm text-zinc-500 leading-relaxed">
-            Sign up today for exclusive access to new blog posts covering tooling industry updates,
-            downloadable files, upcoming events, and a verified global supplier network.
-            Stay informed, stay ahead — connect with thousands of mold and die professionals worldwide.
-          </p>
+          {joinDescription && (
+            <p className="mt-4 text-sm text-zinc-500 leading-relaxed">
+              {joinDescription}
+            </p>
+          )}
 
           <motion.div
             className="mt-8 inline-block"

@@ -70,13 +70,21 @@ export default function CartClient() {
       <div className="flex flex-col items-center justify-center py-32 text-center px-6">
         <ShoppingCart size={56} className="text-zinc-200 mb-4" strokeWidth={1} />
         <p className="text-zinc-700 font-semibold text-lg">Your cart is empty</p>
-        <p className="text-zinc-400 text-sm mt-1">Browse molds and courses to add items.</p>
-        <Link
-          href="/molds"
-          className="mt-6 inline-block bg-primary text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors"
-        >
-          Browse Molds
-        </Link>
+        <p className="text-zinc-400 text-sm mt-1">Browse the library or academy to add items.</p>
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
+          <Link
+            href="/molds"
+            className="inline-block bg-primary text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors"
+          >
+            Browse Library
+          </Link>
+          <Link
+            href="/courses"
+            className="inline-block bg-zinc-900 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-zinc-800 transition-colors"
+          >
+            Browse Academy
+          </Link>
+        </div>
       </div>
     )
   }

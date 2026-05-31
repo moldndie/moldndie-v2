@@ -51,7 +51,9 @@ const navItems: NavItem[] = [
     href: "/dashboard/homepage/hero-carousel",
     icon: LayoutPanelTop,
     children: [
-      { label: "Hero Carousel", href: "/dashboard/homepage/hero-carousel" },
+      { label: "Hero Carousel",   href: "/dashboard/homepage/hero-carousel" },
+      { label: "What We Offer",   href: "/dashboard/homepage/offer-items" },
+      { label: "Why Choose Us",   href: "/dashboard/homepage/why-cards" },
     ],
   },
   {
