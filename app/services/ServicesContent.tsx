@@ -12,6 +12,7 @@ import {
   Sparkles,
   Mail,
 } from "lucide-react"
+import Image from "next/image"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import type { ServiceOffering } from "@/services/service.service"
 
@@ -100,9 +101,20 @@ function ServiceCard({ service, index }: { service: ServiceOffering; index: numb
       </div>
 
       <div className={`${!isEven ? "lg:order-1" : ""}`}>
-        <div className="relative rounded-2xl bg-gradient-to-br from-primary/5 via-zinc-50 to-primary/10 border border-zinc-100 p-10 md:p-14 flex items-center justify-center aspect-square max-w-sm mx-auto">
-          <FolderKanban size={80} className="text-primary/20" strokeWidth={0.8} />
-          <div className="absolute inset-0 rounded-2xl bg-[radial-gradient(circle_at_50%_50%,transparent_40%,white_100%)]" />
+        <div className="relative rounded-2xl overflow-hidden aspect-4/3 max-w-sm mx-auto bg-zinc-100 border border-zinc-100">
+          {service.image ? (
+            <Image
+              src={service.image}
+              alt={service.title}
+              fill
+              className="object-cover"
+              sizes="(max-width: 1024px) 100vw, 480px"
+            />
+          ) : (
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-zinc-50 to-primary/10 flex items-center justify-center">
+              <FolderKanban size={80} className="text-primary/20" strokeWidth={0.8} />
+            </div>
+          )}
         </div>
       </div>
     </motion.div>

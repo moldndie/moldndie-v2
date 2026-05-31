@@ -203,27 +203,14 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
               <Textarea {...register("description")} placeholder="Describe the mold…" rows={3} />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-zinc-700">Category</label>
-                <Select {...register("category_id")}>
-                  <option value="">— No category —</option>
-                  {categories.map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
-                  ))}
-                </Select>
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-sm font-medium text-zinc-700">Difficulty</label>
-                <Select {...register("difficulty")}>
-                  <option value="">— Not set —</option>
-                  <option value="simple">Simple</option>
-                  <option value="moderate">Moderate</option>
-                  <option value="difficult">Difficult</option>
-                  <option value="sophisticated">Sophisticated</option>
-                </Select>
-              </div>
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-zinc-700">Category</label>
+              <Select {...register("category_id")}>
+                <option value="">— No category —</option>
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>{c.name}</option>
+                ))}
+              </Select>
             </div>
 
             {/* Free / Paid toggle */}

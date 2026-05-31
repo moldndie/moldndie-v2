@@ -15,7 +15,7 @@ import {
   ImageOff,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
-import { ImageUpload } from "@/components/ui/image-upload"
+import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import {
   createHeroSlide,
   updateHeroSlide,
@@ -84,11 +84,22 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
   const [pendingId, setPendingId] = useState<string | null>(null)
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState<SlideForm>(EMPTY_FORM)
+  // formKey forces CroppableFileUploadField to remount on form reset
+  const [formKey, setFormKey] = useState(0)
+  const [imageUploading, setImageUploading] = useState(false)
+  const [mobileUploading, setMobileUploading] = useState(false)
 
   const activeCount = slides.filter((s) => s.is_active).length
+  const isUploading = imageUploading || mobileUploading
 
   function field(key: keyof SlideForm) {
     return (v: string) => setForm((prev) => ({ ...prev, [key]: v }))
+  }
+
+  function resetForm() {
+    setForm(EMPTY_FORM)
+    setFormKey((k) => k + 1)
+    setShowForm(false)
   }
 
   function handleAdd() {
@@ -115,8 +126,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
           is_active: willBeActive,
         })
         setSlides((prev) => [...prev, created])
-        setForm(EMPTY_FORM)
-        setShowForm(false)
+        resetForm()
         toast.success(
           willBeActive
             ? "Slide added and active."
@@ -171,12 +181,10 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
 
     const swapIdx = dir === "up" ? idx - 1 : idx + 1
     const next = [...slides]
-    // Swap sort_order values
     const aOrder = next[idx].sort_order
     const bOrder = next[swapIdx].sort_order
     next[idx] = { ...next[idx], sort_order: bOrder }
     next[swapIdx] = { ...next[swapIdx], sort_order: aOrder }
-    // Swap positions
     ;[next[idx], next[swapIdx]] = [next[swapIdx], next[idx]]
     setSlides(next)
 
@@ -226,14 +234,16 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
               <label className="block text-sm font-medium text-zinc-700 mb-1.5">
                 Desktop Image <span className="text-red-500">*</span>
               </label>
-              <ImageUpload
-                bucket="hero/slides"
-                value={form.image_url}
-                onChange={field("image_url")}
-                onClear={() => setForm((prev) => ({ ...prev, image_url: "" }))}
+              <CroppableFileUploadField
+                key={`desktop-${formKey}`}
+                folder="hero/slides"
+                aspect={16 / 9}
+                label="Click to upload desktop image (16:9)"
+                onUploadSuccess={({ url }) => field("image_url")(url)}
+                onUploadingChange={setImageUploading}
               />
               <p className="mt-1.5 text-xs text-zinc-400">
-                Landscape — recommended 1920×700px or wider.
+                Landscape 16:9 — recommended 1920×1080px or wider.
               </p>
             </div>
 
@@ -242,14 +252,16 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                 Mobile Image{" "}
                 <span className="text-zinc-400 font-normal">(optional)</span>
               </label>
-              <ImageUpload
-                bucket="hero/slides"
-                value={form.mobile_image}
-                onChange={field("mobile_image")}
-                onClear={() => setForm((prev) => ({ ...prev, mobile_image: "" }))}
+              <CroppableFileUploadField
+                key={`mobile-${formKey}`}
+                folder="hero/slides"
+                aspect={9 / 16}
+                label="Click to upload mobile image (9:16)"
+                onUploadSuccess={({ url }) => field("mobile_image")(url)}
+                onUploadingChange={setMobileUploading}
               />
               <p className="mt-1.5 text-xs text-zinc-400">
-                Portrait — recommended 750×900px. Falls back to desktop image if omitted.
+                Portrait 9:16 — falls back to desktop image if omitted.
               </p>
             </div>
           </div>
@@ -305,10 +317,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
           <div className="flex items-center justify-end gap-3">
             <button
               type="button"
-              onClick={() => {
-                setShowForm(false)
-                setForm(EMPTY_FORM)
-              }}
+              onClick={resetForm}
               className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
             >
               Cancel
@@ -316,15 +325,15 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
             <button
               type="button"
               onClick={handleAdd}
-              disabled={isPending || !isValidImageUrl(form.image_url)}
+              disabled={isPending || isUploading || !isValidImageUrl(form.image_url)}
               className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm px-6 py-2 rounded-lg transition-colors"
             >
-              {isPending ? (
+              {isPending || isUploading ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
                 <Plus className="size-4" />
               )}
-              Add Slide
+              {isUploading ? "Uploading…" : "Add Slide"}
             </button>
           </div>
         </div>
@@ -350,7 +359,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                 pendingId === slide.id && "opacity-30 pointer-events-none",
               )}
             >
-              {/* Thumbnail — only rendered when image_url is a real absolute/root URL */}
+              {/* Thumbnail */}
               <div className="relative h-20 w-32 shrink-0 rounded-lg overflow-hidden bg-zinc-100 flex items-center justify-center">
                 {isValidImageUrl(slide.image_url) ? (
                   <Image

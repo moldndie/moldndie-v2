@@ -115,8 +115,8 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
           <label className="text-sm font-medium text-zinc-700">Logo</label>
           <CroppableFileUploadField
             folder="suppliers/logos"
-            aspect={1}
-            label="Click to upload supplier logo"
+            aspect={4 / 3}
+            label="Click to upload supplier image (4:3)"
             existingValue={isEdit ? (supplier?.logo_path ?? null) : null}
             onUploadSuccess={({ key }) => setValue("logo_path", key, { shouldValidate: true })}
             onUploadingChange={setLogoUploading}

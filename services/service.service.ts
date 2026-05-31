@@ -11,6 +11,7 @@ export interface ServiceOffering {
   description: string | null
   highlights?: string[] | null
   image: string | null
+  icon: string | null
   is_active: boolean
   is_egypt_only: boolean
   sort_order: number
@@ -24,6 +25,7 @@ export interface ServiceOfferingFormValues {
   description?: string
   highlights?: string[]
   image?: string
+  icon?: string
   is_active: boolean
   is_egypt_only: boolean
   sort_order: number
@@ -79,6 +81,7 @@ export async function createService(values: ServiceOfferingFormValues): Promise<
       description:   values.description ?? null,
       highlights:    values.highlights ?? [],
       image:         values.image ?? null,
+      icon:          values.icon ?? null,
       is_active:     values.is_active,
       is_egypt_only: values.is_egypt_only,
       sort_order:    values.sort_order,
@@ -102,6 +105,7 @@ export async function updateService(id: string, values: ServiceOfferingFormValue
       description:   values.description ?? null,
       highlights:    values.highlights ?? [],
       image:         values.image ?? null,
+      icon:          values.icon ?? null,
       is_active:     values.is_active,
       is_egypt_only: values.is_egypt_only,
       sort_order:    values.sort_order,

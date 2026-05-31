@@ -9,7 +9,11 @@ import { Building2, MapPin, Globe, MapPinned, ChevronDown, Lock } from "lucide-r
 import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
-import { useSuppliersListing, useSupplierCategories } from "@/hooks/queries/useSuppliers"
+import {
+  useSuppliersListing,
+  useSupplierCategories,
+  useSupplierCountries,
+} from "@/hooks/queries/useSuppliers"
 import type { SupplierSort } from "@/hooks/queries/useSuppliers"
 import { createClient } from "@/lib/supabase/client"
 
@@ -17,11 +21,9 @@ const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
 const SORT_OPTIONS: { label: string; value: SupplierSort }[] = [
-  { label: "None",                    value: "none" },
-  { label: "Company Name A → Z",      value: "name_asc" },
-  { label: "Company Name Z → A",      value: "name_desc" },
   { label: "Product or Service A → Z", value: "service_asc" },
-  { label: "Country of Origin A → Z", value: "country_asc" },
+  { label: "Company Name A → Z",       value: "name_asc" },
+  { label: "Country of Origin A → Z",  value: "country_asc" },
 ]
 
 const pageVariants = {
@@ -135,44 +137,69 @@ function SupplierCard({
     <motion.div
       variants={cardVariants}
       className={`rounded-xl overflow-hidden border bg-white shadow-sm transition-colors duration-200 flex flex-col h-full ${
-        expanded ? "border-primary shadow-md" : supplier.sponsored ? "border-amber-200 hover:shadow-lg hover:border-amber-300" : "border-zinc-100 hover:shadow-lg hover:border-zinc-200"
+        expanded
+          ? "border-primary shadow-md"
+          : supplier.sponsored
+          ? "border-amber-200 hover:shadow-lg hover:border-amber-300"
+          : "border-zinc-100 hover:shadow-lg hover:border-zinc-200"
       }`}
     >
       <motion.button
         onClick={onToggle}
         whileTap={{ scale: 0.98 }}
         transition={{ duration: 0.1 }}
-        className="w-full flex-1 p-5 flex flex-col items-center text-center gap-3"
+        className="w-full flex-1 p-5 flex flex-col gap-4 text-left"
       >
         {supplier.sponsored && (
           <span className="self-start text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 tracking-wide uppercase">
             Sponsored
           </span>
         )}
-        <div className="w-14 h-14 rounded-full overflow-hidden bg-zinc-50 border border-zinc-100 shrink-0 relative flex items-center justify-center">
+
+        {/* Supplier image — aspect-4/3 matches the 4:3 crop ratio */}
+        <div className="w-full aspect-4/3 rounded-xl overflow-hidden bg-zinc-100 border border-zinc-100 relative">
           {logoSrc ? (
-            <Image src={logoSrc} alt={supplier.name} fill className="object-contain p-1" sizes="56px" />
+            <Image
+              src={logoSrc}
+              alt={supplier.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            />
           ) : (
-            <Building2 size={24} className="text-zinc-300" strokeWidth={1} />
+            <div className="w-full h-full flex items-center justify-center">
+              <Building2 size={36} className="text-zinc-300" strokeWidth={1} />
+            </div>
           )}
         </div>
 
+        {/* Info */}
         <div className="min-w-0 w-full">
-          <h3 className={`text-sm font-bold leading-snug line-clamp-2 transition-colors ${expanded ? "text-primary" : "text-zinc-900"}`}>
+          <h3
+            className={`text-base font-bold leading-snug line-clamp-2 transition-colors ${
+              expanded ? "text-primary" : "text-zinc-900"
+            }`}
+          >
             {supplier.name}
           </h3>
           {supplier.category && (
-            <span className="text-xs text-primary font-medium mt-0.5 block">{supplier.category.name}</span>
+            <span className="text-sm text-primary font-semibold mt-1 block">
+              {supplier.category.name}
+            </span>
           )}
           {supplier.country && (
-            <div className="flex items-center justify-center gap-1 text-xs text-zinc-400 mt-1.5">
+            <div className="flex items-center gap-1.5 text-xs text-zinc-400 mt-2">
               <MapPin size={11} className="shrink-0" />
               {supplier.country}
             </div>
           )}
         </div>
 
-        <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
+        <motion.div
+          animate={{ rotate: expanded ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="self-center"
+        >
           <ChevronDown size={15} className="text-zinc-400" />
         </motion.div>
       </motion.button>
@@ -188,11 +215,9 @@ function SupplierCard({
             style={{ overflow: "hidden" }}
           >
             <div className="relative min-h-25">
-              {/* Content — blurred for guests */}
               <div className={showGate ? "blur-[3px] pointer-events-none select-none" : ""}>
                 <SupplierExpandedContent supplier={supplier} />
               </div>
-              {/* Login gate overlay */}
               {showGate && <LoginGate callbackPath={callbackPath} />}
             </div>
           </motion.div>
@@ -205,9 +230,9 @@ function SupplierCard({
 function SkeletonCard() {
   return (
     <div className="rounded-xl overflow-hidden border border-zinc-100 bg-white animate-pulse">
-      <div className="p-5 flex flex-col items-center gap-3">
-        <div className="w-14 h-14 bg-zinc-200 rounded-full" />
-        <div className="h-4 bg-zinc-200 rounded w-2/3" />
+      <div className="p-5 flex flex-col gap-4">
+        <div className="w-full h-28 bg-zinc-200 rounded-xl" />
+        <div className="h-5 bg-zinc-200 rounded w-2/3" />
         <div className="h-3 bg-zinc-100 rounded w-1/3" />
       </div>
     </div>
@@ -222,7 +247,8 @@ export default function SuppliersListingClient() {
   const [inputValue, setInputValue]             = useState(() => searchParams.get("search") ?? "")
   const [searchTerm, setSearchTerm]             = useState(() => searchParams.get("search") ?? "")
   const [selectedCategory, setSelectedCategory] = useState<string | null>(() => searchParams.get("category"))
-  const [sort, setSort]                         = useState<SupplierSort>(() => (searchParams.get("sort") as SupplierSort) ?? "none")
+  const [selectedCountry, setSelectedCountry]   = useState<string | null>(() => searchParams.get("country"))
+  const [sort, setSort]                         = useState<SupplierSort>(() => (searchParams.get("sort") as SupplierSort) ?? "service_asc")
   const [currentPage, setCurrentPage]           = useState(() => Number(searchParams.get("page")) || 1)
   const pageSize = DEFAULT_PAGE_SIZE
   const [expandedIds, setExpandedIds]           = useState<Record<string, boolean>>({})
@@ -249,33 +275,37 @@ export default function SuppliersListingClient() {
   // Sync to URL
   useEffect(() => {
     const p = new URLSearchParams()
-    if (searchTerm)                       p.set("search",   searchTerm)
-    if (selectedCategory)                 p.set("category", selectedCategory)
-    if (sort !== "none")                  p.set("sort",     sort)
-    if (currentPage > 1)                  p.set("page",     String(currentPage))
+    if (searchTerm)      p.set("search",   searchTerm)
+    if (selectedCategory) p.set("category", selectedCategory)
+    if (selectedCountry)  p.set("country",  selectedCountry)
+    if (sort !== "service_asc") p.set("sort", sort)
+    if (currentPage > 1) p.set("page",     String(currentPage))
     const qs = p.toString()
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false })
-  }, [searchTerm, selectedCategory, sort, currentPage, pathname, router])
+  }, [searchTerm, selectedCategory, selectedCountry, sort, currentPage, pathname, router])
 
   const handleCategoryChange = useCallback((id: string | null) => { setSelectedCategory(id); setCurrentPage(1) }, [])
   const handleSort           = useCallback((v: string) => { setSort(v as SupplierSort); setCurrentPage(1) }, [])
   const clearAll             = useCallback(() => {
-    setInputValue(""); setSearchTerm(""); setSelectedCategory(null); setSort("none"); setCurrentPage(1)
+    setInputValue(""); setSearchTerm(""); setSelectedCategory(null)
+    setSelectedCountry(null); setSort("service_asc"); setCurrentPage(1)
   }, [])
 
   const { data, isLoading, isFetching } = useSuppliersListing({
     search: searchTerm,
     categoryId: selectedCategory,
+    country: selectedCountry,
     sort,
     page: currentPage,
     pageSize,
   })
   const { data: categories } = useSupplierCategories()
+  const { data: countryList = [] } = useSupplierCountries()
 
   const suppliers  = data?.data ?? []
   const total      = data?.total ?? 0
   const totalPages = Math.ceil(total / pageSize)
-  const hasActiveFilters = !!searchTerm || !!selectedCategory || sort !== "none"
+  const hasActiveFilters = !!searchTerm || !!selectedCategory || !!selectedCountry || sort !== "service_asc"
 
   const handleToggle = (id: string) => setExpandedIds((prev) => ({
     ...prev,
@@ -291,28 +321,50 @@ export default function SuppliersListingClient() {
     >
       <div>
         <PublicBreadcrumb crumbs={[{ label: "Suppliers" }]} />
-        <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">Suppliers</h1>
-        <p className="mt-1 text-sm text-zinc-500">Browse our verified network of mold and die suppliers</p>
+        <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">
+          Suppliers
+        </h1>
+        <p className="mt-1 text-sm text-zinc-500">
+          Browse our verified network of mold and die suppliers
+        </p>
       </div>
 
-      <ListingFiltersBar
-        searchValue={inputValue}
-        onSearchChange={setInputValue}
-        searchPlaceholder="Search suppliers…"
-        sortValue={sort}
-        onSortChange={handleSort}
-        sortOptions={SORT_OPTIONS}
-        categories={categories}
-        categoryValue={selectedCategory ?? ""}
-        onCategoryChange={handleCategoryChange}
-        hasActiveFilters={hasActiveFilters}
-        onClear={clearAll}
-        isFetching={isFetching && !isLoading}
-      />
+      <div className="space-y-3">
+        <ListingFiltersBar
+          searchValue={inputValue}
+          onSearchChange={setInputValue}
+          searchPlaceholder="Search suppliers…"
+          sortValue={sort}
+          onSortChange={handleSort}
+          sortOptions={SORT_OPTIONS}
+          categories={categories}
+          categoryValue={selectedCategory ?? ""}
+          onCategoryChange={handleCategoryChange}
+          hasActiveFilters={hasActiveFilters}
+          onClear={clearAll}
+          isFetching={isFetching && !isLoading}
+        />
+
+        {/* Country filter */}
+        {countryList.length > 0 && (
+          <select
+            value={selectedCountry ?? ""}
+            onChange={(e) => { setSelectedCountry(e.target.value || null); setCurrentPage(1) }}
+            className="h-9 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition w-full sm:w-52"
+          >
+            <option value="">All countries</option>
+            {countryList.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+        )}
+      </div>
 
       {!isLoading && (
         <p className="text-xs text-zinc-400">
-          {total === 0 ? "No results" : `${total} supplier${total !== 1 ? "s" : ""} found`}
+          {total === 0
+            ? "No results"
+            : `${total} supplier${total !== 1 ? "s" : ""} found`}
         </p>
       )}
 
@@ -321,12 +373,19 @@ export default function SuppliersListingClient() {
           {Array.from({ length: pageSize }).map((_, i) => <SkeletonCard key={i} />)}
         </div>
       ) : suppliers.length === 0 ? (
-        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="flex flex-col items-center justify-center py-24 text-center">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="flex flex-col items-center justify-center py-24 text-center"
+        >
           <Building2 size={48} className="text-zinc-200 mb-4" strokeWidth={1} />
           <p className="text-zinc-500 font-medium">No suppliers found</p>
           <p className="text-zinc-400 text-sm mt-1">Try adjusting your search or filters</p>
           {hasActiveFilters && (
-            <button onClick={clearAll} className="mt-4 text-sm text-primary underline underline-offset-2 hover:opacity-70">
+            <button
+              onClick={clearAll}
+              className="mt-4 text-sm text-primary underline underline-offset-2 hover:opacity-70"
+            >
               Clear all filters
             </button>
           )}
@@ -337,7 +396,9 @@ export default function SuppliersListingClient() {
           variants={gridVariants}
           initial="initial"
           animate="animate"
-          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}
+          className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-stretch transition-opacity duration-200 ${
+            isFetching && !isLoading ? "opacity-60" : ""
+          }`}
         >
           {suppliers.map((supplier) => (
             <SupplierCard

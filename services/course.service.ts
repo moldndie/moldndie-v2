@@ -74,7 +74,7 @@ export async function getCourses(): Promise<Course[]> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from("courses")
-    .select("id, title, description, price, thumbnail_url, is_published, created_at")
+    .select("id, title, description, price, thumbnail_url, is_published, category_id, trainee_level, created_at")
     .order("created_at", { ascending: false })
   if (error) throw dbError(error)
   return (data ?? []) as Course[]
@@ -82,13 +82,12 @@ export async function getCourses(): Promise<Course[]> {
 
 export async function getCourseById(id: string): Promise<Course> {
   const supabase = createAdminClient()
-  const { data, error } = await supabase
-    .from("courses")
-    .select("*, lessons(*)")
-    .eq("id", id)
-    .single()
-  if (error) throw dbError(error)
-  return data as Course
+  const [courseResult, lessonsResult] = await Promise.all([
+    supabase.from("courses").select("*").eq("id", id).single(),
+    supabase.from("lessons").select("*").eq("course_id", id).order("order_index"),
+  ])
+  if (courseResult.error) throw dbError(courseResult.error)
+  return { ...courseResult.data, lessons: lessonsResult.data ?? [] } as Course
 }
 
 export async function getCourseByIdAdmin(id: string): Promise<Course> {
