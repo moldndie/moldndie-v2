@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Eye, EyeOff, Lock } from "lucide-react";
+import { Eye, EyeOff, Lock, CheckCircle2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { resetPasswordSchema, type ResetPasswordInput } from "@/schemas/auth.schema";
@@ -12,11 +12,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 
-export default function ResetPasswordPage() {
+export default function SetPasswordPage() {
   const router = useRouter();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [ready, setReady] = useState(false);
+  const [done, setDone] = useState(false);
 
   const {
     register,
@@ -26,9 +27,6 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     const supabase = createClient();
-
-    // The browser client automatically reads the #access_token hash.
-    // getSession() resolves after that processing is done.
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
         router.replace("/login");
@@ -45,8 +43,8 @@ export default function ResetPasswordPage() {
     if (error) {
       toast.error(error.message);
     } else {
-      toast.success("Password updated successfully!");
-      router.push("/dashboard");
+      setDone(true);
+      setTimeout(() => router.push("/dashboard"), 1800);
     }
   }
 
@@ -58,19 +56,31 @@ export default function ResetPasswordPage() {
     );
   }
 
+  if (done) {
+    return (
+      <div className="w-full flex flex-col items-center justify-center py-12 text-center gap-4">
+        <CheckCircle2 className="size-12 text-green-500" />
+        <h2 className="text-xl font-semibold text-foreground">You&apos;re all set!</h2>
+        <p className="text-sm text-muted-foreground">Redirecting you to the dashboard…</p>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full flex flex-col">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground">Set New Password</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          Choose a strong password for your account.
+        <p className="text-sm font-medium text-primary uppercase tracking-wide mb-1">
+          Welcome to MoldNdie
+        </p>
+        <h1 className="text-3xl font-bold text-foreground">Set your password</h1>
+        <p className="mt-1.5 text-sm text-muted-foreground">
+          Your account is ready. Choose a password to complete your setup.
         </p>
       </div>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
-        {/* New Password */}
         <div className="space-y-1.5">
-          <Label htmlFor="password">New Password</Label>
+          <Label htmlFor="password">Password</Label>
           <div className="relative">
             <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <Input
@@ -93,9 +103,8 @@ export default function ResetPasswordPage() {
           {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
         </div>
 
-        {/* Confirm Password */}
         <div className="space-y-1.5">
-          <Label htmlFor="confirm_password">Confirm Password</Label>
+          <Label htmlFor="confirm_password">Confirm password</Label>
           <div className="relative">
             <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <Input
@@ -115,7 +124,9 @@ export default function ResetPasswordPage() {
               {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
             </button>
           </div>
-          {errors.confirm_password && <p className="text-xs text-destructive">{errors.confirm_password.message}</p>}
+          {errors.confirm_password && (
+            <p className="text-xs text-destructive">{errors.confirm_password.message}</p>
+          )}
         </div>
 
         <Button
@@ -123,7 +134,7 @@ export default function ResetPasswordPage() {
           disabled={isSubmitting}
           className="w-full h-10 cursor-pointer hover:opacity-90"
         >
-          {isSubmitting ? "Updating..." : "Set new password"}
+          {isSubmitting ? "Setting up your account…" : "Activate my account"}
         </Button>
       </form>
     </div>

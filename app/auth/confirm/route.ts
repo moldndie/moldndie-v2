@@ -23,9 +23,9 @@ export async function GET(request: NextRequest) {
     const { error } = await supabase.auth.verifyOtp({ token_hash, type });
 
     if (!error) {
-      // For invite / recovery the user must still set their password.
       const destination =
-        next ?? (type === "invite" || type === "recovery" ? "/reset-password" : "/dashboard");
+        next ??
+        (type === "invite" ? "/set-password" : type === "recovery" ? "/reset-password" : "/dashboard");
       return NextResponse.redirect(`${origin}${destination}`);
     }
 
