@@ -102,19 +102,27 @@ export async function createUser(payload: {
 
   const inviteUrl = linkData.properties.action_link
 
-  // Send via Resend — no Supabase email rate limits
-  const resend = new Resend(process.env.RESEND_API_KEY)
+  const resendKey = process.env.RESEND_API_KEY
+  if (!resendKey) throw new Error("RESEND_API_KEY is not set in environment variables")
+
   const fromEmail = process.env.FROM_EMAIL ?? "noreply@moldndie.com"
-  const { error: emailError } = await resend.emails.send({
-    from: `MoldNdie <${fromEmail}>`,
-    to: payload.email,
-    subject: "You've been invited to join MoldNdie",
-    html: buildInviteEmail(inviteUrl, payload.first_name),
-  })
-  if (emailError) {
+
+  try {
+    const resend = new Resend(resendKey)
+    const { error: emailError } = await resend.emails.send({
+      from: `MoldNdie <${fromEmail}>`,
+      to: payload.email,
+      subject: "You've been invited to join MoldNdie",
+      html: buildInviteEmail(inviteUrl, payload.first_name),
+    })
+    if (emailError) {
+      throw new Error(emailError.message)
+    }
+  } catch (e) {
     // Clean up the orphaned auth user so the invite can be retried
     await admin.auth.admin.deleteUser(linkData.user.id).catch(() => {})
-    throw new Error(`Failed to send invitation email: ${emailError.message}`)
+    const msg = e instanceof Error ? e.message : "Unknown error"
+    throw new Error(`Failed to send invitation email: ${msg}`)
   }
 
   const authData = linkData
