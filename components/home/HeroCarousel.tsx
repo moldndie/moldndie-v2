@@ -104,7 +104,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
   return (
     <section
       className="relative w-full overflow-hidden bg-zinc-950 select-none"
-      style={{ height: "min(56.25vw, 92vh)" }}
+      style={{ height: "min(56.25vw, 75vh)" }}
     >
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
@@ -133,7 +133,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
                 alt={slide.alt_text ?? slide.title ?? `Hero slide ${index + 1}`}
                 fill
                 priority={index === 0}
-                className="object-contain pointer-events-none sm:hidden"
+                className="object-cover pointer-events-none sm:hidden"
                 sizes="100vw"
                 draggable={false}
               />
@@ -142,7 +142,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
                 alt={slide.alt_text ?? slide.title ?? `Hero slide ${index + 1}`}
                 fill
                 priority={index === 0}
-                className="object-contain pointer-events-none hidden sm:block"
+                className="object-cover pointer-events-none hidden sm:block"
                 sizes="100vw"
                 draggable={false}
               />
@@ -153,7 +153,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
               alt={slide.alt_text ?? slide.title ?? `Hero slide ${index + 1}`}
               fill
               priority={index === 0}
-              className="object-contain pointer-events-none"
+              className="object-cover pointer-events-none"
               sizes="100vw"
               draggable={false}
             />
