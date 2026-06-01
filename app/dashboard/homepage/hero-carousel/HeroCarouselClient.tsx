@@ -5,6 +5,7 @@ import Image from "next/image"
 import { toast } from "sonner"
 import {
   Plus,
+  Pencil,
   Trash2,
   ChevronUp,
   ChevronDown,
@@ -89,8 +90,16 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
   const [imageUploading, setImageUploading] = useState(false)
   const [mobileUploading, setMobileUploading] = useState(false)
 
+  // edit state
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editForm, setEditForm] = useState<SlideForm>(EMPTY_FORM)
+  const [editFormKey, setEditFormKey] = useState(0)
+  const [editImageUploading, setEditImageUploading] = useState(false)
+  const [editMobileUploading, setEditMobileUploading] = useState(false)
+
   const activeCount = slides.filter((s) => s.is_active).length
   const isUploading = imageUploading || mobileUploading
+  const isEditUploading = editImageUploading || editMobileUploading
 
   function field(key: keyof SlideForm) {
     return (v: string) => setForm((prev) => ({ ...prev, [key]: v }))
@@ -100,6 +109,74 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
     setForm(EMPTY_FORM)
     setFormKey((k) => k + 1)
     setShowForm(false)
+  }
+
+  function editField(key: keyof SlideForm) {
+    return (v: string) => setEditForm((prev) => ({ ...prev, [key]: v }))
+  }
+
+  function openEdit(slide: HeroSlide) {
+    setEditingId(slide.id)
+    setEditForm({
+      image_url: slide.image_url,
+      mobile_image: slide.mobile_image ?? "",
+      title: slide.title ?? "",
+      subtitle: slide.subtitle ?? "",
+      button_text: slide.button_text ?? "",
+      button_link: slide.button_link ?? "",
+      alt_text: slide.alt_text ?? "",
+    })
+    setEditFormKey((k) => k + 1)
+    setShowForm(false)
+  }
+
+  function closeEdit() {
+    setEditingId(null)
+    setEditForm(EMPTY_FORM)
+  }
+
+  function handleSaveEdit() {
+    if (!editingId) return
+    if (!isValidImageUrl(editForm.image_url)) {
+      toast.error("Please upload a slide image first.")
+      return
+    }
+    setPendingId(editingId)
+    startTransition(async () => {
+      try {
+        await updateHeroSlide(editingId, {
+          image_url: editForm.image_url,
+          mobile_image: editForm.mobile_image || null,
+          title: editForm.title || null,
+          subtitle: editForm.subtitle || null,
+          button_text: editForm.button_text || null,
+          button_link: editForm.button_link || null,
+          alt_text: editForm.alt_text || null,
+        })
+        setSlides((prev) =>
+          prev.map((s) =>
+            s.id === editingId
+              ? {
+                  ...s,
+                  image_url: editForm.image_url,
+                  mobile_image: editForm.mobile_image || null,
+                  title: editForm.title || null,
+                  subtitle: editForm.subtitle || null,
+                  button_text: editForm.button_text || null,
+                  button_link: editForm.button_link || null,
+                  alt_text: editForm.alt_text || null,
+                }
+              : s,
+          ),
+        )
+        closeEdit()
+        toast.success("Slide updated.")
+      } catch (e) {
+        toast.error((e as Error).message ?? "Failed to update slide.")
+      } finally {
+        setPendingId(null)
+      }
+    })
   }
 
   function handleAdd() {
@@ -214,7 +291,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
         </p>
 
         <button
-          onClick={() => setShowForm((v) => !v)}
+          onClick={() => { setShowForm((v) => !v); closeEdit() }}
           disabled={isPending}
           className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 text-white font-semibold text-sm px-4 py-2 rounded-lg transition-colors"
         >
@@ -351,8 +428,8 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
       ) : (
         <div className="space-y-3">
           {slides.map((slide, idx) => (
+            <div key={slide.id} className="space-y-2">
             <div
-              key={slide.id}
               className={cn(
                 "bg-white rounded-xl border border-zinc-200 p-4 flex gap-4 items-center transition-opacity duration-200",
                 !slide.is_active && "opacity-55",
@@ -360,13 +437,13 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
               )}
             >
               {/* Thumbnail */}
-              <div className="relative h-20 w-32 shrink-0 rounded-lg overflow-hidden bg-zinc-100 flex items-center justify-center">
+              <div className="relative w-56 aspect-video shrink-0 rounded-lg bg-zinc-100 flex items-center justify-center overflow-hidden">
                 {isValidImageUrl(slide.image_url) ? (
                   <Image
                     src={slide.image_url}
                     alt={slide.alt_text ?? slide.title ?? `Slide ${idx + 1}`}
                     fill
-                    className="object-cover"
+                    className="object-contain"
                     sizes="128px"
                   />
                 ) : (
@@ -432,6 +509,20 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                 </button>
 
                 <button
+                  onClick={() => (editingId === slide.id ? closeEdit() : openEdit(slide))}
+                  disabled={isPending}
+                  title={editingId === slide.id ? "Cancel edit" : "Edit slide"}
+                  className={cn(
+                    "p-1.5 rounded-md transition-colors disabled:opacity-30",
+                    editingId === slide.id
+                      ? "text-primary bg-primary/10 hover:bg-primary/20"
+                      : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100",
+                  )}
+                >
+                  <Pencil className="size-4" />
+                </button>
+
+                <button
                   onClick={() => handleToggle(slide)}
                   disabled={isPending}
                   title={slide.is_active ? "Deactivate" : "Activate"}
@@ -453,6 +544,117 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                   <Trash2 className="size-4" />
                 </button>
               </div>
+            </div>
+
+            {/* ── Inline edit form ── */}
+            {editingId === slide.id && (
+              <div className="bg-zinc-50 rounded-xl border border-primary/20 p-6 space-y-5">
+                <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">
+                  Edit Slide
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 mb-1.5">
+                      Desktop Image <span className="text-red-500">*</span>
+                    </label>
+                    <CroppableFileUploadField
+                      key={`edit-desktop-${slide.id}-${editFormKey}`}
+                      folder="hero/slides"
+                      aspect={16 / 9}
+                      label="Click to replace desktop image (16:9)"
+                      existingValue={editForm.image_url || null}
+                      onUploadSuccess={({ url }) => editField("image_url")(url)}
+                      onUploadingChange={setEditImageUploading}
+                    />
+                    <p className="mt-1.5 text-xs text-zinc-400">
+                      Landscape 16:9 — recommended 1920×1080px or wider.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-zinc-700 mb-1.5">
+                      Mobile Image{" "}
+                      <span className="text-zinc-400 font-normal">(optional)</span>
+                    </label>
+                    <CroppableFileUploadField
+                      key={`edit-mobile-${slide.id}-${editFormKey}`}
+                      folder="hero/slides"
+                      aspect={9 / 16}
+                      label="Click to add mobile image (9:16)"
+                      existingValue={editForm.mobile_image || null}
+                      onUploadSuccess={({ url }) => editField("mobile_image")(url)}
+                      onUploadingChange={setEditMobileUploading}
+                    />
+                    <p className="mt-1.5 text-xs text-zinc-400">
+                      Portrait 9:16 — falls back to desktop image if omitted.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <FormField
+                    label="Title"
+                    value={editForm.title}
+                    onChange={editField("title")}
+                    placeholder="e.g. New Academy Course"
+                  />
+                  <FormField
+                    label="Subtitle"
+                    value={editForm.subtitle}
+                    onChange={editField("subtitle")}
+                    placeholder="Short supporting text"
+                  />
+                  <FormField
+                    label="Button Text"
+                    value={editForm.button_text}
+                    onChange={editField("button_text")}
+                    placeholder="e.g. Learn More"
+                  />
+                  <FormField
+                    label="Button Link"
+                    value={editForm.button_link}
+                    onChange={editField("button_link")}
+                    placeholder="/courses"
+                  />
+                </div>
+
+                <div className="border-t border-zinc-200 pt-4 space-y-1.5">
+                  <p className="text-xs font-bold text-zinc-500 uppercase tracking-wide mb-3">
+                    SEO / Accessibility
+                  </p>
+                  <FormField
+                    label="Image Alt Text"
+                    value={editForm.alt_text}
+                    onChange={editField("alt_text")}
+                    placeholder="Describe the image for screen readers and search engines"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-3">
+                  <button
+                    type="button"
+                    onClick={closeEdit}
+                    className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSaveEdit}
+                    disabled={isPending || isEditUploading || !isValidImageUrl(editForm.image_url)}
+                    className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm px-6 py-2 rounded-lg transition-colors"
+                  >
+                    {isPending || isEditUploading ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      <Pencil className="size-4" />
+                    )}
+                    {isEditUploading ? "Uploading…" : "Save Changes"}
+                  </button>
+                </div>
+              </div>
+            )}
             </div>
           ))}
         </div>
