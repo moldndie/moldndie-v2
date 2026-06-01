@@ -73,28 +73,64 @@ export async function reactivateUser(id: string): Promise<void> {
 }
 
 export async function createUser(payload: {
-  email: string
+  invitation_method: "email" | "sms"
+  email?: string
+  phone?: string
   first_name: string
   last_name: string
-  phone?: string
   country_code?: string
   role: "admin" | "user"
 }): Promise<Profile> {
   const admin = createAdminClient()
-
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? ""
 
-  // Invite the user — no plaintext password. Supabase sends a set-password email.
-  const { data: authData, error: authError } = await admin.auth.admin.inviteUserByEmail(
-    payload.email,
-    {
-      data: { first_name: payload.first_name, last_name: payload.last_name },
-      redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
-    }
-  )
-  if (authError) throw dbError(authError)
+  let userId: string
+  let userEmail: string | null = null
 
-  const userId = authData.user.id
+  if (payload.invitation_method === "email") {
+    if (!payload.email) throw new Error("Email is required for email invitation")
+
+    const { data: authData, error: authError } = await admin.auth.admin.inviteUserByEmail(
+      payload.email,
+      {
+        data: { first_name: payload.first_name, last_name: payload.last_name },
+        redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
+      }
+    )
+    if (authError) {
+      const msg = authError.message ?? ""
+      if (msg.toLowerCase().includes("already") || msg.toLowerCase().includes("exist")) {
+        throw new Error("A user with this email already exists.")
+      }
+      if (msg.toLowerCase().includes("smtp") || msg.toLowerCase().includes("email")) {
+        throw new Error("Failed to send invitation email. Please check SMTP configuration.")
+      }
+      throw new Error(`Invitation failed: ${msg}`)
+    }
+    userId  = authData.user.id
+    userEmail = payload.email
+
+  } else {
+    if (!payload.phone) throw new Error("Phone number is required for SMS invitation")
+
+    const { data: authData, error: authError } = await admin.auth.admin.createUser({
+      phone: payload.phone,
+      phone_confirm: false,
+      user_metadata: { first_name: payload.first_name, last_name: payload.last_name },
+    })
+    if (authError) {
+      const msg = authError.message ?? ""
+      if (msg.toLowerCase().includes("already") || msg.toLowerCase().includes("exist")) {
+        throw new Error("A user with this phone number already exists.")
+      }
+      if (msg.toLowerCase().includes("invalid") || msg.toLowerCase().includes("phone")) {
+        throw new Error("Invalid phone number format. Please use international format (e.g. +201234567890).")
+      }
+      throw new Error(`User creation failed: ${msg}`)
+    }
+    userId = authData.user.id
+  }
+
   const { data, error } = await admin
     .from("profiles")
     .insert({
@@ -107,10 +143,14 @@ export async function createUser(payload: {
     })
     .select()
     .single()
-  if (error) throw dbError(error)
+  if (error) {
+    // Attempt to clean up the orphaned auth user if profile insert fails
+    await admin.auth.admin.deleteUser(userId).catch(() => {})
+    throw new Error(`Profile creation failed: ${error.message}`)
+  }
 
   revalidatePath("/dashboard/users")
-  return { ...data, email: payload.email, email_confirmed_at: null } as Profile
+  return { ...data, email: userEmail, email_confirmed_at: null } as Profile
 }
 
 export async function resendVerificationEmail(email: string): Promise<void> {

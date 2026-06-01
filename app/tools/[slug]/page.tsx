@@ -1,10 +1,12 @@
 import { Metadata } from "next"
+import { Suspense } from "react"
 import { notFound } from "next/navigation"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { getCalculatorBySlug, getCalculators } from "@/services/calculator.service"
 import CalculatorRunner from "./CalculatorRunner"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
+import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 
 export async function generateStaticParams() {
   const calcs = await getCalculators({ published: true }).catch(() => [])
@@ -91,6 +93,12 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
             </div>
           )}
         </section>
+        <div className="max-w-5xl mx-auto px-6 pb-12">
+          <hr className="border-zinc-100 mb-8" />
+          <Suspense fallback={null}>
+            <AdSlotGrid page="engineering" className="w-full" />
+          </Suspense>
+        </div>
       </main>
       <Footer />
     </div>
