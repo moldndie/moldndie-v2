@@ -44,7 +44,7 @@ export default function SetPasswordPage() {
       toast.error(error.message);
     } else {
       setDone(true);
-      setTimeout(() => router.push("/dashboard"), 1800);
+      setTimeout(() => router.push("/login"), 1800);
     }
   }
 
@@ -60,8 +60,8 @@ export default function SetPasswordPage() {
     return (
       <div className="w-full flex flex-col items-center justify-center py-12 text-center gap-4">
         <CheckCircle2 className="size-12 text-green-500" />
-        <h2 className="text-xl font-semibold text-foreground">You&apos;re all set!</h2>
-        <p className="text-sm text-muted-foreground">Redirecting you to the dashboard…</p>
+        <h2 className="text-xl font-semibold text-foreground">Password set!</h2>
+        <p className="text-sm text-muted-foreground">Redirecting you to the login page…</p>
       </div>
     );
   }
