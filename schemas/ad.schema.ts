@@ -8,6 +8,7 @@ export const AD_PAGE_OPTIONS: { value: string; label: string }[] = [
   { value: "engineering", label: "Engineering" },
   { value: "suppliers",   label: "Suppliers" },
   { value: "events",      label: "Events" },
+  { value: "services",    label: "Services" },
 ]
 
 export const adSchema = z.object({

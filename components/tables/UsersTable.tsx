@@ -112,7 +112,16 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
   })
 
   const createMutation = useMutation({
-    mutationFn: (values: UserCreateValues) => createUser(values),
+    mutationFn: (values: UserCreateValues) =>
+      createUser({
+        invitation_method: values.invitation_method,
+        email: values.email,
+        phone: values.phone,
+        first_name: values.first_name,
+        last_name: values.last_name,
+        country_code: values.country_code,
+        role: values.role,
+      }),
     onSuccess: (newUser) => {
       queryClient.setQueryData<Profile[]>(QUERY_KEYS.USERS, (old = []) => [newUser, ...old])
       toast.success("Invitation sent.")

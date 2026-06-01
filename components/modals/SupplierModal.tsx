@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { supplierSchema, type SupplierFormValues } from "@/schemas/supplier.schema"
 import { useCreateSupplier, useUpdateSupplier, useSupplierCategories } from "@/hooks/queries/useSuppliers"
+import { countries } from "@/lib/countries"
 import type { Supplier } from "@/types"
 
 interface SupplierModalProps {
@@ -144,7 +145,17 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Country</label>
-          <Input {...register("country")} placeholder="e.g. Egypt" />
+          <Select {...register("country")}>
+            <option value="">— Select country —</option>
+            {countries
+              .slice()
+              .sort((a, b) => a.name.localeCompare(b.name))
+              .map((c) => (
+                <option key={c.code} value={c.name}>
+                  {c.name}
+                </option>
+              ))}
+          </Select>
         </div>
 
         <div className="space-y-1.5">

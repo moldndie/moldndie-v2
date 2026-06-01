@@ -139,8 +139,6 @@ function SupplierCard({
       className={`rounded-xl overflow-hidden border bg-white shadow-sm transition-colors duration-200 flex flex-col h-full ${
         expanded
           ? "border-primary shadow-md"
-          : supplier.sponsored
-          ? "border-amber-200 hover:shadow-lg hover:border-amber-300"
           : "border-zinc-100 hover:shadow-lg hover:border-zinc-200"
       }`}
     >
@@ -150,12 +148,6 @@ function SupplierCard({
         transition={{ duration: 0.1 }}
         className="w-full flex-1 p-5 flex flex-col gap-4 text-left"
       >
-        {supplier.sponsored && (
-          <span className="self-start text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700 tracking-wide uppercase">
-            Sponsored
-          </span>
-        )}
-
         {/* Supplier image — aspect-4/3 matches the 4:3 crop ratio */}
         <div className="w-full aspect-4/3 rounded-xl overflow-hidden bg-zinc-100 border border-zinc-100 relative">
           {logoSrc ? (
@@ -170,6 +162,11 @@ function SupplierCard({
             <div className="w-full h-full flex items-center justify-center">
               <Building2 size={36} className="text-zinc-300" strokeWidth={1} />
             </div>
+          )}
+          {supplier.sponsored && (
+            <span className="absolute top-2 left-2 text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500 text-white tracking-wide uppercase shadow-sm">
+              Sponsored
+            </span>
           )}
         </div>
 

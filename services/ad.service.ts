@@ -25,15 +25,37 @@ export async function getAds(): Promise<Ad[]> {
 async function fetchActiveAds(page: string): Promise<Ad[]> {
   const supabase = createAdminClient()
   const now = new Date().toISOString()
+
+  // Fetch all active ads for this page, then filter dates in JS to avoid
+  // PostgREST OR-chain edge cases with timestamptz parsing.
   const { data, error } = await supabase
     .from("ads")
     .select("*")
     .contains("target_pages", [page])
     .eq("is_active", true)
-    .or(`starts_at.is.null,starts_at.lte.${now}`)
-    .or(`ends_at.is.null,ends_at.gte.${now}`)
-  if (error) throw dbError(error)
-  return (data ?? []) as Ad[]
+
+  if (error) {
+    console.error(`[ads] query error for page="${page}":`, error.message)
+    throw dbError(error)
+  }
+
+  const all = (data ?? []) as Ad[]
+
+  // Apply date-range filter in JS so timezone/format issues can't silently drop ads.
+  const filtered = all.filter((ad) => {
+    const afterStart = !ad.starts_at || ad.starts_at <= now
+    const beforeEnd  = !ad.ends_at   || ad.ends_at   >= now
+    return afterStart && beforeEnd
+  })
+
+  if (process.env.NODE_ENV !== "production") {
+    console.log(
+      `[ads] page="${page}" found=${all.length} after_date_filter=${filtered.length}`,
+      filtered.map((a) => ({ id: a.id, target_pages: a.target_pages, starts_at: a.starts_at, ends_at: a.ends_at }))
+    )
+  }
+
+  return filtered
 }
 
 function shuffle<T>(arr: T[]): T[] {

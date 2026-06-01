@@ -1,4 +1,5 @@
 import type { Metadata } from "next"
+import { Suspense } from "react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import SupplierDetailClient from "./SupplierDetailClient"
@@ -23,7 +24,9 @@ export default async function SupplierDetailPage({
         <SupplierDetailClient supplierId={id} />
         <div className="max-w-7xl mx-auto px-6 pb-12">
           <hr className="border-zinc-100 mb-8" />
-          <AdSlotGrid page="suppliers" className="w-full" />
+          <Suspense fallback={null}>
+            <AdSlotGrid page="suppliers" className="w-full" />
+          </Suspense>
         </div>
       </main>
       <Footer />
