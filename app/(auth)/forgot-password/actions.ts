@@ -13,9 +13,6 @@ export async function forgotPasswordAction(
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: "recovery",
     email: data.email,
-    options: {
-      redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
-    },
   });
 
   // Always return success to avoid exposing whether an email exists
@@ -24,6 +21,7 @@ export async function forgotPasswordAction(
   const resendKey = process.env.RESEND_API_KEY;
   if (!resendKey) return { error: "Email service is not configured." };
 
+  const confirmUrl = `${siteUrl}/auth/confirm?token_hash=${linkData.properties.hashed_token}&type=recovery`;
   const fromEmail = process.env.FROM_EMAIL ?? "noreply@moldndie.com";
   const resend = new Resend(resendKey);
 
@@ -31,7 +29,7 @@ export async function forgotPasswordAction(
     from: `MoldNdie <${fromEmail}>`,
     to: data.email,
     subject: "Reset your MoldNdie password",
-    html: buildResetPasswordEmail(linkData.properties.action_link, siteUrl),
+    html: buildResetPasswordEmail(confirmUrl, siteUrl),
   });
 
   if (emailError) return { error: `Failed to send email: ${emailError.message}` };

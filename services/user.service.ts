@@ -88,7 +88,6 @@ export async function createUser(payload: {
     email: payload.email,
     options: {
       data: { first_name: payload.first_name, last_name: payload.last_name },
-      redirectTo: `${siteUrl}/auth/callback?next=/set-password`,
     },
   })
   if (linkError) {
@@ -99,7 +98,8 @@ export async function createUser(payload: {
     throw new Error(msg || "Failed to generate invitation link")
   }
 
-  const inviteUrl = linkData.properties.action_link
+  // Use token_hash + /auth/confirm — avoids PKCE verifier mismatch that action_link causes
+  const inviteUrl = `${siteUrl}/auth/confirm?token_hash=${linkData.properties.hashed_token}&type=invite`
 
   const resendKey = process.env.RESEND_API_KEY
   if (!resendKey) throw new Error("RESEND_API_KEY is not set in environment variables")
@@ -168,15 +168,13 @@ export async function resendVerificationEmail(email: string): Promise<void> {
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: "invite",
     email,
-    options: {
-      redirectTo: `${siteUrl}/auth/callback?next=/set-password`,
-    },
   })
   if (linkError) throw dbError(linkError)
 
   const resendKey = process.env.RESEND_API_KEY
   if (!resendKey) throw new Error("RESEND_API_KEY is not set")
 
+  const confirmUrl = `${siteUrl}/auth/confirm?token_hash=${linkData.properties.hashed_token}&type=invite`
   const resend = new Resend(resendKey)
   const fromEmail = process.env.FROM_EMAIL ?? "noreply@moldndie.com"
 
@@ -184,7 +182,7 @@ export async function resendVerificationEmail(email: string): Promise<void> {
     from: `MoldNdie <${fromEmail}>`,
     to: email,
     subject: "Your invitation to MoldNdie",
-    html: buildInviteEmail(linkData.properties.action_link, ""),
+    html: buildInviteEmail(confirmUrl, ""),
   })
   if (emailError) throw new Error(`Failed to resend invite: ${emailError.message}`)
 }
@@ -196,15 +194,13 @@ export async function resetPasswordForUser(email: string): Promise<void> {
   const { data: linkData, error: linkError } = await admin.auth.admin.generateLink({
     type: "recovery",
     email,
-    options: {
-      redirectTo: `${siteUrl}/auth/callback?next=/reset-password`,
-    },
   })
   if (linkError) throw dbError(linkError)
 
   const resendKey = process.env.RESEND_API_KEY
   if (!resendKey) throw new Error("RESEND_API_KEY is not set")
 
+  const confirmUrl = `${siteUrl}/auth/confirm?token_hash=${linkData.properties.hashed_token}&type=recovery`
   const resend = new Resend(resendKey)
   const fromEmail = process.env.FROM_EMAIL ?? "noreply@moldndie.com"
 
@@ -212,7 +208,7 @@ export async function resetPasswordForUser(email: string): Promise<void> {
     from: `MoldNdie <${fromEmail}>`,
     to: email,
     subject: "Reset your MoldNdie password",
-    html: buildResetPasswordEmail(linkData.properties.action_link, siteUrl),
+    html: buildResetPasswordEmail(confirmUrl, siteUrl),
   })
   if (emailError) throw new Error(`Failed to send reset email: ${emailError.message}`)
 }
