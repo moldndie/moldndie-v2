@@ -1,3 +1,5 @@
+import { getSiteSettings } from "@/services/siteSettings.service"
+
 export const metadata = { title: "Terms & Conditions" };
 
 const sections = [
@@ -35,7 +37,15 @@ const sections = [
   },
 ];
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  let contactEmail = "moldndie.eg@gmail.com"
+  try {
+    const settings = await getSiteSettings()
+    if (settings.contact_email) contactEmail = settings.contact_email
+  } catch {
+    // graceful fallback
+  }
+
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-3xl mx-auto px-6 py-16">
@@ -60,8 +70,8 @@ export default function TermsPage() {
         <div className="mt-12 pt-8 border-t border-zinc-200">
           <p className="text-sm text-zinc-500">
             If you have any questions about these Terms &amp; Conditions, please contact us at{" "}
-            <a href="mailto:support@example.com" className="text-[#7C2020] hover:underline">
-              support@example.com
+            <a href={`mailto:${contactEmail}`} className="text-[#7C2020] hover:underline">
+              {contactEmail}
             </a>
             .
           </p>
