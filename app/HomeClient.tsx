@@ -1,7 +1,9 @@
 "use client"
 
 import Link from "next/link"
-import { motion, type Variants } from "framer-motion"
+import { useState, useEffect, useRef } from "react"
+import { motion, useInView, type Variants } from "framer-motion"
+import { Layers, BookOpen, Users, Calendar, Globe } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 import HeroCarousel from "@/components/home/HeroCarousel"
 import type { HeroSlide } from "@/services/heroSlides.service"
@@ -115,13 +117,69 @@ function WhyCard({ card }: { card: HomeWhyCard }) {
   )
 }
 
-// ── Counter chip ───────────────────────────────────────────────────────────
-function CounterChip({ value, label }: { value: string; label: string }) {
+// ── Counter helpers ─────────────────────────────────────────────────────────
+const statIcons: Record<string, React.ElementType> = {
+  toolings: Layers,
+  courses:  BookOpen,
+  users:    Users,
+  events:   Calendar,
+  visitors: Globe,
+}
+
+function parseCounter(raw: string): { num: number; suffix: string } {
+  const clean = raw.replace(/,/g, "")
+  const m = clean.match(/^(\d+)(.*)$/)
+  return m ? { num: parseInt(m[1], 10), suffix: m[2] } : { num: 0, suffix: raw }
+}
+
+function useCountUp(end: number, active: boolean, duration = 1600) {
+  const [val, setVal] = useState(0)
+  useEffect(() => {
+    if (!active || end === 0) return
+    let raf: number
+    const t0 = performance.now()
+    const tick = (now: number) => {
+      const p  = Math.min((now - t0) / duration, 1)
+      const ep = 1 - Math.pow(1 - p, 3)        // easeOutCubic
+      setVal(Math.round(ep * end))
+      if (p < 1) raf = requestAnimationFrame(tick)
+      else setVal(end)
+    }
+    raf = requestAnimationFrame(tick)
+    return () => cancelAnimationFrame(raf)
+  }, [end, active, duration])
+  return val
+}
+
+function StatItem({
+  statKey, value, label, delay,
+}: {
+  statKey: string; value: string; label: string; delay: number
+}) {
+  const ref    = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: "-60px" })
+  const Icon   = statIcons[statKey] ?? Globe
+  const { num, suffix } = parseCounter(value)
+  const displayed = useCountUp(num, inView)
+
   return (
-    <div className="flex flex-col items-center gap-1.5 px-8 py-6 bg-white rounded-2xl border border-zinc-100 shadow-sm hover:shadow-md transition-shadow">
-      <span className="text-3xl md:text-4xl font-black text-primary tabular-nums">{value}</span>
-      <span className="text-xs font-semibold uppercase tracking-widest text-zinc-500">{label}</span>
-    </div>
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 24 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.5, delay, ease: "easeOut" }}
+      className="flex flex-col items-center gap-3 px-8 py-6"
+    >
+      <div className="w-11 h-11 rounded-full bg-white/10 ring-1 ring-white/15 flex items-center justify-center">
+        <Icon size={18} className="text-white/70" strokeWidth={1.5} />
+      </div>
+      <div className="text-center">
+        <p className="text-4xl md:text-5xl font-black text-white tabular-nums tracking-tight leading-none">
+          {displayed.toLocaleString()}{suffix}
+        </p>
+        <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.18em] text-white/45">{label}</p>
+      </div>
+    </motion.div>
   )
 }
 
@@ -281,32 +339,45 @@ export default function HomeClient({
 
       {/* ── Counters / Social Proof ── */}
       {counterEntries.length > 0 && (
-        <section className="bg-zinc-950 py-16 px-6">
-          <div className="max-w-4xl mx-auto">
-            <motion.p
-              {...scrollReveal}
-              className="text-center text-xs font-bold uppercase tracking-widest text-zinc-500 mb-8"
-            >
-              By the numbers
-            </motion.p>
-            <motion.div
-              variants={stagger(0.08)}
-              initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true, margin: "-40px" }}
-              className={`grid gap-4 ${
-                counterEntries.length === 1 ? "grid-cols-1 max-w-xs mx-auto"
-                : counterEntries.length === 2 ? "grid-cols-2 max-w-md mx-auto"
-                : counterEntries.length === 3 ? "grid-cols-3"
-                : "grid-cols-2 sm:grid-cols-4"
-              }`}
-            >
-              {counterEntries.map((c) => (
-                <motion.div key={c.key} variants={cardItem}>
-                  <CounterChip value={c.value!} label={c.label} />
-                </motion.div>
-              ))}
+        <section className="relative overflow-hidden bg-linear-to-br from-[#5C1515] via-[#3d0f0f] to-[#1a0404] py-20 px-6">
+          {/* dot-grid texture */}
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-[0.04]"
+            style={{
+              backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
+              backgroundSize: "28px 28px",
+            }}
+          />
+          {/* soft top glow */}
+          <div aria-hidden className="absolute -top-32 left-1/2 -translate-x-1/2 w-150 h-75 rounded-full bg-white/5 blur-3xl pointer-events-none" />
+
+          <div className="relative max-w-5xl mx-auto">
+            {/* heading */}
+            <motion.div {...scrollReveal} className="text-center mb-14">
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 mb-3">
+                Trusted by professionals worldwide
+              </p>
+              <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+                By the Numbers
+              </h2>
+              <div className="mt-4 mx-auto w-10 h-0.5 rounded-full bg-white/20" />
             </motion.div>
+
+            {/* stats row */}
+            <div className={`flex flex-wrap justify-center ${
+              counterEntries.length > 2 ? "divide-x divide-white/10" : "gap-8"
+            }`}>
+              {counterEntries.map((c, i) => (
+                <StatItem
+                  key={c.key}
+                  statKey={c.key}
+                  value={c.value!}
+                  label={c.label}
+                  delay={i * 0.1}
+                />
+              ))}
+            </div>
           </div>
         </section>
       )}
