@@ -6,7 +6,7 @@ import { getSiteSettings } from "@/services/siteSettings.service"
 import { getActiveHeroSlides } from "@/services/heroSlides.service"
 import { getActiveOfferItems } from "@/services/homeOfferItems.service"
 import { getActiveWhyCards } from "@/services/homeWhyCards.service"
-import { getTotalVisitorCount } from "@/services/visitorCount.service"
+import { getTotalVisitorCount, getMemberCount } from "@/services/visitorCount.service"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 import type { HeroSlide } from "@/services/heroSlides.service"
 import type { HomeOfferItem } from "@/services/homeOfferItems.service"
@@ -25,6 +25,7 @@ export default async function HomePage() {
   let offerItems: HomeOfferItem[] = []
   let whyCards: HomeWhyCard[] = []
   let visitorCount = 0
+  let memberCount  = 0
 
   await Promise.allSettled([
     getSiteSettings().then((s) => { settings = s }).catch(() => {}),
@@ -32,12 +33,14 @@ export default async function HomePage() {
     getActiveOfferItems().then((s) => { offerItems = s }).catch(() => {}),
     getActiveWhyCards().then((s) => { whyCards = s }).catch(() => {}),
     getTotalVisitorCount().then((n) => { visitorCount = n }).catch(() => {}),
+    getMemberCount().then((n)        => { memberCount  = n }).catch(() => {}),
   ])
 
   const counters = {
     toolings: settings.counter_toolings,
     courses:  settings.counter_courses,
-    users:    settings.counter_users,
+    // Real member count from profiles table; fall back to CMS value if DB returns 0
+    users:    memberCount > 0 ? memberCount.toLocaleString() : settings.counter_users,
     events:   settings.counter_events,
     visitors: visitorCount > 0 ? visitorCount.toLocaleString() : undefined,
   }
