@@ -170,14 +170,14 @@ function StatItem({
       transition={{ duration: 0.5, delay, ease: "easeOut" }}
       className="flex flex-col items-center gap-3 px-8 py-6"
     >
-      <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.12)", boxShadow: "0 0 0 1px rgba(255,255,255,0.15)" }}>
-        <Icon size={18} strokeWidth={1.5} style={{ color: "rgba(255,220,200,0.75)" }} />
+      <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "#FDE8E8", border: "1px solid #F5C0C0" }}>
+        <Icon size={18} strokeWidth={1.5} style={{ color: "#5C1515" }} />
       </div>
       <div className="text-center">
-        <p className="text-4xl md:text-5xl font-black tabular-nums tracking-tight leading-none" style={{ color: "#FFD9C8" }}>
+        <p className="text-4xl md:text-5xl font-black tabular-nums tracking-tight leading-none" style={{ color: "#5C1515" }}>
           {displayed.toLocaleString()}{suffix}
         </p>
-        <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "rgba(255,255,255,0.45)" }}>{label}</p>
+        <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "#9B4040" }}>{label}</p>
       </div>
     </motion.div>
   )
@@ -339,41 +339,22 @@ export default function HomeClient({
 
       {/* ── Counters / Social Proof ── */}
       {counterEntries.length > 0 && (
-        <section
-          className="relative overflow-hidden py-20 px-6"
-          style={{ background: "linear-gradient(135deg, #5C1515 0%, #3d0f0f 55%, #1a0404 100%)" }}
-        >
-          {/* dot-grid texture */}
-          <div
-            aria-hidden
-            className="absolute inset-0 opacity-[0.04]"
-            style={{
-              backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)",
-              backgroundSize: "28px 28px",
-            }}
-          />
-          {/* soft top glow */}
-          <div
-            aria-hidden
-            className="absolute -top-32 left-1/2 -translate-x-1/2 w-150 h-75 rounded-full blur-3xl pointer-events-none"
-            style={{ background: "rgba(255,255,255,0.06)" }}
-          />
-
-          <div className="relative max-w-5xl mx-auto">
+        <section className="bg-stone-50 py-20 px-6 border-y border-stone-200">
+          <div className="max-w-5xl mx-auto">
             {/* heading */}
             <motion.div {...scrollReveal} className="text-center mb-14">
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-white/30 mb-3">
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#9B4040" }}>
                 Trusted by professionals worldwide
               </p>
-              <h2 className="text-2xl md:text-3xl font-black text-white tracking-tight">
+              <h2 className="text-2xl md:text-3xl font-black tracking-tight" style={{ color: "#5C1515" }}>
                 By the Numbers
               </h2>
-              <div className="mt-4 mx-auto w-10 h-0.5 rounded-full bg-white/20" />
+              <div className="mt-4 mx-auto w-10 h-0.5 rounded-full" style={{ background: "#C06060" }} />
             </motion.div>
 
             {/* stats row */}
             <div className={`flex flex-wrap justify-center ${
-              counterEntries.length > 2 ? "divide-x divide-white/10" : "gap-8"
+              counterEntries.length > 2 ? "divide-x divide-red-200" : "gap-8"
             }`}>
               {counterEntries.map((c, i) => (
                 <StatItem
