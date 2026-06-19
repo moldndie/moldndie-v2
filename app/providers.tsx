@@ -6,6 +6,7 @@ import { QueryProvider } from "@/providers/query-provider";
 import { useCartMigration } from "@/hooks/useCartMigration";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { CurrencyProvider } from "@/context/CurrencyContext";
+import { CookieConsent } from "@/components/CookieConsent";
 
 function CartMigration() {
   useCartMigration();
@@ -21,6 +22,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
           <ErrorBoundary>
             {children}
           </ErrorBoundary>
+          <CookieConsent />
           <Toaster richColors position="top-right" />
         </CurrencyProvider>
       </ThemeProvider>

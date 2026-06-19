@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { Award, Layers, TrendingUp, GitBranch } from "lucide-react"
+import { getSiteSettings } from "@/services/siteSettings.service"
 
 export const metadata: Metadata = {
   title: "About Us | MoldNdie",
@@ -40,7 +41,15 @@ const offerings = [
   { label: "Services", desc: "A vertically integrated suite of engineering services — from product validation and DFM analysis to multi-disciplinary tooling design and turnkey project management." },
 ]
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  let contactEmail = "moldndie.eg@gmail.com"
+  try {
+    const settings = await getSiteSettings()
+    if (settings.contact_email) contactEmail = settings.contact_email
+  } catch {
+    // graceful fallback
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
@@ -164,8 +173,8 @@ export default function AboutPage() {
             </h2>
             <p className="text-zinc-600 text-sm leading-relaxed">
               Have questions, collaboration proposals, or want to learn more? Reach us at{" "}
-              <a href="mailto:moldndie.eg@gmail.com" className="text-primary hover:underline font-medium">
-                moldndie.eg@gmail.com
+              <a href={`mailto:${contactEmail}`} className="text-primary hover:underline font-medium">
+                {contactEmail}
               </a>
             </p>
           </section>

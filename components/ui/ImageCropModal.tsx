@@ -76,13 +76,13 @@ export function ImageCropModal({
   onCropDone,
   originalFileName = "image",
 }: ImageCropModalProps) {
+  const MIN_ZOOM = 0.1
+  const MAX_ZOOM = 3
+
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(1)
+  const [zoom, setZoom] = useState(MIN_ZOOM)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
   const [processing, setProcessing] = useState(false)
-
-  const MIN_ZOOM = 0.4
-  const MAX_ZOOM = 3
 
   // Preserve PNG transparency; everything else becomes JPEG
   const outputType: "image/jpeg" | "image/png" = isPng(originalFileName)
@@ -114,7 +114,7 @@ export function ImageCropModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+      <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100">
           <h2 className="text-base font-semibold text-zinc-900">Crop Image</h2>
@@ -128,7 +128,7 @@ export function ImageCropModal({
         </div>
 
         {/* Crop area */}
-        <div className="relative w-full bg-zinc-900" style={{ height: 320 }}>
+        <div className="relative w-full bg-zinc-900" style={{ height: 480 }}>
           <Cropper
             image={imageSrc}
             crop={crop}
@@ -160,7 +160,7 @@ export function ImageCropModal({
 
         {/* Hint */}
         <p className="px-5 pt-3 text-[11px] text-zinc-400 text-center">
-          Drag to reposition · Zoom out to capture more of the image
+          Drag to reposition · Use the slider to zoom out and capture the full image
           {outputType === "image/png" && (
             <span className="ml-1 text-blue-500">· PNG transparency preserved</span>
           )}

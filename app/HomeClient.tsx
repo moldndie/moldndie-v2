@@ -132,6 +132,7 @@ interface HomeClientProps {
     courses?:  string
     users?:    string
     events?:   string
+    visitors?: string
   }
   heroSlides?: HeroSlide[]
   offerItems?: HomeOfferItem[]
@@ -153,6 +154,7 @@ export default function HomeClient({
     { key: "courses",  label: "Courses",    value: counters.courses  },
     { key: "users",    label: "Members",    value: counters.users    },
     { key: "events",   label: "Events",     value: counters.events   },
+    { key: "visitors", label: "Visitors",   value: counters.visitors },
   ].filter((c) => c.value && c.value.trim() !== "")
 
   const heroTitle       = settings.hero_title       || "Start Your Journey with MoldNdie"

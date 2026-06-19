@@ -17,6 +17,7 @@ import {
   Calculator,
   Briefcase,
   LayoutPanelTop,
+  BarChart3,
   X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -43,6 +44,7 @@ const navItems: NavItem[] = [
   { label: "Suppliers",        href: "/dashboard/suppliers",         icon: Truck },
   { label: "Ads",              href: "/dashboard/ads",               icon: Megaphone },
   { label: "Users",            href: "/dashboard/users",             icon: Users },
+  { label: "Analytics",        href: "/dashboard/analytics",         icon: BarChart3 },
   { label: "Service Requests", href: "/dashboard/service-requests",  icon: Inbox },
   { label: "Services",         href: "/dashboard/services",          icon: Briefcase },
   { label: "Calculators",      href: "/dashboard/calculators",       icon: Calculator },

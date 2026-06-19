@@ -6,6 +6,7 @@ import { getSiteSettings } from "@/services/siteSettings.service"
 import { getActiveHeroSlides } from "@/services/heroSlides.service"
 import { getActiveOfferItems } from "@/services/homeOfferItems.service"
 import { getActiveWhyCards } from "@/services/homeWhyCards.service"
+import { getTotalVisitorCount } from "@/services/visitorCount.service"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 import type { HeroSlide } from "@/services/heroSlides.service"
 import type { HomeOfferItem } from "@/services/homeOfferItems.service"
@@ -23,12 +24,14 @@ export default async function HomePage() {
   let heroSlides: HeroSlide[] = []
   let offerItems: HomeOfferItem[] = []
   let whyCards: HomeWhyCard[] = []
+  let visitorCount = 0
 
   await Promise.allSettled([
     getSiteSettings().then((s) => { settings = s }).catch(() => {}),
     getActiveHeroSlides().then((s) => { heroSlides = s }).catch(() => {}),
     getActiveOfferItems().then((s) => { offerItems = s }).catch(() => {}),
     getActiveWhyCards().then((s) => { whyCards = s }).catch(() => {}),
+    getTotalVisitorCount().then((n) => { visitorCount = n }).catch(() => {}),
   ])
 
   const counters = {
@@ -36,6 +39,7 @@ export default async function HomePage() {
     courses:  settings.counter_courses,
     users:    settings.counter_users,
     events:   settings.counter_events,
+    visitors: visitorCount > 0 ? visitorCount.toLocaleString() : undefined,
   }
 
   return (

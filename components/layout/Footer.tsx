@@ -3,6 +3,7 @@ import Image from "next/image"
 import { Phone, Mail, MapPin, Clock, MessageCircle, Youtube, Facebook, Instagram, Linkedin } from "lucide-react"
 import { getSiteSettings } from "@/services/siteSettings.service"
 import type { SiteSettings } from "@/services/siteSettings.service"
+import { CookieSettingsButton } from "@/components/layout/CookieSettingsButton"
 
 const pages = [
   { label: "Blog",              href: "/blogs" },
@@ -92,7 +93,7 @@ export default async function Footer() {
   ].filter((item) => item.href)
 
   const hasContact =
-    s.contact_phone || s.contact_email || s.contact_address || s.contact_hours
+    s.contact_phone || s.contact_email || s.contact_address || s.contact_hours || s.contact_whatsapp
 
   return (
     <footer className="bg-[#5C1515] text-white">
@@ -157,13 +158,15 @@ export default async function Footer() {
                     {s.contact_phone}
                   </ContactRow>
                 )}
-                <ContactRow
-                  icon={MessageCircle}
-                  href="https://wa.me/201120060658"
-                  newTab
-                >
-                  WhatsApp
-                </ContactRow>
+                {s.contact_whatsapp && (
+                  <ContactRow
+                    icon={MessageCircle}
+                    href={`https://wa.me/${s.contact_whatsapp.replace(/[^0-9]/g, "")}`}
+                    newTab
+                  >
+                    WhatsApp
+                  </ContactRow>
+                )}
                 {s.contact_email && (
                   <ContactRow icon={Mail} href={`mailto:${s.contact_email}`}>
                     {s.contact_email}
@@ -209,7 +212,7 @@ export default async function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/15 pt-8">
+        <div className="border-t border-white/15 pt-8 space-y-4">
           <p className="text-xs text-white/40 leading-relaxed max-w-4xl">
             Copyright © 2026 www.moldndie.com. All digital content on this website—including text, PDF files, MS Office
             documents, 2D Drawing files, 3D Computer-Aided Design (CAD) files, animations, simulations, photos, videos,
@@ -217,6 +220,15 @@ export default async function Footer() {
             digital content is sponsored by or affiliated with any company, organization, or real-world product, or
             service they may purport to portray.
           </p>
+          <div className="flex items-center gap-4 flex-wrap">
+            <Link href="/privacy-policy" className="text-xs text-white/40 hover:text-white/70 transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="/terms" className="text-xs text-white/40 hover:text-white/70 transition-colors">
+              Terms of Use
+            </Link>
+            <CookieSettingsButton />
+          </div>
         </div>
       </div>
     </footer>
