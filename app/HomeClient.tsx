@@ -170,14 +170,14 @@ function StatItem({
       transition={{ duration: 0.5, delay, ease: "easeOut" }}
       className="flex flex-col items-center gap-3 px-8 py-6"
     >
-      <div className="w-11 h-11 rounded-full bg-white/10 ring-1 ring-white/15 flex items-center justify-center">
-        <Icon size={18} className="text-white/70" strokeWidth={1.5} />
+      <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "rgba(255,255,255,0.12)", boxShadow: "0 0 0 1px rgba(255,255,255,0.15)" }}>
+        <Icon size={18} strokeWidth={1.5} style={{ color: "rgba(255,220,200,0.75)" }} />
       </div>
       <div className="text-center">
-        <p className="text-4xl md:text-5xl font-black text-white tabular-nums tracking-tight leading-none">
+        <p className="text-4xl md:text-5xl font-black tabular-nums tracking-tight leading-none" style={{ color: "#FFD9C8" }}>
           {displayed.toLocaleString()}{suffix}
         </p>
-        <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.18em] text-white/45">{label}</p>
+        <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "rgba(255,255,255,0.45)" }}>{label}</p>
       </div>
     </motion.div>
   )
@@ -339,7 +339,10 @@ export default function HomeClient({
 
       {/* ── Counters / Social Proof ── */}
       {counterEntries.length > 0 && (
-        <section className="relative overflow-hidden bg-linear-to-br from-[#5C1515] via-[#3d0f0f] to-[#1a0404] py-20 px-6">
+        <section
+          className="relative overflow-hidden py-20 px-6"
+          style={{ background: "linear-gradient(135deg, #5C1515 0%, #3d0f0f 55%, #1a0404 100%)" }}
+        >
           {/* dot-grid texture */}
           <div
             aria-hidden
@@ -350,7 +353,11 @@ export default function HomeClient({
             }}
           />
           {/* soft top glow */}
-          <div aria-hidden className="absolute -top-32 left-1/2 -translate-x-1/2 w-150 h-75 rounded-full bg-white/5 blur-3xl pointer-events-none" />
+          <div
+            aria-hidden
+            className="absolute -top-32 left-1/2 -translate-x-1/2 w-150 h-75 rounded-full blur-3xl pointer-events-none"
+            style={{ background: "rgba(255,255,255,0.06)" }}
+          />
 
           <div className="relative max-w-5xl mx-auto">
             {/* heading */}
