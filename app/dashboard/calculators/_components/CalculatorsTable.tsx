@@ -50,7 +50,7 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
       try {
         const copy = await duplicateCalculator(id)
         setRows((prev) => [{ ...copy, category: prev.find((r) => r.id === id)?.category ?? null }, ...prev])
-        toast.success("Calculator duplicated")
+        toast.success("Engineering tool duplicated")
       } catch {
         toast.error("Failed to duplicate")
       }
@@ -78,7 +78,7 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400" />
           <input
             type="text"
-            placeholder="Search calculators…"
+            placeholder="Search engineering tools…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full rounded-lg border border-zinc-200 pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
@@ -114,9 +114,9 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-zinc-400">
             <Calculator className="size-10 mb-3 text-zinc-200" />
-            <p className="text-sm font-medium">No calculators found</p>
+            <p className="text-sm font-medium">No engineering tools found</p>
             <Link href="/dashboard/calculators/new" className="mt-4 text-sm text-primary hover:underline">
-              Create your first calculator →
+              Create your first engineering tool →
             </Link>
           </div>
         ) : (
@@ -124,7 +124,7 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
             <table className="w-full text-sm">
               <thead className="bg-zinc-50 border-b border-zinc-200">
                 <tr>
-                  <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">Calculator</th>
+                  <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">Engineering Tool</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide hidden md:table-cell">Category</th>
                   <th className="text-center px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide hidden sm:table-cell">Status</th>
                   <th className="text-center px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide hidden lg:table-cell">Featured</th>

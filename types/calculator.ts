@@ -52,7 +52,12 @@ export interface CalcField {
   max_value: number | null
   step_value: number | null
   default_value: string | null
-  options: Array<{ label: string; value: string }> | null
+  // For `select` fields. An option may carry a `values` map so that picking it
+  // injects those variables into the formula scope (a "material preset" lookup),
+  // e.g. { label: "ABS", value: "abs", values: { alpha: 0.069, melt_temp: 220 } }.
+  options: Array<{ label: string; value: string; values?: Record<string, number> }> | null
+  // Optional heading used to group inputs into sections on the public page.
+  field_group: string | null
   sort_order: number
   created_at: string
 }

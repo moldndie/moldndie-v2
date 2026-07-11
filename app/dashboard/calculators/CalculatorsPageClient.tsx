@@ -26,7 +26,7 @@ export default function CalculatorsPageClient({
   const [activeTab, setActiveTab] = useState<Tab>(defaultTab)
 
   const tabs: { id: Tab; label: string }[] = [
-    { id: "calculators", label: "Calculators" },
+    { id: "calculators", label: "Engineering Tools" },
     { id: "categories",  label: "Categories" },
   ]
 
@@ -57,7 +57,7 @@ export default function CalculatorsPageClient({
             className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white hover:bg-primary/90 transition-colors"
           >
             <Plus className="size-4" />
-            New Calculator
+            New Engineering Tool
           </Link>
         )}
       </div>
