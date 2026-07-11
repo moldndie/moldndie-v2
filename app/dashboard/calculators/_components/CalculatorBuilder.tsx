@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useTransition, useCallback, useMemo } from "react"
+import { useState, useTransition, useCallback, useMemo, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import {
   Plus, Trash2, ChevronUp, ChevronDown, Info, Zap, Settings,
   FlaskConical, HelpCircle, CheckCircle2, ArrowLeft, ArrowRight,
-  Eye, Check, AlertTriangle,
+  Eye, Check, AlertTriangle, X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { CalcCategory, CalculatorWithRelations, CalcField, CalcOutput, FieldType } from "@/types/calculator"
@@ -291,6 +291,15 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
   const [isPending, startTransition] = useTransition()
   const [step, setStep] = useState(0)
   const [showTemplates, setShowTemplates] = useState(!calculator)
+  const [previewOpen, setPreviewOpen] = useState(false)
+
+  // Close the preview drawer on Escape.
+  useEffect(() => {
+    if (!previewOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setPreviewOpen(false) }
+    window.addEventListener("keydown", onKey)
+    return () => window.removeEventListener("keydown", onKey)
+  }, [previewOpen])
 
   // Basic info state
   const [title, setTitle] = useState(calculator?.title ?? "")
@@ -471,8 +480,7 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
       {/* Stepper */}
       <Stepper current={step} counts={[undefined, fields.length, outputs.length, undefined]} onGo={setStep} />
 
-      <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_minmax(340px,420px)] gap-6 items-start">
-        {/* ── Left: current step ─────────────────────────────────────────────── */}
+      <div>
         <div className="min-w-0 space-y-5">
           {/* Template chooser (step 1, new only) */}
           {step === 0 && showTemplates && (
@@ -532,29 +540,6 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
             />
           )}
         </div>
-
-        {/* ── Right: live preview ────────────────────────────────────────────── */}
-        <div className="xl:sticky xl:top-4">
-          <div className="rounded-2xl border border-zinc-200 bg-zinc-50/60 p-3">
-            <div className="flex items-center gap-2 px-1 pb-2">
-              <Eye className="size-4 text-primary" />
-              <p className="text-xs font-bold uppercase tracking-wide text-zinc-500">Live Preview</p>
-            </div>
-            {fields.length === 0 && outputs.length === 0 ? (
-              <div className="rounded-xl border border-dashed border-zinc-200 bg-white py-12 text-center">
-                <Eye className="size-7 text-zinc-200 mx-auto mb-2" />
-                <p className="text-sm text-zinc-400">Your engineering tool will appear here as you build it.</p>
-              </div>
-            ) : (
-              <div className="rounded-xl bg-white p-1">
-                <p className="text-sm font-bold text-zinc-900 px-3 pt-2">{title || "Untitled Engineering Tool"}</p>
-                <div className="p-2">
-                  <CalculatorRunner key={previewKey} calculator={previewCalc} preview />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
       </div>
 
       {/* Navigation bar */}
@@ -597,6 +582,46 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
           )}
         </div>
       </div>
+
+      {/* Floating Live Preview trigger */}
+      <button
+        type="button"
+        onClick={() => setPreviewOpen(true)}
+        className="fixed bottom-6 right-6 z-40 inline-flex items-center gap-2 rounded-full bg-zinc-900 px-4 py-3 text-sm font-semibold text-white shadow-lg hover:bg-zinc-700 transition-colors"
+      >
+        <Eye className="size-4" /> Live Preview
+      </button>
+
+      {/* Live Preview drawer */}
+      {previewOpen && (
+        <div className="fixed inset-0 z-50">
+          <div className="absolute inset-0 bg-black/40 animate-in fade-in duration-200" onClick={() => setPreviewOpen(false)} />
+          <div className="absolute right-0 top-0 h-full w-full sm:w-1/2 sm:min-w-[520px] bg-white shadow-xl flex flex-col animate-in slide-in-from-right duration-200">
+            <div className="flex items-center justify-between border-b border-zinc-200 px-4 py-3 shrink-0">
+              <div className="flex items-center gap-2">
+                <Eye className="size-4 text-primary" />
+                <p className="text-sm font-bold text-zinc-900">Live Preview</p>
+              </div>
+              <button onClick={() => setPreviewOpen(false)} className="rounded-md p-1 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors" aria-label="Close preview">
+                <X className="size-5" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-y-auto p-4">
+              {fields.length === 0 && outputs.length === 0 ? (
+                <div className="rounded-xl border border-dashed border-zinc-200 bg-white py-12 text-center">
+                  <Eye className="size-7 text-zinc-200 mx-auto mb-2" />
+                  <p className="text-sm text-zinc-400">Your engineering tool will appear here as you build it.</p>
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm font-bold text-zinc-900 mb-3">{title || "Untitled Engineering Tool"}</p>
+                  <CalculatorRunner key={previewKey} calculator={previewCalc} preview />
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
