@@ -5,6 +5,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { toast } from "sonner"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
+import { Eye } from "lucide-react"
 import {
   BookOpen,
   Lock,
@@ -92,7 +94,7 @@ function NotFoundState() {
 }
 
 // ── Main component ────────────────────────────────────────────
-export default function CourseDetailClient({ courseId }: { courseId: string }) {
+export default function CourseDetailClient({ courseId, viewCount }: { courseId: string; viewCount?: number }) {
   const { data: course, isLoading, isError } = useCourseById(courseId)
   const { data: purchased, isLoading: accessLoading } = useCourseAccess(courseId)
   const addToCart = useAddToCart()
@@ -141,7 +143,7 @@ export default function CourseDetailClient({ courseId }: { courseId: string }) {
         {/* ── LEFT: Info ── */}
         <div className="space-y-6">
           {/* Thumbnail */}
-          <div className="aspect-video relative bg-zinc-50 rounded-2xl overflow-hidden border border-zinc-100">
+          <div className="aspect-video relative bg-white rounded-2xl overflow-hidden border border-zinc-100">
             {thumbnailSrc ? (
               <Image
                 src={thumbnailSrc}
@@ -163,19 +165,26 @@ export default function CourseDetailClient({ courseId }: { courseId: string }) {
             {course.title}
           </h1>
 
-          {/* Price */}
-          <div className="flex items-center gap-3">
+          {/* Price + views */}
+          <div className="flex items-center gap-3 flex-wrap">
             <span className={`text-3xl font-extrabold ${isFree ? "text-emerald-600" : "text-zinc-900"}`}>
               {priceText}
             </span>
             {!isFree && <span className="text-sm text-zinc-400">one-time purchase</span>}
+            {viewCount != null && viewCount > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs text-zinc-400 ml-auto">
+                <Eye size={12} className="shrink-0" />
+                {viewCount >= 1000 ? `${(viewCount / 1000).toFixed(1)}k` : viewCount.toLocaleString()} views
+              </span>
+            )}
           </div>
 
           {/* Description */}
           {course.description && (
-            <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-line">
-              {course.description}
-            </p>
+            <RichTextRenderer
+              content={course.description}
+              className="text-sm text-zinc-600 leading-relaxed"
+            />
           )}
 
           <div className="border-t border-zinc-100" />

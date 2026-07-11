@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect, useMemo } from "react"
 import Cropper from "react-easy-crop"
 import type { Area, Point } from "react-easy-crop"
 import { X, Check, ZoomIn, ZoomOut } from "lucide-react"
@@ -14,21 +14,28 @@ interface ImageCropModalProps {
   originalFileName?: string
 }
 
-function isPng(fileName: string): boolean {
-  return fileName.toLowerCase().endsWith(".png")
+const PADDING_EPSILON = 0.5 // px tolerance for float rounding in react-easy-crop's pixel math
+
+function hasPadding(pixelCrop: Area, naturalWidth: number, naturalHeight: number): boolean {
+  return (
+    pixelCrop.x < -PADDING_EPSILON ||
+    pixelCrop.y < -PADDING_EPSILON ||
+    pixelCrop.x + pixelCrop.width > naturalWidth + PADDING_EPSILON ||
+    pixelCrop.y + pixelCrop.height > naturalHeight + PADDING_EPSILON
+  )
 }
 
 async function getCroppedImg(
-  imageSrc: string,
+  image: HTMLImageElement,
   pixelCrop: Area,
-  outputType: "image/jpeg" | "image/png",
+  originalFileName: string,
 ): Promise<File> {
-  const image = new window.Image()
-  image.src = imageSrc
-  await new Promise<void>((resolve, reject) => {
-    image.onload = () => resolve()
-    image.onerror = reject
-  })
+  // Crop extends beyond the source image bounds (e.g. image zoomed out to fit a
+  // wider/taller frame) — export as PNG so that empty space is transparent
+  // instead of an opaque fill color.
+  const outputType: "image/jpeg" | "image/png" = hasPadding(pixelCrop, image.naturalWidth, image.naturalHeight)
+    ? "image/png"
+    : "image/jpeg"
 
   const canvas = document.createElement("canvas")
   canvas.width = pixelCrop.width
@@ -36,7 +43,8 @@ async function getCroppedImg(
   const ctx = canvas.getContext("2d")!
 
   if (outputType === "image/jpeg") {
-    // JPEG has no alpha channel — fill white so transparency becomes white, not black
+    // JPEG has no alpha channel — fill white as a defensive fallback (shouldn't
+    // be reachable since this branch means there's no padding to fill)
     ctx.fillStyle = "#ffffff"
     ctx.fillRect(0, 0, canvas.width, canvas.height)
   }
@@ -57,16 +65,23 @@ async function getCroppedImg(
   const ext = outputType === "image/png" ? "png" : "jpg"
   const quality = outputType === "image/jpeg" ? 0.92 : undefined
 
-  return new Promise<File>((resolve, reject) => {
+  const blob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
-      (blob) => {
-        if (!blob) { reject(new Error("Canvas is empty")); return }
-        resolve(new File([blob], `cropped.${ext}`, { type: outputType }))
-      },
+      (b) => (b ? resolve(b) : reject(new Error("Canvas is empty"))),
       outputType,
       quality,
     )
   })
+
+  return new File(
+    [blob],
+    originalFileName.replace(/\.[^.]+$/, `.${ext}`),
+    { type: outputType },
+  )
+}
+
+function clamp(value: number, min: number, max: number): number {
+  return Math.min(Math.max(value, min), max)
 }
 
 export function ImageCropModal({
@@ -76,35 +91,60 @@ export function ImageCropModal({
   onCropDone,
   originalFileName = "image",
 }: ImageCropModalProps) {
-  const MIN_ZOOM = 0.1
+  const ABSOLUTE_MIN_ZOOM = 0.1
   const MAX_ZOOM = 3
 
+  const [imageEl, setImageEl] = useState<HTMLImageElement | null>(null)
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 })
-  const [zoom, setZoom] = useState(MIN_ZOOM)
+  const [zoom, setZoom] = useState(1)
+  const [zoomInitialized, setZoomInitialized] = useState(false)
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null)
   const [processing, setProcessing] = useState(false)
 
-  // Preserve PNG transparency; everything else becomes JPEG
-  const outputType: "image/jpeg" | "image/png" = isPng(originalFileName)
-    ? "image/png"
-    : "image/jpeg"
+  // Load the source image once to read its natural dimensions
+  useEffect(() => {
+    setZoomInitialized(false)
+    const image = new window.Image()
+    image.onload = () => setImageEl(image)
+    image.src = imageSrc
+  }, [imageSrc])
+
+  // "Fit" zoom: the level at which react-easy-crop shows the entire image
+  // inside the crop frame (like object-fit: contain) instead of its default
+  // zoom=1 "cover" behavior. react-easy-crop scales zoom=1 to exactly cover
+  // the crop box, so the contain/cover ratio below is relative to that baseline.
+  const fitZoom = useMemo(() => {
+    if (!imageEl) return 1
+    const imageAspect = imageEl.naturalWidth / imageEl.naturalHeight
+    const ratio = Math.min(imageAspect, aspect) / Math.max(imageAspect, aspect)
+    return clamp(ratio, ABSOLUTE_MIN_ZOOM, 1)
+  }, [imageEl, aspect])
+
+  // Default to showing the whole image — as wide/uncropped as possible —
+  // once we know its dimensions, instead of an arbitrary fixed zoom.
+  useEffect(() => {
+    if (imageEl && !zoomInitialized) {
+      setZoom(fitZoom)
+      setZoomInitialized(true)
+    }
+  }, [imageEl, fitZoom, zoomInitialized])
+
+  const minZoom = imageEl ? fitZoom : ABSOLUTE_MIN_ZOOM
 
   const onCropComplete = useCallback((_: Area, croppedPixels: Area) => {
     setCroppedAreaPixels(croppedPixels)
   }, [])
 
+  const willBeTransparent = imageEl && croppedAreaPixels
+    ? hasPadding(croppedAreaPixels, imageEl.naturalWidth, imageEl.naturalHeight)
+    : false
+
   async function handleDone() {
-    if (!croppedAreaPixels) return
+    if (!croppedAreaPixels || !imageEl) return
     setProcessing(true)
     try {
-      const file = await getCroppedImg(imageSrc, croppedAreaPixels, outputType)
-      const ext = outputType === "image/png" ? ".png" : ".jpg"
-      const namedFile = new File(
-        [file],
-        originalFileName.replace(/\.[^.]+$/, ext),
-        { type: outputType },
-      )
-      onCropDone(namedFile)
+      const file = await getCroppedImg(imageEl, croppedAreaPixels, originalFileName)
+      onCropDone(file)
     } catch {
       onCancel()
     } finally {
@@ -133,7 +173,7 @@ export function ImageCropModal({
             image={imageSrc}
             crop={crop}
             zoom={zoom}
-            minZoom={MIN_ZOOM}
+            minZoom={minZoom}
             maxZoom={MAX_ZOOM}
             aspect={aspect}
             restrictPosition={false}
@@ -148,7 +188,7 @@ export function ImageCropModal({
           <ZoomOut size={14} className="text-zinc-400 shrink-0" />
           <input
             type="range"
-            min={MIN_ZOOM}
+            min={minZoom}
             max={MAX_ZOOM}
             step={0.05}
             value={zoom}
@@ -160,9 +200,9 @@ export function ImageCropModal({
 
         {/* Hint */}
         <p className="px-5 pt-3 text-[11px] text-zinc-400 text-center">
-          Drag to reposition · Use the slider to zoom out and capture the full image
-          {outputType === "image/png" && (
-            <span className="ml-1 text-blue-500">· PNG transparency preserved</span>
+          The full image is shown by default · Drag or zoom in to crop tighter
+          {willBeTransparent && (
+            <span className="ml-1 text-blue-500">· Empty space will be saved transparent</span>
           )}
         </p>
 
@@ -171,7 +211,7 @@ export function ImageCropModal({
           <Button type="button" variant="outline" onClick={onCancel} disabled={processing}>
             Cancel
           </Button>
-          <Button type="button" onClick={handleDone} disabled={processing}>
+          <Button type="button" onClick={handleDone} disabled={processing || !imageEl}>
             <Check className="size-4 mr-1.5" />
             {processing ? "Processing…" : "Apply Crop"}
           </Button>

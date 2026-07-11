@@ -2,10 +2,11 @@ import type { Metadata } from "next"
 import { Suspense } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { FileText, Heart, MessageSquare } from "lucide-react"
+import { FileText, Heart, MessageSquare, Eye } from "lucide-react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { getFilteredPublishedBlogs, getBlogCategories, getBlogTags, getBlogCountsMap, type BlogSort } from "@/services/blog.service"
+import { getContentViewCountsMap } from "@/services/contentViews.service"
 import { BlogPaginationBar } from "./_components/BlogPaginationBar"
 import { getFileUrl } from "@/lib/utils"
 import { BlogFiltersBar } from "./_components/BlogFiltersBar"
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
   description: "Industry insights, guides, and news from the mold & die world.",
 }
 
-function BlogCard({ blog, likes, comments }: { blog: Blog; likes: number; comments: number }) {
+function BlogCard({ blog, likes, comments, views }: { blog: Blog; likes: number; comments: number; views: number }) {
   const date = new Date(blog.created_at).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
@@ -30,7 +31,7 @@ function BlogCard({ blog, likes, comments }: { blog: Blog; likes: number; commen
       href={`/blogs/${blog.slug}`}
       className="group flex flex-col rounded-2xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-md transition-all duration-200"
     >
-      <div className="aspect-video relative bg-zinc-50 overflow-hidden">
+      <div className="aspect-video relative bg-white overflow-hidden">
         {blog.cover_image_path ? (
           <Image
             src={getFileUrl(blog.cover_image_path)}
@@ -71,6 +72,12 @@ function BlogCard({ blog, likes, comments }: { blog: Blog; likes: number; commen
             Read more →
           </span>
           <div className="flex items-center gap-3 text-xs text-zinc-400">
+            {views > 0 && (
+              <span className="flex items-center gap-1">
+                <Eye className="size-3" />
+                {views >= 1000 ? `${(views / 1000).toFixed(1)}k` : views}
+              </span>
+            )}
             <span className="flex items-center gap-1">
               <Heart className="size-3" />
               {likes}
@@ -108,10 +115,11 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
   })
   const totalPages = Math.ceil(total / pageSize)
 
-  const [categories, tags, countsMap] = await Promise.all([
+  const [categories, tags, countsMap, viewsMap] = await Promise.all([
     getBlogCategories(),
     getBlogTags(),
     getBlogCountsMap(blogs.map((b) => b.id)),
+    getContentViewCountsMap("blog", blogs.map((b) => b.id)),
   ])
 
   return (
@@ -160,6 +168,7 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
                   blog={blog}
                   likes={countsMap.get(blog.id)?.likes ?? 0}
                   comments={countsMap.get(blog.id)?.comments ?? 0}
+                  views={viewsMap.get(blog.id) ?? 0}
                 />
               ))}
             </div>

@@ -5,8 +5,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Modal } from "@/components/ui/modal"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
+import RichTextEditor from "@/components/editor/RichTextEditor"
 import { Button } from "@/components/ui/button"
 import { FileUploadField } from "@/components/forms/FileUploadField"
 import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
@@ -200,7 +200,16 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
 
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700">Description</label>
-              <Textarea {...register("description")} placeholder="Describe the mold…" rows={3} />
+              <RichTextEditor
+                value={(() => {
+                  const raw = watch("description")
+                  if (!raw) return null
+                  try { return JSON.parse(raw) as Record<string, unknown> } catch { return null }
+                })()}
+                onChange={(v) => setValue("description", JSON.stringify(v))}
+                placeholder="Describe the mold…"
+                minHeight={120}
+              />
             </div>
 
             <div className="space-y-1.5">

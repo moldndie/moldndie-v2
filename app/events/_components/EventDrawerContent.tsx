@@ -74,35 +74,32 @@ export function EventDrawerContent({ eventId }: { eventId: string }) {
 
   return (
     <div>
-      {/* Hero — image or fallback banner */}
-      <div className="relative w-full h-48 bg-zinc-900 overflow-hidden shrink-0">
+      {/* Hero — image on clean white background */}
+      <div className="relative w-full h-48 bg-white border-b border-zinc-100 overflow-hidden shrink-0">
         {imgSrc ? (
-          <Image src={imgSrc} alt={event.title} fill className="object-cover opacity-90" sizes="460px" priority />
+          <Image src={imgSrc} alt={event.title} fill className="object-contain" sizes="460px" priority />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <CalendarDays size={48} className="text-white/20" strokeWidth={1} />
+            <CalendarDays size={48} className="text-zinc-200" strokeWidth={1} />
           </div>
         )}
-        {/* gradient overlay */}
-        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-transparent" />
-
         {/* Status badge */}
         {event.event_date && (
           <span className={`absolute top-3 left-3 text-[10px] font-bold px-2.5 py-1 rounded-full tracking-wider uppercase ${upcoming ? "bg-emerald-500 text-white" : "bg-zinc-600 text-white"}`}>
             {upcoming ? "Upcoming" : "Past Event"}
           </span>
         )}
+      </div>
 
-        {/* Title on image */}
-        <div className="absolute bottom-0 left-0 right-0 p-4">
-          {event.category && (
-            <span className="inline-flex items-center gap-1 text-[10px] font-bold text-white/70 uppercase tracking-widest mb-1">
-              <Tag size={9} />
-              {event.category.name}
-            </span>
-          )}
-          <h3 className="text-base font-extrabold text-white leading-snug line-clamp-2">{event.title}</h3>
-        </div>
+      {/* Title block below image */}
+      <div className="px-5 pt-4 pb-0">
+        {event.category && (
+          <span className="inline-flex items-center gap-1 text-[10px] font-bold text-primary uppercase tracking-widest mb-1">
+            <Tag size={9} />
+            {event.category.name}
+          </span>
+        )}
+        <h3 className="text-base font-extrabold text-zinc-900 leading-snug">{event.title}</h3>
       </div>
 
       {/* Body */}

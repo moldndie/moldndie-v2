@@ -4,11 +4,12 @@ import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
-import { BookOpen } from "lucide-react"
+import { BookOpen, Eye } from "lucide-react"
 import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { useCoursesListing, useAcademyCategories } from "@/hooks/queries/useCourses"
+import { useContentViewCounts } from "@/hooks/queries/useContentViews"
 import type { CourseSort, CoursesListingParams } from "@/hooks/queries/useCourses"
 import type { TraineeLevel } from "@/services/course.service"
 import type { Course } from "@/types"
@@ -44,7 +45,7 @@ function SkeletonCard() {
   )
 }
 
-function CourseCard({ course }: { course: Course }) {
+function CourseCard({ course, views }: { course: Course; views: number }) {
   const { currency, rates } = useCurrency()
   const { text: priceText, isFree } = displayPrice(course.price, "EGP", currency, rates)
   const imgSrc = course.thumbnail_url ? `${R2_BASE}/${course.thumbnail_url}` : null
@@ -60,7 +61,7 @@ function CourseCard({ course }: { course: Course }) {
       href={`/courses/${course.id}`}
       className="group rounded-xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col"
     >
-      <div className="aspect-video relative bg-zinc-50 overflow-hidden">
+      <div className="aspect-video relative bg-white overflow-hidden">
         {imgSrc ? (
           <Image
             src={imgSrc}
@@ -91,11 +92,19 @@ function CourseCard({ course }: { course: Course }) {
           <span className={`text-sm font-bold ${isFree ? "text-emerald-600" : "text-zinc-900"}`}>
             {priceText}
           </span>
-          {course.trainee_level && (
-            <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${levelColors[course.trainee_level] ?? "bg-zinc-100 text-zinc-600"}`}>
-              {course.trainee_level}
-            </span>
-          )}
+          <div className="flex items-center gap-2">
+            {views > 0 && (
+              <span className="flex items-center gap-1 text-xs text-zinc-400">
+                <Eye className="size-3" />
+                {views >= 1000 ? `${(views / 1000).toFixed(1)}k` : views}
+              </span>
+            )}
+            {course.trainee_level && (
+              <span className={`text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${levelColors[course.trainee_level] ?? "bg-zinc-100 text-zinc-600"}`}>
+                {course.trainee_level}
+              </span>
+            )}
+          </div>
         </div>
       </div>
     </Link>
@@ -156,6 +165,8 @@ export default function CoursesListingClient() {
   const total      = data?.total ?? 0
   const totalPages = Math.ceil(total / pageSize)
   const hasActiveFilters = !!searchTerm || sort !== "price_asc" || !!selectedCategory || !!traineeLevel
+
+  const { data: viewsMap } = useContentViewCounts("course", courses.map((c) => c.id))
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
@@ -224,7 +235,7 @@ export default function CoursesListingClient() {
         </div>
       ) : (
         <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}>
-          {courses.map((course) => <CourseCard key={course.id} course={course} />)}
+          {courses.map((course) => <CourseCard key={course.id} course={course} views={viewsMap?.get(course.id) ?? 0} />)}
         </div>
       )}
 

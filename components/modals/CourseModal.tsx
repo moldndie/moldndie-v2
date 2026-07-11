@@ -6,8 +6,8 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Modal } from "@/components/ui/modal"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
+import RichTextEditor from "@/components/editor/RichTextEditor"
 import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { courseSchema, type CourseFormValues } from "@/schemas/course.schema"
 import { useCreateCourse, useUpdateCourse, useAcademyCategories } from "@/hooks/queries/useCourses"
@@ -131,7 +131,16 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
 
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700">Description</label>
-            <Textarea {...register("description")} placeholder="What will students learn…" rows={3} />
+            <RichTextEditor
+              value={(() => {
+                const raw = watch("description")
+                if (!raw) return null
+                try { return JSON.parse(raw) as Record<string, unknown> } catch { return null }
+              })()}
+              onChange={(v) => setValue("description", JSON.stringify(v))}
+              placeholder="What will students learn…"
+              minHeight={120}
+            />
           </div>
 
           {/* Category */}

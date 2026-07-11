@@ -8,6 +8,7 @@ import {
   MapPinned,
   AlertCircle,
   Tag,
+  Eye,
 } from "lucide-react"
 import { useEventById } from "@/hooks/queries/useEvents"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
@@ -116,7 +117,7 @@ function DetailRow({
 }
 
 // ── Main component ────────────────────────────────────────────
-export default function EventDetailClient({ eventId }: { eventId: string }) {
+export default function EventDetailClient({ eventId, viewCount }: { eventId: string; viewCount?: number }) {
   const { data: event, isLoading, isError } = useEventById(eventId)
 
   if (isLoading) return <SkeletonDetail />
@@ -135,12 +136,12 @@ export default function EventDetailClient({ eventId }: { eventId: string }) {
 
       {/* ── Hero image ── */}
       {imgSrc && (
-        <div className="aspect-video relative rounded-2xl overflow-hidden bg-zinc-50 border border-zinc-100 mb-8">
+        <div className="aspect-video relative rounded-2xl overflow-hidden bg-white border border-zinc-100 mb-8">
           <Image
             src={imgSrc}
             alt={event.title}
             fill
-            className="object-cover"
+            className="object-contain"
             sizes="(max-width: 768px) 100vw, 768px"
             priority
           />
@@ -182,6 +183,12 @@ export default function EventDetailClient({ eventId }: { eventId: string }) {
                 <MapPin size={15} className="text-zinc-400 shrink-0" />
                 {event.country}
               </div>
+            )}
+            {viewCount != null && viewCount > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs text-zinc-400 ml-auto">
+                <Eye size={12} className="shrink-0" />
+                {viewCount >= 1000 ? `${(viewCount / 1000).toFixed(1)}k` : viewCount.toLocaleString()} views
+              </span>
             )}
           </div>
         </div>

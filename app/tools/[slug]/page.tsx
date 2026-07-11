@@ -3,6 +3,7 @@ import { Suspense } from "react"
 import { notFound } from "next/navigation"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
+import { ContentViewTracker } from "@/components/analytics/ContentViewTracker"
 import { getCalculatorBySlug, getCalculators } from "@/services/calculator.service"
 import CalculatorRunner from "./CalculatorRunner"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
@@ -39,6 +40,7 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <main className="flex-1">
+        <ContentViewTracker contentType="calculator" contentId={calc.id} />
         {/* Hero */}
         <section className="bg-zinc-950 text-white py-12 px-6">
           <div className="max-w-5xl mx-auto">

@@ -27,7 +27,7 @@ export default function NavbarLinks() {
             className={`text-sm transition-colors ${
               isActive
                 ? "text-primary font-semibold"
-                : "text-zinc-600 hover:text-zinc-900"
+                : "text-zinc-600 hover:text-primary"
             }`}
           >
             {link.label}

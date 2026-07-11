@@ -5,11 +5,12 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { CalendarDays, MapPin, MapPinned, ChevronDown, Lock, Globe } from "lucide-react"
+import { CalendarDays, MapPin, MapPinned, ChevronDown, Lock, Globe, Eye } from "lucide-react"
 import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { useEventsListing, useEventCategories } from "@/hooks/queries/useEvents"
+import { useContentViewCounts } from "@/hooks/queries/useContentViews"
 import type { EventSort } from "@/hooks/queries/useEvents"
 import { createClient } from "@/lib/supabase/client"
 
@@ -145,6 +146,7 @@ function EventCard({
   onToggle,
   isLoggedIn,
   callbackPath,
+  views,
 }: {
   event: {
     id: string
@@ -163,6 +165,7 @@ function EventCard({
   onToggle: () => void
   isLoggedIn: boolean | null
   callbackPath: string
+  views: number
 }) {
   const imgSrc       = event.image_path ? `${R2_BASE}/${event.image_path}` : null
   const displayDate  = event.start_date || event.event_date
@@ -182,9 +185,9 @@ function EventCard({
         transition={{ duration: 0.1 }}
         className="w-full text-left flex flex-col"
       >
-        <div className="aspect-video relative bg-zinc-50 overflow-hidden shrink-0">
+        <div className="aspect-video relative bg-white overflow-hidden shrink-0">
           {imgSrc ? (
-            <Image src={imgSrc} alt={event.title} fill className="object-cover" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+            <Image src={imgSrc} alt={event.title} fill className="object-contain" sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <CalendarDays size={36} className="text-zinc-300" strokeWidth={1} />
@@ -216,6 +219,12 @@ function EventCard({
               </div>
             )}
             {event.category && <span className="text-xs text-zinc-400">{event.category.name}</span>}
+            {views > 0 && (
+              <span className="flex items-center gap-1 text-xs text-zinc-400">
+                <Eye size={11} className="shrink-0" />
+                {views >= 1000 ? `${(views / 1000).toFixed(1)}k` : views}
+              </span>
+            )}
           </div>
           <div className="flex justify-center pt-1">
             <motion.div animate={{ rotate: expanded ? 180 : 0 }} transition={{ duration: 0.2 }}>
@@ -313,6 +322,8 @@ export default function EventsListingClient() {
   const totalPages = Math.ceil(total / pageSize)
   const hasActiveFilters = !!searchTerm || !!selectedCategory || sort !== "country_asc"
 
+  const { data: viewsMap } = useContentViewCounts("event", events.map((e) => e.id))
+
   const handleToggle = (id: string) => setExpandedIds((prev) => ({
     ...prev,
     [id]: !prev[id],
@@ -383,6 +394,7 @@ export default function EventsListingClient() {
               onToggle={() => handleToggle(event.id)}
               isLoggedIn={isLoggedIn}
               callbackPath={pathname}
+              views={viewsMap?.get(event.id) ?? 0}
             />
           ))}
         </motion.div>
