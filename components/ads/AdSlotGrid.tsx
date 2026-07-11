@@ -2,6 +2,7 @@
 import Image from "next/image"
 import { getAdsForPlacement } from "@/services/ad.service"
 import { getFileUrl } from "@/lib/utils"
+import { AdViewTracker } from "./AdViewTracker"
 
 interface AdSlotGridProps {
   page: string
@@ -25,13 +26,12 @@ export async function AdSlotGrid({ page, className }: AdSlotGridProps) {
       </p>
       <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-1 -mx-1 px-1 scrollbar-hide">
         {ads.map((ad) => (
-          <a
+          <AdViewTracker
             key={ad.id}
+            adId={ad.id}
             href={ad.link}
-            target="_blank"
-            rel="noopener noreferrer sponsored"
             aria-label={ad.title}
-            className="group block rounded-2xl border border-zinc-100 bg-zinc-50 p-3 hover:border-zinc-200 hover:shadow-lg hover:scale-[1.015] transition-all duration-200 shrink-0 snap-start w-[85vw] sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)]"
+            className="group block rounded-2xl border border-zinc-100 bg-white p-3 hover:border-zinc-200 hover:shadow-lg hover:scale-[1.015] transition-all duration-200 shrink-0 snap-start w-[85vw] sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)]"
           >
             <div className="relative w-full overflow-hidden rounded-xl aspect-video">
               <Image
@@ -47,7 +47,7 @@ export async function AdSlotGrid({ page, className }: AdSlotGridProps) {
                 {ad.title}
               </p>
             )}
-          </a>
+          </AdViewTracker>
         ))}
       </div>
     </div>

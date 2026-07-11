@@ -7,6 +7,7 @@ import { useCartMigration } from "@/hooks/useCartMigration";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { CurrencyProvider } from "@/context/CurrencyContext";
 import { CookieConsent } from "@/components/CookieConsent";
+import { PageViewTracker } from "@/components/analytics/PageViewTracker";
 
 function CartMigration() {
   useCartMigration();
@@ -19,6 +20,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <ThemeProvider attribute="class" defaultTheme="light" disableTransitionOnChange>
         <CurrencyProvider>
           <CartMigration />
+          <PageViewTracker />
           <ErrorBoundary>
             {children}
           </ErrorBoundary>

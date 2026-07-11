@@ -1,8 +1,10 @@
 "use server"
 
+import { unstable_noStore as noStore } from "next/cache"
 import { createAdminClient } from "@/lib/supabase/admin"
 
 export async function getTotalVisitorCount(): Promise<number> {
+  noStore()
   try {
     const admin = createAdminClient()
 
@@ -23,6 +25,7 @@ export async function getTotalVisitorCount(): Promise<number> {
 }
 
 export async function getMemberCount(): Promise<number> {
+  noStore()
   try {
     const admin = createAdminClient()
     const { count, error } = await admin

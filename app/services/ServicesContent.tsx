@@ -101,13 +101,13 @@ function ServiceCard({ service, index }: { service: ServiceOffering; index: numb
       </div>
 
       <div className={`${!isEven ? "lg:order-1" : ""}`}>
-        <div className="relative rounded-2xl overflow-hidden aspect-4/3 max-w-sm mx-auto bg-zinc-100 border border-zinc-100">
+        <div className="relative rounded-2xl overflow-hidden aspect-4/3 max-w-sm mx-auto bg-white border border-zinc-100">
           {service.image ? (
             <Image
               src={service.image}
               alt={service.title}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="(max-width: 1024px) 100vw, 480px"
             />
           ) : (

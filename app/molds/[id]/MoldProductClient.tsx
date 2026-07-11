@@ -5,6 +5,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { toast } from "sonner"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
+import { Eye } from "lucide-react"
 import {
   Package,
   Play,
@@ -135,7 +137,7 @@ function Thumbnail({
 }
 
 // ── Main component ────────────────────────────────────────────
-export default function MoldProductClient({ moldId }: { moldId: string }) {
+export default function MoldProductClient({ moldId, viewCount }: { moldId: string; viewCount?: number }) {
   const { data: mold, isLoading, isError } = useMoldById(moldId)
   const { data: galleryItems = [] } = useMoldGallery(moldId)
   const [activeMedia, setActiveMedia] = useState<MoldMedia | null>(null)
@@ -288,18 +290,25 @@ export default function MoldProductClient({ moldId }: { moldId: string }) {
           </h1>
 
           {/* Price block */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 flex-wrap">
             <span className={`text-3xl font-extrabold ${isFree ? "text-emerald-600" : "text-zinc-900"}`}>
               {priceText}
             </span>
             {!isFree && <span className="text-sm text-zinc-400">one-time purchase</span>}
+            {viewCount != null && viewCount > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs text-zinc-400 ml-auto">
+                <Eye size={12} className="shrink-0" />
+                {viewCount >= 1000 ? `${(viewCount / 1000).toFixed(1)}k` : viewCount.toLocaleString()} views
+              </span>
+            )}
           </div>
 
           {/* Description */}
           {mold.description && (
-            <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-line">
-              {mold.description}
-            </p>
+            <RichTextRenderer
+              content={mold.description}
+              className="text-sm text-zinc-600 leading-relaxed"
+            />
           )}
 
           {/* Divider */}

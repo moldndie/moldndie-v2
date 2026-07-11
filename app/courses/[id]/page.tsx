@@ -4,6 +4,8 @@ import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import CourseDetailClient from "./CourseDetailClient"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
+import { ContentViewTracker } from "@/components/analytics/ContentViewTracker"
+import { getContentViewCount } from "@/services/contentViews.service"
 
 export const metadata: Metadata = {
   title: "Course | MoldNdie",
@@ -16,12 +18,14 @@ export default async function CourseDetailPage({
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
+  const viewCount = await getContentViewCount("course", id)
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <main className="flex-1">
-        <CourseDetailClient courseId={id} />
+        <ContentViewTracker contentType="course" contentId={id} />
+        <CourseDetailClient courseId={id} viewCount={viewCount} />
         <div className="max-w-7xl mx-auto px-6 pb-12">
           <hr className="border-zinc-100 mb-8" />
           <Suspense fallback={null}>

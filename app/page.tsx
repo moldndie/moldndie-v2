@@ -1,6 +1,9 @@
 import type { Metadata } from "next"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
+
+// Always fetch live visitor + member counts — do not cache
+export const dynamic = "force-dynamic"
 import HomeClient from "./HomeClient"
 import { getSiteSettings } from "@/services/siteSettings.service"
 import { getActiveHeroSlides } from "@/services/heroSlides.service"

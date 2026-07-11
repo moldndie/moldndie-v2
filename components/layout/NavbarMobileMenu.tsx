@@ -39,7 +39,7 @@ export default function NavbarMobileMenu() {
                 href={link.href}
                 onClick={() => setOpen(false)}
                 className={`py-2.5 text-sm transition-colors border-b border-zinc-50 last:border-0 ${
-                  isActive ? "text-primary font-semibold" : "text-zinc-700 hover:text-zinc-900"
+                  isActive ? "text-primary font-semibold" : "text-zinc-700 hover:text-primary"
                 }`}
               >
                 {link.label}

@@ -4,11 +4,12 @@ import { useState, useEffect, useCallback } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
-import { Package } from "lucide-react"
+import { Package, Eye } from "lucide-react"
 import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { useMoldsListing, useMoldCategories } from "@/hooks/queries/useMolds"
+import { useContentViewCounts } from "@/hooks/queries/useContentViews"
 import type { SortOption } from "@/hooks/queries/useMolds"
 import { useCurrency } from "@/context/CurrencyContext"
 import { displayPrice } from "@/lib/currency"
@@ -34,8 +35,9 @@ function SkeletonCard() {
   )
 }
 
-function MoldCard({ mold }: {
+function MoldCard({ mold, views }: {
   mold: { id: string; title: string; price: number | null; preview_image: string | null; category?: { name: string } | null }
+  views: number
 }) {
   const { currency, rates } = useCurrency()
   const { text: priceText, isFree } = displayPrice(mold.price, "EGP", currency, rates)
@@ -46,7 +48,7 @@ function MoldCard({ mold }: {
       href={`/molds/${mold.id}`}
       className="group rounded-xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col"
     >
-      <div className="aspect-square relative bg-zinc-50 overflow-hidden">
+      <div className="aspect-square relative bg-white overflow-hidden">
         {imgSrc ? (
           <Image src={imgSrc} alt={mold.title} fill className="object-contain group-hover:scale-105 transition-transform duration-300" sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw" />
         ) : (
@@ -65,6 +67,12 @@ function MoldCard({ mold }: {
           <span className={`text-sm font-bold ${isFree ? "text-emerald-600" : "text-zinc-900"}`}>
             {priceText}
           </span>
+          {views > 0 && (
+            <span className="flex items-center gap-1 text-xs text-zinc-400">
+              <Eye className="size-3" />
+              {views >= 1000 ? `${(views / 1000).toFixed(1)}k` : views}
+            </span>
+          )}
         </div>
       </div>
     </Link>
@@ -115,6 +123,8 @@ export default function MoldsListingClient() {
   const totalPages = Math.ceil(total / pageSize)
   const hasActiveFilters = !!searchTerm || !!selectedCategory || sort !== "price_asc"
 
+  const { data: viewsMap } = useContentViewCounts("mold", molds.map((m) => m.id))
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
       <div>
@@ -161,7 +171,7 @@ export default function MoldsListingClient() {
         </div>
       ) : (
         <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 transition-opacity duration-200 ${isFetching && !isLoading ? "opacity-60" : ""}`}>
-          {molds.map((mold) => <MoldCard key={mold.id} mold={mold} />)}
+          {molds.map((mold) => <MoldCard key={mold.id} mold={mold} views={viewsMap?.get(mold.id) ?? 0} />)}
         </div>
       )}
 

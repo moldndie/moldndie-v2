@@ -14,6 +14,9 @@ import { CommentsSection } from "../_components/CommentsSection"
 import { ShareButtons } from "../_components/ShareButtons"
 import { createClient } from "@/lib/supabase/server"
 import { AdSlot } from "@/components/ads/AdSlot"
+import { ContentViewTracker } from "@/components/analytics/ContentViewTracker"
+import { ViewCount } from "@/components/analytics/ViewCount"
+import { Suspense } from "react"
 import type { Blog } from "@/types"
 
 interface Props {
@@ -41,7 +44,7 @@ function RelatedBlogCard({ blog }: { blog: Blog }) {
       href={`/blogs/${blog.slug}`}
       className="group flex flex-col rounded-2xl border border-zinc-100 bg-white overflow-hidden hover:border-zinc-200 hover:shadow-md transition-all duration-200"
     >
-      <div className="relative aspect-video w-full bg-zinc-100 overflow-hidden">
+      <div className="relative aspect-video w-full bg-white overflow-hidden">
         {blog.cover_image_path ? (
           <Image
             src={getFileUrl(blog.cover_image_path)}
@@ -131,6 +134,8 @@ export default async function BlogDetailPage({ params }: Props) {
             <PublicBreadcrumb crumbs={[{ label: "Blog", href: "/blogs" }, { label: blog.title }]} />
           </div>
 
+          <ContentViewTracker contentType="blog" contentId={blog.id} />
+
           {/* Meta */}
           <div className="flex flex-wrap items-center gap-2 mb-3">
             {blog.category && (
@@ -139,6 +144,9 @@ export default async function BlogDetailPage({ params }: Props) {
               </span>
             )}
             <span className="text-xs text-zinc-400">{date}</span>
+            <Suspense fallback={null}>
+              <ViewCount contentType="blog" contentId={blog.id} />
+            </Suspense>
           </div>
 
           <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 leading-tight mb-4">

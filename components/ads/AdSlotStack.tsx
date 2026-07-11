@@ -1,6 +1,7 @@
 import Image from "next/image"
 import { getAdsForPlacement } from "@/services/ad.service"
 import { getFileUrl } from "@/lib/utils"
+import { AdViewTracker } from "./AdViewTracker"
 
 interface AdSlotStackProps {
   page: string
@@ -25,13 +26,12 @@ export async function AdSlotStack({ page, count = 2, className }: AdSlotStackPro
       </p>
       <div className="flex flex-col gap-4">
         {ads.map((ad) => (
-          <a
+          <AdViewTracker
             key={ad.id}
+            adId={ad.id}
             href={ad.link}
-            target="_blank"
-            rel="noopener noreferrer sponsored"
             aria-label={ad.title}
-            className="group block rounded-2xl border border-zinc-100 bg-zinc-50 p-3 hover:border-zinc-200 hover:shadow-md hover:scale-[1.015] transition-all duration-200"
+            className="group block rounded-2xl border border-zinc-100 bg-white p-3 hover:border-zinc-200 hover:shadow-md hover:scale-[1.015] transition-all duration-200"
           >
             <div className="relative w-full overflow-hidden rounded-xl aspect-video">
               <Image
@@ -47,7 +47,7 @@ export async function AdSlotStack({ page, count = 2, className }: AdSlotStackPro
                 {ad.title}
               </p>
             )}
-          </a>
+          </AdViewTracker>
         ))}
       </div>
     </div>

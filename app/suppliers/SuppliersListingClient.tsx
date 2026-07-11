@@ -149,13 +149,13 @@ function SupplierCard({
         className="w-full flex-1 p-5 flex flex-col gap-4 text-left"
       >
         {/* Supplier image — aspect-4/3 matches the 4:3 crop ratio */}
-        <div className="w-full aspect-4/3 rounded-xl overflow-hidden bg-zinc-100 border border-zinc-100 relative">
+        <div className="w-full aspect-4/3 rounded-xl overflow-hidden bg-white border border-zinc-100 relative">
           {logoSrc ? (
             <Image
               src={logoSrc}
               alt={supplier.name}
               fill
-              className="object-cover"
+              className="object-contain"
               sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
           ) : (
