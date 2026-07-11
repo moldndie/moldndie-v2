@@ -45,7 +45,7 @@ const navItems: NavItem[] = [
   { label: "Users",            href: "/dashboard/users",             icon: Users },
 { label: "Service Requests", href: "/dashboard/service-requests",  icon: Inbox },
   { label: "Services",         href: "/dashboard/services",          icon: Briefcase },
-  { label: "Calculators",      href: "/dashboard/calculators",       icon: Calculator },
+  { label: "Engineering Tools", href: "/dashboard/calculators",       icon: Calculator },
   {
     label: "Homepage",
     href: "/dashboard/homepage/hero-carousel",

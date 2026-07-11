@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useMemo, useCallback, useEffect, useRef } from "react"
-import { AlertCircle, RotateCcw, Zap } from "lucide-react"
+import { AlertCircle, RotateCcw, Zap, Table2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type { CalculatorWithRelations, CalcField } from "@/types/calculator"
 import { evaluateFormula } from "@/lib/formula-engine"
@@ -9,9 +9,21 @@ import { recordRun } from "@/services/calculator.service"
 
 interface Props {
   calculator: CalculatorWithRelations
+  /** When true, render for the dashboard live preview: never records runs. */
+  preview?: boolean
 }
 
-export default function CalculatorRunner({ calculator }: Props) {
+// A field is "filled" when it holds a usable value. Numeric-style fields must
+// parse to a finite number; other field types just need to be non-empty.
+function isFilled(field: CalcField, value: string, numeric: number): boolean {
+  if (field.field_type === "checkbox") return true // always 0 or 1
+  if (field.field_type === "number" || field.field_type === "range") {
+    return value !== "" && !isNaN(numeric)
+  }
+  return value !== "" // select / text
+}
+
+export default function CalculatorRunner({ calculator, preview = false }: Props) {
   // Build initial values from defaults or empty string
   const initialValues = useMemo(() => {
     const init: Record<string, string> = {}
@@ -26,34 +38,44 @@ export default function CalculatorRunner({ calculator }: Props) {
 
   function reset() { setValues(initialValues); runTracked.current = false }
 
-  // Parse numeric values — invalid = NaN
+  // Assemble the numeric variable scope from raw inputs, then merge in the
+  // values carried by any selected `select` option (material-preset lookup).
   const numericValues = useMemo(() => {
     const out: Record<string, number> = {}
     for (const [k, v] of Object.entries(values)) {
       out[k] = v === "" ? NaN : parseFloat(v)
     }
+    for (const f of calculator.fields) {
+      if (f.field_type !== "select" || !f.options) continue
+      const opt = f.options.find((o) => o.value === values[f.field_key])
+      if (opt?.values) Object.assign(out, opt.values)
+    }
     return out
-  }, [values])
+  }, [values, calculator.fields])
 
   // Check all required fields filled
   const allFilled = useMemo(() =>
     calculator.fields
       .filter((f) => f.is_required)
-      .every((f) => values[f.field_key] !== "" && !isNaN(numericValues[f.field_key])),
+      .every((f) => isFilled(f, values[f.field_key] ?? "", numericValues[f.field_key] ?? NaN)),
     [calculator.fields, values, numericValues]
   )
 
-  // Compute outputs
+  // Compute outputs in order, feeding each successful result back into the
+  // scope so later outputs can reference earlier ones by their output_key.
   const results = useMemo(() => {
     if (!allFilled) return null
+    const scope: Record<string, number> = { ...numericValues }
     return calculator.outputs.map((o) => {
-      const r = evaluateFormula(o.formula, numericValues)
+      const r = evaluateFormula(o.formula, scope)
+      if (typeof r.value === "number") scope[o.output_key] = r.value
       return { output: o, result: r }
     })
   }, [allFilled, calculator.outputs, numericValues])
 
   // Track run once results are computed
   useEffect(() => {
+    if (preview) return
     if (!results || runTracked.current) return
     const hasError = results.some((r) => "error" in r.result)
     if (hasError) return
@@ -61,88 +83,167 @@ export default function CalculatorRunner({ calculator }: Props) {
     const inputs = Object.fromEntries(calculator.fields.map((f) => [f.field_key, numericValues[f.field_key]]))
     const outputs = Object.fromEntries(results.map(({ output, result }) => [output.output_key, "value" in result ? result.value : null]))
     recordRun(calculator.id, inputs, outputs).catch(() => {})
-  }, [results, calculator, numericValues])
+  }, [results, calculator, numericValues, preview])
 
   const setValue = useCallback((key: string, val: string) => {
     setValues((prev) => ({ ...prev, [key]: val }))
     runTracked.current = false
   }, [])
 
+  // Group fields by field_group, preserving order. Ungrouped fields come first
+  // under no heading; grouped fields render under their heading.
+  const groups = useMemo(() => {
+    const order: string[] = []
+    const map = new Map<string, CalcField[]>()
+    for (const f of calculator.fields) {
+      const key = f.field_group?.trim() || ""
+      if (!map.has(key)) { map.set(key, []); order.push(key) }
+      map.get(key)!.push(f)
+    }
+    return order.map((key) => ({ name: key, fields: map.get(key)! }))
+  }, [calculator.fields])
+
+  // Reference tables: any select field whose options carry a `values` map.
+  const referenceFields = useMemo(
+    () => calculator.fields.filter(
+      (f) => f.field_type === "select" && f.options?.some((o) => o.values),
+    ),
+    [calculator.fields]
+  )
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      {/* ── Left: Inputs ──────────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-6 space-y-5">
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-bold text-zinc-900">Inputs</h2>
-          <button
-            onClick={reset}
-            className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-700 transition-colors"
-          >
-            <RotateCcw className="size-3.5" /> Reset
-          </button>
-        </div>
-
-        {calculator.fields.length === 0 ? (
-          <p className="text-sm text-zinc-400">This calculator has no input fields.</p>
-        ) : (
-          calculator.fields.map((field) => (
-            <FieldInput
-              key={field.id}
-              field={field}
-              value={values[field.field_key] ?? ""}
-              onChange={(v) => setValue(field.field_key, v)}
-            />
-          ))
-        )}
-      </div>
-
-      {/* ── Right: Results ─────────────────────────────────────────────────── */}
-      <div className="rounded-2xl border border-zinc-200 bg-white p-6 space-y-5">
-        <div className="flex items-center gap-2">
-          <Zap className="size-4 text-primary" />
-          <h2 className="text-base font-bold text-zinc-900">Results</h2>
-        </div>
-
-        {!allFilled ? (
-          <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="size-12 rounded-full bg-zinc-100 flex items-center justify-center mb-3">
-              <Zap className="size-5 text-zinc-300" />
-            </div>
-            <p className="text-sm font-medium text-zinc-400">Fill in all required fields</p>
-            <p className="text-xs text-zinc-300 mt-1">Results will appear automatically</p>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* ── Left: Inputs ────────────────────────────────────────────────────── */}
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6 space-y-5">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-zinc-900">Inputs</h2>
+            <button
+              onClick={reset}
+              className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-700 transition-colors"
+            >
+              <RotateCcw className="size-3.5" /> Reset
+            </button>
           </div>
-        ) : calculator.outputs.length === 0 ? (
-          <p className="text-sm text-zinc-400">No outputs defined for this calculator.</p>
-        ) : (
-          <div className="space-y-4">
-            {results?.map(({ output, result }) => (
-              <div key={output.id} className={cn(
-                "rounded-xl p-4 border",
-                "error" in result ? "border-red-200 bg-red-50" : "border-primary/20 bg-primary/5"
-              )}>
-                <div className="flex items-start justify-between gap-2">
-                  <div>
-                    <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{output.label}</p>
-                    {"error" in result ? (
-                      <div className="flex items-center gap-1.5 mt-1 text-red-600">
-                        <AlertCircle className="size-4 shrink-0" />
-                        <p className="text-sm">{result.error}</p>
-                      </div>
-                    ) : (
-                      <p className="text-3xl font-black text-zinc-900 mt-1 leading-none">
-                        {result.value.toFixed(output.decimals)}
-                        {output.unit && <span className="text-base font-medium text-zinc-500 ml-2">{output.unit}</span>}
-                      </p>
-                    )}
-                    {output.description && (
-                      <p className="text-xs text-zinc-400 mt-1.5">{output.description}</p>
-                    )}
+
+          {calculator.fields.length === 0 ? (
+            <p className="text-sm text-zinc-400">This calculator has no input fields.</p>
+          ) : (
+            groups.map((group) => (
+              <div key={group.name || "_ungrouped"} className="space-y-5">
+                {group.name && (
+                  <p className="text-xs font-bold uppercase tracking-wide text-zinc-400 pt-1">{group.name}</p>
+                )}
+                {group.fields.map((field) => (
+                  <FieldInput
+                    key={field.id}
+                    field={field}
+                    value={values[field.field_key] ?? ""}
+                    onChange={(v) => setValue(field.field_key, v)}
+                  />
+                ))}
+              </div>
+            ))
+          )}
+        </div>
+
+        {/* ── Right: Results ───────────────────────────────────────────────────── */}
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6 space-y-5">
+          <div className="flex items-center gap-2">
+            <Zap className="size-4 text-primary" />
+            <h2 className="text-base font-bold text-zinc-900">Results</h2>
+          </div>
+
+          {!allFilled ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <div className="size-12 rounded-full bg-zinc-100 flex items-center justify-center mb-3">
+                <Zap className="size-5 text-zinc-300" />
+              </div>
+              <p className="text-sm font-medium text-zinc-400">Fill in all required fields</p>
+              <p className="text-xs text-zinc-300 mt-1">Results will appear automatically</p>
+            </div>
+          ) : calculator.outputs.length === 0 ? (
+            <p className="text-sm text-zinc-400">No outputs defined for this calculator.</p>
+          ) : (
+            <div className="space-y-4">
+              {results?.map(({ output, result }) => (
+                <div key={output.id} className={cn(
+                  "rounded-xl p-4 border",
+                  "error" in result ? "border-red-200 bg-red-50" : "border-primary/20 bg-primary/5"
+                )}>
+                  <div className="flex items-start justify-between gap-2">
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{output.label}</p>
+                      {"error" in result ? (
+                        <div className="flex items-center gap-1.5 mt-1 text-red-600">
+                          <AlertCircle className="size-4 shrink-0" />
+                          <p className="text-sm">{result.error}</p>
+                        </div>
+                      ) : (
+                        <p className="text-3xl font-black text-zinc-900 mt-1 leading-none">
+                          {result.value.toFixed(output.decimals)}
+                          {output.unit && <span className="text-base font-medium text-zinc-500 ml-2">{output.unit}</span>}
+                        </p>
+                      )}
+                      {output.description && (
+                        <p className="text-xs text-zinc-400 mt-1.5">{output.description}</p>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* ── Reference value tables (from material-preset dropdowns) ─────────────── */}
+      {referenceFields.map((field) => (
+        <ReferenceTable key={field.id} field={field} />
+      ))}
+    </div>
+  )
+}
+
+// ── ReferenceTable ──────────────────────────────────────────────────────────────
+// Renders the property values that each option of a preset dropdown injects.
+
+function ReferenceTable({ field }: { field: CalcField }) {
+  const options = field.options ?? []
+  // Column keys = union of all value keys across options, in first-seen order.
+  const cols: string[] = []
+  for (const o of options) {
+    for (const k of Object.keys(o.values ?? {})) if (!cols.includes(k)) cols.push(k)
+  }
+  if (cols.length === 0) return null
+
+  return (
+    <div className="rounded-2xl border border-zinc-200 bg-white p-6">
+      <div className="flex items-center gap-2 mb-4">
+        <Table2 className="size-4 text-primary" />
+        <h2 className="text-base font-bold text-zinc-900">{field.label} — Reference Values</h2>
+      </div>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm border-collapse">
+          <thead>
+            <tr className="border-b border-zinc-200 text-left">
+              <th className="py-2 pr-4 font-semibold text-zinc-700">{field.label}</th>
+              {cols.map((c) => (
+                <th key={c} className="py-2 px-4 font-semibold text-zinc-700 whitespace-nowrap">{c}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>
+            {options.map((o) => (
+              <tr key={o.value} className="border-b border-zinc-100 last:border-0">
+                <td className="py-2 pr-4 font-medium text-zinc-900 whitespace-nowrap">{o.label}</td>
+                {cols.map((c) => (
+                  <td key={c} className="py-2 px-4 text-zinc-600 tabular-nums">{o.values?.[c] ?? "—"}</td>
+                ))}
+              </tr>
             ))}
-          </div>
-        )}
+          </tbody>
+        </table>
       </div>
     </div>
   )

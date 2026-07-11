@@ -3,7 +3,7 @@ import PageHeader from "@/components/dashboard/PageHeader"
 import { getCalculators, getAllCategories } from "@/services/calculator.service"
 import CalculatorsPageClient from "./CalculatorsPageClient"
 
-export const metadata: Metadata = { title: "Calculators | Admin" }
+export const metadata: Metadata = { title: "Engineering Tools | Admin" }
 
 export default async function CalculatorsPage() {
   const [calculators, categories] = await Promise.all([
@@ -14,8 +14,8 @@ export default async function CalculatorsPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Calculators"
-        description="Build and manage dynamic engineering calculators."
+        title="Engineering Tools"
+        description="Build and manage dynamic engineering tools."
       />
       <CalculatorsPageClient
         initialCalculators={calculators}

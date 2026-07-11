@@ -6,7 +6,7 @@ import PageHeader from "@/components/dashboard/PageHeader"
 import { getCalculatorById, getCategories } from "@/services/calculator.service"
 import CalculatorBuilder from "../../_components/CalculatorBuilder"
 
-export const metadata: Metadata = { title: "Edit Calculator | Admin" }
+export const metadata: Metadata = { title: "Edit Engineering Tool | Admin" }
 
 export default async function EditCalculatorPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
@@ -21,7 +21,7 @@ export default async function EditCalculatorPage({ params }: { params: Promise<{
     <div className="space-y-6">
       <div className="flex items-center gap-3">
         <Link href="/dashboard/calculators" className="text-sm text-zinc-400 hover:text-zinc-700 flex items-center gap-1">
-          <ChevronLeft className="size-4" /> Calculators
+          <ChevronLeft className="size-4" /> Engineering Tools
         </Link>
         <Link
           href={`/tools/${calculator.slug}`}
