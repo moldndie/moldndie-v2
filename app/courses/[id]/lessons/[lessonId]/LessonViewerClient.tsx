@@ -524,6 +524,12 @@ export default function LessonViewerClient({
             </span>
           </div>
 
+          {lesson.description && (
+            <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-wrap">
+              {lesson.description}
+            </p>
+          )}
+
           {renderSecondaryMedia()}
 
           {/* Prev / Next navigation */}

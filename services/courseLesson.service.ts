@@ -23,6 +23,8 @@ export async function getLessons(courseId: string): Promise<CourseLesson[]> {
 
 export interface LessonInput {
   title: string
+  description?: string | null
+  thumbnail_url?: string | null
   video_url?: string | null
   pdf_url?: string | null
   video_path?: string | null
@@ -42,6 +44,8 @@ export async function createLesson(
     .insert({
       course_id: courseId,
       title: input.title,
+      description: input.description ?? null,
+      thumbnail_url: input.thumbnail_url ?? null,
       video_url: input.video_url ?? null,
       pdf_url: input.pdf_url ?? null,
       video_path: input.video_path ?? null,
@@ -65,6 +69,8 @@ export async function updateLesson(
     .from("lessons")
     .update({
       title: input.title,
+      description: input.description ?? null,
+      thumbnail_url: input.thumbnail_url ?? null,
       video_url: input.video_url ?? null,
       pdf_url: input.pdf_url ?? null,
       video_path: input.video_path ?? null,

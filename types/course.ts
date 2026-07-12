@@ -2,6 +2,8 @@ export interface CourseLesson {
   id: string
   course_id: string
   title: string
+  description: string | null
+  thumbnail_url: string | null
   video_url: string | null
   pdf_url: string | null
   video_path: string | null

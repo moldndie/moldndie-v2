@@ -85,7 +85,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
       setBlocks(
         [...blog.blocks]
           .sort((a, b) => a.order_index - b.order_index)
-          .map((b) => ({ id: b.id, block_type: b.block_type, content: b.content, layout: b.layout ?? null, column_position: b.column_position ?? null }))
+          .map((b) => ({ id: b.id, block_type: b.block_type, content: b.content, layout: b.layout ?? null, column_position: b.column_position ?? null, column_ratio: b.column_ratio ?? null }))
       )
     }
   }, [blog])
@@ -109,7 +109,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
     }
 
     try {
-      await saveBlogBlocks(saved.id, blocks.map((b, i) => ({ block_type: b.block_type, content: b.content, order_index: i, layout: b.layout ?? null, column_position: b.column_position ?? null })))
+      await saveBlogBlocks(saved.id, blocks.map((b, i) => ({ block_type: b.block_type, content: b.content, order_index: i, layout: b.layout ?? null, column_position: b.column_position ?? null, column_ratio: b.column_ratio ?? null })))
       await saveBlogTags(saved.id, pickedTagIds)
     } catch {
       // blocks/tags save failure is non-fatal
