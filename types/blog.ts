@@ -24,6 +24,7 @@ export interface BlogBlock {
   order_index: number
   layout?: "single" | "two-column" | null
   column_position?: "left" | "right" | "full" | null
+  column_ratio?: number | null
   created_at: string
 }
 

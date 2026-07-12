@@ -285,11 +285,24 @@ export default function CourseDetailClient({ courseId, viewCount }: { courseId: 
                           <span className="w-6 h-6 rounded-full bg-zinc-100 group-hover:bg-primary/10 flex items-center justify-center text-xs font-bold text-zinc-500 group-hover:text-primary shrink-0 transition-colors">
                             {index + 1}
                           </span>
+                          {/* Thumbnail */}
+                          {lesson.thumbnail_url && (
+                            <img
+                              src={`${R2_BASE}/${lesson.thumbnail_url}`}
+                              alt=""
+                              className="w-16 aspect-video rounded-md object-cover bg-zinc-100 shrink-0"
+                            />
+                          )}
                           {/* Info */}
                           <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium text-zinc-800 group-hover:text-primary truncate transition-colors">
                               {lesson.title}
                             </p>
+                            {lesson.description && (
+                              <p className="text-xs text-zinc-500 line-clamp-2 mt-0.5">
+                                {lesson.description}
+                              </p>
+                            )}
                             <div className="flex items-center gap-2 mt-0.5">
                               {lesson.is_free && !hasAccess && (
                                 <span className="text-[10px] font-medium text-emerald-600">
@@ -323,10 +336,22 @@ export default function CourseDetailClient({ courseId, viewCount }: { courseId: 
                       <span className="w-6 h-6 rounded-full bg-zinc-100 flex items-center justify-center text-xs font-bold text-zinc-400 shrink-0">
                         {index + 1}
                       </span>
+                      {lesson.thumbnail_url && (
+                        <img
+                          src={`${R2_BASE}/${lesson.thumbnail_url}`}
+                          alt=""
+                          className="w-16 aspect-video rounded-md object-cover bg-zinc-100 shrink-0"
+                        />
+                      )}
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-zinc-500 truncate">
                           {lesson.title}
                         </p>
+                        {lesson.description && (
+                          <p className="text-xs text-zinc-400 line-clamp-2 mt-0.5">
+                            {lesson.description}
+                          </p>
+                        )}
                       </div>
                       <Lock size={13} className="text-zinc-300 shrink-0" />
                     </li>

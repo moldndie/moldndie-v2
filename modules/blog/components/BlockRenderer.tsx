@@ -6,51 +6,54 @@ interface BlockRendererProps {
   blocks: BlogBlock[]
 }
 
-type TwoColRow = [BlogBlock | null, BlogBlock | null]
-type Row = BlogBlock | TwoColRow
+type TwoColRegion = { kind: "two-column"; left: BlogBlock[]; right: BlogBlock[]; ratio: number }
+type Row = BlogBlock | TwoColRegion
+
+const DEFAULT_COLUMN_RATIO = 50
 
 export function BlockRenderer({ blocks }: BlockRendererProps) {
   const sorted = [...blocks].sort((a, b) => a.order_index - b.order_index)
 
-  // Group into rows:
-  // - Consecutive left+right two-column blocks → paired row
-  // - Orphaned left two-column → [left, null]
-  // - Orphaned right two-column → [null, right]
-  // - All other blocks → standalone row
+  // Group a run of consecutive two-column blocks into one region with two
+  // independent, continuously-flowing stacks. Every other block stands alone.
   const rows: Row[] = []
   let i = 0
   while (i < sorted.length) {
-    const block = sorted[i]
-
-    if (block.layout === "two-column" && block.column_position === "left") {
-      const next = sorted[i + 1]
-      if (next && next.layout === "two-column" && next.column_position === "right") {
-        rows.push([block, next])
-        i += 2
-      } else {
-        rows.push([block, null])
-        i += 1
+    if (sorted[i].layout === "two-column") {
+      const run: BlogBlock[] = []
+      while (i < sorted.length && sorted[i].layout === "two-column") {
+        run.push(sorted[i])
+        i++
       }
-    } else if (block.layout === "two-column" && block.column_position === "right") {
-      // Orphaned right — preserve right column position with empty left
-      rows.push([null, block])
-      i += 1
+      rows.push({
+        kind: "two-column",
+        left: run.filter((b) => b.column_position !== "right"),
+        right: run.filter((b) => b.column_position === "right"),
+        ratio: run[0].column_ratio ?? DEFAULT_COLUMN_RATIO,
+      })
     } else {
-      rows.push(block)
-      i += 1
+      rows.push(sorted[i])
+      i++
     }
   }
 
   return (
     <div className="space-y-4">
       {rows.map((row) => {
-        if (Array.isArray(row)) {
-          const [left, right] = row
-          const key = left?.id ?? right?.id ?? String(Math.random())
+        if ("kind" in row) {
+          const key = row.left[0]?.id ?? row.right[0]?.id ?? String(Math.random())
           return (
-            <div key={key} className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>{left ? <BlockItem block={left} /> : null}</div>
-              <div>{right ? <BlockItem block={right} /> : null}</div>
+            <div
+              key={key}
+              className="flex flex-col gap-4 sm:grid sm:gap-4"
+              style={{ gridTemplateColumns: `${row.ratio}fr ${100 - row.ratio}fr` }}
+            >
+              <div className="space-y-4">
+                {row.left.map((b) => <BlockItem key={b.id} block={b} />)}
+              </div>
+              <div className="space-y-4">
+                {row.right.map((b) => <BlockItem key={b.id} block={b} />)}
+              </div>
             </div>
           )
         }
@@ -80,7 +83,7 @@ function BlockItem({ block }: { block: BlogBlock }) {
         <figure className="max-w-2xl mx-auto">
           <img src={c.url} alt={c.caption ?? ""} className="w-full rounded-xl" />
           {c.caption && (
-            <figcaption className="mt-2 text-center text-sm text-zinc-500">{c.caption}</figcaption>
+            <figcaption className="mt-2 text-left text-sm text-zinc-500">{c.caption}</figcaption>
           )}
         </figure>
       )

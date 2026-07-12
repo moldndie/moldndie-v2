@@ -3,8 +3,10 @@
 import { useState } from "react"
 import { Plus, Pencil, Trash2, X, Lock, Unlock, Video } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 import { FileUploadField } from "@/components/forms/FileUploadField"
+import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { cn } from "@/lib/utils"
 import {
   useLessons,
@@ -17,6 +19,8 @@ import type { CourseLesson } from "@/types"
 interface LessonFormState {
   id: string | null // null = new lesson
   title: string
+  description: string
+  thumbnail_url: string
   video_url: string
   pdf_url: string
   video_path: string
@@ -32,7 +36,7 @@ interface LessonFormErrors {
 }
 
 function emptyForm(nextPosition: number): LessonFormState {
-  return { id: null, title: "", video_url: "", pdf_url: "", video_path: "", pdf_path: "", file_path: "", order_index: String(nextPosition), is_free: false }
+  return { id: null, title: "", description: "", thumbnail_url: "", video_url: "", pdf_url: "", video_path: "", pdf_path: "", file_path: "", order_index: String(nextPosition), is_free: false }
 }
 
 function LessonForm({
@@ -87,6 +91,28 @@ function LessonForm({
           />
           {errors.order_index && <p className="text-xs text-red-500">{errors.order_index}</p>}
         </div>
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-xs font-medium text-zinc-600">Description (optional)</label>
+        <Textarea
+          value={form.description}
+          onChange={(e) => onChange({ ...form, description: e.target.value })}
+          placeholder="Short description of this session…"
+          rows={3}
+        />
+      </div>
+
+      <div className="space-y-1.5">
+        <label className="text-xs font-medium text-zinc-600">Thumbnail (optional)</label>
+        <CroppableFileUploadField
+          folder="courses/lessons/thumbnails"
+          aspect={16 / 9}
+          label="Click to upload thumbnail"
+          existingValue={form.thumbnail_url || null}
+          onUploadSuccess={({ key }) => onChange({ ...form, thumbnail_url: key })}
+          onUploadingChange={setFileUploading}
+        />
       </div>
 
       <div className="space-y-1.5">
@@ -260,6 +286,8 @@ export function LessonsManager({ courseId }: { courseId: string }) {
     setForm({
       id: lesson.id,
       title: lesson.title,
+      description: lesson.description ?? "",
+      thumbnail_url: lesson.thumbnail_url ?? "",
       video_url: lesson.video_url ?? "",
       pdf_url: lesson.pdf_url ?? "",
       video_path: lesson.video_path ?? "",
@@ -293,6 +321,8 @@ export function LessonsManager({ courseId }: { courseId: string }) {
     }
     const input = {
       title: form.title.trim(),
+      description: form.description.trim() || null,
+      thumbnail_url: form.thumbnail_url || null,
       video_url: form.video_url.trim() || null,
       pdf_url: form.pdf_url || null,
       video_path: form.video_path || null,
