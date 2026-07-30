@@ -3,8 +3,9 @@
 import { useState } from "react"
 import { Plus, Pencil, Trash2, X, Lock, Unlock, Video } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
+import RichTextEditor from "@/components/editor/RichTextEditor"
+import { toDoc, fromDoc } from "@/lib/richtext"
 import { FileUploadField } from "@/components/forms/FileUploadField"
 import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { cn } from "@/lib/utils"
@@ -95,11 +96,12 @@ function LessonForm({
 
       <div className="space-y-1.5">
         <label className="text-xs font-medium text-zinc-600">Description (optional)</label>
-        <Textarea
-          value={form.description}
-          onChange={(e) => onChange({ ...form, description: e.target.value })}
+        <RichTextEditor
+          key={form.id ?? "new"}
+          value={toDoc(form.description)}
+          onChange={(v) => onChange({ ...form, description: fromDoc(v) })}
           placeholder="Short description of this session…"
-          rows={3}
+          minHeight={140}
         />
       </div>
 
@@ -111,6 +113,7 @@ function LessonForm({
           label="Click to upload thumbnail"
           existingValue={form.thumbnail_url || null}
           onUploadSuccess={({ key }) => onChange({ ...form, thumbnail_url: key })}
+          onClear={() => onChange({ ...form, thumbnail_url: "" })}
           onUploadingChange={setFileUploading}
         />
       </div>
@@ -132,6 +135,7 @@ function LessonForm({
           label="Click to upload video"
           existingValue={form.video_path || null}
           onUploadSuccess={({ key }) => onChange({ ...form, video_path: key })}
+          onClear={() => onChange({ ...form, video_path: "" })}
           onUploadingChange={setFileUploading}
         />
       </div>
@@ -144,6 +148,7 @@ function LessonForm({
           label="Click to upload PDF"
           existingValue={form.pdf_path || form.pdf_url || null}
           onUploadSuccess={({ key }) => onChange({ ...form, pdf_path: key })}
+          onClear={() => onChange({ ...form, pdf_path: "", pdf_url: "" })}
           onUploadingChange={setFileUploading}
         />
       </div>
@@ -156,6 +161,7 @@ function LessonForm({
           label="Click to upload file"
           existingValue={form.file_path || null}
           onUploadSuccess={({ key }) => onChange({ ...form, file_path: key })}
+          onClear={() => onChange({ ...form, file_path: "" })}
           onUploadingChange={setFileUploading}
         />
       </div>

@@ -13,6 +13,7 @@ import { PriceTag } from "@/components/pricing/PriceTag"
 import { getAcademyCategoryBySlug } from "@/services/academyCategory.service"
 import { getCoursesListing } from "@/services/course.service"
 import type { Course } from "@/types"
+import { docToText } from "@/lib/richtext"
 
 const PAGE_SIZE = 12
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
@@ -71,7 +72,7 @@ function CourseCard({ course }: { course: Course }) {
           {course.title}
         </h3>
         {course.description && (
-          <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">{course.description}</p>
+          <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">{docToText(course.description)}</p>
         )}
         <div className="mt-auto pt-2 flex items-center justify-between gap-2">
           <PriceTag amount={course.price} />

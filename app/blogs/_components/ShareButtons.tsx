@@ -6,6 +6,8 @@ import { Link2, Check } from "lucide-react"
 interface ShareButtonsProps {
   url: string
   title: string
+  /** Absolute image URL — Pinterest requires one to create a pin */
+  image?: string
 }
 
 function LinkedInIcon() {
@@ -48,6 +50,14 @@ function TelegramIcon() {
   )
 }
 
+function PinterestIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="size-4 fill-current" aria-hidden="true">
+      <path d="M12 0C5.373 0 0 5.372 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146A12 12 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0z" />
+    </svg>
+  )
+}
+
 function MailIcon() {
   return (
     <svg viewBox="0 0 24 24" className="size-4 stroke-current fill-none" strokeWidth={1.8} aria-hidden="true">
@@ -57,11 +67,17 @@ function MailIcon() {
   )
 }
 
-export function ShareButtons({ url, title }: ShareButtonsProps) {
+const BTN =
+  "inline-flex items-center justify-center size-8 rounded-full border border-zinc-200 text-zinc-400 transition-colors"
+
+export function ShareButtons({ url, title, image }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false)
+  const [igCopied, setIgCopied] = useState(false)
   const encoded = encodeURIComponent(url)
   const encodedTitle = encodeURIComponent(title)
 
+  // Order requested by the client: LinkedIn, Facebook, Pinterest, Instagram,
+  // Telegram, WhatsApp, Email.
   const shareLinks = [
     {
       label: "LinkedIn",
@@ -76,16 +92,12 @@ export function ShareButtons({ url, title }: ShareButtonsProps) {
       color: "hover:bg-[#1877f2]/10 hover:text-[#1877f2] hover:border-[#1877f2]/30",
     },
     {
-      label: "Instagram",
-      icon: <InstagramIcon />,
-      href: `https://www.instagram.com/`,
-      color: "hover:bg-[#e1306c]/10 hover:text-[#e1306c] hover:border-[#e1306c]/30",
-    },
-    {
-      label: "WhatsApp",
-      icon: <WhatsAppIcon />,
-      href: `https://wa.me/?text=${encodedTitle}%20${encoded}`,
-      color: "hover:bg-[#25d366]/10 hover:text-[#25d366] hover:border-[#25d366]/30",
+      label: "Pinterest",
+      icon: <PinterestIcon />,
+      href:
+        `https://www.pinterest.com/pin/create/button/?url=${encoded}&description=${encodedTitle}` +
+        (image ? `&media=${encodeURIComponent(image)}` : ""),
+      color: "hover:bg-[#e60023]/10 hover:text-[#e60023] hover:border-[#e60023]/30",
     },
     {
       label: "Telegram",
@@ -94,42 +106,88 @@ export function ShareButtons({ url, title }: ShareButtonsProps) {
       color: "hover:bg-[#229ed9]/10 hover:text-[#229ed9] hover:border-[#229ed9]/30",
     },
     {
+      label: "WhatsApp",
+      icon: <WhatsAppIcon />,
+      href: `https://wa.me/?text=${encodedTitle}%20${encoded}`,
+      color: "hover:bg-[#25d366]/10 hover:text-[#25d366] hover:border-[#25d366]/30",
+    },
+    {
+      // Subject + a body that actually reads as a message. Previously the body
+      // was the bare URL with no title.
       label: "Email",
       icon: <MailIcon />,
-      href: `mailto:?subject=${encodedTitle}&body=${encoded}`,
+      href: `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A%0A${encoded}`,
       color: "hover:bg-primary/10 hover:text-primary hover:border-primary/30",
     },
   ]
 
-  async function copyLink() {
+  async function copy(setter: (v: boolean) => void) {
     try {
       await navigator.clipboard.writeText(url)
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      setter(true)
+      setTimeout(() => setter(false), 2000)
+      return true
     } catch {
-      // clipboard not available
+      return false
     }
   }
+
+  // Instagram has no web share endpoint — the old link just opened
+  // instagram.com and dropped the post. Copy the link, then open Instagram so
+  // it can be pasted into a story or bio.
+  async function shareInstagram() {
+    await copy(setIgCopied)
+    window.open("https://www.instagram.com/", "_blank", "noopener,noreferrer")
+  }
+
+  const insertAt = 3 // Instagram sits between Pinterest and Telegram
 
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mr-1">Share</span>
-      {shareLinks.map(({ label, icon, href, color }) => (
+
+      {shareLinks.slice(0, insertAt).map(({ label, icon, href, color }) => (
         <a
           key={label}
           href={href}
           target="_blank"
           rel="noopener noreferrer"
+          title={`Share on ${label}`}
           aria-label={`Share on ${label}`}
-          className={`inline-flex items-center justify-center size-8 rounded-full border border-zinc-200 text-zinc-400 transition-colors ${color}`}
+          className={`${BTN} ${color}`}
         >
           {icon}
         </a>
       ))}
+
       <button
-        onClick={copyLink}
+        onClick={shareInstagram}
+        title="Copy link and open Instagram"
+        aria-label="Copy link and open Instagram"
+        className={`${BTN} hover:bg-[#e1306c]/10 hover:text-[#e1306c] hover:border-[#e1306c]/30`}
+      >
+        {igCopied ? <Check className="size-3.5" /> : <InstagramIcon />}
+      </button>
+
+      {shareLinks.slice(insertAt).map(({ label, icon, href, color }) => (
+        <a
+          key={label}
+          href={href}
+          target="_blank"
+          rel="noopener noreferrer"
+          title={`Share on ${label}`}
+          aria-label={`Share on ${label}`}
+          className={`${BTN} ${color}`}
+        >
+          {icon}
+        </a>
+      ))}
+
+      <button
+        onClick={() => copy(setCopied)}
+        title="Copy link"
         aria-label="Copy link"
-        className="inline-flex items-center justify-center size-8 rounded-full border border-zinc-200 text-zinc-400 hover:bg-primary/10 hover:text-primary hover:border-primary/30 transition-colors"
+        className={`${BTN} hover:bg-primary/10 hover:text-primary hover:border-primary/30`}
       >
         {copied ? <Check className="size-3.5" /> : <Link2 className="size-3.5" />}
       </button>

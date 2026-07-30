@@ -22,7 +22,7 @@ export default async function ToolsPage() {
       <Navbar />
       <main className="flex-1">
         <ToolsClient dbCalculators={dbCalculators} categories={categories} />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-6 pb-12">
           <AdSlotGrid page="engineering" />
         </div>
       </main>

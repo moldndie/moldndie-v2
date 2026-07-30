@@ -9,9 +9,12 @@ import {
   MapPinned,
   AlertCircle,
   Tag,
+  Phone,
+  Mail,
 } from "lucide-react"
 import { useSupplierById } from "@/hooks/queries/useSuppliers"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -158,14 +161,12 @@ export default function SupplierDetailClient({ supplierId }: { supplierId: strin
           {supplier.description && (
             <div>
               <p className="text-xs text-zinc-400 font-medium uppercase tracking-wider mb-2">About</p>
-              <p className="text-sm text-zinc-700 leading-relaxed whitespace-pre-line">
-                {supplier.description}
-              </p>
+              <RichTextRenderer content={supplier.description} className="text-sm text-zinc-700" />
             </div>
           )}
 
           {/* Detail rows */}
-          {(supplier.website || supplier.address) && (
+          {(supplier.website || supplier.address || supplier.phone || supplier.email) && (
             <div className="space-y-4 pt-2 border-t border-zinc-50">
               {supplier.website && (
                 <DetailRow icon={Globe} label="Website">
@@ -182,6 +183,20 @@ export default function SupplierDetailClient({ supplierId }: { supplierId: strin
               {supplier.address && (
                 <DetailRow icon={MapPinned} label="Address">
                   {supplier.address}
+                </DetailRow>
+              )}
+              {supplier.phone && (
+                <DetailRow icon={Phone} label="Phone">
+                  <a href={`tel:${supplier.phone}`} className="text-primary hover:underline">
+                    {supplier.phone}
+                  </a>
+                </DetailRow>
+              )}
+              {supplier.email && (
+                <DetailRow icon={Mail} label="Email">
+                  <a href={`mailto:${supplier.email}`} className="text-primary hover:underline break-all">
+                    {supplier.email}
+                  </a>
                 </DetailRow>
               )}
             </div>

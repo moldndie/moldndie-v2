@@ -18,6 +18,8 @@ import { Modal } from "@/components/ui/modal"
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal"
 import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import IconPicker from "@/components/dashboard/IconPicker"
+import RichTextEditor from "@/components/editor/RichTextEditor"
+import { toDoc, fromDoc } from "@/lib/richtext"
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -118,12 +120,11 @@ function ServiceForm({
 
       <div>
         <label className={labelCls}>Description</label>
-        <textarea
-          rows={4}
-          className={inputCls}
-          value={form.description ?? ""}
-          onChange={(e) => set("description", e.target.value)}
+        <RichTextEditor
+          value={toDoc(form.description)}
+          onChange={(v) => set("description", fromDoc(v))}
           placeholder="Describe the service…"
+          minHeight={180}
         />
       </div>
 
@@ -174,6 +175,7 @@ function ServiceForm({
           label="Click to upload service image (4:3)"
           existingValue={form.image || null}
           onUploadSuccess={({ url }) => set("image", url)}
+          onClear={() => set("image", "")}
           onUploadingChange={setImageUploading}
         />
       </div>

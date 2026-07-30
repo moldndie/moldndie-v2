@@ -29,6 +29,7 @@ export function AdModal({ open, onClose, ad, onSuccess }: AdModalProps) {
     register,
     handleSubmit,
     setValue,
+    watch,
     control,
     reset,
     formState: { errors },
@@ -104,8 +105,9 @@ export function AdModal({ open, onClose, ad, onSuccess }: AdModalProps) {
             folder="ads/images"
             aspect={16 / 9}
             label="Click to upload ad image"
-            existingValue={isEdit ? (ad?.image_path ?? null) : null}
+            existingValue={watch("image_path") || null}
             onUploadSuccess={({ key }) => setValue("image_path", key, { shouldValidate: true })}
+            onClear={() => setValue("image_path", "", { shouldValidate: true })}
             onUploadingChange={setImageUploading}
           />
           {errors.image_path && (

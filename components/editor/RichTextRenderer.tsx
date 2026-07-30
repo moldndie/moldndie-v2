@@ -13,6 +13,7 @@ import TableCell from "@tiptap/extension-table-cell"
 import TableHeader from "@tiptap/extension-table-header"
 import { TextStyle } from "@tiptap/extension-text-style"
 import Color from "@tiptap/extension-color"
+import { toDoc, isDocEmpty } from "@/lib/richtext"
 
 // Extensions are configured at module level — they don't touch the DOM.
 // Only generateHTML → getHTMLFromFragment uses document/DOM APIs, which is
@@ -32,25 +33,6 @@ const extensions = [
   Color,
 ]
 
-function parseContent(raw: unknown): Record<string, unknown> | null {
-  if (!raw) return null
-  if (typeof raw === "string") {
-    try { return JSON.parse(raw) as Record<string, unknown> } catch { return null }
-  }
-  if (typeof raw === "object") return raw as Record<string, unknown>
-  return null
-}
-
-function isTiptapDocEmpty(content: Record<string, unknown>): boolean {
-  const nodes = content.content as Array<{ type: string; content?: unknown[] }> | undefined
-  if (!nodes || nodes.length === 0) return true
-  if (nodes.length === 1 && nodes[0].type === "paragraph") {
-    const children = nodes[0].content
-    return !children || children.length === 0
-  }
-  return false
-}
-
 interface RichTextRendererProps {
   content: unknown
   className?: string
@@ -64,8 +46,8 @@ export default function RichTextRenderer({ content, className, emptyMessage = ""
   const [html, setHtml] = useState<string | null>(null)
 
   useEffect(() => {
-    const parsed = parseContent(content)
-    if (!parsed || isTiptapDocEmpty(parsed)) { setHtml(""); return }
+    const parsed = toDoc(content)
+    if (!parsed || isDocEmpty(parsed)) { setHtml(""); return }
 
     // generateHTML calls getHTMLFromFragment which uses document.createElement —
     // safe here because useEffect only runs in the browser.

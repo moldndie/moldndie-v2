@@ -1,10 +1,11 @@
 "use client"
 
 import { useRef, useState } from "react"
-import { Upload, X, RotateCcw, CheckCircle, Loader2, Crop } from "lucide-react"
+import { Upload, X, RotateCcw, Loader2, Crop } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useFileUpload } from "@/hooks/useFileUpload"
 import { ImageCropModal } from "@/components/ui/ImageCropModal"
+import { FilePreview } from "./FilePreview"
 
 interface CroppableFileUploadFieldProps {
   folder: string
@@ -13,6 +14,12 @@ interface CroppableFileUploadFieldProps {
   label?: string
   existingValue?: string | null
   onUploadSuccess: (result: { key: string; url: string }) => void
+  /**
+   * Clears the stored value. Pass it to show a Remove button.
+   * ponytail: clears the reference only — the R2 object is left orphaned.
+   * Add a DeleteObject route if storage cost ever matters.
+   */
+  onClear?: () => void
   onUploadingChange?: (uploading: boolean) => void
   className?: string
 }
@@ -23,6 +30,7 @@ export function CroppableFileUploadField({
   label = "Click to select image",
   existingValue,
   onUploadSuccess,
+  onClear,
   onUploadingChange,
   className,
 }: CroppableFileUploadFieldProps) {
@@ -59,17 +67,31 @@ export function CroppableFileUploadField({
     setCropSrc(null)
   }
 
+  function handleClear() {
+    reset()
+    onClear?.()
+  }
+
   // ── Success ───────────────────────────────────────────────────
   if (result) {
     return (
-      <div className={cn("flex items-center justify-between rounded-lg border border-green-200 bg-green-50 px-4 py-3", className)}>
-        <span className="flex items-center gap-2 text-sm text-green-700">
-          <CheckCircle className="size-4 shrink-0" />
-          Upload complete
-        </span>
-        <button type="button" onClick={reset} className="text-xs text-zinc-500 hover:text-zinc-800 transition-colors">
-          Replace
-        </button>
+      <div className={cn("space-y-2", className)}>
+        <FilePreview
+          value={result.key}
+          justUploaded
+          onReplace={() => inputRef.current?.click()}
+          onClear={onClear ? handleClear : undefined}
+        />
+        <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
+        {cropSrc && (
+          <ImageCropModal
+            imageSrc={cropSrc}
+            aspect={aspect}
+            originalFileName={pendingFileName}
+            onCancel={handleCropCancel}
+            onCropDone={handleCropDone}
+          />
+        )}
       </div>
     )
   }
@@ -118,15 +140,11 @@ export function CroppableFileUploadField({
   if (existingValue && !result) {
     return (
       <div className={cn("space-y-2", className)}>
-        <div className="flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3">
-          <span className="flex items-center gap-2 text-sm text-zinc-600">
-            <CheckCircle className="size-4 shrink-0 text-zinc-400" />
-            Image already uploaded
-          </span>
-          <button type="button" onClick={() => inputRef.current?.click()} className="text-xs text-zinc-500 hover:text-zinc-800 transition-colors">
-            Replace
-          </button>
-        </div>
+        <FilePreview
+          value={existingValue}
+          onReplace={() => inputRef.current?.click()}
+          onClear={onClear}
+        />
         <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
         {cropSrc && (
           <ImageCropModal

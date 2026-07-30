@@ -316,7 +316,9 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                 folder="hero/slides"
                 aspect={16 / 9}
                 label="Click to upload desktop image (16:9)"
+                existingValue={form.image_url || null}
                 onUploadSuccess={({ url }) => field("image_url")(url)}
+                onClear={() => field("image_url")("")}
                 onUploadingChange={setImageUploading}
               />
               <p className="mt-1.5 text-xs text-zinc-400">
@@ -334,7 +336,9 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                 folder="hero/slides"
                 aspect={9 / 16}
                 label="Click to upload mobile image (9:16)"
+                existingValue={form.mobile_image || null}
                 onUploadSuccess={({ url }) => field("mobile_image")(url)}
+                onClear={() => field("mobile_image")("")}
                 onUploadingChange={setMobileUploading}
               />
               <p className="mt-1.5 text-xs text-zinc-400">
@@ -565,6 +569,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                       label="Click to replace desktop image (16:9)"
                       existingValue={editForm.image_url || null}
                       onUploadSuccess={({ url }) => editField("image_url")(url)}
+                      onClear={() => editField("image_url")("")}
                       onUploadingChange={setEditImageUploading}
                     />
                     <p className="mt-1.5 text-xs text-zinc-400">
@@ -584,6 +589,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                       label="Click to add mobile image (9:16)"
                       existingValue={editForm.mobile_image || null}
                       onUploadSuccess={({ url }) => editField("mobile_image")(url)}
+                      onClear={() => editField("mobile_image")("")}
                       onUploadingChange={setEditMobileUploading}
                     />
                     <p className="mt-1.5 text-xs text-zinc-400">

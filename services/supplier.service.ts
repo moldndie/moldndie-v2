@@ -116,6 +116,8 @@ export async function createSupplier(values: SupplierFormValues): Promise<Suppli
       category_id: values.category_id || null,
       country: values.country ?? null,
       address: values.address ?? null,
+      phone: values.phone || null,
+      email: values.email || null,
       sponsored: values.sponsored ?? false,
     })
     .select()
@@ -137,6 +139,8 @@ export async function updateSupplier(id: string, values: SupplierFormValues): Pr
       category_id: values.category_id || null,
       country: values.country ?? null,
       address: values.address ?? null,
+      phone: values.phone || null,
+      email: values.email || null,
       sponsored: values.sponsored ?? false,
     })
     .eq("id", id)

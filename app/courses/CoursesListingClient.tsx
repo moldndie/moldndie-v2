@@ -15,6 +15,7 @@ import type { TraineeLevel } from "@/services/course.service"
 import type { Course } from "@/types"
 import { useCurrency } from "@/context/CurrencyContext"
 import { displayPrice } from "@/lib/currency"
+import { docToText } from "@/lib/richtext"
 
 const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
@@ -86,7 +87,7 @@ function CourseCard({ course, views }: { course: Course; views: number }) {
           {course.title}
         </h3>
         {course.description && (
-          <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">{course.description}</p>
+          <p className="text-xs text-zinc-400 line-clamp-2 leading-relaxed">{docToText(course.description)}</p>
         )}
         <div className="mt-auto pt-2 flex items-center justify-between gap-2">
           <span className={`text-sm font-bold ${isFree ? "text-emerald-600" : "text-zinc-900"}`}>

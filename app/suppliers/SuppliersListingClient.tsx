@@ -16,6 +16,7 @@ import {
 } from "@/hooks/queries/useSuppliers"
 import type { SupplierSort } from "@/hooks/queries/useSuppliers"
 import { createClient } from "@/lib/supabase/client"
+import { docToText } from "@/lib/richtext"
 
 const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
@@ -67,7 +68,7 @@ function SupplierExpandedContent({ supplier }: {
         <p className="text-sm text-zinc-400 italic">No additional details available.</p>
       )}
       {supplier.description && (
-        <p className="text-sm text-zinc-600 leading-relaxed">{supplier.description}</p>
+        <p className="text-sm text-zinc-600 leading-relaxed">{docToText(supplier.description)}</p>
       )}
       {(supplier.website || supplier.address) && (
         <div className="flex flex-col gap-2.5">

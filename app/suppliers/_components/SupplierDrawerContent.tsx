@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { Building2, Globe, MapPin, MapPinned, Tag, AlertCircle } from "lucide-react"
 import { useSupplierById } from "@/hooks/queries/useSuppliers"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -92,7 +93,7 @@ export function SupplierDrawerContent({ supplierId }: { supplierId: string }) {
         {supplier.description && (
           <div>
             <p className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider mb-2">About</p>
-            <p className="text-sm text-zinc-700 leading-relaxed whitespace-pre-line">{supplier.description}</p>
+            <RichTextRenderer content={supplier.description} className="text-sm text-zinc-700" />
           </div>
         )}
 

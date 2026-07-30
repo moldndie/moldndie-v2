@@ -9,9 +9,12 @@ import {
   AlertCircle,
   Tag,
   Eye,
+  Phone,
+  Mail,
 } from "lucide-react"
 import { useEventById } from "@/hooks/queries/useEvents"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -201,19 +204,33 @@ export default function EventDetailClient({ eventId, viewCount }: { eventId: str
               <p className="text-xs text-zinc-400 font-medium uppercase tracking-wider mb-3">
                 About this Event
               </p>
-              <p className="text-sm text-zinc-700 leading-relaxed whitespace-pre-line">
-                {event.description}
-              </p>
+              <RichTextRenderer content={event.description} className="text-sm text-zinc-700" />
             </div>
           )}
 
-          {/* Location detail */}
-          {event.address && (
-            <div className="pt-2 border-t border-zinc-50">
-              <DetailRow icon={MapPinned} label="Location">
-                {event.address}
-                {event.country ? `, ${event.country}` : ""}
-              </DetailRow>
+          {/* Location + contact details */}
+          {(event.address || event.phone || event.email) && (
+            <div className="space-y-4 pt-2 border-t border-zinc-50">
+              {event.address && (
+                <DetailRow icon={MapPinned} label="Location">
+                  {event.address}
+                  {event.country ? `, ${event.country}` : ""}
+                </DetailRow>
+              )}
+              {event.phone && (
+                <DetailRow icon={Phone} label="Phone">
+                  <a href={`tel:${event.phone}`} className="text-primary hover:underline">
+                    {event.phone}
+                  </a>
+                </DetailRow>
+              )}
+              {event.email && (
+                <DetailRow icon={Mail} label="Email">
+                  <a href={`mailto:${event.email}`} className="text-primary hover:underline break-all">
+                    {event.email}
+                  </a>
+                </DetailRow>
+              )}
             </div>
           )}
         </div>

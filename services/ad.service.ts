@@ -28,54 +28,36 @@ async function fetchActiveAds(page: string): Promise<Ad[]> {
 
   // Fetch all active ads for this page, then filter dates in JS to avoid
   // PostgREST OR-chain edge cases with timestamptz parsing.
+  // Ordered by created_at so the sequence is stable across renders: paginating a
+  // listing must not reshuffle the ads underneath it.
   const { data, error } = await supabase
     .from("ads")
     .select("*")
     .contains("target_pages", [page])
     .eq("is_active", true)
+    .order("created_at", { ascending: false })
 
   if (error) {
     console.error(`[ads] query error for page="${page}":`, error.message)
     throw dbError(error)
   }
 
-  const all = (data ?? []) as Ad[]
-
   // Apply date-range filter in JS so timezone/format issues can't silently drop ads.
-  const filtered = all.filter((ad) => {
+  return ((data ?? []) as Ad[]).filter((ad) => {
     const afterStart = !ad.starts_at || ad.starts_at <= now
     const beforeEnd  = !ad.ends_at   || ad.ends_at   >= now
     return afterStart && beforeEnd
   })
-
-  if (process.env.NODE_ENV !== "production") {
-    console.log(
-      `[ads] page="${page}" found=${all.length} after_date_filter=${filtered.length}`,
-      filtered.map((a) => ({ id: a.id, target_pages: a.target_pages, starts_at: a.starts_at, ends_at: a.ends_at }))
-    )
-  }
-
-  return filtered
-}
-
-function shuffle<T>(arr: T[]): T[] {
-  for (let i = arr.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[arr[i], arr[j]] = [arr[j], arr[i]]
-  }
-  return arr
 }
 
 export async function getAdForPlacement(page: string): Promise<Ad | null> {
   const ads = await fetchActiveAds(page)
-  if (ads.length === 0) return null
-  return ads[Math.floor(Math.random() * ads.length)]
+  return ads[0] ?? null
 }
 
-export async function getAdsForPlacement(page: string, count: number): Promise<Ad[]> {
-  const ads = await fetchActiveAds(page)
-  if (ads.length === 0) return []
-  return shuffle(ads).slice(0, count)
+/** All active ads for a placement, newest first. The carousel paginates them client-side. */
+export async function getAdsForPlacement(page: string): Promise<Ad[]> {
+  return fetchActiveAds(page)
 }
 
 export async function getAdById(id: string): Promise<Ad> {

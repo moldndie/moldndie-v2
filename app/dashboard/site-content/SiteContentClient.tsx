@@ -394,7 +394,9 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 folder="branding"
                 aspect={4}
                 label="Upload navbar logo (4:1 wide)"
+                existingValue={settings.logo_navbar || null}
                 onUploadSuccess={({ url }) => handleChange("logo_navbar", url)}
+                onClear={() => handleChange("logo_navbar", "")}
               />
               <p className="text-xs text-zinc-400">Recommended: transparent PNG, ~480×120px</p>
             </div>
@@ -423,7 +425,9 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 folder="branding"
                 aspect={4}
                 label="Upload footer logo (4:1 wide, white version)"
+                existingValue={settings.logo_footer || null}
                 onUploadSuccess={({ url }) => handleChange("logo_footer", url)}
+                onClear={() => handleChange("logo_footer", "")}
               />
               <p className="text-xs text-zinc-400">Recommended: white transparent PNG for the dark footer background</p>
             </div>
@@ -452,7 +456,9 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 folder="branding"
                 aspect={1}
                 label="Upload favicon (1:1 square)"
+                existingValue={settings.logo_favicon || null}
                 onUploadSuccess={({ url }) => handleChange("logo_favicon", url)}
+                onClear={() => handleChange("logo_favicon", "")}
               />
               <p className="text-xs text-zinc-400">Recommended: 512×512px PNG or ICO. Changes require a site redeploy to take effect in browser tabs.</p>
             </div>

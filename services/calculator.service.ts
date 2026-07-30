@@ -178,6 +178,7 @@ type CalcPayload = {
   description?: string | null
   category_id?: string | null
   icon?: string | null
+  cover_image?: string | null
   is_featured?: boolean
   is_published?: boolean
   sort_order?: number

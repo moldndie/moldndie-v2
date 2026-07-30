@@ -11,6 +11,8 @@ export const eventSchema = z.object({
   country: z.string().optional(),
   address: z.string().optional(),
   website: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.union([z.literal(""), z.string().email("Enter a valid email")]).optional(),
 })
 
 export type EventFormValues = z.infer<typeof eventSchema>

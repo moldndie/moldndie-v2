@@ -13,6 +13,7 @@ import { useEventsListing, useEventCategories } from "@/hooks/queries/useEvents"
 import { useContentViewCounts } from "@/hooks/queries/useContentViews"
 import type { EventSort } from "@/hooks/queries/useEvents"
 import { createClient } from "@/lib/supabase/client"
+import { docToText } from "@/lib/richtext"
 
 const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
@@ -108,7 +109,7 @@ function EventExpandedContent({ event }: {
       )}
       {event.description && (
         <p className="text-sm text-zinc-600 leading-relaxed pt-1 border-t border-zinc-100">
-          {event.description}
+          {docToText(event.description)}
         </p>
       )}
       {event.website && (

@@ -12,6 +12,7 @@ import { CroppableFileUploadField } from "@/components/forms/CroppableFileUpload
 import { courseSchema, type CourseFormValues } from "@/schemas/course.schema"
 import { useCreateCourse, useUpdateCourse, useAcademyCategories } from "@/hooks/queries/useCourses"
 import { cn } from "@/lib/utils"
+import { toDoc, fromDoc } from "@/lib/richtext"
 import type { Course } from "@/types"
 
 const TRAINEE_LEVELS = [
@@ -132,12 +133,9 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700">Description</label>
             <RichTextEditor
-              value={(() => {
-                const raw = watch("description")
-                if (!raw) return null
-                try { return JSON.parse(raw) as Record<string, unknown> } catch { return null }
-              })()}
-              onChange={(v) => setValue("description", JSON.stringify(v))}
+              key={course?.id ?? "new"}
+              value={toDoc(watch("description"))}
+              onChange={(v) => setValue("description", fromDoc(v))}
               placeholder="What will students learn…"
               minHeight={120}
             />
@@ -232,8 +230,9 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
               folder="courses/thumbnails"
               aspect={16 / 9}
               label="Click to upload thumbnail"
-              existingValue={isEdit ? (course?.thumbnail_url ?? null) : null}
+              existingValue={watch("thumbnail_url") || null}
               onUploadSuccess={({ key }) => setValue("thumbnail_url", key, { shouldValidate: true })}
+              onClear={() => setValue("thumbnail_url", "", { shouldValidate: true })}
               onUploadingChange={setThumbnailUploading}
             />
           </div>

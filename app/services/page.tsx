@@ -3,7 +3,9 @@ import { Suspense } from "react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import ServicesContent from "./ServicesContent"
+import PortfolioSection from "./PortfolioSection"
 import { getActiveServices } from "@/services/service.service"
+import { getActivePortfolioItems } from "@/services/portfolio.service"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 
 export const metadata: Metadata = {
@@ -12,13 +14,17 @@ export const metadata: Metadata = {
 }
 
 export default async function ServicesPage() {
-  const services = await getActiveServices()
+  const [services, portfolio] = await Promise.all([
+    getActiveServices(),
+    getActivePortfolioItems().catch(() => []),
+  ])
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <main className="flex-1">
         <ServicesContent services={services} />
+        <PortfolioSection items={portfolio} />
         <div className="max-w-7xl mx-auto px-6 pb-12">
           <hr className="border-zinc-100 mb-8" />
           <Suspense fallback={null}>

@@ -5,9 +5,10 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Modal } from "@/components/ui/modal"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import RichTextEditor from "@/components/editor/RichTextEditor"
+import { toDoc, fromDoc } from "@/lib/richtext"
 import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { supplierSchema, type SupplierFormValues } from "@/schemas/supplier.schema"
 import { useCreateSupplier, useUpdateSupplier, useSupplierCategories } from "@/hooks/queries/useSuppliers"
@@ -46,6 +47,8 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
       category_id: "",
       country: "",
       address: "",
+      phone: "",
+      email: "",
       sponsored: false,
     },
   })
@@ -66,6 +69,8 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
         category_id: supplier.category_id ?? "",
         country: supplier.country ?? "",
         address: supplier.address ?? "",
+        phone: supplier.phone ?? "",
+        email: supplier.email ?? "",
         sponsored: supplier.sponsored ?? false,
       })
     } else {
@@ -77,6 +82,8 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
         category_id: "",
         country: "",
         address: "",
+        phone: "",
+        email: "",
         sponsored: false,
       })
     }
@@ -109,7 +116,13 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Description</label>
-          <Textarea {...register("description")} placeholder="Supplier description…" rows={3} />
+          <RichTextEditor
+            key={supplier?.id ?? "new"}
+            value={toDoc(watch("description"))}
+            onChange={(v) => setValue("description", fromDoc(v))}
+            placeholder="Supplier description…"
+            minHeight={160}
+          />
         </div>
 
         <div className="space-y-1.5">
@@ -118,8 +131,9 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
             folder="suppliers/logos"
             aspect={4 / 3}
             label="Click to upload supplier image (4:3)"
-            existingValue={isEdit ? (supplier?.logo_path ?? null) : null}
+            existingValue={watch("logo_path") || null}
             onUploadSuccess={({ key }) => setValue("logo_path", key, { shouldValidate: true })}
+            onClear={() => setValue("logo_path", "", { shouldValidate: true })}
             onUploadingChange={setLogoUploading}
           />
         </div>
@@ -161,6 +175,19 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Address</label>
           <Input {...register("address")} placeholder="Full address" />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-zinc-700">Phone</label>
+            <Input {...register("phone")} type="tel" placeholder="+20 1XX XXX XXXX" />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-zinc-700">Email</label>
+            <Input {...register("email")} type="email" placeholder="contact@example.com" />
+            {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+          </div>
         </div>
 
         <div className="flex items-center justify-between rounded-lg border border-zinc-100 bg-zinc-50 px-4 py-3">
