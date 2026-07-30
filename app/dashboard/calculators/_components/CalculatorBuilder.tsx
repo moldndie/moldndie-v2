@@ -9,6 +9,10 @@ import {
   Eye, Check, AlertTriangle, X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { toDoc, fromDoc } from "@/lib/richtext"
+import { Textarea } from "@/components/ui/textarea"
+import RichTextEditor from "@/components/editor/RichTextEditor"
+import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import type { CalcCategory, CalculatorWithRelations, CalcField, CalcOutput, FieldType } from "@/types/calculator"
 import { saveFullCalculator } from "@/services/calculator.service"
 import { evaluateFormula } from "@/lib/formula-engine"
@@ -232,19 +236,6 @@ function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   )
 }
 
-function Textarea(props: React.TextareaHTMLAttributes<HTMLTextAreaElement>) {
-  return (
-    <textarea
-      rows={3}
-      {...props}
-      className={cn(
-        "w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition resize-none",
-        props.className,
-      )}
-    />
-  )
-}
-
 function Select({ children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement> & { children: React.ReactNode }) {
   return (
     <select
@@ -307,6 +298,7 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
   const [slugManual, setSlugManual] = useState(!!calculator)
   const [shortDesc, setShortDesc] = useState(calculator?.short_description ?? "")
   const [description, setDescription] = useState(calculator?.description ?? "")
+  const [coverImage, setCoverImage] = useState(calculator?.cover_image ?? "")
   const [categoryId, setCategoryId] = useState(calculator?.category_id ?? "")
   const [isFeatured, setIsFeatured] = useState(calculator?.is_featured ?? false)
   const [isPublished, setIsPublished] = useState(calculator?.is_published ?? false)
@@ -455,6 +447,7 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
             slug: slug.trim(),
             short_description: shortDesc || null,
             description: description || null,
+            cover_image: coverImage || null,
             category_id: categoryId || null,
             is_featured: isFeatured,
             is_published: isPublished,
@@ -513,6 +506,7 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
               slug={slug} onSlug={(v) => { setSlug(v); setSlugManual(true) }}
               shortDesc={shortDesc} onShortDesc={setShortDesc}
               description={description} onDescription={setDescription}
+              coverImage={coverImage} onCoverImage={setCoverImage}
               categoryId={categoryId} onCategory={setCategoryId}
               categories={categories}
               showTemplateLink={!showTemplates && !calculator}
@@ -531,6 +525,7 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
           {step === 3 && (
             <StepReview
               issues={issues} fieldCount={fields.length} outputCount={outputs.length}
+              fields={fields} outputs={outputs}
               isPublished={isPublished} onPublished={setIsPublished}
               isFeatured={isFeatured} onFeatured={setIsFeatured}
               sortOrder={sortOrder} onSortOrder={setSortOrder}
@@ -675,6 +670,7 @@ function StepDetails(props: {
   slug: string; onSlug: (v: string) => void
   shortDesc: string; onShortDesc: (v: string) => void
   description: string; onDescription: (v: string) => void
+  coverImage: string; onCoverImage: (v: string) => void
   categoryId: string; onCategory: (v: string) => void
   categories: CalcCategory[]
   showTemplateLink: boolean; onShowTemplates: () => void
@@ -704,8 +700,27 @@ function StepDetails(props: {
       </div>
       <div>
         <Label>Full Description</Label>
-        <Textarea value={props.description} onChange={(e) => props.onDescription(e.target.value)} placeholder="Detailed explanation, formula notes, assumptions…" rows={4} />
-        <p className="text-xs text-zinc-400 mt-1">Shown in the &ldquo;About This Calculator&rdquo; box. Line breaks are preserved.</p>
+        <RichTextEditor
+          value={toDoc(props.description)}
+          onChange={(v) => props.onDescription(fromDoc(v))}
+          placeholder="Detailed explanation, formula notes, assumptions…"
+          minHeight={180}
+        />
+        <p className="text-xs text-zinc-400 mt-1">Shown in the &ldquo;About This Calculator&rdquo; box.</p>
+      </div>
+      <div>
+        <Label>Cover Image</Label>
+        <CroppableFileUploadField
+          folder="calculators/covers"
+          aspect={16 / 9}
+          label="Click to upload a cover image (16:9)"
+          existingValue={props.coverImage || null}
+          onUploadSuccess={({ key }) => props.onCoverImage(key)}
+          onClear={() => props.onCoverImage("")}
+        />
+        <p className="text-xs text-zinc-400 mt-1">
+          Optional. Use it to illustrate what the tool calculates — shown above the tool on its public page.
+        </p>
       </div>
       <div>
         <Label>Category</Label>
@@ -736,6 +751,17 @@ function StepInputs({ fields, onAdd, onUpdate, onRemove, onMove }: {
         <button type="button" onClick={onAdd} className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary/90 transition-colors shrink-0">
           <Plus className="size-4" /> Add Input
         </button>
+      </div>
+
+      <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-xs text-zinc-600">
+        <p className="flex items-center gap-1.5 font-semibold text-zinc-800">
+          <Info className="size-3.5" /> Looking for the material / reference table?
+        </p>
+        <p className="mt-1 leading-relaxed">
+          It lives inside a <strong>Dropdown</strong> input. Open the input below (or add one and
+          set its type to Dropdown) to add, edit or delete materials and their property columns.
+          Formulas are edited on the next step.
+        </p>
       </div>
 
       {fields.length === 0 && (
@@ -822,6 +848,7 @@ function StepFormulas({ fields, outputs, knownVars, onAdd, onUpdate, onRemove, o
 
 function StepReview(props: {
   issues: string[]; fieldCount: number; outputCount: number
+  fields: DraftField[]; outputs: DraftOutput[]
   isPublished: boolean; onPublished: (v: boolean) => void
   isFeatured: boolean; onFeatured: (v: boolean) => void
   sortOrder: string; onSortOrder: (v: string) => void
@@ -852,6 +879,55 @@ function StepReview(props: {
           <div className="flex gap-2 mt-3">
             <button onClick={() => props.onGo(1)} className="text-xs font-medium text-amber-800 underline hover:no-underline">Go to Inputs</button>
             <button onClick={() => props.onGo(2)} className="text-xs font-medium text-amber-800 underline hover:no-underline">Go to Formulas</button>
+          </div>
+        )}
+      </div>
+
+      {/* What's configured — so formulas and reference tables are visible without hunting */}
+      <div className="bg-white rounded-xl border border-zinc-200 p-6 space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">Formulas &amp; Data</h3>
+          <button onClick={() => props.onGo(2)} className="text-xs font-medium text-primary underline hover:no-underline">
+            Edit formulas
+          </button>
+        </div>
+
+        {props.outputs.length === 0 ? (
+          <p className="text-sm text-zinc-400">No results defined yet.</p>
+        ) : (
+          <ul className="space-y-2">
+            {props.outputs.map((o) => (
+              <li key={o._uid} className="rounded-lg border border-zinc-100 bg-zinc-50 px-3 py-2">
+                <span className="text-xs font-semibold text-zinc-800">{o.label || "Untitled result"}</span>
+                <code className="ml-2 font-mono text-xs text-zinc-500 break-all">
+                  {o.output_key || "?"} = {o.formula || "—"}
+                </code>
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {props.fields.filter((f) => f.field_type === "select").length > 0 && (
+          <div className="pt-2 border-t border-zinc-100">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-xs font-semibold text-zinc-700">Reference tables</p>
+              <button onClick={() => props.onGo(1)} className="text-xs font-medium text-primary underline hover:no-underline">
+                Edit tables
+              </button>
+            </div>
+            <ul className="space-y-1">
+              {props.fields.filter((f) => f.field_type === "select").map((f) => {
+                const rows = parseOptions(f.options_text) ?? []
+                const cols = Object.keys(rows[0]?.values ?? {})
+                return (
+                  <li key={f._uid} className="text-xs text-zinc-500">
+                    <span className="font-medium text-zinc-700">{f.label || f.field_key}</span>
+                    {" — "}{rows.length} row{rows.length !== 1 ? "s" : ""}
+                    {cols.length > 0 && <> · columns: <code className="font-mono">{cols.join(", ")}</code></>}
+                  </li>
+                )
+              })}
+            </ul>
           </div>
         )}
       </div>
@@ -933,6 +1009,11 @@ function FieldCard({ field, idx, total, onUpdate, onRemove, onMove }: FieldCardP
           </span>
           {field.field_key && <code className="ml-2 text-xs bg-zinc-200 text-zinc-600 px-1.5 py-0.5 rounded">{field.field_key}</code>}
           <span className="ml-2 text-xs text-zinc-400">{FIELD_TYPE_LABELS[field.field_type]}</span>
+          {field.field_type === "select" && (
+            <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-700">
+              {(parseOptions(field.options_text) ?? []).length} rows · reference table
+            </span>
+          )}
         </button>
         <button onClick={() => onRemove(field._uid)} className="rounded-md p-1 text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors">
           <Trash2 className="size-4" />
@@ -1002,7 +1083,22 @@ function FieldCard({ field, idx, total, onUpdate, onRemove, onMove }: FieldCardP
 
           {field.field_type === "select" && (
             <div>
-              <label className="block text-xs font-medium text-zinc-600 mb-1.5">Dropdown Options</label>
+              <label className="block text-xs font-medium text-zinc-600 mb-1">
+                Options &amp; Reference Table
+              </label>
+              <div className="mb-2 rounded-lg border border-blue-200 bg-blue-50 p-3 text-xs text-blue-800">
+                <p className="flex items-center gap-1.5 font-semibold">
+                  <Info className="size-3.5" /> This is the material table
+                </p>
+                <p className="mt-1 leading-relaxed">
+                  Each <strong>row</strong> is a dropdown choice (e.g. a material). Each{" "}
+                  <strong>column</strong> is a property whose key you can use in formulas
+                  (e.g. <code className="font-mono">alpha</code>,{" "}
+                  <code className="font-mono">melt_temp</code>). Add, edit or delete rows and
+                  columns here — this exact table is what visitors see under
+                  &ldquo;{field.label || "…"} — Reference Values&rdquo; on the public page.
+                </p>
+              </div>
               <OptionsEditor value={field.options_text} onChange={(json) => u("options_text", json)} />
             </div>
           )}

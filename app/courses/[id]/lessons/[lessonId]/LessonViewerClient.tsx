@@ -24,6 +24,7 @@ import { useCourseById, useCourseAccess } from "@/hooks/queries/useCourses"
 import { useAddToCart, useCartHasItem } from "@/hooks/queries/useCart"
 import { cn } from "@/lib/utils"
 import type { CourseLesson } from "@/types"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -525,9 +526,7 @@ export default function LessonViewerClient({
           </div>
 
           {lesson.description && (
-            <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-wrap">
-              {lesson.description}
-            </p>
+            <RichTextRenderer content={lesson.description} className="text-sm text-zinc-600" />
           )}
 
           {renderSecondaryMedia()}

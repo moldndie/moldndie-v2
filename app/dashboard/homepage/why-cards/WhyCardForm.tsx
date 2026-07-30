@@ -8,6 +8,8 @@ import IconPicker from "@/components/dashboard/IconPicker"
 import { createWhyCard, updateWhyCard, deleteWhyCard } from "@/services/homeWhyCards.service"
 import type { HomeWhyCard } from "@/services/homeWhyCards.service"
 import { cn } from "@/lib/utils"
+import RichTextEditor from "@/components/editor/RichTextEditor"
+import { toDoc, fromDoc } from "@/lib/richtext"
 
 interface Props {
   card?: HomeWhyCard
@@ -108,12 +110,11 @@ export default function WhyCardForm({ card }: Props) {
 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Description</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDesc(e.target.value)}
-            rows={4}
+          <RichTextEditor
+            value={toDoc(description)}
+            onChange={(v) => setDesc(fromDoc(v))}
             placeholder="Describe why this differentiator matters…"
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition resize-none"
+            minHeight={160}
           />
         </div>
 

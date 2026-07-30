@@ -16,4 +16,5 @@ export const QUERY_KEYS = {
   DASHBOARD: ["dashboard"] as const,
   CART: ["cart"] as const,
   SERVICES: ["services"] as const,
+  PORTFOLIO: ["portfolio"] as const,
 }

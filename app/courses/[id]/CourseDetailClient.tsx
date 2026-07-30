@@ -23,6 +23,7 @@ import { useAddToCart, useCartHasItem } from "@/hooks/queries/useCart"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { useCurrency } from "@/context/CurrencyContext"
 import { displayPrice } from "@/lib/currency"
+import { docToText } from "@/lib/richtext"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -300,7 +301,7 @@ export default function CourseDetailClient({ courseId, viewCount }: { courseId: 
                             </p>
                             {lesson.description && (
                               <p className="text-xs text-zinc-500 line-clamp-2 mt-0.5">
-                                {lesson.description}
+                                {docToText(lesson.description)}
                               </p>
                             )}
                             <div className="flex items-center gap-2 mt-0.5">
@@ -349,7 +350,7 @@ export default function CourseDetailClient({ courseId, viewCount }: { courseId: 
                         </p>
                         {lesson.description && (
                           <p className="text-xs text-zinc-400 line-clamp-2 mt-0.5">
-                            {lesson.description}
+                            {docToText(lesson.description)}
                           </p>
                         )}
                       </div>

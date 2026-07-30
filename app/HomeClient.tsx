@@ -12,6 +12,7 @@ import type { HomeWhyCard } from "@/services/homeWhyCards.service"
 import type { SiteSettings } from "@/services/siteSettings.service"
 import { isValidImageUrl } from "@/lib/heroSlides.constants"
 import { DynamicIcon } from "@/lib/icons"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
 
 // ── Animation variants ─────────────────────────────────────────────────────
 const fadeUp: Variants = {
@@ -80,7 +81,7 @@ function OfferCard({ item }: { item: HomeOfferItem }) {
         <DynamicIcon name={item.icon} size={36} strokeWidth={1.5} className="text-primary" />
         <h3 className="text-sm font-bold text-primary leading-snug uppercase tracking-wide">{item.title}</h3>
         {item.description && (
-          <p className="text-xs text-zinc-500 leading-relaxed">{item.description}</p>
+          <RichTextRenderer content={item.description} className="text-xs text-zinc-500" />
         )}
         {item.button_text && (
           <span className="mt-auto pt-1 text-xs font-semibold text-primary/70 group-hover:text-primary transition-colors">
@@ -111,7 +112,7 @@ function WhyCard({ card }: { card: HomeWhyCard }) {
       </div>
       <h3 className="text-sm font-bold text-zinc-900">{card.title}</h3>
       {card.description && (
-        <p className="text-xs text-zinc-500 leading-relaxed">{card.description}</p>
+        <RichTextRenderer content={card.description} className="text-xs text-zinc-500" />
       )}
     </motion.div>
   )

@@ -196,6 +196,7 @@ export default async function BlogDetailPage({ params }: Props) {
             <ShareButtons
               url={`${process.env.NEXT_PUBLIC_SITE_URL ?? ""}/blogs/${blog.slug}`}
               title={blog.title}
+              image={blog.cover_image_path ? getFileUrl(blog.cover_image_path) : undefined}
             />
           </div>
 

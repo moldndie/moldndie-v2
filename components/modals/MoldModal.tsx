@@ -15,6 +15,7 @@ import { moldSchema, type MoldFormValues } from "@/schemas/mold.schema"
 import { useCreateMold, useUpdateMold } from "@/hooks/queries/useMolds"
 import { getGalleryItems, addGalleryItems, deleteGalleryItem } from "@/services/moldGallery.service"
 import { cn } from "@/lib/utils"
+import { toDoc, fromDoc } from "@/lib/richtext"
 import type { Mold, MoldCategory } from "@/types"
 
 interface MoldModalProps {
@@ -201,12 +202,9 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700">Description</label>
               <RichTextEditor
-                value={(() => {
-                  const raw = watch("description")
-                  if (!raw) return null
-                  try { return JSON.parse(raw) as Record<string, unknown> } catch { return null }
-                })()}
-                onChange={(v) => setValue("description", JSON.stringify(v))}
+                key={mold?.id ?? "new"}
+                value={toDoc(watch("description"))}
+                onChange={(v) => setValue("description", fromDoc(v))}
                 placeholder="Describe the mold…"
                 minHeight={120}
               />
@@ -267,8 +265,9 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
                 folder="molds/previews"
                 aspect={1}
                 label="Click to upload preview image"
-                existingValue={isEdit ? (mold?.preview_image ?? null) : null}
+                existingValue={watch("preview_image") || null}
                 onUploadSuccess={({ key }) => setValue("preview_image", key, { shouldValidate: true })}
+                onClear={() => setValue("preview_image", "", { shouldValidate: true })}
                 onUploadingChange={setImageUploading}
               />
             </div>
@@ -279,8 +278,9 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
                 folder="molds/files"
                 accept=".zip,.step,.stl,.obj,.3mf"
                 label="Click to select mold file (.zip, .step, .stl…)"
-                existingValue={isEdit ? (mold?.file_key ?? null) : null}
+                existingValue={watch("file_key") || null}
                 onUploadSuccess={({ key }) => setValue("file_key", key, { shouldValidate: true })}
+                onClear={() => setValue("file_key", "", { shouldValidate: true })}
                 onUploadingChange={setFileUploading}
               />
               {errors.file_key && <p className="text-xs text-red-500">{errors.file_key.message}</p>}

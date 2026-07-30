@@ -215,6 +215,7 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
               label="Click to upload PDF"
               existingValue={form.pdf_url || null}
               onUploadSuccess={({ key }) => setForm((f) => (f ? { ...f, pdf_url: key } : f))}
+              onClear={() => setForm((f) => (f ? { ...f, pdf_url: "" } : f))}
               onUploadingChange={onUploadingChange}
             />
           </div>

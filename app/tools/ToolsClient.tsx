@@ -36,81 +36,67 @@ export function ToolsClient({ dbCalculators, categories }: Props) {
   })
 
   return (
-    <div>
-      {/* ── Hero ──────────────────────────────────────────────────────── */}
-      <section className="bg-zinc-950 text-white py-16 px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-4">
-            <PublicBreadcrumb crumbs={[{ label: "Engineering" }]} />
-          </div>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="flex size-10 items-center justify-center rounded-xl bg-primary/20">
-              <Wrench size={20} className="text-primary" />
-            </div>
-            <span className="text-xs font-bold uppercase tracking-widest text-primary">
-              Free Tools
-            </span>
-          </div>
-          <h1 className="text-3xl md:text-5xl font-black uppercase leading-tight tracking-tight mb-4">
-            Engineering <span className="text-primary">Tools</span>
-          </h1>
-          <p className="text-sm text-zinc-400 max-w-xl">
-            Free, high-accuracy tools to streamline the design of injection molds,
-            pressure die-casting molds, and sheet metal dies.
-          </p>
-        </div>
-      </section>
+    <div className="max-w-7xl mx-auto px-6 py-10 space-y-8">
+      {/* ── Heading ───────────────────────────────────────────────────── */}
+      <div>
+        <PublicBreadcrumb crumbs={[{ label: "Engineering" }]} />
+        <h1 className="mt-3 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">
+          Engineering Tools
+        </h1>
+        <p className="mt-1 text-sm text-zinc-500 max-w-2xl">
+          Free, high-accuracy tools to streamline the design of injection molds,
+          pressure die-casting molds, and sheet metal dies.
+        </p>
+      </div>
 
-      <section className="max-w-6xl mx-auto px-6 py-14">
-        {/* ── Featured ─────────────────────────────────────────────────── */}
-        {featured.length > 0 && (
-          <div className="mb-12">
-            <div className="flex items-center gap-2 mb-5">
-              <Zap className="size-4 text-amber-500 fill-amber-400" />
-              <h2 className="text-base font-bold text-zinc-900 uppercase tracking-wide">
-                Featured Tools
-              </h2>
-            </div>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              {featured.map((c) => (
-                <Link
-                  key={c.id}
-                  href={`/tools/${c.slug}`}
-                  className="group rounded-xl border border-amber-200 bg-amber-50 p-5 hover:border-amber-400 hover:shadow-md transition-all"
-                >
-                  <p className="text-sm font-bold text-zinc-900 group-hover:text-primary transition-colors">
-                    {c.title}
-                  </p>
-                  {c.short_description && (
-                    <p className="text-xs text-zinc-500 mt-1.5 line-clamp-2">
-                      {c.short_description}
-                    </p>
-                  )}
-                  <p className="mt-3 text-xs font-semibold text-primary flex items-center gap-1">
-                    Open tool <ArrowRight className="size-3" />
-                  </p>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* ── Specialist Tools ─────────────────────────────────────────── */}
-        <div className="flex items-center gap-2 mb-6">
-          <Wrench className="size-4 text-zinc-400" />
-          <h2 className="text-base font-bold text-zinc-900 uppercase tracking-wide">
-            Specialist Tools
+      {/* ── Featured ─────────────────────────────────────────────────── */}
+      {featured.length > 0 && (
+        <div>
+          <h2 className="text-base font-bold text-zinc-900 uppercase tracking-wide mb-4">
+            Featured Tools
           </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featured.map((c) => (
+              <Link
+                key={c.id}
+                href={`/tools/${c.slug}`}
+                className="group flex flex-col rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm hover:shadow-md transition-all duration-200"
+              >
+                <span className="inline-flex items-center gap-1 self-start rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary mb-3">
+                  <Zap className="size-2.5 fill-current" />
+                  Featured
+                </span>
+                <p className="text-sm font-bold text-zinc-900 group-hover:text-primary transition-colors">
+                  {c.title}
+                </p>
+                {c.short_description && (
+                  <p className="text-xs text-zinc-500 mt-1.5 line-clamp-2">
+                    {c.short_description}
+                  </p>
+                )}
+                <p className="mt-3 text-xs font-semibold text-primary flex items-center gap-1">
+                  Open tool <ArrowRight className="size-3" />
+                </p>
+              </Link>
+            ))}
+          </div>
         </div>
+      )}
+
+      {/* ── All tools ────────────────────────────────────────────────── */}
+      <div>
+        <h2 className="text-base font-bold text-zinc-900 uppercase tracking-wide mb-4">
+          All Tools
+        </h2>
 
         {/* Search bar */}
-        <div className="mb-5">
+        <div className="mb-4">
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search tools…"
-            className="w-full sm:max-w-sm rounded-lg border border-zinc-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
+            className="w-full sm:max-w-sm rounded-xl border border-zinc-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
           />
         </div>
 
@@ -122,7 +108,7 @@ export function ToolsClient({ dbCalculators, categories }: Props) {
               className={cn(
                 "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
                 activeCat === "all"
-                  ? "bg-zinc-900 text-white"
+                  ? "bg-primary text-white"
                   : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
               )}
             >
@@ -135,7 +121,7 @@ export function ToolsClient({ dbCalculators, categories }: Props) {
                 className={cn(
                   "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
                   activeCat === cat.id
-                    ? "bg-zinc-900 text-white"
+                    ? "bg-primary text-white"
                     : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
                 )}
               >
@@ -157,15 +143,15 @@ export function ToolsClient({ dbCalculators, categories }: Props) {
             No tools match your search.
           </p>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {filtered.map((c) => (
               <motion.div key={c.id} {...reveal}>
                 <Link
                   href={`/tools/${c.slug}`}
-                  className="group flex flex-col h-full rounded-xl border border-zinc-200 bg-white p-5 hover:border-primary hover:shadow-md transition-all"
+                  className="group flex flex-col h-full rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm hover:shadow-md transition-all duration-200"
                 >
                   {c.category && (
-                    <span className="inline-block self-start rounded-full bg-primary/10 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-primary mb-3">
+                    <span className="inline-block self-start rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary mb-3">
                       {c.category.name}
                     </span>
                   )}
@@ -173,7 +159,7 @@ export function ToolsClient({ dbCalculators, categories }: Props) {
                     {c.title}
                   </p>
                   {c.short_description && (
-                    <p className="text-xs text-zinc-400 mt-2 leading-relaxed line-clamp-3 flex-1">
+                    <p className="text-xs text-zinc-500 mt-2 leading-relaxed line-clamp-3 flex-1">
                       {c.short_description}
                     </p>
                   )}
@@ -186,7 +172,7 @@ export function ToolsClient({ dbCalculators, categories }: Props) {
             ))}
           </div>
         )}
-      </section>
+      </div>
     </div>
   )
 }

@@ -30,6 +30,7 @@ export function AdForm({ ad }: AdFormProps) {
     register,
     handleSubmit,
     setValue,
+    watch,
     control,
     formState: { errors },
   } = useForm<AdFormValues>({
@@ -83,8 +84,9 @@ export function AdForm({ ad }: AdFormProps) {
           folder="ads"
           accept="image/*"
           label="Click to upload ad image"
-          existingValue={isEdit ? (ad?.image_path ?? null) : null}
+          existingValue={watch("image_path") || null}
           onUploadSuccess={({ key }) => setValue("image_path", key, { shouldValidate: true })}
+          onClear={() => setValue("image_path", "", { shouldValidate: true })}
           onUploadingChange={setImageUploading}
         />
         {errors.image_path && <p className="text-xs text-red-500">{errors.image_path.message}</p>}

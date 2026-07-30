@@ -5,9 +5,10 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Modal } from "@/components/ui/modal"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
+import RichTextEditor from "@/components/editor/RichTextEditor"
+import { toDoc, fromDoc } from "@/lib/richtext"
 import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
 import { eventSchema, type EventFormValues } from "@/schemas/event.schema"
 import { useCreateEvent, useUpdateEvent, useEventCategories } from "@/hooks/queries/useEvents"
@@ -33,6 +34,7 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
     register,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors },
   } = useForm<EventFormValues>({
@@ -48,6 +50,8 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
       country: "",
       address: "",
       website: "",
+      phone: "",
+      email: "",
     },
   })
 
@@ -68,6 +72,8 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
         country: event.country ?? "",
         address: event.address ?? "",
         website: event.website ?? "",
+        phone: event.phone ?? "",
+        email: event.email ?? "",
       })
     } else {
       reset({
@@ -81,6 +87,8 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
         country: "",
         address: "",
         website: "",
+        phone: "",
+        email: "",
       })
     }
   }, [open, event, reset])
@@ -112,7 +120,13 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
 
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Description</label>
-          <Textarea {...register("description")} placeholder="Event description…" rows={3} />
+          <RichTextEditor
+            key={event?.id ?? "new"}
+            value={toDoc(watch("description"))}
+            onChange={(v) => setValue("description", fromDoc(v))}
+            placeholder="Event description…"
+            minHeight={160}
+          />
         </div>
 
         <div className="space-y-1.5">
@@ -121,8 +135,9 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
             folder="events/images"
             aspect={16 / 9}
             label="Click to upload event image"
-            existingValue={isEdit ? (event?.image_path ?? null) : null}
+            existingValue={watch("image_path") || null}
             onUploadSuccess={({ key }) => setValue("image_path", key, { shouldValidate: true })}
+            onClear={() => setValue("image_path", "", { shouldValidate: true })}
             onUploadingChange={setImageUploading}
           />
           {errors.image_path && (
@@ -182,6 +197,19 @@ export function EventModal({ open, onClose, event, onSuccess }: EventModalProps)
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Website</label>
           <Input {...register("website")} placeholder="https://example.com" />
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-zinc-700">Phone</label>
+            <Input {...register("phone")} type="tel" placeholder="+20 1XX XXX XXXX" />
+          </div>
+
+          <div className="space-y-1.5">
+            <label className="text-sm font-medium text-zinc-700">Email</label>
+            <Input {...register("email")} type="email" placeholder="contact@example.com" />
+            {errors.email && <p className="text-xs text-red-500">{errors.email.message}</p>}
+          </div>
         </div>
 
         {mutationError && (

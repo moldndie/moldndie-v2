@@ -8,6 +8,8 @@ export const supplierSchema = z.object({
   category_id: z.string().optional(),
   country: z.string().optional(),
   address: z.string().optional(),
+  phone: z.string().optional(),
+  email: z.union([z.literal(""), z.string().email("Enter a valid email")]).optional(),
   sponsored: z.boolean(),
 })
 

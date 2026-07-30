@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { CalendarDays, MapPin, MapPinned, Tag, AlertCircle } from "lucide-react"
 import { useEventById } from "@/hooks/queries/useEvents"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
@@ -122,7 +123,7 @@ export function EventDrawerContent({ eventId }: { eventId: string }) {
         {event.description && (
           <div className="pt-4 border-t border-zinc-100">
             <p className="text-[10px] text-zinc-400 font-semibold uppercase tracking-wider mb-2">About this Event</p>
-            <p className="text-sm text-zinc-700 leading-relaxed whitespace-pre-line">{event.description}</p>
+            <RichTextRenderer content={event.description} className="text-sm text-zinc-700" />
           </div>
         )}
 

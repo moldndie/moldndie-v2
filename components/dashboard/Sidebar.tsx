@@ -16,6 +16,7 @@ import {
   Settings2,
   Calculator,
   Briefcase,
+  FolderKanban,
   LayoutPanelTop,
   X,
 } from "lucide-react"
@@ -45,6 +46,7 @@ const navItems: NavItem[] = [
   { label: "Users",            href: "/dashboard/users",             icon: Users },
 { label: "Service Requests", href: "/dashboard/service-requests",  icon: Inbox },
   { label: "Services",         href: "/dashboard/services",          icon: Briefcase },
+  { label: "Portfolio",        href: "/dashboard/portfolio",         icon: FolderKanban },
   { label: "Engineering Tools", href: "/dashboard/calculators",       icon: Calculator },
   {
     label: "Homepage",

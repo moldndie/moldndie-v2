@@ -17,6 +17,8 @@ export interface Event {
   country: string | null
   address: string | null
   website: string | null
+  phone: string | null
+  email: string | null
   created_at: string
   category?: EventCategory | null
 }

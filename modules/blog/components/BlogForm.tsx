@@ -161,8 +161,9 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
                 folder="blogs/covers"
                 accept="image/*"
                 label="Click to upload cover image"
-                existingValue={isEdit ? (blog?.cover_image_path ?? null) : null}
+                existingValue={watch("cover_image_path") || null}
                 onUploadSuccess={({ key }) => setValue("cover_image_path", key, { shouldValidate: true })}
+                onClear={() => setValue("cover_image_path", "", { shouldValidate: true })}
                 onUploadingChange={setCoverUploading}
               />
             </div>

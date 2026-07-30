@@ -1,6 +1,9 @@
 import { Metadata } from "next"
 import { Suspense } from "react"
+import Image from "next/image"
 import { notFound } from "next/navigation"
+import { getFileUrl } from "@/lib/utils"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { ContentViewTracker } from "@/components/analytics/ContentViewTracker"
@@ -41,53 +44,69 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
       <Navbar />
       <main className="flex-1">
         <ContentViewTracker contentType="calculator" contentId={calc.id} />
-        {/* Hero */}
-        <section className="bg-zinc-950 text-white py-12 px-6">
-          <div className="max-w-5xl mx-auto">
-            <PublicBreadcrumb crumbs={[
-              { label: "Engineering Tools", href: "/tools" },
-              { label: calc.title },
-            ]} />
-            <div className="mt-4">
-              {calc.category && (
-                <span className="inline-block rounded-full bg-primary/20 px-3 py-0.5 text-xs font-bold uppercase tracking-wide text-primary mb-3">
-                  {calc.category.name}
-                </span>
-              )}
-              <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tight text-white">{calc.title}</h1>
-              {calc.short_description && (
-                <p className="mt-2 text-sm text-zinc-400 max-w-xl">{calc.short_description}</p>
-              )}
-            </div>
-          </div>
+        {/* Header */}
+        <section className="max-w-7xl mx-auto px-6 pt-10">
+          <PublicBreadcrumb crumbs={[
+            { label: "Engineering", href: "/tools" },
+            { label: calc.title },
+          ]} />
+          {calc.category && (
+            <span className="mt-3 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+              {calc.category.name}
+            </span>
+          )}
+          <h1 className="mt-2 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">
+            {calc.title}
+          </h1>
+          {calc.short_description && (
+            <p className="mt-1 text-sm text-zinc-500 max-w-2xl">{calc.short_description}</p>
+          )}
         </section>
 
         {/* Calculator */}
-        <section className="max-w-5xl mx-auto px-6 py-12">
+        <section className="max-w-7xl mx-auto px-6 py-10 space-y-8">
+          {calc.cover_image && (
+            <div className="relative aspect-video w-full max-w-3xl overflow-hidden rounded-2xl border border-zinc-100 bg-white">
+              <Image
+                src={getFileUrl(calc.cover_image)}
+                alt={calc.title}
+                fill
+                className="object-contain"
+                sizes="(max-width: 768px) 100vw, 768px"
+              />
+            </div>
+          )}
+
           <CalculatorRunner calculator={calc} />
 
           {/* Description */}
           {calc.description && (
-            <div className="mt-10 rounded-xl border border-zinc-200 bg-white p-6">
-              <h2 className="text-base font-bold text-zinc-900 mb-3">About This Calculator</h2>
-              <p className="text-sm text-zinc-600 leading-relaxed whitespace-pre-line">{calc.description}</p>
+            <div className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm">
+              <h2 className="text-base font-bold text-zinc-900 uppercase tracking-wide mb-3">
+                About This Calculator
+              </h2>
+              <RichTextRenderer content={calc.description} className="text-sm text-zinc-600" />
             </div>
           )}
 
           {/* Related */}
           {related.length > 0 && (
-            <div className="mt-10">
-              <h2 className="text-base font-bold text-zinc-900 mb-4">Related Calculators</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div>
+              <h2 className="text-base font-bold text-zinc-900 uppercase tracking-wide mb-4">
+                Related Tools
+              </h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {related.map((r) => (
                   <a
                     key={r.id}
                     href={`/tools/${r.slug}`}
-                    className="rounded-xl border border-zinc-200 bg-white p-4 hover:border-primary hover:shadow-sm transition-all"
+                    className="group rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm hover:shadow-md transition-all duration-200"
                   >
-                    <p className="text-sm font-semibold text-zinc-900">{r.title}</p>
+                    <p className="text-sm font-bold text-zinc-900 group-hover:text-primary transition-colors">
+                      {r.title}
+                    </p>
                     {r.short_description && (
-                      <p className="text-xs text-zinc-400 mt-1 line-clamp-2">{r.short_description}</p>
+                      <p className="text-xs text-zinc-500 mt-1 line-clamp-2">{r.short_description}</p>
                     )}
                   </a>
                 ))}
@@ -95,7 +114,7 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
             </div>
           )}
         </section>
-        <div className="max-w-5xl mx-auto px-6 pb-12">
+        <div className="max-w-7xl mx-auto px-6 pb-12">
           <hr className="border-zinc-100 mb-8" />
           <Suspense fallback={null}>
             <AdSlotGrid page="engineering" className="w-full" />
