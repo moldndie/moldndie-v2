@@ -3,54 +3,58 @@
 import { useEffect, useRef, useState } from "react"
 import Image from "next/image"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { getFileUrl } from "@/lib/utils"
+import { cn, getFileUrl } from "@/lib/utils"
+import { useCarousel } from "@/hooks/useCarousel"
 import { AdViewTracker } from "./AdViewTracker"
 import type { Ad } from "@/types"
 
+const AUTOPLAY_MS = 5000
+
 /**
- * Ads are deliberately independent of the page they sit under: the track is a
- * plain scroll container whose position only changes when the arrows are used,
- * so paginating or filtering the listing above never moves the ads.
+ * Ads advance on their own timer and are otherwise independent of the page they
+ * sit under: the track scrolls only from this component's own index, so
+ * paginating or filtering the listing above never moves the ads.
+ *
+ * Unlike the hero, which shows one slide at a time, this shows a row of cards —
+ * so a "page" is one viewport-width of cards and the dots count pages, not ads.
  */
+/** Cards are 1/2/3 across — mirrors the `sm:`/`lg:` widths on the card itself. */
+function cardsPerPage(): number {
+  if (typeof window === "undefined") return 1
+  if (window.matchMedia("(min-width: 1024px)").matches) return 3
+  if (window.matchMedia("(min-width: 640px)").matches) return 2
+  return 1
+}
+
 export function AdCarousel({ ads, className }: { ads: Ad[]; className?: string }) {
   const trackRef = useRef<HTMLDivElement>(null)
-  const [atStart, setAtStart] = useState(true)
-  const [atEnd, setAtEnd] = useState(false)
+  const [perPage, setPerPage] = useState(1)
 
-  function sync(el: HTMLDivElement) {
-    setAtStart(el.scrollLeft <= 1)
-    setAtEnd(el.scrollLeft + el.clientWidth >= el.scrollWidth - 1)
-  }
+  // Read from the breakpoints rather than measuring the DOM: the card widths
+  // are set by those same breakpoints, and a measured clientWidth is 0 while
+  // the track is still laying out.
+  useEffect(() => {
+    const sync = () => setPerPage(cardsPerPage())
+    sync()
+    window.addEventListener("resize", sync)
+    return () => window.removeEventListener("resize", sync)
+  }, [])
 
+  const pages = Math.max(1, Math.ceil(ads.length / perPage))
+  const { index, next, prev, select } = useCarousel({ length: pages, intervalMs: AUTOPLAY_MS })
+
+  // Scroll the first card of the page to the left edge. Plain assignment, no
+  // smooth behaviour: `scroll-snap-type: mandatory` re-snaps smooth
+  // programmatic scrolls back to the first card, and a `scroll-behavior:
+  // smooth` container can swallow the assignment entirely.
   useEffect(() => {
     const el = trackRef.current
-    if (!el) return
-    const onScroll = () => sync(el)
-    onScroll()
-    el.addEventListener("scroll", onScroll, { passive: true })
-    window.addEventListener("resize", onScroll)
-    return () => {
-      el.removeEventListener("scroll", onScroll)
-      window.removeEventListener("resize", onScroll)
-    }
-  }, [ads.length])
+    const first = el?.children[index * perPage] as HTMLElement | undefined
+    if (!el || !first) return
+    el.scrollLeft = first.offsetLeft - (el.firstElementChild as HTMLElement).offsetLeft
+  }, [index, perPage])
 
-  function page(dir: 1 | -1) {
-    const el = trackRef.current
-    if (!el) return
-    // Plain assignment, no smooth behaviour: `scroll-snap-type: mandatory`
-    // re-snaps smooth programmatic scrolls back to the first card, and a
-    // `scroll-behavior: smooth` container can swallow the assignment entirely.
-    el.scrollLeft = Math.max(
-      0,
-      Math.min(el.scrollLeft + dir * el.clientWidth, el.scrollWidth - el.clientWidth),
-    )
-    // Programmatic scrolls do not reliably emit a scroll event, so drive the
-    // arrow states from here rather than waiting on the listener.
-    sync(el)
-  }
-
-  const hasArrows = !atStart || !atEnd
+  const hasPager = pages > 1
 
   return (
     <div className={className}>
@@ -58,23 +62,21 @@ export function AdCarousel({ ads, className }: { ads: Ad[]; className?: string }
         <p className="select-none text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
           Sponsored
         </p>
-        {hasArrows && (
+        {hasPager && (
           <div className="flex items-center gap-1.5">
             <button
               type="button"
-              onClick={() => page(-1)}
-              disabled={atStart}
+              onClick={prev}
               aria-label="Previous ads"
-              className="flex size-7 items-center justify-center rounded-full border border-zinc-200 text-zinc-500 transition-colors hover:border-zinc-300 hover:text-zinc-800 disabled:cursor-default disabled:opacity-30 disabled:hover:border-zinc-200 disabled:hover:text-zinc-500"
+              className="flex size-7 items-center justify-center rounded-full border border-zinc-200 text-zinc-500 transition-colors hover:border-zinc-300 hover:text-zinc-800"
             >
               <ChevronLeft className="size-4" />
             </button>
             <button
               type="button"
-              onClick={() => page(1)}
-              disabled={atEnd}
+              onClick={next}
               aria-label="Next ads"
-              className="flex size-7 items-center justify-center rounded-full border border-zinc-200 text-zinc-500 transition-colors hover:border-zinc-300 hover:text-zinc-800 disabled:cursor-default disabled:opacity-30 disabled:hover:border-zinc-200 disabled:hover:text-zinc-500"
+              className="flex size-7 items-center justify-center rounded-full border border-zinc-200 text-zinc-500 transition-colors hover:border-zinc-300 hover:text-zinc-800"
             >
               <ChevronRight className="size-4" />
             </button>
@@ -111,6 +113,29 @@ export function AdCarousel({ ads, className }: { ads: Ad[]; className?: string }
           </AdViewTracker>
         ))}
       </div>
+
+      {/* Dots — same treatment as the homepage hero, tinted for a light background */}
+      {hasPager && (
+        <div
+          role="tablist"
+          aria-label="Sponsored slide navigation"
+          className="mt-3 flex items-center justify-center gap-2"
+        >
+          {Array.from({ length: pages }, (_, i) => (
+            <button
+              key={i}
+              role="tab"
+              aria-selected={i === index}
+              aria-label={`Go to sponsored slide ${i + 1}`}
+              onClick={() => select(i)}
+              className={cn(
+                "h-1.5 rounded-full transition-all duration-400 focus-visible:outline-none",
+                i === index ? "w-8 bg-zinc-400" : "w-1.5 bg-zinc-200 hover:bg-zinc-300",
+              )}
+            />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

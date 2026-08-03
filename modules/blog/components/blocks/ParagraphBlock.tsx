@@ -1,5 +1,8 @@
 "use client"
 
+import RichTextEditor from "@/components/editor/RichTextEditor"
+import { toDoc, fromDoc } from "@/lib/richtext"
+
 interface ParagraphContent {
   text: string
 }
@@ -9,19 +12,18 @@ interface ParagraphBlockProps {
   onChange: (value: ParagraphContent) => void
 }
 
+/**
+ * `text` holds a stringified Tiptap doc, the same convention as every other
+ * rich-text column. Posts written before this block became rich text hold raw
+ * plain text — `toDoc` wraps those in a paragraph rather than dropping them.
+ */
 export function ParagraphBlock({ value, onChange }: ParagraphBlockProps) {
   return (
-    <textarea
-      value={value.text ?? ""}
-      onChange={(e) => onChange({ text: e.target.value })}
-      onInput={(e) => {
-        const el = e.currentTarget
-        el.style.height = "auto"
-        el.style.height = `${el.scrollHeight}px`
-      }}
-      placeholder="Start writing..."
-      rows={3}
-      className="w-full resize-none rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-800 placeholder:text-zinc-400 focus:border-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-300 transition-colors"
+    <RichTextEditor
+      value={toDoc(value.text)}
+      onChange={(doc) => onChange({ text: fromDoc(doc) })}
+      placeholder="Start writing…"
+      minHeight={140}
     />
   )
 }

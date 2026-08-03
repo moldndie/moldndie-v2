@@ -15,6 +15,7 @@ import {
   type PortfolioItem,
   type PortfolioItemFormValues,
 } from "@/services/portfolio.service"
+import { getServices, type ServiceOffering } from "@/services/service.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import { Modal } from "@/components/ui/modal"
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal"
@@ -30,6 +31,7 @@ const EMPTY_FORM: PortfolioItemFormValues = {
   images: [],
   video_path: "",
   video_url: "",
+  service_id: "",
   sort_order: 0,
   is_active: true,
 }
@@ -43,6 +45,7 @@ const labelCls = "block text-xs font-semibold text-zinc-700 mb-1"
 function PortfolioForm({
   initial,
   formKey,
+  services,
   onSave,
   isPending,
   error,
@@ -50,6 +53,7 @@ function PortfolioForm({
   initial: PortfolioItemFormValues
   /** Changes whenever a different item is loaded — remounts the editor/uploads */
   formKey: string
+  services: ServiceOffering[]
   onSave: (values: PortfolioItemFormValues) => void
   isPending: boolean
   error: string | null
@@ -83,6 +87,23 @@ function PortfolioForm({
           onChange={(e) => set("title", e.target.value)}
           placeholder="e.g. 8-cavity hot runner mold for automotive clips"
         />
+      </div>
+
+      <div>
+        <label className={labelCls}>Service</label>
+        <select
+          className={inputCls}
+          value={form.service_id ?? ""}
+          onChange={(e) => set("service_id", e.target.value)}
+        >
+          <option value="">General — show in “Our Work” on /services</option>
+          {services.map((s) => (
+            <option key={s.id} value={s.id}>{s.title}</option>
+          ))}
+        </select>
+        <p className="text-xs text-zinc-400 mt-1">
+          Pick a service to show this example on that service&apos;s own page instead.
+        </p>
       </div>
 
       <div>
@@ -191,6 +212,13 @@ export default function PortfolioManagementClient() {
     staleTime: 2 * 60 * 1000,
   })
 
+  // For the "Service" picker — an item can be tied to one service, or left general.
+  const { data: services = [] } = useQuery({
+    queryKey: QUERY_KEYS.SERVICES,
+    queryFn: getServices,
+    staleTime: 2 * 60 * 1000,
+  })
+
   const invalidate = () => qc.invalidateQueries({ queryKey: QUERY_KEYS.PORTFOLIO })
 
   const createMut = useMutation({
@@ -242,6 +270,7 @@ export default function PortfolioManagementClient() {
         images:      editing.images ?? [],
         video_path:  editing.video_path ?? "",
         video_url:   editing.video_url ?? "",
+        service_id:  editing.service_id ?? "",
         sort_order:  editing.sort_order,
         is_active:   editing.is_active,
       }
@@ -364,6 +393,7 @@ export default function PortfolioManagementClient() {
         <PortfolioForm
           initial={createInitial}
           formKey="new"
+          services={services}
           onSave={(v) => createMut.mutate(v)}
           isPending={createMut.isPending}
           error={formError}
@@ -379,6 +409,7 @@ export default function PortfolioManagementClient() {
         <PortfolioForm
           initial={editInitial}
           formKey={editing?.id ?? "new"}
+          services={services}
           onSave={(v) => editing && updateMut.mutate({ id: editing.id, values: v })}
           isPending={updateMut.isPending}
           error={formError}

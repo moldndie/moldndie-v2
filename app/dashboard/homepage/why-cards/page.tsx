@@ -5,6 +5,7 @@ import PageHeader from "@/components/dashboard/PageHeader"
 import { getAllWhyCards } from "@/services/homeWhyCards.service"
 import type { HomeWhyCard } from "@/services/homeWhyCards.service"
 import { DynamicIcon } from "@/lib/icons"
+import { docToText } from "@/lib/richtext"
 import WhyCardToggle from "./WhyCardToggle"
 
 export const metadata: Metadata = { title: "Why Choose Us | Admin" }
@@ -61,8 +62,8 @@ export default async function WhyCardsPage() {
                       </div>
                       <div>
                         <p className="font-medium text-zinc-900">{card.title}</p>
-                        {card.description && (
-                          <p className="text-xs text-zinc-400 line-clamp-1 max-w-xs">{card.description}</p>
+                        {docToText(card.description) && (
+                          <p className="text-xs text-zinc-400 line-clamp-1 max-w-xs">{docToText(card.description)}</p>
                         )}
                       </div>
                     </div>

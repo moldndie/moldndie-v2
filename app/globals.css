@@ -259,6 +259,11 @@
   line-height: 1.75;
 }
 .cms-editor strong, .cms-content strong { font-weight: 700; color: #09090b; }
+/* A colour set with the toolbar's colour picker renders as an inline-styled
+   span. Its children must inherit it, or the `strong`/heading colours above
+   would silently win and bold coloured text would come out black. */
+.cms-editor span[style*="color"] *,
+.cms-content span[style*="color"] * { color: inherit; }
 .cms-editor em, .cms-content em { font-style: italic; }
 .cms-editor u, .cms-content u { text-decoration: underline; }
 .cms-editor s, .cms-content s { text-decoration: line-through; }

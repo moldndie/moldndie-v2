@@ -10,6 +10,8 @@ export interface PortfolioItem {
   images: string[]
   video_path: string | null
   video_url: string | null
+  /** null = a general example, shown in the portfolio section on /services */
+  service_id: string | null
   sort_order: number
   is_active: boolean
   created_at: string
@@ -21,6 +23,7 @@ export interface PortfolioItemFormValues {
   images?: string[]
   video_path?: string
   video_url?: string
+  service_id?: string
   sort_order: number
   is_active: boolean
 }
@@ -33,7 +36,8 @@ function dbError(e: unknown): Error {
 }
 
 function revalidate() {
-  revalidatePath("/services")
+  // "layout" so the per-service pages under /services/[slug] refresh too.
+  revalidatePath("/services", "layout")
   revalidatePath("/dashboard/portfolio")
 }
 
@@ -44,6 +48,7 @@ function toRow(values: PortfolioItemFormValues) {
     images:     values.images ?? [],
     video_path: values.video_path || null,
     video_url:  values.video_url || null,
+    service_id: values.service_id || null,
     sort_order: values.sort_order,
     is_active:  values.is_active,
   }
@@ -58,11 +63,25 @@ export async function getPortfolioItems(): Promise<PortfolioItem[]> {
   return (data ?? []) as PortfolioItem[]
 }
 
+/** General examples — the portfolio section on /services. Items tied to a
+ *  specific service are shown on that service's own page instead. */
 export async function getActivePortfolioItems(): Promise<PortfolioItem[]> {
   const { data, error } = await createAdminClient()
     .from("portfolio_items")
     .select("*")
     .eq("is_active", true)
+    .is("service_id", null)
+    .order("sort_order", { ascending: true })
+  if (error) throw dbError(error)
+  return (data ?? []) as PortfolioItem[]
+}
+
+export async function getPortfolioItemsForService(serviceId: string): Promise<PortfolioItem[]> {
+  const { data, error } = await createAdminClient()
+    .from("portfolio_items")
+    .select("*")
+    .eq("is_active", true)
+    .eq("service_id", serviceId)
     .order("sort_order", { ascending: true })
   if (error) throw dbError(error)
   return (data ?? []) as PortfolioItem[]

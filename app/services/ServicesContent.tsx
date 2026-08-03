@@ -11,9 +11,11 @@ import {
   Mail,
 } from "lucide-react"
 import Image from "next/image"
+import Link from "next/link"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
-import RichTextRenderer from "@/components/editor/RichTextRenderer"
+import { docToText } from "@/lib/richtext"
 import type { ServiceOffering } from "@/services/service.service"
+import type { ServiceProcessStep } from "@/services/serviceProcessSteps.service"
 
 const reveal = {
   initial: { opacity: 0, y: 14 },
@@ -21,13 +23,6 @@ const reveal = {
   viewport: { once: true, margin: "-40px" } as const,
   transition: { duration: 0.3, ease: "easeOut" as const },
 }
-
-const processSteps = [
-  { label: "Consult", desc: "Share your project requirements" },
-  { label: "Analyze", desc: "We evaluate feasibility & design" },
-  { label: "Design", desc: "Precision tooling engineering" },
-  { label: "Deliver", desc: "On-time, production-ready results" },
-]
 
 type FormState = {
   name: string
@@ -52,12 +47,14 @@ const inputClass =
 
 // ── Service card — same shape as the Blog/Library/Academy cards ─────────────
 function ServiceCard({ service }: { service: ServiceOffering }) {
-  const highlights: string[] = service.highlights ?? []
+  // Blank entries in the repeater would otherwise render as a bare tick icon.
+  const highlights: string[] = (service.highlights ?? []).filter((h) => h.trim())
 
   return (
-    <motion.div
-      {...reveal}
-      className="group flex flex-col rounded-2xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-md transition-all duration-200"
+    <motion.div {...reveal} className="flex">
+    <Link
+      href={`/services/${service.slug}`}
+      className="group flex flex-col flex-1 rounded-2xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-md transition-all duration-200"
     >
       <div className="aspect-video relative bg-white overflow-hidden">
         {service.image ? (
@@ -84,8 +81,11 @@ function ServiceCard({ service }: { service: ServiceOffering }) {
             {service.tagline}
           </span>
         )}
-        {service.description && (
-          <RichTextRenderer content={service.description} className="text-sm text-zinc-600" />
+        {/* Flattened teaser, not rich text: the whole card is a link, and an
+            anchor inside an anchor is invalid. The full description with its
+            working links lives on /services/[slug]. */}
+        {docToText(service.description) && (
+          <p className="text-sm text-zinc-600 line-clamp-3">{docToText(service.description)}</p>
         )}
         {highlights.length > 0 && (
           <ul className="mt-1 space-y-2">
@@ -97,13 +97,23 @@ function ServiceCard({ service }: { service: ServiceOffering }) {
             ))}
           </ul>
         )}
+        <span className="mt-auto pt-2 text-xs font-bold uppercase tracking-wider text-primary">
+          View examples &rarr;
+        </span>
       </div>
+    </Link>
     </motion.div>
   )
 }
 
 // ── Main Content ──────────────────────────────────────────────────────────
-export default function ServicesContent({ services }: { services: ServiceOffering[] }) {
+export default function ServicesContent({
+  services,
+  processSteps,
+}: {
+  services: ServiceOffering[]
+  processSteps: ServiceProcessStep[]
+}) {
   const serviceTypes = services.map((s) => s.title)
   const [form, setForm] = useState<FormState>(EMPTY_FORM)
   const [isLoading, setIsLoading] = useState(false)
@@ -159,25 +169,29 @@ export default function ServicesContent({ services }: { services: ServiceOfferin
       </div>
 
       {/* ── Process ── */}
-      <div>
-        <h2 className="text-base font-bold text-zinc-900 uppercase tracking-wide mb-4">
-          How It Works
-        </h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {processSteps.map(({ label, desc }, i) => (
-            <div
-              key={label}
-              className="rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm"
-            >
-              <span className="inline-flex size-8 items-center justify-center rounded-full bg-primary text-white text-xs font-bold mb-3">
-                {i + 1}
-              </span>
-              <h3 className="text-sm font-bold text-zinc-900">{label}</h3>
-              <p className="text-xs text-zinc-500 mt-1">{desc}</p>
-            </div>
-          ))}
+      {processSteps.length > 0 && (
+        <div>
+          <h2 className="text-base font-bold text-zinc-900 uppercase tracking-wide mb-4">
+            How It Works
+          </h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            {processSteps.map((step, i) => (
+              <div
+                key={step.id}
+                className="rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm"
+              >
+                <span className="inline-flex size-8 items-center justify-center rounded-full bg-primary text-white text-xs font-bold mb-3">
+                  {i + 1}
+                </span>
+                <h3 className="text-sm font-bold text-zinc-900">{step.label}</h3>
+                {step.description && (
+                  <p className="text-xs text-zinc-500 mt-1">{step.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* ── Services ── */}
       {services.length > 0 && (

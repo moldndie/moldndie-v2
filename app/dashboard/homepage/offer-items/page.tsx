@@ -5,6 +5,7 @@ import PageHeader from "@/components/dashboard/PageHeader"
 import { getAllOfferItems } from "@/services/homeOfferItems.service"
 import type { HomeOfferItem } from "@/services/homeOfferItems.service"
 import { DynamicIcon } from "@/lib/icons"
+import { docToText } from "@/lib/richtext"
 import OfferItemToggle from "./OfferItemToggle"
 
 export const metadata: Metadata = { title: "What We Offer | Admin" }
@@ -64,8 +65,8 @@ export default async function OfferItemsPage() {
                       </div>
                       <div>
                         <p className="font-medium text-zinc-900">{item.title}</p>
-                        {item.description && (
-                          <p className="text-xs text-zinc-400 line-clamp-1 max-w-xs">{item.description}</p>
+                        {docToText(item.description) && (
+                          <p className="text-xs text-zinc-400 line-clamp-1 max-w-xs">{docToText(item.description)}</p>
                         )}
                       </div>
                     </div>

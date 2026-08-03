@@ -6,6 +6,7 @@ import { Metadata } from "next"
 import dynamic from "next/dynamic"
 import { getCourseByIdAdmin } from "@/services/course.service"
 import PageHeader from "@/components/dashboard/PageHeader"
+import { docToText } from "@/lib/richtext"
 
 const LessonsManager = dynamic(
   () => import("@/components/dashboard/courses/LessonsManager").then((m) => m.LessonsManager),
@@ -49,9 +50,10 @@ export default async function CourseEditPage({ params }: Props) {
         Back to Courses
       </Link>
 
+      {/* description is a Tiptap JSON blob — flatten it, or the raw doc prints under the title */}
       <PageHeader
         title={course.title}
-        description={course.description ?? undefined}
+        description={docToText(course.description) || undefined}
       />
 
       {/* Course meta strip */}

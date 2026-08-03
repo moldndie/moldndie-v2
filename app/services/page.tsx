@@ -6,6 +6,7 @@ import ServicesContent from "./ServicesContent"
 import PortfolioSection from "./PortfolioSection"
 import { getActiveServices } from "@/services/service.service"
 import { getActivePortfolioItems } from "@/services/portfolio.service"
+import { getActiveProcessSteps } from "@/services/serviceProcessSteps.service"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 
 export const metadata: Metadata = {
@@ -14,16 +15,17 @@ export const metadata: Metadata = {
 }
 
 export default async function ServicesPage() {
-  const [services, portfolio] = await Promise.all([
+  const [services, portfolio, processSteps] = await Promise.all([
     getActiveServices(),
     getActivePortfolioItems().catch(() => []),
+    getActiveProcessSteps().catch(() => []),
   ])
 
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
       <main className="flex-1">
-        <ServicesContent services={services} />
+        <ServicesContent services={services} processSteps={processSteps} />
         <PortfolioSection items={portfolio} />
         <div className="max-w-7xl mx-auto px-6 pb-12">
           <hr className="border-zinc-100 mb-8" />
