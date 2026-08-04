@@ -104,13 +104,19 @@ function PortfolioCard({ item }: { item: PortfolioItem }) {
   )
 }
 
-export default function PortfolioSection({ items }: { items: PortfolioItem[] }) {
+export default function PortfolioSection({
+  items,
+  heading = "Our Work",
+}: {
+  items: PortfolioItem[]
+  heading?: string
+}) {
   if (items.length === 0) return null
 
   return (
     <section className="max-w-7xl mx-auto px-6 pb-10">
       <h2 className="text-base font-bold text-zinc-900 uppercase tracking-wide mb-4">
-        Our Work
+        {heading}
       </h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item) => (

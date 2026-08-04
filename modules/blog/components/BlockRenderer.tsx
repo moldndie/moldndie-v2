@@ -1,5 +1,6 @@
 import { FileText, FileSpreadsheet, Presentation, Video, Archive, File, Download } from "lucide-react"
 import { getFileUrl } from "@/lib/utils"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
 import type { BlogBlock } from "@/types"
 
 interface BlockRendererProps {
@@ -73,8 +74,10 @@ function BlockItem({ block }: { block: BlogBlock }) {
       return <Tag className={`font-bold text-zinc-900 ${sizeClass}`}>{c.text}</Tag>
     }
     case "paragraph": {
+      // Rendered as rich text, not a text child — otherwise links the author
+      // inserted come out as escaped markup instead of working anchors.
       const c = block.content as { text?: string }
-      return <p className="text-zinc-700 leading-relaxed">{c.text}</p>
+      return <RichTextRenderer content={c.text} className="text-zinc-700" />
     }
     case "image": {
       const c = block.content as { url?: string; caption?: string }
@@ -92,7 +95,7 @@ function BlockItem({ block }: { block: BlogBlock }) {
       const c = block.content as { text?: string; author?: string }
       return (
         <blockquote className="border-l-4 border-zinc-300 pl-4 py-1">
-          <p className="italic text-zinc-700">{c.text}</p>
+          <RichTextRenderer content={c.text} className="italic text-zinc-700" />
           {c.author && (
             <cite className="mt-1 block text-sm text-zinc-500 not-italic">— {c.author}</cite>
           )}

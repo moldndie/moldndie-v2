@@ -59,6 +59,19 @@ export async function getActiveServices(): Promise<ServiceOffering[]> {
   return (data ?? []) as ServiceOffering[]
 }
 
+/** Active service for the public /services/[slug] page. null when missing. */
+export async function getActiveServiceBySlug(slug: string): Promise<ServiceOffering | null> {
+  const supabase = createAdminClient()
+  const { data, error } = await supabase
+    .from("services")
+    .select("*")
+    .eq("slug", slug)
+    .eq("is_active", true)
+    .maybeSingle()
+  if (error) throw dbError(error)
+  return (data as ServiceOffering | null) ?? null
+}
+
 export async function getServiceById(id: string): Promise<ServiceOffering> {
   const supabase = createAdminClient()
   const { data, error } = await supabase

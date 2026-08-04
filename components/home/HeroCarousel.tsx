@@ -1,12 +1,12 @@
 "use client"
 
-import { useState, useEffect, useCallback, useRef } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
+import { useCarousel } from "@/hooks/useCarousel"
 import type { HeroSlide } from "@/services/heroSlides.service"
 import { isValidImageUrl } from "@/lib/heroSlides.constants"
 
@@ -48,55 +48,8 @@ const textVariants = {
 }
 
 export default function HeroCarousel({ slides }: HeroCarouselProps) {
-  const [index, setIndex] = useState(0)
-  const [direction, setDirection] = useState(1)
-  // Ref lets the interval callback always read the latest index without
-  // needing to re-register the interval every time index changes.
-  const indexRef = useRef(0)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  const goTo = useCallback(
-    (next: number, dir: number) => {
-      const clamped = ((next % slides.length) + slides.length) % slides.length
-      indexRef.current = clamped
-      setDirection(dir)
-      setIndex(clamped)
-    },
-    [slides.length],
-  )
-
-  function advance() {
-    goTo(indexRef.current + 1, 1)
-  }
-
-  function resetTimer() {
-    if (timerRef.current) clearInterval(timerRef.current)
-    timerRef.current = setInterval(advance, AUTOPLAY_MS)
-  }
-
-  function handlePrev() {
-    resetTimer()
-    goTo(indexRef.current - 1, -1)
-  }
-
-  function handleNext() {
-    resetTimer()
-    goTo(indexRef.current + 1, 1)
-  }
-
-  function handleDot(i: number) {
-    resetTimer()
-    goTo(i, i > indexRef.current ? 1 : -1)
-  }
-
-  useEffect(() => {
-    timerRef.current = setInterval(advance, AUTOPLAY_MS)
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current)
-    }
-    // advance is stable because indexRef never changes identity
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slides.length])
+  const { index, direction, next: handleNext, prev: handlePrev, select: handleDot } =
+    useCarousel({ length: slides.length, intervalMs: AUTOPLAY_MS })
 
   const slide = slides[index]
   const hasText = slide.title || slide.subtitle || slide.button_text

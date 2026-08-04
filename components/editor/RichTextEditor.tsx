@@ -72,6 +72,7 @@ export default function RichTextEditor({
   const [showImageInput, setShowImageInput] = useState(false)
   const [youtubeUrl, setYoutubeUrl] = useState("")
   const [showYoutubeInput, setShowYoutubeInput] = useState(false)
+  const [showColorPicker, setShowColorPicker] = useState(false)
 
   const editor = useEditor({
     extensions: [
@@ -189,11 +190,48 @@ export default function RichTextEditor({
 
         <Divider />
 
+        {/* Text colour */}
+        <div className="relative">
+          <ToolBtn
+            title="Text colour"
+            onClick={() => { setShowLinkInput(false); setShowImageInput(false); setShowYoutubeInput(false); setShowColorPicker((v) => !v) }}
+            active={showColorPicker}
+          >
+            <TextColorIcon color={(editor.getAttributes("textStyle").color as string) ?? DEFAULT_SWATCH} />
+          </ToolBtn>
+          {showColorPicker && (
+            <div className="absolute top-8 left-0 z-10 w-44 rounded-lg border border-zinc-200 bg-white p-2 shadow-lg">
+              <div className="grid grid-cols-6 gap-1">
+                {TEXT_COLORS.map(({ name, value }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    title={name}
+                    aria-label={name}
+                    onClick={() => { editor.chain().focus().setColor(value).run(); setShowColorPicker(false) }}
+                    className="size-5 rounded border border-zinc-200 transition-transform hover:scale-110"
+                    style={{ backgroundColor: value }}
+                  />
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => { editor.chain().focus().unsetColor().run(); setShowColorPicker(false) }}
+                className="mt-2 w-full rounded px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100"
+              >
+                Reset colour
+              </button>
+            </div>
+          )}
+        </div>
+
+        <Divider />
+
         {/* Link */}
         <div className="relative">
           <ToolBtn
             title="Insert link"
-            onClick={() => { setShowImageInput(false); setShowYoutubeInput(false); setShowLinkInput((v) => !v) }}
+            onClick={() => { setShowImageInput(false); setShowYoutubeInput(false); setShowColorPicker(false); setShowLinkInput((v) => !v) }}
             active={editor.isActive("link") || showLinkInput}
           >
             <LinkIcon />
@@ -219,7 +257,7 @@ export default function RichTextEditor({
         <div className="relative">
           <ToolBtn
             title="Insert image"
-            onClick={() => { setShowLinkInput(false); setShowYoutubeInput(false); setShowImageInput((v) => !v) }}
+            onClick={() => { setShowLinkInput(false); setShowYoutubeInput(false); setShowColorPicker(false); setShowImageInput((v) => !v) }}
             active={showImageInput}
           >
             <ImageIcon />
@@ -244,7 +282,7 @@ export default function RichTextEditor({
         <div className="relative">
           <ToolBtn
             title="Embed YouTube video"
-            onClick={() => { setShowLinkInput(false); setShowImageInput(false); setShowYoutubeInput((v) => !v) }}
+            onClick={() => { setShowLinkInput(false); setShowImageInput(false); setShowColorPicker(false); setShowYoutubeInput((v) => !v) }}
             active={showYoutubeInput}
           >
             <YoutubeIcon />
@@ -288,7 +326,34 @@ export default function RichTextEditor({
   )
 }
 
+// Swatches for the text-colour picker. TextStyle + Color are registered on both
+// the editor and RichTextRenderer, so a colour set here round-trips to the
+// public page unchanged.
+const DEFAULT_SWATCH = "#f59e0b"
+const TEXT_COLORS = [
+  { name: "Amber", value: "#f59e0b" },
+  { name: "Red", value: "#dc2626" },
+  { name: "Orange", value: "#ea580c" },
+  { name: "Green", value: "#16a34a" },
+  { name: "Blue", value: "#2563eb" },
+  { name: "Purple", value: "#7c3aed" },
+  { name: "Pink", value: "#db2777" },
+  { name: "Teal", value: "#0d9488" },
+  { name: "Slate", value: "#475569" },
+  { name: "Zinc", value: "#71717a" },
+  { name: "Black", value: "#18181b" },
+  { name: "White", value: "#ffffff" },
+]
+
 // ——— Inline SVG icons ———
+function TextColorIcon({ color }: { color: string }) {
+  return (
+    <svg viewBox="0 0 16 16" className="size-3.5" fill="none">
+      <path d="M3.5 12L8 3l4.5 9M5.4 8.8h5.2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+      <rect x="2" y="13" width="12" height="2.5" rx="0.75" fill={color} />
+    </svg>
+  )
+}
 function AlignLeftIcon() {
   return (
     <svg viewBox="0 0 16 16" className="size-3.5" fill="currentColor">

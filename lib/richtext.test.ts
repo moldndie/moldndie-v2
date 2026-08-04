@@ -33,4 +33,12 @@ assert.equal(isDocEmpty({ type: "doc", content: [{ type: "paragraph" }] }), true
 const doc = toDoc("Round trip")!
 assert.equal(docToText(toDoc(fromDoc(doc))), "Round trip")
 
+// Blog paragraph/quote blocks store their body in this same shape, so a link
+// mark has to survive the save/load round trip — a dropped href is exactly the
+// bug that made blog hyperlinks unclickable.
+const withLink =
+  '{"type":"doc","content":[{"type":"paragraph","content":[{"type":"text","marks":[{"type":"link","attrs":{"href":"https://example.com"}}],"text":"docs"}]}]}'
+assert.deepEqual(toDoc(fromDoc(toDoc(withLink)!)), JSON.parse(withLink))
+assert.equal(docToText(withLink), "docs")
+
 console.log("richtext: all assertions passed")

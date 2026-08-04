@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { CalendarDays, MapPin, MapPinned, ChevronDown, Lock, Globe, Eye } from "lucide-react"
+import { CalendarDays, MapPin, MapPinned, ChevronDown, Lock, Globe, Eye, Phone, Mail } from "lucide-react"
 import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
@@ -13,7 +13,7 @@ import { useEventsListing, useEventCategories } from "@/hooks/queries/useEvents"
 import { useContentViewCounts } from "@/hooks/queries/useContentViews"
 import type { EventSort } from "@/hooks/queries/useEvents"
 import { createClient } from "@/lib/supabase/client"
-import { docToText } from "@/lib/richtext"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
 
 const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
@@ -71,7 +71,7 @@ function LoginGate({ callbackPath }: { callbackPath: string }) {
 }
 
 function EventExpandedContent({ event }: {
-  event: { event_date: string | null; start_date: string | null; end_date: string | null; country: string | null; address: string | null; description: string | null; website?: string | null }
+  event: { event_date: string | null; start_date: string | null; end_date: string | null; country: string | null; address: string | null; description: string | null; website?: string | null; phone?: string | null; email?: string | null }
 }) {
   const displayStart = event.start_date || event.event_date
   const displayEnd = event.end_date
@@ -107,10 +107,27 @@ function EventExpandedContent({ event }: {
           </a>
         </div>
       )}
+      {/* Contact details are optional — each row only appears once filled in. */}
+      {event.phone && (
+        <div className="flex items-center gap-2 text-sm text-zinc-500">
+          <Phone size={13} className="text-zinc-400 shrink-0" />
+          <a href={`tel:${event.phone}`} onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2 hover:opacity-70">
+            {event.phone}
+          </a>
+        </div>
+      )}
+      {event.email && (
+        <div className="flex items-center gap-2 text-sm text-zinc-500">
+          <Mail size={13} className="text-zinc-400 shrink-0" />
+          <a href={`mailto:${event.email}`} onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2 hover:opacity-70">
+            {event.email}
+          </a>
+        </div>
+      )}
       {event.description && (
-        <p className="text-sm text-zinc-600 leading-relaxed pt-1 border-t border-zinc-100">
-          {docToText(event.description)}
-        </p>
+        <div className="pt-1 border-t border-zinc-100" onClick={(e) => e.stopPropagation()}>
+          <RichTextRenderer content={event.description} className="text-sm text-zinc-600" />
+        </div>
       )}
       {event.website && (
         <a

@@ -5,7 +5,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
-import { Building2, MapPin, Globe, MapPinned, ChevronDown, Lock } from "lucide-react"
+import { Building2, MapPin, Globe, MapPinned, ChevronDown, Lock, Phone, Mail } from "lucide-react"
 import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
@@ -16,7 +16,7 @@ import {
 } from "@/hooks/queries/useSuppliers"
 import type { SupplierSort } from "@/hooks/queries/useSuppliers"
 import { createClient } from "@/lib/supabase/client"
-import { docToText } from "@/lib/richtext"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
 
 const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
@@ -58,9 +58,10 @@ function LoginGate({ callbackPath }: { callbackPath: string }) {
 }
 
 function SupplierExpandedContent({ supplier }: {
-  supplier: { description: string | null; website: string | null; address: string | null }
+  supplier: { description: string | null; website: string | null; address: string | null; phone?: string | null; email?: string | null }
 }) {
-  const hasDetails = supplier.description || supplier.website || supplier.address
+  const hasDetails =
+    supplier.description || supplier.website || supplier.address || supplier.phone || supplier.email
 
   return (
     <div className="border-t border-zinc-100 bg-zinc-50/70 px-5 py-4 space-y-4">
@@ -68,10 +69,33 @@ function SupplierExpandedContent({ supplier }: {
         <p className="text-sm text-zinc-400 italic">No additional details available.</p>
       )}
       {supplier.description && (
-        <p className="text-sm text-zinc-600 leading-relaxed">{docToText(supplier.description)}</p>
+        <div onClick={(e) => e.stopPropagation()}>
+          <RichTextRenderer content={supplier.description} className="text-sm text-zinc-600" />
+        </div>
       )}
-      {(supplier.website || supplier.address) && (
+      {(supplier.website || supplier.address || supplier.phone || supplier.email) && (
         <div className="flex flex-col gap-2.5">
+          {/* Contact details are optional — each row only appears once filled in. */}
+          {supplier.phone && (
+            <a
+              href={`tel:${supplier.phone}`}
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-2 text-sm text-primary font-medium hover:underline"
+            >
+              <Phone size={13} className="shrink-0" />
+              {supplier.phone}
+            </a>
+          )}
+          {supplier.email && (
+            <a
+              href={`mailto:${supplier.email}`}
+              onClick={(e) => e.stopPropagation()}
+              className="inline-flex items-center gap-2 text-sm text-primary font-medium hover:underline"
+            >
+              <Mail size={13} className="shrink-0" />
+              <span className="break-all">{supplier.email}</span>
+            </a>
+          )}
           {supplier.website && (
             <a
               href={supplier.website}

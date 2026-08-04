@@ -1,6 +1,8 @@
 "use client"
 
 import { Input } from "@/components/ui/input"
+import RichTextEditor from "@/components/editor/RichTextEditor"
+import { toDoc, fromDoc } from "@/lib/richtext"
 
 interface QuoteContent {
   text: string
@@ -15,17 +17,12 @@ interface QuoteBlockProps {
 export function QuoteBlock({ value, onChange }: QuoteBlockProps) {
   return (
     <div className="space-y-2">
-      <textarea
-        value={value.text ?? ""}
-        onChange={(e) => onChange({ ...value, text: e.target.value })}
-        onInput={(e) => {
-          const el = e.currentTarget
-          el.style.height = "auto"
-          el.style.height = `${el.scrollHeight}px`
-        }}
-        placeholder="Quote text..."
-        rows={3}
-        className="w-full resize-none rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm italic text-zinc-700 placeholder:text-zinc-400 placeholder:not-italic focus:border-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-300 transition-colors"
+      {/* Same stringified-Tiptap convention as ParagraphBlock; author stays plain. */}
+      <RichTextEditor
+        value={toDoc(value.text)}
+        onChange={(doc) => onChange({ ...value, text: fromDoc(doc) })}
+        placeholder="Quote text…"
+        minHeight={120}
       />
       <Input
         value={value.author ?? ""}
