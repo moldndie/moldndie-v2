@@ -2,16 +2,21 @@
 
 import { useEffect, useRef, useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { LogOut, LayoutDashboard, ChevronDown, ShoppingBag, GraduationCap, ShoppingCart, UserCircle } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { useCart } from "@/hooks/queries/useCart"
+import { showsPrices } from "./CurrencySelector"
 import type { User } from "@supabase/supabase-js"
 
 function CartButton() {
+  const pathname = usePathname()
   const { data: items = [] } = useCart()
   const count = items.length
+
+  // Only where prices are — same pages as the currency switcher.
+  if (!showsPrices(pathname)) return null
 
   return (
     <Link

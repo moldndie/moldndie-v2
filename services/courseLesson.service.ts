@@ -32,6 +32,8 @@ export interface LessonInput {
   file_path?: string | null
   order_index: number
   is_free: boolean
+  pdf_is_free?: boolean
+  file_is_free?: boolean
 }
 
 export async function createLesson(
@@ -53,6 +55,8 @@ export async function createLesson(
       file_path: input.file_path ?? null,
       order_index: input.order_index,
       is_free: input.is_free,
+      pdf_is_free: input.pdf_is_free ?? false,
+      file_is_free: input.file_is_free ?? false,
     })
     .select()
     .single()
@@ -78,6 +82,8 @@ export async function updateLesson(
       file_path: input.file_path ?? null,
       order_index: input.order_index,
       is_free: input.is_free,
+      pdf_is_free: input.pdf_is_free ?? false,
+      file_is_free: input.file_is_free ?? false,
     })
     .eq("id", id)
     .select()

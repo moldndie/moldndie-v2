@@ -9,6 +9,8 @@ import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { getBlogBySlug, getRelatedBlogs, getBlogLikeData, getBlogComments } from "@/services/blog.service"
 import { BlockRenderer } from "@/modules/blog/components/BlockRenderer"
 import { getFileUrl } from "@/lib/utils"
+import { docToText } from "@/lib/richtext"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
 import { LikeButton } from "../_components/LikeButton"
 import { CommentsSection } from "../_components/CommentsSection"
 import { ShareButtons } from "../_components/ShareButtons"
@@ -27,12 +29,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const blog = await getBlogBySlug(slug)
   if (!blog) return { title: "Blog Not Found" }
+  // Rich text now — meta tags need the plain-text form.
+  const intro = docToText(blog.introduction)
   return {
     title: blog.title,
-    description: blog.introduction ?? undefined,
+    description: intro || undefined,
     openGraph: {
       title: blog.title,
-      description: blog.introduction ?? undefined,
+      description: intro || undefined,
       images: blog.cover_image_path ? [getFileUrl(blog.cover_image_path)] : [],
     },
   }
@@ -70,7 +74,7 @@ function RelatedBlogCard({ blog }: { blog: Blog }) {
         </p>
         {blog.introduction && (
           <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">
-            {blog.introduction}
+            {docToText(blog.introduction)}
           </p>
         )}
       </div>
@@ -114,7 +118,7 @@ export default async function BlogDetailPage({ params }: Props) {
         {/* Cover image — constrained to content width, natural aspect ratio */}
         {blog.cover_image_path && (
           <div className="max-w-7xl mx-auto px-4 sm:px-6 pt-10 pb-2">
-            <div className="rounded-2xl overflow-hidden shadow-sm bg-zinc-50 flex items-center justify-center">
+            <div className="overflow-hidden bg-white flex items-center justify-center">
               <Image
                 src={getFileUrl(blog.cover_image_path)}
                 alt={blog.title}
@@ -154,9 +158,10 @@ export default async function BlogDetailPage({ params }: Props) {
           </h1>
 
           {blog.introduction && (
-            <p className="text-base text-zinc-500 leading-relaxed mb-6 border-l-4 border-primary/30 pl-4">
-              {blog.introduction}
-            </p>
+            <RichTextRenderer
+              content={blog.introduction}
+              className="text-base text-zinc-500 leading-relaxed mb-6 border-l-4 border-primary/30 pl-4"
+            />
           )}
 
           {blogTags.length > 0 && (

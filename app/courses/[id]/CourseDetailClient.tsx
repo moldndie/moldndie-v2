@@ -17,6 +17,7 @@ import {
   ShoppingCart,
   CheckCircle,
   FileText,
+  Archive,
 } from "lucide-react"
 import { useCourseById, useCourseAccess } from "@/hooks/queries/useCourses"
 import { useAddToCart, useCartHasItem } from "@/hooks/queries/useCart"
@@ -272,8 +273,41 @@ export default function CourseDetailClient({ courseId, viewCount }: { courseId: 
             ) : (
               <ul className="divide-y divide-zinc-50">
                 {lessons.map((lesson, index) => {
-                  const hasPdf = !!lesson.pdf_url
+                  // The dashboard saves the R2 key to pdf_path; pdf_url only
+                  // holds legacy external links. Checking one missed the other.
+                  const hasPdf = !!(lesson.pdf_url || lesson.pdf_path)
+                  const hasFile = !!lesson.file_path
                   const lessonAccessible = hasAccess || lesson.is_free
+
+                  // Same badges whether the row is locked or not — a locked row
+                  // showing nothing is what made added content look missing.
+                  const badges = (
+                    <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                      {lesson.is_free && !hasAccess && (
+                        <span className="text-[10px] font-medium text-emerald-600">
+                          Free preview
+                        </span>
+                      )}
+                      {hasPdf && (
+                        <span className="inline-flex items-center gap-1 text-[10px] text-zinc-400">
+                          <FileText size={10} />
+                          PDF included
+                          {lesson.pdf_is_free && !lessonAccessible && !hasAccess && (
+                            <span className="font-medium text-emerald-600">(free)</span>
+                          )}
+                        </span>
+                      )}
+                      {hasFile && (
+                        <span className="inline-flex items-center gap-1 text-[10px] text-zinc-400">
+                          <Archive size={10} />
+                          Attachment
+                          {lesson.file_is_free && !lessonAccessible && !hasAccess && (
+                            <span className="font-medium text-emerald-600">(free)</span>
+                          )}
+                        </span>
+                      )}
+                    </div>
+                  )
 
                   if (lessonAccessible) {
                     return (
@@ -304,19 +338,7 @@ export default function CourseDetailClient({ courseId, viewCount }: { courseId: 
                                 {docToText(lesson.description)}
                               </p>
                             )}
-                            <div className="flex items-center gap-2 mt-0.5">
-                              {lesson.is_free && !hasAccess && (
-                                <span className="text-[10px] font-medium text-emerald-600">
-                                  Free preview
-                                </span>
-                              )}
-                              {hasPdf && (
-                                <span className="inline-flex items-center gap-1 text-[10px] text-zinc-400">
-                                  <FileText size={10} />
-                                  PDF included
-                                </span>
-                              )}
-                            </div>
+                            {badges}
                           </div>
                           {/* Icon */}
                           <Play
@@ -353,6 +375,7 @@ export default function CourseDetailClient({ courseId, viewCount }: { courseId: 
                             {docToText(lesson.description)}
                           </p>
                         )}
+                        {badges}
                       </div>
                       <Lock size={13} className="text-zinc-300 shrink-0" />
                     </li>

@@ -6,10 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
 import { Plus } from "lucide-react"
 import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
 import { Select } from "@/components/ui/select"
 import { Button } from "@/components/ui/button"
 import { FileUploadField } from "@/components/forms/FileUploadField"
+import RichTextEditor from "@/components/editor/RichTextEditor"
+import { toDoc, fromDoc } from "@/lib/richtext"
 import { CategoryModal } from "@/components/modals/CategoryModal"
 import { TagModal } from "@/components/modals/TagModal"
 import { blogSchema, type BlogFormValues } from "@/schemas/blog.schema"
@@ -144,7 +145,12 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
 
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700">Introduction</label>
-              <Textarea {...register("introduction")} placeholder="Short description…" rows={3} />
+              <RichTextEditor
+                value={toDoc(watch("introduction"))}
+                onChange={(doc) => setValue("introduction", fromDoc(doc), { shouldDirty: true })}
+                placeholder="Short description…"
+                minHeight={120}
+              />
             </div>
 
             <div className="space-y-3">

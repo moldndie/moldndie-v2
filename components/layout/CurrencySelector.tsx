@@ -14,14 +14,19 @@ const OPTIONS: { value: CurrencyCode; label: string }[] = [
 // the mold library, and the cart/checkout/receipt pages.
 const PRICED_PATHS = ["/courses", "/molds", "/cart", "/checkout", "/purchases"]
 
+/**
+ * True on the pages that put a price on screen. Shared with the navbar cart
+ * button so the two only ever appear together — one list, no drift.
+ */
+export function showsPrices(pathname: string): boolean {
+  return PRICED_PATHS.some((p) => pathname === p || pathname.startsWith(`${p}/`))
+}
+
 export function CurrencySelector() {
   const pathname = usePathname()
   const { currency, setCurrency } = useCurrency()
 
-  const showsPrices = PRICED_PATHS.some(
-    (p) => pathname === p || pathname.startsWith(`${p}/`),
-  )
-  if (!showsPrices) return null
+  if (!showsPrices(pathname)) return null
 
   return (
     <div className="flex items-center rounded-lg border border-zinc-200 bg-zinc-50 text-xs font-semibold overflow-hidden">

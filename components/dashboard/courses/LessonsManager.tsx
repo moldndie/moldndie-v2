@@ -29,6 +29,8 @@ interface LessonFormState {
   file_path: string
   order_index: string
   is_free: boolean
+  pdf_is_free: boolean
+  file_is_free: boolean
 }
 
 interface LessonFormErrors {
@@ -37,7 +39,46 @@ interface LessonFormErrors {
 }
 
 function emptyForm(nextPosition: number): LessonFormState {
-  return { id: null, title: "", description: "", thumbnail_url: "", video_url: "", pdf_url: "", video_path: "", pdf_path: "", file_path: "", order_index: String(nextPosition), is_free: false }
+  return { id: null, title: "", description: "", thumbnail_url: "", video_url: "", pdf_url: "", video_path: "", pdf_path: "", file_path: "", order_index: String(nextPosition), is_free: false, pdf_is_free: false, file_is_free: false }
+}
+
+/** The free/paid switch, used once per lesson and once per attachment slot. */
+function FreeSwitch({
+  checked,
+  onChange,
+  title,
+  hint,
+}: {
+  checked: boolean
+  onChange: (v: boolean) => void
+  title: string
+  hint: string
+}) {
+  return (
+    <div className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3">
+      <div>
+        <p className="text-sm font-medium text-zinc-800">{title}</p>
+        <p className="text-xs text-zinc-500">{hint}</p>
+      </div>
+      <button
+        type="button"
+        role="switch"
+        aria-checked={checked}
+        onClick={() => onChange(!checked)}
+        className={cn(
+          "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500",
+          checked ? "bg-zinc-900" : "bg-zinc-200"
+        )}
+      >
+        <span
+          className={cn(
+            "inline-block size-4 rounded-full bg-white shadow transition-transform",
+            checked ? "translate-x-6" : "translate-x-1"
+          )}
+        />
+      </button>
+    </div>
+  )
 }
 
 function LessonForm({
@@ -151,6 +192,14 @@ function LessonForm({
           onClear={() => onChange({ ...form, pdf_path: "", pdf_url: "" })}
           onUploadingChange={setFileUploading}
         />
+        {(form.pdf_path || form.pdf_url) && (
+          <FreeSwitch
+            checked={form.pdf_is_free}
+            onChange={(v) => onChange({ ...form, pdf_is_free: v })}
+            title="Free PDF"
+            hint="Downloadable even when the lesson is paid"
+          />
+        )}
       </div>
 
       <div className="space-y-1.5">
@@ -164,32 +213,22 @@ function LessonForm({
           onClear={() => onChange({ ...form, file_path: "" })}
           onUploadingChange={setFileUploading}
         />
+        {form.file_path && (
+          <FreeSwitch
+            checked={form.file_is_free}
+            onChange={(v) => onChange({ ...form, file_is_free: v })}
+            title="Free attachment"
+            hint="Downloadable even when the lesson is paid"
+          />
+        )}
       </div>
 
-      {/* is_free toggle */}
-      <div className="flex items-center justify-between rounded-lg border border-zinc-200 bg-white px-4 py-3">
-        <div>
-          <p className="text-sm font-medium text-zinc-800">Free preview</p>
-          <p className="text-xs text-zinc-500">Students can watch without purchasing</p>
-        </div>
-        <button
-          type="button"
-          role="switch"
-          aria-checked={form.is_free}
-          onClick={() => onChange({ ...form, is_free: !form.is_free })}
-          className={cn(
-            "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500",
-            form.is_free ? "bg-zinc-900" : "bg-zinc-200"
-          )}
-        >
-          <span
-            className={cn(
-              "inline-block size-4 rounded-full bg-white shadow transition-transform",
-              form.is_free ? "translate-x-6" : "translate-x-1"
-            )}
-          />
-        </button>
-      </div>
+      <FreeSwitch
+        checked={form.is_free}
+        onChange={(v) => onChange({ ...form, is_free: v })}
+        title="Free lesson"
+        hint="Whole lesson, video included, opens without purchasing"
+      />
 
       <div className="flex justify-end gap-2 pt-1">
         <Button type="button" variant="outline" onClick={onClose} disabled={isPending || anyUploading}>
@@ -301,6 +340,8 @@ export function LessonsManager({ courseId }: { courseId: string }) {
       file_path: lesson.file_path ?? "",
       order_index: String(lesson.order_index),
       is_free: lesson.is_free,
+      pdf_is_free: lesson.pdf_is_free ?? false,
+      file_is_free: lesson.file_is_free ?? false,
     })
     setFormErrors({})
   }
@@ -336,6 +377,8 @@ export function LessonsManager({ courseId }: { courseId: string }) {
       file_path: form.file_path || null,
       order_index: Number(form.order_index),
       is_free: form.is_free,
+      pdf_is_free: form.pdf_is_free,
+      file_is_free: form.file_is_free,
     }
     try {
       if (form.id) {

@@ -1,7 +1,9 @@
 "use client"
 
+import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Mail, Phone, Tag, Clock, CheckCheck, Loader2 } from "lucide-react"
+import { Mail, Phone, Tag, Clock, CheckCheck, Loader2, Trash2 } from "lucide-react"
+import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal"
 
 type ServiceRequest = {
   id: string
@@ -29,8 +31,15 @@ async function patchMarkRead(id: string): Promise<void> {
   if (!res.ok) throw new Error("Failed to mark as read.")
 }
 
+async function deleteRequest(id: string): Promise<void> {
+  const res = await fetch(`/api/service-requests/${id}`, { method: "DELETE" })
+  if (!res.ok) throw new Error("Failed to delete request.")
+}
+
 export default function ServiceRequestsClient() {
   const qc = useQueryClient()
+  // Id pending confirmation — spam and stale requests are deleted for good.
+  const [confirmId, setConfirmId] = useState<string | null>(null)
 
   const { data: requests = [], isLoading, error } = useQuery({
     queryKey: QUERY_KEY,
@@ -51,6 +60,12 @@ export default function ServiceRequestsClient() {
     onError: (_, __, ctx) => {
       if (ctx?.prev) qc.setQueryData(QUERY_KEY, ctx.prev)
     },
+    onSettled: () => qc.invalidateQueries({ queryKey: QUERY_KEY }),
+  })
+
+  const remove = useMutation({
+    mutationFn: deleteRequest,
+    onSuccess: () => setConfirmId(null),
     onSettled: () => qc.invalidateQueries({ queryKey: QUERY_KEY }),
   })
 
@@ -88,6 +103,7 @@ export default function ServiceRequestsClient() {
                 req={req}
                 onMarkRead={() => markRead.mutate(req.id)}
                 isMarking={markRead.isPending && markRead.variables === req.id}
+                onDelete={() => setConfirmId(req.id)}
               />
             ))}
           </div>
@@ -101,11 +117,26 @@ export default function ServiceRequestsClient() {
           </h2>
           <div className="grid gap-4">
             {read.map((req) => (
-              <RequestCard key={req.id} req={req} onMarkRead={() => {}} isMarking={false} />
+              <RequestCard
+                key={req.id}
+                req={req}
+                onMarkRead={() => {}}
+                isMarking={false}
+                onDelete={() => setConfirmId(req.id)}
+              />
             ))}
           </div>
         </section>
       )}
+
+      <DeleteConfirmModal
+        open={confirmId !== null}
+        onClose={() => setConfirmId(null)}
+        onConfirm={() => confirmId && remove.mutate(confirmId)}
+        isPending={remove.isPending}
+        title="Delete request"
+        message="This permanently removes the request. It cannot be undone."
+      />
     </div>
   )
 }
@@ -114,10 +145,12 @@ function RequestCard({
   req,
   onMarkRead,
   isMarking,
+  onDelete,
 }: {
   req: ServiceRequest
   onMarkRead: () => void
   isMarking: boolean
+  onDelete: () => void
 }) {
   const date = new Date(req.created_at).toLocaleDateString("en-GB", {
     day: "numeric",
@@ -169,16 +202,25 @@ function RequestCard({
           </div>
         </div>
 
-        {!req.is_read && (
+        <div className="flex shrink-0 items-center gap-2">
+          {!req.is_read && (
+            <button
+              onClick={onMarkRead}
+              disabled={isMarking}
+              className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-1.5 rounded-lg transition-colors"
+            >
+              {isMarking ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={13} />}
+              Mark as read
+            </button>
+          )}
           <button
-            onClick={onMarkRead}
-            disabled={isMarking}
-            className="shrink-0 inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-1.5 rounded-lg transition-colors"
+            onClick={onDelete}
+            aria-label="Delete request"
+            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600"
           >
-            {isMarking ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={13} />}
-            Mark as read
+            <Trash2 size={13} />
           </button>
-        )}
+        </div>
       </div>
 
       <p className="mt-4 text-sm text-zinc-700 whitespace-pre-wrap leading-relaxed border-t border-zinc-100 pt-4">

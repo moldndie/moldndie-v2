@@ -14,7 +14,7 @@ interface HeroCarouselProps {
   slides: HeroSlide[]
 }
 
-const AUTOPLAY_MS = 5000
+const AUTOPLAY_MS = 8000
 
 // Premium cubic-bezier ease for slide transitions — typed as tuple so TS
 // maps it to Framer Motion's BezierDefinition rather than number[].

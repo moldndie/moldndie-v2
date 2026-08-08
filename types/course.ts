@@ -10,7 +10,11 @@ export interface CourseLesson {
   pdf_path: string | null
   file_path: string | null
   order_index: number
+  /** Unlocks the lesson page and its video. */
   is_free: boolean
+  /** Let a paid lesson still hand out its PDF / attachment. */
+  pdf_is_free: boolean
+  file_is_free: boolean
 }
 
 export interface CourseResource {

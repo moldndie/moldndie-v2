@@ -9,6 +9,7 @@ import { getFilteredPublishedBlogs, getBlogCategories, getBlogTags, getBlogCount
 import { getContentViewCountsMap } from "@/services/contentViews.service"
 import { BlogPaginationBar } from "./_components/BlogPaginationBar"
 import { getFileUrl } from "@/lib/utils"
+import { docToText } from "@/lib/richtext"
 import { BlogFiltersBar } from "./_components/BlogFiltersBar"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
@@ -63,7 +64,7 @@ function BlogCard({ blog, likes, comments, views }: { blog: Blog; likes: number;
 
         {blog.introduction && (
           <p className="text-xs text-zinc-500 line-clamp-3 leading-relaxed">
-            {blog.introduction}
+            {docToText(blog.introduction)}
           </p>
         )}
 
