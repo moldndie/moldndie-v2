@@ -7,24 +7,10 @@ import type {
   CalculatorWithRelations,
   CalcField,
   CalcReferenceColumn,
-  UnitMap,
 } from "@/types/calculator"
 import { evaluateFormula } from "@/lib/formula-engine"
+import { unitFor, toBase, fromBase } from "@/lib/units"
 import { recordRun } from "@/services/calculator.service"
-
-/**
- * Unit label + conversion factor for the selected system.
- *
- * Formulas are authored in one base system, so `factor` is how many display
- * units make one base unit: inputs are divided by it, results multiplied.
- * A field with no entry for the system keeps its plain `unit` and factor 1 —
- * which is every calculator that predates the unit switcher.
- */
-function unitFor(units: UnitMap | null | undefined, system: string | null, fallback: string | null) {
-  const entry = system && units ? units[system] : undefined
-  const factor = entry && Number.isFinite(entry.factor) && entry.factor !== 0 ? entry.factor : 1
-  return { unit: entry?.unit ?? fallback ?? "", factor }
-}
 
 interface Props {
   calculator: CalculatorWithRelations
@@ -68,7 +54,7 @@ export default function CalculatorRunner({ calculator, preview = false }: Props)
     for (const [k, v] of Object.entries(values)) {
       const raw = v === "" ? NaN : parseFloat(v)
       // Into the base system, so the formula never has to know which one is on.
-      out[k] = raw / unitFor(byKey.get(k)?.units, system, null).factor
+      out[k] = toBase(raw, unitFor(byKey.get(k)?.units, system, null))
     }
     for (const f of calculator.fields) {
       if (f.field_type !== "select" || !f.options) continue
@@ -255,7 +241,7 @@ export default function CalculatorRunner({ calculator, preview = false }: Props)
                         </div>
                       ) : (
                         <p className="text-3xl font-black text-zinc-900 mt-1 leading-none">
-                          {(result.value * ou.factor).toFixed(output.decimals)}
+                          {fromBase(result.value, ou).toFixed(output.decimals)}
                           {ou.unit && <span className="text-base font-medium text-zinc-500 ml-2">{ou.unit}</span>}
                         </p>
                       )}

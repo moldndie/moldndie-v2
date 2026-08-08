@@ -5,7 +5,7 @@ type TokenType =
   | "NUMBER" | "IDENT" | "PLUS" | "MINUS" | "STAR" | "SLASH"
   | "CARET" | "LPAREN" | "RPAREN" | "COMMA" | "EOF"
 
-interface Token { type: TokenType; value?: string | number }
+export interface Token { type: TokenType; value?: string | number }
 
 const CONSTANTS: Record<string, number> = { pi: Math.PI, e: Math.E }
 
@@ -25,7 +25,9 @@ const FUNCTIONS: Record<string, (...a: number[]) => number> = {
   tan:   (x)       => Math.tan(x),
 }
 
-function tokenize(expr: string): Token[] {
+/** Exported so the dashboard's formula editor can rebuild pills from a stored
+ *  expression without a second lexer going out of sync with this one. */
+export function tokenize(expr: string): Token[] {
   const toks: Token[] = []
   let i = 0
   while (i < expr.length) {
@@ -54,10 +56,15 @@ function tokenize(expr: string): Token[] {
 
 class Parser {
   private pos = 0
-  constructor(
-    private readonly toks: Token[],
-    private readonly vars: Record<string, number>,
-  ) {}
+  private readonly toks: Token[]
+  private readonly vars: Record<string, number>
+
+  // Plain fields rather than parameter properties, so this file also runs under
+  // `node --experimental-strip-types` for lib/formula-tokens.check.ts.
+  constructor(toks: Token[], vars: Record<string, number>) {
+    this.toks = toks
+    this.vars = vars
+  }
 
   private peek() { return this.toks[this.pos] }
   private eat()  { return this.toks[this.pos++] }
@@ -148,6 +155,16 @@ class Parser {
     }
     throw new Error(`Unexpected token '${t.type}'`)
   }
+}
+
+/** Names the editor is allowed to offer — kept next to the implementations so a
+ *  new function shows up in the picker automatically. */
+export const FUNCTION_NAMES = Object.keys(FUNCTIONS)
+export const CONSTANT_NAMES = Object.keys(CONSTANTS)
+
+/** How many arguments each function takes, for the editor's placeholder. */
+export const FUNCTION_ARITY: Record<string, number> = {
+  pow: 2, min: 2, max: 2,
 }
 
 export interface FormulaResult {

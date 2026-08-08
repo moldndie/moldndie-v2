@@ -19,11 +19,11 @@ export interface UnitSystem {
 }
 
 /**
- * Per-system unit label + conversion factor, keyed by `UnitSystem["key"]`.
- * `factor` is how many display units make one base unit — formulas are always
- * authored in the base (factor 1) system.
+ * Per-system unit label + conversion, keyed by `UnitSystem["key"]`.
+ * `display = base × factor + offset` — formulas are always authored in the base
+ * (factor 1, offset 0) system. `offset` is only ever non-zero for temperature.
  */
-export type UnitMap = Record<string, { unit: string; factor: number }>
+export type UnitMap = Record<string, { unit: string; factor: number; offset?: number }>
 
 export interface Calculator {
   id: string
