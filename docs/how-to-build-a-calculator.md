@@ -32,6 +32,10 @@ You can jump between steps by clicking them, and **Save** at any time.
 - **Short Description** — one line shown on cards and under the title.
 - **Full Description** — the "About This Calculator" text under the tool. Line breaks are
   kept, so you can list formula notes here.
+- **Images** — add as many as you like. One image is centred above the tool; several become
+  a gallery. Remove any with the trash icon.
+- **Unit System** *(optional)* — click **Add a unit switcher** to give the tool a
+  Metric / Imperial toggle. You can rename both labels. See "Unit systems" below.
 - **Category** — groups the tool on the public page.
 
 > Starting a new tool? Use the **template picker** at the top of this step to clone a
@@ -56,6 +60,10 @@ in formulas — letters, numbers, underscores only, e.g. `wall`, `clamp_force`).
 Other options: **Unit** (e.g. `mm`), **Placeholder**, **Help Text**, **Required**,
 **Default Value**, and **Group**.
 
+**Common inputs:** the **Calculation Method** and **Safety Factor** buttons drop in a
+ready-made dropdown, optional by default. Each choice carries a number that your formulas
+can use as a variable (`method`, `safety_factor`) — edit the names and numbers as you like.
+
 **Groups (sections):** type a **Group** name (e.g. `Part & Machine`) on several inputs and
 they render together under that heading. Inputs with no group appear first.
 
@@ -78,6 +86,43 @@ Picking a material loads its row of values, and the site automatically shows a
 
 > Give every property column the same name spelling, and use those exact names in your
 > formulas.
+
+---
+
+## Step 2 (special) — Reference tables
+
+Below the inputs there is a **Reference tables** section. These are plain lookup tables —
+they don't need a dropdown behind them.
+
+1. **Add table**, give it a **title** and, optionally, a **category**.
+2. **Add column** for each column (a label and an optional unit).
+3. **Add row** and type the cells. Cells are free text, so `0.5 - 0.7` or `see note` is
+   fine — not just numbers.
+
+On the public page every reference table — these and the ones generated from material
+presets — sits under one **search box**. If you use categories, filter chips appear too.
+
+---
+
+## Unit systems (Metric ↔ Imperial)
+
+Turn the switcher on in Step 1, then on each **input** and each **result** you get a small
+box with one row per system: a **unit** label and a **factor**.
+
+**Write your formulas for one system only.** That system's factor is `1`. The factor for
+the other system is how many of *its* units make one of your base units.
+
+Example — formulas written in cm, offering inches too:
+
+| System | Unit | Factor |
+|---|---|---|
+| Metric (cm/kg/s) | `cm` | `1` |
+| Imperial (in/lb/s) | `in` | `0.3937` |
+
+The site converts what people type back to your base system before running the formula,
+and converts each result into whichever system they picked — so results always come out in
+the units the visitor is using. Leave a row blank and that input/result just keeps its
+plain **Unit** for both systems.
 
 ---
 

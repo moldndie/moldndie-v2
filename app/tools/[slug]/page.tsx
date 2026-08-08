@@ -65,17 +65,35 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
 
         {/* Calculator */}
         <section className="max-w-7xl mx-auto px-6 py-10 space-y-8">
-          {calc.cover_image && (
-            <div className="relative aspect-video w-full max-w-3xl overflow-hidden rounded-2xl border border-zinc-100 bg-white">
-              <Image
-                src={getFileUrl(calc.cover_image)}
-                alt={calc.title}
-                fill
-                className="object-contain"
-                sizes="(max-width: 768px) 100vw, 768px"
-              />
-            </div>
-          )}
+          {/* `images` is the current field; `cover_image` covers rows saved before it existed. */}
+          {(() => {
+            const images = calc.images?.length ? calc.images : calc.cover_image ? [calc.cover_image] : []
+            if (images.length === 0) return null
+            return (
+              <div
+                className={
+                  images.length === 1
+                    ? "mx-auto max-w-3xl"
+                    : "grid gap-4 sm:grid-cols-2 lg:grid-cols-3"
+                }
+              >
+                {images.map((key) => (
+                  <div
+                    key={key}
+                    className="relative aspect-video w-full overflow-hidden rounded-2xl border border-zinc-100 bg-white"
+                  >
+                    <Image
+                      src={getFileUrl(key)}
+                      alt={calc.title}
+                      fill
+                      className="object-contain"
+                      sizes={images.length === 1 ? "(max-width: 768px) 100vw, 768px" : "(max-width: 640px) 100vw, 33vw"}
+                    />
+                  </div>
+                ))}
+              </div>
+            )
+          })()}
 
           <CalculatorRunner calculator={calc} />
 

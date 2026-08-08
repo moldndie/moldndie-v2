@@ -12,6 +12,19 @@ export interface CalcCategory {
   updated_at: string
 }
 
+/** One entry of a calculator's unit switcher. */
+export interface UnitSystem {
+  key: string
+  label: string
+}
+
+/**
+ * Per-system unit label + conversion factor, keyed by `UnitSystem["key"]`.
+ * `factor` is how many display units make one base unit — formulas are always
+ * authored in the base (factor 1) system.
+ */
+export type UnitMap = Record<string, { unit: string; factor: number }>
+
 export interface Calculator {
   id: string
   category_id: string | null
@@ -21,6 +34,10 @@ export interface Calculator {
   description: string | null
   icon: string | null
   cover_image: string | null
+  /** Extra images; falls back to `cover_image` when empty. */
+  images: string[]
+  /** null / empty = no unit switcher on this calculator. */
+  unit_systems: UnitSystem[] | null
   is_featured: boolean
   is_published: boolean
   sort_order: number
@@ -36,6 +53,7 @@ export interface CalculatorWithRelations extends Calculator {
   category: CalcCategory | null
   fields: CalcField[]
   outputs: CalcOutput[]
+  referenceTables: CalcReferenceTable[]
 }
 
 export interface CalcField {
@@ -56,6 +74,9 @@ export interface CalcField {
   // injects those variables into the formula scope (a "material preset" lookup),
   // e.g. { label: "ABS", value: "abs", values: { alpha: 0.069, melt_temp: 220 } }.
   options: Array<{ label: string; value: string; values?: Record<string, number> }> | null
+  units: UnitMap | null
+  /** Preset dropdowns render a reference table unless this is off. */
+  show_reference: boolean
   // Optional heading used to group inputs into sections on the public page.
   field_group: string | null
   sort_order: number
@@ -69,8 +90,26 @@ export interface CalcOutput {
   output_key: string
   formula: string
   unit: string | null
+  units: UnitMap | null
   decimals: number
   description: string | null
+  sort_order: number
+  created_at: string
+}
+
+export interface CalcReferenceColumn {
+  key: string
+  label: string
+  unit?: string | null
+}
+
+export interface CalcReferenceTable {
+  id: string
+  calculator_id: string
+  title: string
+  category: string | null
+  columns: CalcReferenceColumn[]
+  rows: Record<string, string>[]
   sort_order: number
   created_at: string
 }

@@ -13,7 +13,11 @@ import { toDoc, fromDoc } from "@/lib/richtext"
 import { Textarea } from "@/components/ui/textarea"
 import RichTextEditor from "@/components/editor/RichTextEditor"
 import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
-import type { CalcCategory, CalculatorWithRelations, CalcField, CalcOutput, FieldType } from "@/types/calculator"
+import { FilePreview } from "@/components/forms/FilePreview"
+import type {
+  CalcCategory, CalculatorWithRelations, CalcField, CalcOutput, FieldType,
+  UnitSystem, UnitMap,
+} from "@/types/calculator"
 import { saveFullCalculator } from "@/services/calculator.service"
 import { evaluateFormula } from "@/lib/formula-engine"
 import CalculatorRunner from "@/app/tools/[slug]/CalculatorRunner"
@@ -43,6 +47,21 @@ interface DraftField {
   default_value: string
   options_text: string
   field_group: string
+  /** Per-system unit + factor, factor kept as a string while being typed. */
+  units: DraftUnits
+  show_reference: boolean
+}
+
+/** Keyed by unit-system key. */
+type DraftUnits = Record<string, { unit: string; factor: string }>
+
+interface DraftTable {
+  _uid: string
+  id?: string
+  title: string
+  category: string
+  columns: { id: string; key: string; label: string; unit: string }[]
+  rows: { id: string; cells: Record<string, string> }[]
 }
 
 interface DraftOutput {
@@ -52,6 +71,7 @@ interface DraftOutput {
   output_key: string
   formula: string
   unit: string
+  units: DraftUnits
   decimals: number
   description: string
 }
@@ -174,11 +194,83 @@ function presetVarKeys(fields: DraftField[]): string[] {
 }
 
 function emptyField(): DraftField {
-  return { _uid: uid(), label: "", field_key: "", field_type: "number", unit: "", placeholder: "", help_text: "", is_required: true, min_value: "", max_value: "", step_value: "", default_value: "", options_text: "", field_group: "" }
+  return { _uid: uid(), label: "", field_key: "", field_type: "number", unit: "", placeholder: "", help_text: "", is_required: true, min_value: "", max_value: "", step_value: "", default_value: "", options_text: "", field_group: "", units: {}, show_reference: true }
 }
 
 function emptyOutput(): DraftOutput {
-  return { _uid: uid(), label: "", output_key: "", formula: "", unit: "", decimals: 2, description: "" }
+  return { _uid: uid(), label: "", output_key: "", formula: "", unit: "", decimals: 2, units: {}, description: "" }
+}
+
+/**
+ * Prefilled inputs for the two options-with-values dropdowns every calculator
+ * seems to want. They are ordinary select fields — picking a choice injects its
+ * value into the formula scope — just saved from being retyped each time.
+ * `show_reference` is off so they don't publish themselves as reference tables.
+ */
+const FIELD_TEMPLATES: { key: string; label: string; build: () => Partial<DraftField> }[] = [
+  {
+    key: "method",
+    label: "Calculation Method",
+    build: () => ({
+      label: "Calculation Method", field_key: "method", field_type: "select",
+      is_required: false, show_reference: false,
+      options_text: JSON.stringify([
+        { label: "Standard", value: "standard", values: { method: 1 } },
+        { label: "Conservative", value: "conservative", values: { method: 1.2 } },
+      ]),
+      help_text: "Each choice sets the `method` variable you can use in formulas.",
+    }),
+  },
+  {
+    key: "safety",
+    label: "Safety Factor",
+    build: () => ({
+      label: "Safety Factor", field_key: "safety_factor", field_type: "select",
+      is_required: false, show_reference: false,
+      options_text: JSON.stringify([
+        { label: "None (1.0)", value: "none", values: { safety_factor: 1 } },
+        { label: "Light (1.1)", value: "light", values: { safety_factor: 1.1 } },
+        { label: "Standard (1.25)", value: "standard", values: { safety_factor: 1.25 } },
+      ]),
+      help_text: "Each choice sets the `safety_factor` variable you can use in formulas.",
+    }),
+  },
+]
+
+/** The two the client asked for; labels are editable afterwards. */
+const DEFAULT_UNIT_SYSTEMS: UnitSystem[] = [
+  { key: "metric", label: "Metric (cm/kg/s)" },
+  { key: "imperial", label: "Imperial (in/lb/s)" },
+]
+
+/** Drop half-filled rows: a system with no unit and no factor is just noise. */
+function unitsToDb(u: DraftUnits): UnitMap | null {
+  const out: UnitMap = {}
+  for (const [key, v] of Object.entries(u)) {
+    const factor = parseFloat(v.factor)
+    if (!v.unit && !Number.isFinite(factor)) continue
+    out[key] = { unit: v.unit, factor: Number.isFinite(factor) && factor !== 0 ? factor : 1 }
+  }
+  return Object.keys(out).length ? out : null
+}
+
+function unitsToDraft(u: UnitMap | null | undefined): DraftUnits {
+  const out: DraftUnits = {}
+  for (const [key, v] of Object.entries(u ?? {})) out[key] = { unit: v.unit ?? "", factor: String(v.factor ?? 1) }
+  return out
+}
+
+function tableToDb(t: DraftTable) {
+  const columns = t.columns
+    .filter((c) => c.label.trim())
+    .map((c) => ({ key: c.key, label: c.label.trim(), unit: c.unit.trim() || null }))
+  return {
+    title: t.title.trim() || "Reference Values",
+    category: t.category.trim() || null,
+    columns,
+    rows: t.rows.map((r) => Object.fromEntries(columns.map((c) => [c.key, r.cells[c.key] ?? ""]))),
+    sort_order: 0,
+  }
 }
 
 function fieldToDb(f: DraftField) {
@@ -197,6 +289,8 @@ function fieldToDb(f: DraftField) {
     default_value: f.default_value || null,
     options: f.field_type === "select" ? parseOptions(f.options_text) : null,
     field_group: f.field_group || null,
+    units: unitsToDb(f.units),
+    show_reference: f.show_reference,
     sort_order: 0,
   }
 }
@@ -208,6 +302,7 @@ function outputToDb(o: DraftOutput) {
     output_key: o.output_key,
     formula: o.formula,
     unit: o.unit || null,
+    units: unitsToDb(o.units),
     decimals: o.decimals,
     description: o.description || null,
     sort_order: 0,
@@ -298,7 +393,11 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
   const [slugManual, setSlugManual] = useState(!!calculator)
   const [shortDesc, setShortDesc] = useState(calculator?.short_description ?? "")
   const [description, setDescription] = useState(calculator?.description ?? "")
-  const [coverImage, setCoverImage] = useState(calculator?.cover_image ?? "")
+  // `cover_image` is the legacy single slot; anything saved since is in `images`.
+  const [images, setImages] = useState<string[]>(() =>
+    calculator?.images?.length ? calculator.images : calculator?.cover_image ? [calculator.cover_image] : []
+  )
+  const [unitSystems, setUnitSystems] = useState<UnitSystem[]>(calculator?.unit_systems ?? [])
   const [categoryId, setCategoryId] = useState(calculator?.category_id ?? "")
   const [isFeatured, setIsFeatured] = useState(calculator?.is_featured ?? false)
   const [isPublished, setIsPublished] = useState(calculator?.is_published ?? false)
@@ -318,6 +417,8 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
       default_value: f.default_value ?? "",
       options_text: f.options ? JSON.stringify(f.options) : "",
       field_group: f.field_group ?? "",
+      units: unitsToDraft(f.units),
+      show_reference: f.show_reference ?? true,
     })) ?? []
   )
 
@@ -326,8 +427,20 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
     calculator?.outputs.map((o) => ({
       _uid: uid(), id: o.id, label: o.label, output_key: o.output_key,
       formula: o.formula, unit: o.unit ?? "", decimals: o.decimals,
+      units: unitsToDraft(o.units),
       description: o.description ?? "",
     })) ?? []
+  )
+
+  // Reference tables state
+  const [tables, setTables] = useState<DraftTable[]>(() =>
+    calculator?.referenceTables?.map((t) => {
+      const columns = (t.columns ?? []).map((c) => ({ id: uid(), key: c.key, label: c.label, unit: c.unit ?? "" }))
+      return {
+        _uid: uid(), id: t.id, title: t.title, category: t.category ?? "", columns,
+        rows: (t.rows ?? []).map((r) => ({ id: uid(), cells: { ...r } })),
+      }
+    }) ?? []
   )
 
   // ── title → slug auto-derive ──────────────────────────────────────────────
@@ -352,6 +465,10 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
 
   // ── Field helpers ──────────────────────────────────────────────────────────
   const addField = useCallback(() => setFields((p) => [...p, emptyField()]), [])
+  const addTemplateField = useCallback(
+    (patch: Partial<DraftField>) => setFields((p) => [...p, { ...emptyField(), ...patch }]),
+    [],
+  )
   const removeField = useCallback((uid: string) => setFields((p) => p.filter((f) => f._uid !== uid)), [])
   const updateField = useCallback(<K extends keyof DraftField>(uid: string, key: K, val: DraftField[K]) => {
     setFields((p) => p.map((f) => f._uid === uid ? { ...f, [key]: val } : f))
@@ -404,6 +521,7 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
     id: "preview", category_id: null,
     title: title || "Untitled Engineering Tool", slug: slug || "preview",
     short_description: shortDesc || null, description: null, icon: null, cover_image: null,
+    images: [], unit_systems: unitSystems.length ? unitSystems : null,
     is_featured: false, is_published: true, sort_order: 0, seo_title: null, seo_description: null,
     views_count: 0, created_by: null, created_at: "", updated_at: "", category: null,
     fields: fields.map((f, i): CalcField => ({
@@ -416,22 +534,28 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
       step_value: f.step_value !== "" ? parseFloat(f.step_value) : null,
       default_value: f.default_value || null,
       options: parseOptions(f.options_text),
+      units: unitsToDb(f.units), show_reference: f.show_reference,
       field_group: f.field_group || null, sort_order: i, created_at: "",
     })),
     outputs: outputs.map((o, i): CalcOutput => ({
       id: o._uid, calculator_id: "preview",
       label: o.label || "Untitled output", output_key: o.output_key || `out_${i + 1}`,
       formula: o.formula, unit: o.unit || null, decimals: o.decimals,
+      units: unitsToDb(o.units),
       description: o.description || null, sort_order: i, created_at: "",
     })),
-  }), [title, slug, shortDesc, fields, outputs])
+    referenceTables: tables.map((t, i) => ({
+      id: t._uid, calculator_id: "preview", ...tableToDb(t), sort_order: i, created_at: "",
+    })),
+  }), [title, slug, shortDesc, fields, outputs, tables, unitSystems])
 
   // Remount the preview only when structure/formulas/defaults change (not while
   // typing values into the preview itself), so defaults re-initialise cleanly.
   const previewKey = useMemo(() =>
     fields.map((f) => `${f.field_key}|${f.field_type}|${f.default_value}|${f.options_text}`).join("~")
-    + "#" + outputs.map((o) => `${o.output_key}=${o.formula}|${o.decimals}`).join("~"),
-    [fields, outputs])
+    + "#" + outputs.map((o) => `${o.output_key}=${o.formula}|${o.decimals}`).join("~")
+    + "#" + unitSystems.map((u) => u.key).join(","),
+    [fields, outputs, unitSystems])
 
   // ── Save ───────────────────────────────────────────────────────────────────
   function handleSave() {
@@ -447,7 +571,9 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
             slug: slug.trim(),
             short_description: shortDesc || null,
             description: description || null,
-            cover_image: coverImage || null,
+            cover_image: images[0] ?? null,
+            images,
+            unit_systems: unitSystems.length ? unitSystems : null,
             category_id: categoryId || null,
             is_featured: isFeatured,
             is_published: isPublished,
@@ -457,6 +583,7 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
           },
           fields: fields.map(fieldToDb),
           outputs: outputs.map(outputToDb),
+          referenceTables: tables.map(tableToDb),
         })
         toast.success(calculator ? "Engineering tool updated" : "Engineering tool created")
         if (!calculator) router.push(`/dashboard/calculators/${saved.id}/edit`)
@@ -506,7 +633,8 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
               slug={slug} onSlug={(v) => { setSlug(v); setSlugManual(true) }}
               shortDesc={shortDesc} onShortDesc={setShortDesc}
               description={description} onDescription={setDescription}
-              coverImage={coverImage} onCoverImage={setCoverImage}
+              images={images} onImages={setImages}
+              unitSystems={unitSystems} onUnitSystems={setUnitSystems}
               categoryId={categoryId} onCategory={setCategoryId}
               categories={categories}
               showTemplateLink={!showTemplates && !calculator}
@@ -515,11 +643,16 @@ export default function CalculatorBuilder({ calculator, categories }: Props) {
           )}
 
           {step === 1 && (
-            <StepInputs fields={fields} onAdd={addField} onUpdate={updateField} onRemove={removeField} onMove={moveField} />
+            <StepInputs
+              fields={fields} unitSystems={unitSystems}
+              onAdd={addField} onAddTemplate={addTemplateField}
+              onUpdate={updateField} onRemove={removeField} onMove={moveField}
+              tables={tables} onTables={setTables}
+            />
           )}
 
           {step === 2 && (
-            <StepFormulas fields={fields} outputs={outputs} knownVars={knownVars} onAdd={addOutput} onUpdate={updateOutput} onRemove={removeOutput} onMove={moveOutput} />
+            <StepFormulas fields={fields} outputs={outputs} unitSystems={unitSystems} knownVars={knownVars} onAdd={addOutput} onUpdate={updateOutput} onRemove={removeOutput} onMove={moveOutput} />
           )}
 
           {step === 3 && (
@@ -670,7 +803,8 @@ function StepDetails(props: {
   slug: string; onSlug: (v: string) => void
   shortDesc: string; onShortDesc: (v: string) => void
   description: string; onDescription: (v: string) => void
-  coverImage: string; onCoverImage: (v: string) => void
+  images: string[]; onImages: (v: string[]) => void
+  unitSystems: UnitSystem[]; onUnitSystems: (v: UnitSystem[]) => void
   categoryId: string; onCategory: (v: string) => void
   categories: CalcCategory[]
   showTemplateLink: boolean; onShowTemplates: () => void
@@ -709,17 +843,64 @@ function StepDetails(props: {
         <p className="text-xs text-zinc-400 mt-1">Shown in the &ldquo;About This Calculator&rdquo; box.</p>
       </div>
       <div>
-        <Label>Cover Image</Label>
-        <CroppableFileUploadField
-          folder="calculators/covers"
-          aspect={16 / 9}
-          label="Click to upload a cover image (16:9)"
-          existingValue={props.coverImage || null}
-          onUploadSuccess={({ key }) => props.onCoverImage(key)}
-          onClear={() => props.onCoverImage("")}
-        />
+        <Label>Images</Label>
+        <div className="space-y-2">
+          {props.images.map((key, i) => (
+            <FilePreview
+              key={`${key}-${i}`}
+              value={key}
+              onClear={() => props.onImages(props.images.filter((_, j) => j !== i))}
+            />
+          ))}
+          {/* Remounted per upload so the field resets and can take the next one. */}
+          <CroppableFileUploadField
+            key={`calc-img-${props.images.length}`}
+            folder="calculators/covers"
+            aspect={16 / 9}
+            label="Click to add an image (16:9)"
+            existingValue={null}
+            onUploadSuccess={({ key }) => props.onImages([...props.images, key])}
+          />
+        </div>
         <p className="text-xs text-zinc-400 mt-1">
-          Optional. Use it to illustrate what the tool calculates — shown above the tool on its public page.
+          Optional. Shown above the tool on its public page — one image is centred, several become a gallery.
+        </p>
+      </div>
+
+      <div>
+        <Label>Unit System</Label>
+        {props.unitSystems.length === 0 ? (
+          <button
+            type="button"
+            onClick={() => props.onUnitSystems(DEFAULT_UNIT_SYSTEMS)}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-primary hover:text-primary"
+          >
+            <Plus className="size-4" /> Add a unit switcher
+          </button>
+        ) : (
+          <div className="space-y-2">
+            {props.unitSystems.map((u, i) => (
+              <div key={u.key} className="flex items-center gap-2">
+                <span className="w-20 shrink-0 font-mono text-xs text-zinc-400">{u.key}</span>
+                <Input
+                  value={u.label}
+                  onChange={(e) => props.onUnitSystems(props.unitSystems.map((x, j) => j === i ? { ...x, label: e.target.value } : x))}
+                  placeholder="Metric (cm/kg/s)"
+                />
+              </div>
+            ))}
+            <button
+              type="button"
+              onClick={() => props.onUnitSystems([])}
+              className="text-xs text-zinc-400 transition-colors hover:text-red-600"
+            >
+              Remove the unit switcher
+            </button>
+          </div>
+        )}
+        <p className="text-xs text-zinc-400 mt-1">
+          Optional. With this on, each input and result can carry a unit and a conversion factor per system —
+          write your formulas for one system, and the other is converted for you.
         </p>
       </div>
       <div>
@@ -735,12 +916,16 @@ function StepDetails(props: {
 
 // ── Step 2: Inputs ───────────────────────────────────────────────────────────
 
-function StepInputs({ fields, onAdd, onUpdate, onRemove, onMove }: {
+function StepInputs({ fields, unitSystems, onAdd, onAddTemplate, onUpdate, onRemove, onMove, tables, onTables }: {
   fields: DraftField[]
+  unitSystems: UnitSystem[]
   onAdd: () => void
+  onAddTemplate: (patch: Partial<DraftField>) => void
   onUpdate: <K extends keyof DraftField>(uid: string, key: K, val: DraftField[K]) => void
   onRemove: (uid: string) => void
   onMove: (idx: number, dir: 1 | -1) => void
+  tables: DraftTable[]
+  onTables: (v: DraftTable[]) => void
 }) {
   return (
     <div className="space-y-4">
@@ -751,6 +936,20 @@ function StepInputs({ fields, onAdd, onUpdate, onRemove, onMove }: {
         <button type="button" onClick={onAdd} className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white hover:bg-primary/90 transition-colors shrink-0">
           <Plus className="size-4" /> Add Input
         </button>
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs text-zinc-400">Common inputs:</span>
+        {FIELD_TEMPLATES.map((t) => (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => onAddTemplate(t.build())}
+            className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:border-primary hover:text-primary"
+          >
+            <Plus className="size-3.5" /> {t.label}
+          </button>
+        ))}
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-4 text-xs text-zinc-600">
@@ -772,17 +971,164 @@ function StepInputs({ fields, onAdd, onUpdate, onRemove, onMove }: {
       )}
 
       {fields.map((field, idx) => (
-        <FieldCard key={field._uid} field={field} idx={idx} total={fields.length} onUpdate={onUpdate} onRemove={onRemove} onMove={onMove} />
+        <FieldCard key={field._uid} field={field} unitSystems={unitSystems} idx={idx} total={fields.length} onUpdate={onUpdate} onRemove={onRemove} onMove={onMove} />
       ))}
+
+      <TablesEditor tables={tables} onChange={onTables} />
+    </div>
+  )
+}
+
+// ── Reference tables ─────────────────────────────────────────────────────────
+// Standalone lookup tables, independent of any dropdown. Cells are free text so
+// a range ("0.5 - 0.7") or a note is as valid as a number.
+
+function TablesEditor({ tables, onChange }: { tables: DraftTable[]; onChange: (v: DraftTable[]) => void }) {
+  const update = (i: number, patch: Partial<DraftTable>) =>
+    onChange(tables.map((t, j) => (j === i ? { ...t, ...patch } : t)))
+
+  return (
+    <div className="space-y-3 border-t border-zinc-200 pt-5">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-sm font-semibold text-zinc-900">Reference tables</p>
+          <p className="text-xs text-zinc-500">
+            Lookup tables shown under the tool. Visitors can search them, and a category groups them into filters.
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => onChange([...tables, { _uid: uid(), title: "", category: "", columns: [], rows: [] }])}
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-primary hover:text-primary"
+        >
+          <Plus className="size-4" /> Add table
+        </button>
+      </div>
+
+      {tables.map((t, i) => (
+        <TableCard
+          key={t._uid}
+          table={t}
+          onChange={(patch) => update(i, patch)}
+          onRemove={() => onChange(tables.filter((_, j) => j !== i))}
+        />
+      ))}
+    </div>
+  )
+}
+
+function TableCard({ table, onChange, onRemove }: {
+  table: DraftTable
+  onChange: (patch: Partial<DraftTable>) => void
+  onRemove: () => void
+}) {
+  const cellClass = "w-full rounded-md border border-zinc-200 px-2 py-1.5 text-xs focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white"
+
+  const setColumn = (id: string, patch: Partial<DraftTable["columns"][number]>) =>
+    onChange({ columns: table.columns.map((c) => (c.id === id ? { ...c, ...patch } : c)) })
+
+  return (
+    <div className="rounded-xl border border-zinc-200 bg-white p-4 space-y-3">
+      <div className="flex items-center gap-2">
+        <Input value={table.title} onChange={(e) => onChange({ title: e.target.value })} placeholder="Table title" />
+        <Input value={table.category} onChange={(e) => onChange({ category: e.target.value })} placeholder="Category (optional)" />
+        <button type="button" onClick={onRemove} className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600">
+          <Trash2 className="size-4" />
+        </button>
+      </div>
+
+      {table.columns.length > 0 && (
+        <div className="overflow-x-auto">
+          <table className="w-full border-separate border-spacing-1">
+            <thead>
+              <tr>
+                {table.columns.map((c) => (
+                  <th key={c.id} className="text-left">
+                    <div className="flex items-center gap-0.5">
+                      <input
+                        value={c.label}
+                        onChange={(e) => setColumn(c.id, { label: e.target.value })}
+                        placeholder="Column"
+                        className={cn(cellClass, "min-w-24")}
+                      />
+                      <input
+                        value={c.unit}
+                        onChange={(e) => setColumn(c.id, { unit: e.target.value })}
+                        placeholder="unit"
+                        className={cn(cellClass, "w-16")}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => onChange({ columns: table.columns.filter((x) => x.id !== c.id) })}
+                        className="rounded p-1 text-zinc-300 hover:text-red-600"
+                        title="Remove column"
+                      >
+                        <Trash2 className="size-3" />
+                      </button>
+                    </div>
+                  </th>
+                ))}
+                <th className="w-6" />
+              </tr>
+            </thead>
+            <tbody>
+              {table.rows.map((r) => (
+                <tr key={r.id}>
+                  {table.columns.map((c) => (
+                    <td key={c.id}>
+                      <input
+                        value={r.cells[c.key] ?? ""}
+                        onChange={(e) => onChange({
+                          rows: table.rows.map((x) => x.id === r.id ? { ...x, cells: { ...x.cells, [c.key]: e.target.value } } : x),
+                        })}
+                        className={cn(cellClass, "min-w-24")}
+                      />
+                    </td>
+                  ))}
+                  <td>
+                    <button
+                      type="button"
+                      onClick={() => onChange({ rows: table.rows.filter((x) => x.id !== r.id) })}
+                      className="rounded p-1 text-zinc-300 hover:text-red-600"
+                      title="Remove row"
+                    >
+                      <Trash2 className="size-3.5" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <div className="flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => onChange({ columns: [...table.columns, { id: uid(), key: `col_${table.columns.length + 1}`, label: "", unit: "" }] })}
+          className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:border-primary hover:text-primary"
+        >
+          <Plus className="size-3.5" /> Add column
+        </button>
+        <button
+          type="button"
+          disabled={table.columns.length === 0}
+          onClick={() => onChange({ rows: [...table.rows, { id: uid(), cells: {} }] })}
+          className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:border-primary hover:text-primary disabled:opacity-40"
+        >
+          <Plus className="size-3.5" /> Add row
+        </button>
+      </div>
     </div>
   )
 }
 
 // ── Step 3: Formulas ─────────────────────────────────────────────────────────
 
-function StepFormulas({ fields, outputs, knownVars, onAdd, onUpdate, onRemove, onMove }: {
+function StepFormulas({ fields, outputs, unitSystems, knownVars, onAdd, onUpdate, onRemove, onMove }: {
   fields: DraftField[]
   outputs: DraftOutput[]
+  unitSystems: UnitSystem[]
   knownVars: string[]
   onAdd: () => void
   onUpdate: <K extends keyof DraftOutput>(uid: string, key: K, val: DraftOutput[K]) => void
@@ -832,6 +1178,7 @@ function StepFormulas({ fields, outputs, knownVars, onAdd, onUpdate, onRemove, o
         <OutputCard
           key={output._uid}
           output={output}
+          unitSystems={unitSystems}
           idx={idx}
           total={outputs.length}
           knownVars={knownVars}
@@ -980,10 +1327,50 @@ function Toggle({ label, hint, checked, onChange }: { label: string; hint: strin
   )
 }
 
+/**
+ * Per-system unit + factor. `factor` is how many of this system's units make
+ * one base unit, so the base system's row is simply 1.
+ */
+function UnitsEditor({ systems, value, onChange }: {
+  systems: UnitSystem[]
+  value: DraftUnits
+  onChange: (v: DraftUnits) => void
+}) {
+  if (systems.length === 0) return null
+  const set = (key: string, patch: Partial<{ unit: string; factor: string }>) =>
+    onChange({ ...value, [key]: { unit: value[key]?.unit ?? "", factor: value[key]?.factor ?? "1", ...patch } })
+
+  return (
+    <div className="sm:col-span-2 rounded-lg border border-zinc-200 bg-zinc-50/50 p-3 space-y-2">
+      <p className="text-[11px] font-medium text-zinc-500">
+        Units per system — leave the system your formula is written in at factor <code>1</code>.
+      </p>
+      {systems.map((sys) => (
+        <div key={sys.key} className="flex items-center gap-2">
+          <span className="w-32 shrink-0 truncate text-xs text-zinc-500" title={sys.label}>{sys.label}</span>
+          <Input
+            value={value[sys.key]?.unit ?? ""}
+            onChange={(e) => set(sys.key, { unit: e.target.value })}
+            placeholder="unit"
+            className="text-xs"
+          />
+          <Input
+            value={value[sys.key]?.factor ?? ""}
+            onChange={(e) => set(sys.key, { factor: e.target.value })}
+            placeholder="factor"
+            className="font-mono text-xs"
+          />
+        </div>
+      ))}
+    </div>
+  )
+}
+
 // ── FieldCard ──────────────────────────────────────────────────────────────────
 
 interface FieldCardProps {
   field: DraftField
+  unitSystems: UnitSystem[]
   idx: number
   total: number
   onUpdate: <K extends keyof DraftField>(uid: string, key: K, val: DraftField[K]) => void
@@ -995,7 +1382,7 @@ const FIELD_TYPE_LABELS: Record<FieldType, string> = {
   number: "Number", text: "Text", select: "Dropdown", checkbox: "Checkbox", range: "Slider",
 }
 
-function FieldCard({ field, idx, total, onUpdate, onRemove, onMove }: FieldCardProps) {
+function FieldCard({ field, unitSystems, idx, total, onUpdate, onRemove, onMove }: FieldCardProps) {
   const [expanded, setExpanded] = useState(true)
   const u = <K extends keyof DraftField>(k: K, v: DraftField[K]) => onUpdate(field._uid, k, v)
 
@@ -1048,6 +1435,7 @@ function FieldCard({ field, idx, total, onUpdate, onRemove, onMove }: FieldCardP
               <label className="block text-xs font-medium text-zinc-600 mb-1">Unit</label>
               <Input value={field.unit} onChange={(e) => u("unit", e.target.value)} placeholder="mm, kg, MPa…" />
             </div>
+            <UnitsEditor systems={unitSystems} value={field.units} onChange={(v) => u("units", v)} />
             <div>
               <label className="block text-xs font-medium text-zinc-600 mb-1">Placeholder</label>
               <Input value={field.placeholder} onChange={(e) => u("placeholder", e.target.value)} placeholder="e.g. Enter thickness" />
@@ -1253,6 +1641,7 @@ function OptionsEditor({ value, onChange }: { value: string; onChange: (json: st
 
 interface OutputCardProps {
   output: DraftOutput
+  unitSystems: UnitSystem[]
   idx: number
   total: number
   knownVars: string[]
@@ -1261,7 +1650,7 @@ interface OutputCardProps {
   onMove: (idx: number, dir: 1 | -1) => void
 }
 
-function OutputCard({ output, idx, total, knownVars, onUpdate, onRemove, onMove }: OutputCardProps) {
+function OutputCard({ output, unitSystems, idx, total, knownVars, onUpdate, onRemove, onMove }: OutputCardProps) {
   const u = <K extends keyof DraftOutput>(k: K, v: DraftOutput[K]) => onUpdate(output._uid, k, v)
 
   // Live formula test — every known variable (fields, presets, other outputs) = 1.
@@ -1321,6 +1710,7 @@ function OutputCard({ output, idx, total, knownVars, onUpdate, onRemove, onMove 
             <label className="block text-xs font-medium text-zinc-600 mb-1">Unit</label>
             <Input value={output.unit} onChange={(e) => u("unit", e.target.value)} placeholder="s, cm², %…" />
           </div>
+          <UnitsEditor systems={unitSystems} value={output.units} onChange={(v) => u("units", v)} />
           <div>
             <label className="block text-xs font-medium text-zinc-600 mb-1">Decimal Places</label>
             <Input type="number" min={0} max={10} value={output.decimals} onChange={(e) => u("decimals", parseInt(e.target.value) || 0)} className="w-24" />
