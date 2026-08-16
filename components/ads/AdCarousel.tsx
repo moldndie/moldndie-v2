@@ -12,9 +12,8 @@ const AUTOPLAY_MS = 8000
 
 /** Circular arrow pinned to the vertical middle of the card row, half outside it. */
 const ARROW_CLASS =
-  "absolute top-1/2 z-10 hidden -translate-y-1/2 size-9 items-center justify-center rounded-full " +
-  "border border-zinc-200 bg-white/95 text-zinc-600 shadow-sm backdrop-blur transition-colors " +
-  "hover:border-zinc-300 hover:text-zinc-900 sm:flex"
+  "ui-pill absolute top-1/2 z-10 hidden -translate-y-1/2 size-9 items-center justify-center " +
+  "rounded-full border shadow-sm sm:flex"
 
 /**
  * Ads advance on their own timer and are otherwise independent of the page they

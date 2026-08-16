@@ -161,7 +161,7 @@ export default async function AcademyCategoryPage({
               <BookOpen size={48} className="text-zinc-200 mb-4" strokeWidth={1} />
               <p className="text-zinc-500 font-medium">No courses found</p>
               <p className="text-zinc-400 text-sm mt-1">Check back later for new content.</p>
-              <Link href="/courses" className="mt-4 text-sm text-primary underline underline-offset-2 hover:opacity-70">
+              <Link href="/courses" className="mt-4 text-sm text-primary no-underline underline-offset-2 hover:underline hover:opacity-70">
                 Browse all courses
               </Link>
             </div>

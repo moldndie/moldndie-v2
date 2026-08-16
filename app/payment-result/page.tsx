@@ -99,8 +99,8 @@ function PaymentSuccessContent({
           <Clock size={15} className="shrink-0 mt-0.5" />
           <span>
             Your payment was received. Access will be granted within a minute — check{" "}
-            <Link href="/my-courses" className="underline font-medium">My Courses</Link> or{" "}
-            <Link href="/purchases" className="underline font-medium">Purchases</Link> shortly.
+            <Link href="/my-courses" className="no-underline hover:underline font-medium">My Courses</Link> or{" "}
+            <Link href="/purchases" className="no-underline hover:underline font-medium">Purchases</Link> shortly.
           </span>
         </div>
       )}

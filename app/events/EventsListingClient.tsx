@@ -102,7 +102,7 @@ function EventExpandedContent({ event }: {
       {event.website && (
         <div className="flex items-center gap-2 text-sm text-zinc-500">
           <Globe size={13} className="text-zinc-400 shrink-0" />
-          <a href={event.website} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:opacity-70">
+          <a href={event.website} target="_blank" rel="noopener noreferrer" className="text-primary no-underline underline-offset-2 hover:underline hover:opacity-70">
             {event.website}
           </a>
         </div>
@@ -111,7 +111,7 @@ function EventExpandedContent({ event }: {
       {event.phone && (
         <div className="flex items-center gap-2 text-sm text-zinc-500">
           <Phone size={13} className="text-zinc-400 shrink-0" />
-          <a href={`tel:${event.phone}`} onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2 hover:opacity-70">
+          <a href={`tel:${event.phone}`} onClick={(e) => e.stopPropagation()} className="text-primary no-underline underline-offset-2 hover:underline hover:opacity-70">
             {event.phone}
           </a>
         </div>
@@ -119,7 +119,7 @@ function EventExpandedContent({ event }: {
       {event.email && (
         <div className="flex items-center gap-2 text-sm text-zinc-500">
           <Mail size={13} className="text-zinc-400 shrink-0" />
-          <a href={`mailto:${event.email}`} onClick={(e) => e.stopPropagation()} className="text-primary underline underline-offset-2 hover:opacity-70">
+          <a href={`mailto:${event.email}`} onClick={(e) => e.stopPropagation()} className="text-primary no-underline underline-offset-2 hover:underline hover:opacity-70">
             {event.email}
           </a>
         </div>
@@ -391,7 +391,7 @@ export default function EventsListingClient() {
           <p className="text-zinc-500 font-medium">No events found</p>
           <p className="text-zinc-400 text-sm mt-1">Try adjusting your search or filters</p>
           {hasActiveFilters && (
-            <button onClick={clearAll} className="mt-4 text-sm text-primary underline underline-offset-2 hover:opacity-70">
+            <button onClick={clearAll} className="mt-4 text-sm text-primary no-underline underline-offset-2 hover:underline hover:opacity-70">
               Clear all filters
             </button>
           )}

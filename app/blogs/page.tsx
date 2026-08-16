@@ -5,7 +5,7 @@ import Image from "next/image"
 import { FileText, Heart, MessageSquare, Eye } from "lucide-react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { getFilteredPublishedBlogs, getBlogCategories, getBlogTags, getBlogCountsMap, type BlogSort } from "@/services/blog.service"
+import { getFilteredPublishedBlogs, getBlogCategories, getUsedBlogTags, getBlogCountsMap, type BlogSort } from "@/services/blog.service"
 import { getContentViewCountsMap } from "@/services/contentViews.service"
 import { BlogPaginationBar } from "./_components/BlogPaginationBar"
 import { getFileUrl } from "@/lib/utils"
@@ -118,7 +118,7 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
 
   const [categories, tags, countsMap, viewsMap] = await Promise.all([
     getBlogCategories(),
-    getBlogTags(),
+    getUsedBlogTags(),
     getBlogCountsMap(blogs.map((b) => b.id)),
     getContentViewCountsMap("blog", blogs.map((b) => b.id)),
   ])

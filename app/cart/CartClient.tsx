@@ -97,7 +97,7 @@ export default function CartClient() {
         <button
           onClick={() => clearCart.mutate()}
           disabled={clearCart.isPending}
-          className="text-xs text-zinc-400 hover:text-red-500 underline underline-offset-2 transition-colors disabled:opacity-50"
+          className="text-xs text-zinc-400 hover:text-red-500 no-underline underline-offset-2 hover:underline transition-colors disabled:opacity-50"
         >
           Clear all
         </button>

@@ -373,9 +373,46 @@ export async function getBlogCategories(): Promise<BlogCategory[]> {
   return (data ?? []) as BlogCategory[]
 }
 
+/** Every tag row — for the dashboard, where you pick tags to attach. */
 export async function getBlogTags(): Promise<BlogTag[]> {
   const supabase = createAdminClient()
   const { data, error } = await supabase.from("blog_tags").select("*").order("name")
+  if (error) throw dbError(error)
+  return (data ?? []) as BlogTag[]
+}
+
+/**
+ * Only tags that would actually match something.
+ *
+ * The public filter bar used to list every tag row, so a tag attached to
+ * nothing — or attached only to a draft — rendered as a chip that filtered to
+ * zero results. Every chip on the live site is currently in that state.
+ */
+export async function getUsedBlogTags(): Promise<BlogTag[]> {
+  const supabase = createAdminClient()
+  const { data: published, error: blogErr } = await supabase
+    .from("blogs")
+    .select("id")
+    .eq("is_published", true)
+  if (blogErr) throw dbError(blogErr)
+
+  const ids = (published ?? []).map((b: { id: string }) => b.id)
+  if (ids.length === 0) return []
+
+  const { data: relations, error: relErr } = await supabase
+    .from("blog_tag_relations")
+    .select("tag_id")
+    .in("blog_id", ids)
+  if (relErr) throw dbError(relErr)
+
+  const usedIds = [...new Set((relations ?? []).map((r: { tag_id: string }) => r.tag_id))]
+  if (usedIds.length === 0) return []
+
+  const { data, error } = await supabase
+    .from("blog_tags")
+    .select("*")
+    .in("id", usedIds)
+    .order("name")
   if (error) throw dbError(error)
   return (data ?? []) as BlogTag[]
 }

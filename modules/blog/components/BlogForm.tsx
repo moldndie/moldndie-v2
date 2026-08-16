@@ -109,11 +109,24 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
       return
     }
 
+    // Independent saves, and neither one failing silently: these used to share a
+    // try/catch that swallowed the error, so a blocks failure skipped the tag
+    // save and the post looked like it had saved cleanly.
+    const failures: string[] = []
     try {
       await saveBlogBlocks(saved.id, blocks.map((b, i) => ({ block_type: b.block_type, content: b.content, order_index: i, layout: b.layout ?? null, column_position: b.column_position ?? null, column_ratio: b.column_ratio ?? null })))
+    } catch (e) {
+      failures.push(`content (${e instanceof Error ? e.message : "unknown error"})`)
+    }
+    try {
       await saveBlogTags(saved.id, pickedTagIds)
-    } catch {
-      // blocks/tags save failure is non-fatal
+    } catch (e) {
+      failures.push(`tags (${e instanceof Error ? e.message : "unknown error"})`)
+    }
+
+    if (failures.length > 0) {
+      setSubmitError(`The post was saved, but ${failures.join(" and ")} could not be saved.`)
+      return
     }
 
     router.refresh()

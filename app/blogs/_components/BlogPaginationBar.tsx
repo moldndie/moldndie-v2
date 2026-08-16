@@ -44,7 +44,7 @@ export function BlogPaginationBar({ currentPage, totalPages }: BlogPaginationBar
       <button
         onClick={() => goToPage(currentPage - 1)}
         disabled={currentPage === 1}
-        className="p-2 rounded-lg border border-zinc-200 text-zinc-500 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="ui-pill p-2 rounded-lg border"
         aria-label="Previous page"
       >
         <ChevronLeft size={16} />
@@ -57,11 +57,8 @@ export function BlogPaginationBar({ currentPage, totalPages }: BlogPaginationBar
           <button
             key={p}
             onClick={() => goToPage(p as number)}
-            className={`min-w-9 h-9 rounded-lg border text-sm font-medium transition-colors ${
-              p === currentPage
-                ? "bg-primary text-white border-primary"
-                : "border-zinc-200 text-zinc-600 hover:bg-zinc-50"
-            }`}
+            aria-current={p === currentPage ? "page" : undefined}
+            className="ui-pill min-w-9 h-9 rounded-lg border text-sm font-medium"
           >
             {p}
           </button>
@@ -71,7 +68,7 @@ export function BlogPaginationBar({ currentPage, totalPages }: BlogPaginationBar
       <button
         onClick={() => goToPage(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="p-2 rounded-lg border border-zinc-200 text-zinc-500 hover:bg-zinc-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        className="ui-pill p-2 rounded-lg border"
         aria-label="Next page"
       >
         <ChevronRight size={16} />

@@ -40,26 +40,31 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
     : []
 
   return (
-    <div className="min-h-screen flex flex-col bg-white">
+    /* Tool pages are dark — the client asked for the moldminds treatment in our
+       own palette. The rest of the site, and the dashboard preview of this same
+       runner, stay light. */
+    <div className="min-h-screen flex flex-col bg-zinc-950">
       <Navbar />
       <main className="flex-1">
         <ContentViewTracker contentType="calculator" contentId={calc.id} />
         {/* Header */}
         <section className="max-w-7xl mx-auto px-6 pt-10">
-          <PublicBreadcrumb crumbs={[
-            { label: "Engineering", href: "/tools" },
-            { label: calc.title },
-          ]} />
+          <div className="on-dark">
+            <PublicBreadcrumb crumbs={[
+              { label: "Engineering", href: "/tools" },
+              { label: calc.title },
+            ]} />
+          </div>
           {calc.category && (
-            <span className="mt-3 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+            <span className="mt-3 inline-block rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-zinc-200">
               {calc.category.name}
             </span>
           )}
-          <h1 className="mt-2 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">
+          <h1 className="mt-2 text-3xl md:text-4xl font-extrabold text-white uppercase tracking-tight">
             {calc.title}
           </h1>
           {calc.short_description && (
-            <p className="mt-1 text-sm text-zinc-500 max-w-2xl">{calc.short_description}</p>
+            <p className="mt-1 text-sm text-zinc-400 max-w-2xl">{calc.short_description}</p>
           )}
         </section>
 
@@ -80,7 +85,7 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
                 {images.map((key) => (
                   <div
                     key={key}
-                    className="relative aspect-video w-full overflow-hidden rounded-2xl border border-zinc-100 bg-white"
+                    className="relative aspect-video w-full overflow-hidden rounded-2xl border border-white/10 bg-white"
                   >
                     <Image
                       src={getFileUrl(key)}
@@ -95,22 +100,22 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
             )
           })()}
 
-          <CalculatorRunner calculator={calc} />
+          <CalculatorRunner calculator={calc} theme="dark" />
 
           {/* Description */}
           {calc.description && (
-            <div className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm">
-              <h2 className="text-base font-bold text-zinc-900 uppercase tracking-wide mb-3">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
+              <h2 className="text-base font-bold text-zinc-50 uppercase tracking-wide mb-3">
                 About This Calculator
               </h2>
-              <RichTextRenderer content={calc.description} className="text-sm text-zinc-600" />
+              <RichTextRenderer content={calc.description} className="cms-invert text-sm text-zinc-300" />
             </div>
           )}
 
           {/* Related */}
           {related.length > 0 && (
             <div>
-              <h2 className="text-base font-bold text-zinc-900 uppercase tracking-wide mb-4">
+              <h2 className="text-base font-bold text-zinc-50 uppercase tracking-wide mb-4">
                 Related Tools
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -118,13 +123,13 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
                   <a
                     key={r.id}
                     href={`/tools/${r.slug}`}
-                    className="group rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm hover:shadow-md transition-all duration-200"
+                    className="group rounded-2xl border border-white/10 bg-white/[0.04] p-5 transition-colors duration-200 hover:border-white/25"
                   >
-                    <p className="text-sm font-bold text-zinc-900 group-hover:text-primary transition-colors">
+                    <p className="text-sm font-bold text-zinc-50 transition-colors">
                       {r.title}
                     </p>
                     {r.short_description && (
-                      <p className="text-xs text-zinc-500 mt-1 line-clamp-2">{r.short_description}</p>
+                      <p className="text-xs text-zinc-400 mt-1 line-clamp-2">{r.short_description}</p>
                     )}
                   </a>
                 ))}
@@ -133,7 +138,7 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
           )}
         </section>
         <div className="max-w-7xl mx-auto px-6 pb-12">
-          <hr className="border-zinc-100 mb-8" />
+          <hr className="border-white/10 mb-8" />
           <Suspense fallback={null}>
             <AdSlotGrid page="engineering" className="w-full" />
           </Suspense>

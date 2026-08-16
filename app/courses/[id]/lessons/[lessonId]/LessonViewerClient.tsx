@@ -220,7 +220,7 @@ function LockedLesson({
       )}
       <Link
         href={`/courses/${courseId}`}
-        className="text-sm text-zinc-400 hover:text-zinc-600 underline underline-offset-2 transition-colors"
+        className="text-sm text-zinc-400 hover:text-zinc-600 no-underline underline-offset-2 hover:underline transition-colors"
       >
         Back to course
       </Link>
@@ -664,7 +664,7 @@ function ErrorState({ courseId }: { courseId: string }) {
       <p className="text-zinc-700 font-semibold text-lg">Something went wrong</p>
       <Link
         href={`/courses/${courseId}`}
-        className="mt-6 text-sm text-primary underline underline-offset-2"
+        className="mt-6 text-sm text-primary no-underline underline-offset-2 hover:underline"
       >
         Back to course
       </Link>
@@ -679,7 +679,7 @@ function NotFoundState({ courseId }: { courseId: string }) {
       <p className="text-zinc-700 font-semibold text-lg">Lesson not found</p>
       <Link
         href={`/courses/${courseId}`}
-        className="mt-6 text-sm text-primary underline underline-offset-2"
+        className="mt-6 text-sm text-primary no-underline underline-offset-2 hover:underline"
       >
         Back to course
       </Link>

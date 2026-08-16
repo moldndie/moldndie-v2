@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
+  --font-sans: Aptos, "Segoe UI", var(--font-funnel), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -226,6 +226,8 @@
 .cms-editor,
 .cms-content {
   word-break: break-word;
+  /* Authored content matches the rest of the site unless a font is set per-span. */
+  font-family: var(--font-sans);
 }
 .cms-editor h1, .cms-content h1 {
   font-size: 1.875rem;
@@ -316,11 +318,13 @@
   border-top: 1px solid #e4e4e7;
   margin: 1.5rem 0;
 }
+/* Links stay clean and only underline on hover — matches the reference the
+   client gave (ptonline.com). */
 .cms-editor a, .cms-content a {
   color: var(--color-primary, #2563eb);
-  text-decoration: underline;
+  text-decoration: none;
 }
-.cms-editor a:hover, .cms-content a:hover { text-decoration: none; }
+.cms-editor a:hover, .cms-content a:hover { text-decoration: underline; }
 .cms-editor img, .cms-content img {
   max-width: 100%;
   height: auto;
@@ -386,3 +390,62 @@
 
 /* Table resize handle */
 .cms-editor .tableWrapper { overflow-x: auto; }
+/* ─── Interactive chrome: white → maroon ──────────────────────
+   The v1 behaviour the client asked to bring back: icons, arrows, page
+   numbers and filter chips sit on white, fill with the brand maroon while
+   pointed at, and stay filled once selected.
+
+   One class instead of thirty hover: utilities, so the whole site keeps the
+   same feel. Selection is expressed with aria-current / aria-pressed /
+   data-active — the accessible attributes the buttons should carry anyway. */
+.ui-pill {
+  background-color: #fff;
+  border-color: var(--border);
+  color: var(--color-zinc-600, #52525b);
+  transition: background-color 150ms, color 150ms, border-color 150ms;
+}
+
+/* Pointer devices only — on touch, :hover sticks after a tap. */
+@media (hover: hover) {
+  .ui-pill:not(:disabled):hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
+
+.ui-pill[aria-current="true"],
+.ui-pill[aria-current="page"],
+.ui-pill[aria-pressed="true"],
+.ui-pill[data-active="true"] {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: var(--primary-foreground);
+}
+
+.ui-pill:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Keyboard users must still see where they are. */
+.ui-pill:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ─── Rich text on a dark surface ─────────────────────────────
+   The CMS styles hard-code near-black text, which disappears on the dark
+   tool pages. Same markup, inverted palette. */
+.cms-invert.cms-content,
+.cms-invert .cms-content { color: #d4d4d8; }
+.cms-invert h1, .cms-invert h2, .cms-invert h3, .cms-invert h4 { color: #fafafa; }
+.cms-invert p, .cms-invert li, .cms-invert ul, .cms-invert ol { color: #d4d4d8; }
+.cms-invert blockquote { color: #a1a1aa; border-left-color: rgb(255 255 255 / 0.2); }
+.cms-invert hr { border-top-color: rgb(255 255 255 / 0.15); }
+.cms-invert th { background: rgb(255 255 255 / 0.06); color: #fafafa; }
+.cms-invert td, .cms-invert th { border-color: rgb(255 255 255 / 0.12); }
+.cms-invert code { background: rgb(255 255 255 / 0.1); color: #fafafa; }
+
+/* Breadcrumb sits on dark inside the tool pages. */
+.on-dark .text-zinc-700 { color: #e4e4e7; }
