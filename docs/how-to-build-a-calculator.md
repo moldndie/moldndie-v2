@@ -1,133 +1,132 @@
 # How to Build an Engineering Tool (No Code)
 
-Every tool on the public **Engineering** page (`/tools`) is built from the dashboard —
-you never touch code. You define **inputs** (fields) and **results** (formulas), and the
-site renders the tool, computes results live, and tracks usage.
-
-In the dashboard these are called **Engineering Tools**. This guide uses the **Injection
-Molding Cycle Time** tool as a worked example. The fastest way to learn is to open that
-one, or start a new tool from its template.
+You never type a formula, a variable name or a conversion factor. Everything is picked from
+a list. If something is wrong, the builder says so on the card where you can fix it, and
+shows you a real number from your own tool as you go.
 
 ---
 
-## The builder at a glance
+## Starting
 
-Go to **Dashboard → Engineering Tools → New Engineering Tool**. The builder is a
-**4-step wizard** with a progress bar and **Back / Next** buttons, plus a **live preview**
-on the right that updates as you build:
+`Dashboard → Engineering Tools → New`. The first screen offers three ways to start:
 
-1. **Details** — name, description, category
-2. **Inputs** — the boxes people fill in
-3. **Formulas** — the results that get calculated
-4. **Review** — a checklist of anything left to finish, then publish
+- **A ready-made tool** — cycle time, clamp force, shrinkage, and a few simple ones.
+  Everything stays editable; this just saves you building from nothing.
+- **Start from scratch** — an empty tool.
+- **Copy an existing tool** — opens a duplicate of one you already published.
 
-You can jump between steps by clicking them, and **Save** at any time.
+Then you move through four steps: **Details → Inputs → Results → Publish**.
+
+The **live preview on the right** is your tool exactly as visitors will see it, updating as
+you type. On a narrow screen it's behind the **Preview** button.
 
 ---
 
 ## Step 1 — Details
 
-- **Title** — shown as the page heading. The **URL slug** auto-fills (e.g.
-  `/tools/injection-molding-cycle-time`).
-- **Short Description** — one line shown on cards and under the title.
-- **Full Description** — the "About This Calculator" text under the tool. Line breaks are
-  kept, so you can list formula notes here.
+- **Title** — the page heading.
+- **Short description** — one line, shown on cards and under the title.
 - **Category** — groups the tool on the public page.
+- **Images** — as many as you like. One is centred above the tool; several become a gallery.
+- **Unit switcher** *(optional)* — see [Metric and Imperial](#metric-and-imperial) below.
 
-> Starting a new tool? Use the **template picker** at the top of this step to clone a
-> ready-made example (including the full cycle-time tool) and edit from there.
+The URL address and the long "About this calculator" text are under **Advanced**.
 
 ---
 
 ## Step 2 — Inputs
 
-Click **Add Input**. Each input has a **Label** (what the user sees) and a **Key** (used
-in formulas — letters, numbers, underscores only, e.g. `wall`, `clamp_force`).
+The boxes people fill in. Click **Add input**, then give it a **Label** ("Wall Thickness"),
+pick a **Type**, and optionally a **Unit**.
 
-**Types:**
 | Type | Use for |
 |---|---|
-| **Number** | Numeric input (most common). Optional Min / Max / Step. |
-| **Slider** | A number chosen with a slider. |
-| **Dropdown** | A list of choices — including **material presets** (below). |
-| **Checkbox** | A yes/no toggle (value is `1` or `0` in formulas). |
-| **Text** | Free text (rarely used in formulas). |
+| **Number** | Most inputs. |
+| **Slider** | A number chosen by dragging. |
+| **Checkbox** | Yes/no (counts as 1 or 0 in formulas). |
+| **Text** | Free text; can't be used in a formula. |
+| **Dropdown** | Created for you by a data table — see below. |
 
-Other options: **Unit** (e.g. `mm`), **Placeholder**, **Help Text**, **Required**,
-**Default Value**, and **Group**.
+Two **ready-made** inputs are one click away: **Calculation Method** and **Safety Factor**.
+Both are optional dropdowns where each choice carries a number your formulas can use — edit
+the names and numbers however you like.
 
-**Groups (sections):** type a **Group** name (e.g. `Part & Machine`) on several inputs and
-they render together under that heading. Inputs with no group appear first.
+Placeholder, help text, sections, min/max/step and the default value are under **Advanced**.
+So is the **formula key** — the internal name your formulas use. It's created from your
+label automatically, and you should have no reason to touch it.
 
----
+### Data tables
 
-## Step 2 (special) — Material presets (dropdowns that auto-fill values)
+At the bottom of the Inputs step. A table is material properties, standard sizes, or any
+lookup values.
 
-This is how "pick a material and its thermal properties fill in automatically" works — and
-it's now fully **point-and-click, no JSON**.
+1. **Add table**, name it, and optionally give it a **Category**.
+2. **Add column** for each column — type its heading and optional unit.
+3. **Add row** and fill the cells. Cells are free text, so `0.5 - 0.7` or `see note` is fine.
 
-1. Add an input and set its type to **Dropdown**.
-2. A little table appears. Click **Add option** for each choice and type its name
-   (e.g. `ABS`).
-3. Click **Add property value** to add a column, and name it (e.g. `alpha`, `melt_temp`).
-   Fill in the number for each material.
+Tick **"Visitors pick a row from this table"** and it also becomes a dropdown input: the
+first column is the choice name, and every other numeric column becomes a value your
+formulas can use. Leave it unticked and the table is just published for reference.
 
-Now any formula can use those property names (`alpha`, `melt_temp`, …) as variables.
-Picking a material loads its row of values, and the site automatically shows a
-**reference table** of every material below the tool.
-
-> Give every property column the same name spelling, and use those exact names in your
-> formulas.
+Either way, visitors get a **search box** over every table on the page, and **category
+chips** if you used categories.
 
 ---
 
-## Step 3 — Formulas (results)
+## Step 3 — Results
 
-Click **Add Result**. Each result has a **Label**, a **Key**, a **Formula**, a **Unit**,
-and **Decimal Places**.
+Click **Add result**, give it a **Label** and a **Unit**, then build the formula.
 
-- Click the **Insert** chips under the formula box to drop an input/preset/result name in
-  without typing it.
-- A green **✓ valid** / red **⚠ error** badge shows next to each formula as you type.
+**You build formulas by clicking, not typing.** The buttons under the formula box are:
 
-**Formula syntax:**
-- Arithmetic: `+  -  *  /` and `x^y` for powers.
-- Constants: `pi`, `e`.
-- Functions: `sqrt(x)`, `pow(x, y)`, `abs(x)`, `log(x)` (natural log / **ln**),
-  `log10(x)`, `sin(x)`, `cos(x)`, `tan(x)`, `min(a, b)`, `max(a, b)`, `floor(x)`,
-  `ceil(x)`, `round(x)`.
+- **+ Input** — your inputs and table values, listed by their real names. If something
+  you need doesn't exist yet, pick **＋ New input…** and it's created for you on the spot.
+- **+ Number** — click the number afterwards to change it.
+- **+ − × ÷ ( ) ^** — the operators.
+- **+ Function** — `sqrt`, `pow`, `log`, `min`, `max`, `round`, and constants like `pi`.
 
-**Results can reference earlier results.** They compute top to bottom, so a later result
-can use an earlier one's key — that's how the total works:
+Click any piece to put the cursor after it, or double-click it to delete it.
 
-```
-t0     = 0.013 * clamp_force + 3.6
-ti     = 0.0085 * weight + 0.5
-th     = 0.6 * wall^2 + 0.3 * wall
-tc     = wall^2 / (alpha * pi^2) * log(8 / pi^2 * (melt_temp - mold_temp) / (hdt - mold_temp))
-total  = t0 + ti + th + tc
-```
+Under the formula, the builder shows **the actual result using your default values**. If it
+says something in red instead, the formula is wrong and the message says how.
+
+Results compute top to bottom, so a later result can use an earlier one — a **Total** can
+be built from the four results above it.
 
 ---
 
-## Step 4 — Review & publish
+## Metric and Imperial
 
-The Review step lists anything still missing (a label, a broken formula, …) with jump
-links. When it's clean:
+Turn on the **unit switcher** in Step 1 and every input and result gets a small box:
 
-1. Turn on **Published**.
-2. Click **Save Changes** (or **Create Engineering Tool**).
-3. Open **`/tools/your-slug`** to see it live. Results appear once all required inputs are
-   filled; changing a material updates the dependent results.
+1. Pick **what it measures** — Length, Mass, Force, Pressure, Temperature, Time…
+2. Pick the **unit for each system** from the list.
 
-Watch the **live preview** the whole time — it's the real tool, so what you see there is
-exactly what visitors get.
+That's it. **Write your formula in the base unit shown under the picker** (millimetres for
+length, for example) and both directions are converted for you — what visitors type on the
+way in, and every result on the way out. Temperature is handled properly, so 100 °C shows
+as 212 °F, not 180.
+
+If your quantity isn't in the list, choose **Something else** and enter the unit, factor and
+offset yourself: `shown = base × factor + offset`.
+
+---
+
+## Step 4 — Publish
+
+If anything is unfinished, this step says how many problems there are and which step they're
+on — the cards themselves are outlined in red with the reason. **Publishing is blocked until
+they're fixed**; saving as a draft is always allowed.
+
+Then turn on **Published** and save. **Featured** pins it to the top of the tools list.
+Sort order and SEO text are under **Advanced**.
 
 ---
 
 ## Quick checklist
-- [ ] Inputs added, each with a unique **Key**.
-- [ ] Material/preset dropdowns have matching property-column names.
-- [ ] Every result formula shows **✓ valid**.
-- [ ] Grouped inputs have a **Group** name.
-- [ ] **Published** is on and the live preview looks right.
+
+- [ ] Title and short description
+- [ ] Every input has a label
+- [ ] Every result shows a green number, not a red message
+- [ ] The live preview computes what you expect
+- [ ] Published turned on

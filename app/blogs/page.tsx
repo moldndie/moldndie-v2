@@ -5,10 +5,11 @@ import Image from "next/image"
 import { FileText, Heart, MessageSquare, Eye } from "lucide-react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
-import { getFilteredPublishedBlogs, getBlogCategories, getBlogTags, getBlogCountsMap, type BlogSort } from "@/services/blog.service"
+import { getFilteredPublishedBlogs, getBlogCategories, getUsedBlogTags, getBlogCountsMap, type BlogSort } from "@/services/blog.service"
 import { getContentViewCountsMap } from "@/services/contentViews.service"
 import { BlogPaginationBar } from "./_components/BlogPaginationBar"
 import { getFileUrl } from "@/lib/utils"
+import { docToText } from "@/lib/richtext"
 import { BlogFiltersBar } from "./_components/BlogFiltersBar"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
@@ -63,7 +64,7 @@ function BlogCard({ blog, likes, comments, views }: { blog: Blog; likes: number;
 
         {blog.introduction && (
           <p className="text-xs text-zinc-500 line-clamp-3 leading-relaxed">
-            {blog.introduction}
+            {docToText(blog.introduction)}
           </p>
         )}
 
@@ -117,7 +118,7 @@ export default async function BlogsPage({ searchParams }: BlogsPageProps) {
 
   const [categories, tags, countsMap, viewsMap] = await Promise.all([
     getBlogCategories(),
-    getBlogTags(),
+    getUsedBlogTags(),
     getBlogCountsMap(blogs.map((b) => b.id)),
     getContentViewCountsMap("blog", blogs.map((b) => b.id)),
   ])

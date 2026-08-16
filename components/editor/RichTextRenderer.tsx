@@ -11,7 +11,7 @@ import { Table } from "@tiptap/extension-table"
 import TableRow from "@tiptap/extension-table-row"
 import TableCell from "@tiptap/extension-table-cell"
 import TableHeader from "@tiptap/extension-table-header"
-import { TextStyle } from "@tiptap/extension-text-style"
+import { TextStyle, FontFamily, BackgroundColor } from "@tiptap/extension-text-style"
 import Color from "@tiptap/extension-color"
 import { toDoc, isDocEmpty } from "@/lib/richtext"
 
@@ -21,7 +21,7 @@ import { toDoc, isDocEmpty } from "@/lib/richtext"
 const extensions = [
   StarterKit.configure({ heading: { levels: [1, 2, 3, 4] }, link: false, underline: false }),
   Underline,
-  Link.configure({ HTMLAttributes: { class: "text-primary underline hover:no-underline" } }),
+  Link.configure({ HTMLAttributes: { class: "text-primary" } }),
   TextAlign.configure({ types: ["heading", "paragraph"] }),
   Image.configure({ inline: false }),
   Youtube.configure({ nocookie: true }),
@@ -30,6 +30,10 @@ const extensions = [
   TableCell,
   TableHeader,
   TextStyle,
+  // Must mirror RichTextEditor's list, or a font or highlight set in the
+  // dashboard is silently dropped when the page renders.
+  FontFamily,
+  BackgroundColor,
   Color,
 ]
 

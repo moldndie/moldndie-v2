@@ -220,7 +220,7 @@ function LockedLesson({
       )}
       <Link
         href={`/courses/${courseId}`}
-        className="text-sm text-zinc-400 hover:text-zinc-600 underline underline-offset-2 transition-colors"
+        className="text-sm text-zinc-400 hover:text-zinc-600 no-underline underline-offset-2 hover:underline transition-colors"
       >
         Back to course
       </Link>
@@ -366,6 +366,9 @@ export default function LessonViewerClient({
   }
 
   const lessonAccessible = hasFullAccess || lesson.is_free
+  // A paid lesson can still hand out its supporting material.
+  const pdfAccessible = lessonAccessible || lesson.pdf_is_free
+  const fileAccessible = lessonAccessible || lesson.file_is_free
   const prevLesson = currentIndex > 0 ? lessons[currentIndex - 1] : null
   const nextLesson = currentIndex < lessons.length - 1 ? lessons[currentIndex + 1] : null
   const prevAccessible = prevLesson ? hasFullAccess || prevLesson.is_free : false
@@ -382,6 +385,18 @@ export default function LessonViewerClient({
   const hasVideo = !!videoUrl
   const hasPdf = !!pdfUrl
   const hasFile = !!fileUrl
+
+  // What the big player area is showing — secondary downloads skip whatever
+  // is already up there, and show everything when the lesson itself is locked.
+  const primaryKind = !lessonAccessible
+    ? "locked"
+    : hasVideo
+    ? "video"
+    : hasPdf
+    ? "pdf"
+    : hasFile
+    ? "file"
+    : "none"
 
   function handleAddToCart() {
     addToCart.mutate(
@@ -438,17 +453,16 @@ export default function LessonViewerClient({
     )
   }
 
-  // Secondary downloads shown below the primary media (only when accessible)
+  // Secondary downloads shown below the primary media. Gated per slot, so a
+  // free PDF on a paid lesson still shows up under the locked player.
   function renderSecondaryMedia() {
-    if (!lessonAccessible) return null
-
     const items: { url: string; label: string }[] = []
 
-    if (hasVideo) {
-      if (hasPdf) items.push({ url: pdfUrl!, label: "Lesson PDF" })
-      if (hasFile) items.push({ url: fileUrl!, label: "Lesson File" })
-    } else if (hasPdf && hasFile) {
-      items.push({ url: fileUrl!, label: "Additional Resource" })
+    if (hasPdf && pdfAccessible && primaryKind !== "pdf") {
+      items.push({ url: pdfUrl!, label: "Lesson PDF" })
+    }
+    if (hasFile && fileAccessible && primaryKind !== "file") {
+      items.push({ url: fileUrl!, label: "Lesson File" })
     }
 
     if (items.length === 0) return null
@@ -604,7 +618,7 @@ export default function LessonViewerClient({
                   index={i}
                   courseId={courseId}
                   isCurrent={l.id === lessonId}
-                  accessible={hasFullAccess || l.is_free}
+                  accessible={hasFullAccess || l.is_free || l.pdf_is_free || l.file_is_free}
                   activeRef={
                     l.id === lessonId ? (el) => { activeItemRef.current = el } : undefined
                   }
@@ -650,7 +664,7 @@ function ErrorState({ courseId }: { courseId: string }) {
       <p className="text-zinc-700 font-semibold text-lg">Something went wrong</p>
       <Link
         href={`/courses/${courseId}`}
-        className="mt-6 text-sm text-primary underline underline-offset-2"
+        className="mt-6 text-sm text-primary no-underline underline-offset-2 hover:underline"
       >
         Back to course
       </Link>
@@ -665,7 +679,7 @@ function NotFoundState({ courseId }: { courseId: string }) {
       <p className="text-zinc-700 font-semibold text-lg">Lesson not found</p>
       <Link
         href={`/courses/${courseId}`}
-        className="mt-6 text-sm text-primary underline underline-offset-2"
+        className="mt-6 text-sm text-primary no-underline underline-offset-2 hover:underline"
       >
         Back to course
       </Link>

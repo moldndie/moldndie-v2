@@ -12,7 +12,7 @@ import TableRow from "@tiptap/extension-table-row"
 import TableCell from "@tiptap/extension-table-cell"
 import TableHeader from "@tiptap/extension-table-header"
 import Placeholder from "@tiptap/extension-placeholder"
-import { TextStyle } from "@tiptap/extension-text-style"
+import { TextStyle, FontFamily, BackgroundColor } from "@tiptap/extension-text-style"
 import Color from "@tiptap/extension-color"
 import { useEffect, useCallback, useState } from "react"
 import { cn } from "@/lib/utils"
@@ -73,6 +73,7 @@ export default function RichTextEditor({
   const [youtubeUrl, setYoutubeUrl] = useState("")
   const [showYoutubeInput, setShowYoutubeInput] = useState(false)
   const [showColorPicker, setShowColorPicker] = useState(false)
+  const [showBgPicker, setShowBgPicker] = useState(false)
 
   const editor = useEditor({
     extensions: [
@@ -82,7 +83,7 @@ export default function RichTextEditor({
         underline: false,
       }),
       Underline,
-      Link.configure({ openOnClick: false, HTMLAttributes: { class: "text-primary underline" } }),
+      Link.configure({ openOnClick: false, HTMLAttributes: { class: "text-primary" } }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
       Image.configure({ inline: false, allowBase64: false }),
       Youtube.configure({ width: 840, height: 472, nocookie: true }),
@@ -91,6 +92,8 @@ export default function RichTextEditor({
       TableCell,
       TableHeader,
       TextStyle,
+      FontFamily,
+      BackgroundColor,
       Color,
       Placeholder.configure({ placeholder }),
     ],
@@ -194,7 +197,7 @@ export default function RichTextEditor({
         <div className="relative">
           <ToolBtn
             title="Text colour"
-            onClick={() => { setShowLinkInput(false); setShowImageInput(false); setShowYoutubeInput(false); setShowColorPicker((v) => !v) }}
+            onClick={() => { setShowLinkInput(false); setShowImageInput(false); setShowYoutubeInput(false); setShowBgPicker(false); setShowColorPicker((v) => !v) }}
             active={showColorPicker}
           >
             <TextColorIcon color={(editor.getAttributes("textStyle").color as string) ?? DEFAULT_SWATCH} />
@@ -224,6 +227,67 @@ export default function RichTextEditor({
             </div>
           )}
         </div>
+
+        {/* Background colour — the callout-box styling the client asked for */}
+        <div className="relative">
+          <ToolBtn
+            title="Background colour"
+            onClick={() => { setShowLinkInput(false); setShowImageInput(false); setShowYoutubeInput(false); setShowColorPicker(false); setShowBgPicker((v) => !v) }}
+            active={showBgPicker}
+          >
+            <HighlightIcon color={(editor.getAttributes("textStyle").backgroundColor as string) ?? DEFAULT_BG} />
+          </ToolBtn>
+          {showBgPicker && (
+            <div className="absolute top-8 left-0 z-10 w-44 rounded-lg border border-zinc-200 bg-white p-2 shadow-lg">
+              <div className="grid grid-cols-6 gap-1">
+                {BG_COLORS.map(({ name, value }) => (
+                  <button
+                    key={value}
+                    type="button"
+                    title={name}
+                    aria-label={name}
+                    onClick={() => { editor.chain().focus().setBackgroundColor(value).run(); setShowBgPicker(false) }}
+                    className="size-5 rounded border border-zinc-200 transition-transform hover:scale-110"
+                    style={{ backgroundColor: value }}
+                  />
+                ))}
+              </div>
+              <button
+                type="button"
+                onClick={() => { editor.chain().focus().unsetBackgroundColor().run(); setShowBgPicker(false) }}
+                className="mt-2 w-full rounded px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100"
+              >
+                Remove background
+              </button>
+            </div>
+          )}
+        </div>
+
+        <Divider />
+
+        {/* Font family */}
+        <select
+          title="Font"
+          value={(editor.getAttributes("textStyle").fontFamily as string) ?? ""}
+          onChange={(e) => {
+            const v = e.target.value
+            if (v) editor.chain().focus().setFontFamily(v).run()
+            else editor.chain().focus().unsetFontFamily().run()
+          }}
+          className="h-7 rounded border border-zinc-200 bg-white px-1.5 text-xs text-zinc-700 focus:outline-none focus:ring-2 focus:ring-primary/30"
+        >
+          {FONT_OPTIONS.map((f) => (
+            <option key={f.label} value={f.value}>{f.label}</option>
+          ))}
+        </select>
+
+        {/* Clear formatting */}
+        <ToolBtn
+          title="Clear formatting"
+          onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}
+        >
+          <ClearFormatIcon />
+        </ToolBtn>
 
         <Divider />
 
@@ -345,7 +409,56 @@ const TEXT_COLORS = [
   { name: "White", value: "#ffffff" },
 ]
 
+// Background swatches: light tints for callout boxes plus the two brand darks,
+// so a highlight always sits inside the site palette.
+const DEFAULT_BG = "#dbeafe"
+const BG_COLORS = [
+  { name: "Blue tint", value: "#dbeafe" },
+  { name: "Amber tint", value: "#fef3c7" },
+  { name: "Green tint", value: "#dcfce7" },
+  { name: "Rose tint", value: "#ffe4e6" },
+  { name: "Violet tint", value: "#ede9fe" },
+  { name: "Zinc tint", value: "#f4f4f5" },
+  { name: "Brand maroon", value: "#6b1620" },
+  { name: "Brand dark", value: "#18181b" },
+  { name: "Slate", value: "#334155" },
+  { name: "Teal", value: "#0d9488" },
+  { name: "Amber", value: "#f59e0b" },
+  { name: "None", value: "#ffffff" },
+]
+
+// Aptos first — the client's requested font, which Windows/Office machines have.
+// Everything else falls back the same way the page font does.
+const FONT_OPTIONS = [
+  { label: "Default", value: "" },
+  { label: "Aptos", value: 'Aptos, "Segoe UI", system-ui, sans-serif' },
+  { label: "Sans", value: "system-ui, sans-serif" },
+  { label: "Serif", value: 'Georgia, "Times New Roman", serif' },
+  { label: "Mono", value: 'ui-monospace, "Courier New", monospace' },
+]
+
 // ——— Inline SVG icons ———
+function HighlightIcon({ color }: { color: string }) {
+  return (
+    <span className="flex flex-col items-center leading-none">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M12 3l7 7-8 8H6l-3-3 9-12z" />
+      </svg>
+      <span className="mt-0.5 block h-1 w-3.5 rounded-sm border border-zinc-300" style={{ backgroundColor: color }} />
+    </span>
+  )
+}
+
+function ClearFormatIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <path d="M4 7V5h13v2" />
+      <path d="M10 5l-3 14" />
+      <path d="M14 15l6 6M20 15l-6 6" />
+    </svg>
+  )
+}
+
 function TextColorIcon({ color }: { color: string }) {
   return (
     <svg viewBox="0 0 16 16" className="size-3.5" fill="none">

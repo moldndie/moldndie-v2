@@ -8,6 +8,8 @@ import type {
   CalcCategory,
   CalcField,
   CalcOutput,
+  CalcReferenceTable,
+  UnitSystem,
 } from "@/types/calculator"
 
 function dbErr(e: unknown): Error {
@@ -137,15 +139,17 @@ export async function getCalculatorBySlug(slug: string): Promise<CalculatorWithR
     .single()
   if (error || !calc) return null
 
-  const [{ data: fields }, { data: outputs }] = await Promise.all([
+  const [{ data: fields }, { data: outputs }, { data: tables }] = await Promise.all([
     createAdminClient().from("calculator_fields").select("*").eq("calculator_id", calc.id).order("sort_order"),
     createAdminClient().from("calculator_outputs").select("*").eq("calculator_id", calc.id).order("sort_order"),
+    createAdminClient().from("calculator_reference_tables").select("*").eq("calculator_id", calc.id).order("sort_order"),
   ])
 
   return {
     ...(calc as Calculator & { category: CalcCategory | null }),
     fields: (fields ?? []) as CalcField[],
     outputs: (outputs ?? []) as CalcOutput[],
+    referenceTables: (tables ?? []) as CalcReferenceTable[],
   }
 }
 
@@ -157,15 +161,17 @@ export async function getCalculatorById(id: string): Promise<CalculatorWithRelat
     .single()
   if (error || !calc) return null
 
-  const [{ data: fields }, { data: outputs }] = await Promise.all([
+  const [{ data: fields }, { data: outputs }, { data: tables }] = await Promise.all([
     createAdminClient().from("calculator_fields").select("*").eq("calculator_id", id).order("sort_order"),
     createAdminClient().from("calculator_outputs").select("*").eq("calculator_id", id).order("sort_order"),
+    createAdminClient().from("calculator_reference_tables").select("*").eq("calculator_id", id).order("sort_order"),
   ])
 
   return {
     ...(calc as Calculator & { category: CalcCategory | null }),
     fields: (fields ?? []) as CalcField[],
     outputs: (outputs ?? []) as CalcOutput[],
+    referenceTables: (tables ?? []) as CalcReferenceTable[],
   }
 }
 
@@ -179,6 +185,8 @@ type CalcPayload = {
   category_id?: string | null
   icon?: string | null
   cover_image?: string | null
+  images?: string[]
+  unit_systems?: UnitSystem[] | null
   is_featured?: boolean
   is_published?: boolean
   sort_order?: number
@@ -232,7 +240,7 @@ export async function duplicateCalculator(id: string): Promise<Calculator> {
   const calc = await getCalculatorById(id)
   if (!calc) throw new Error("Calculator not found")
 
-  const { id: _id, created_at: _ca, updated_at: _ua, views_count: _vc, category, fields, outputs, ...rest } = calc
+  const { id: _id, created_at: _ca, updated_at: _ua, views_count: _vc, category, fields, outputs, referenceTables, ...rest } = calc
   const newSlug = `${calc.slug}-copy-${Date.now().toString(36)}`
 
   const { data: newCalc, error } = await createAdminClient()
@@ -253,6 +261,12 @@ export async function duplicateCalculator(id: string): Promise<Calculator> {
       ...o, calculator_id: newCalc.id,
     }))
     await createAdminClient().from("calculator_outputs").insert(newOutputs)
+  }
+  if (referenceTables.length > 0) {
+    const newTables = referenceTables.map(({ id: _tid, calculator_id: _cid, created_at: _tca, ...t }) => ({
+      ...t, calculator_id: newCalc.id,
+    }))
+    await createAdminClient().from("calculator_reference_tables").insert(newTables)
   }
 
   revalidatePath("/dashboard/calculators")
@@ -282,12 +296,27 @@ export async function saveCalculatorOutputs(calculatorId: string, outputs: Outpu
   if (error) throw dbErr(error)
 }
 
+type ReferenceTableInput = Omit<CalcReferenceTable, "id" | "calculator_id" | "created_at">
+
+export async function saveCalculatorReferenceTables(
+  calculatorId: string,
+  tables: ReferenceTableInput[],
+): Promise<void> {
+  const admin = createAdminClient()
+  await admin.from("calculator_reference_tables").delete().eq("calculator_id", calculatorId)
+  if (tables.length === 0) return
+  const rows = tables.map((t, i) => ({ ...t, calculator_id: calculatorId, sort_order: i + 1 }))
+  const { error } = await admin.from("calculator_reference_tables").insert(rows)
+  if (error) throw dbErr(error)
+}
+
 // ── Full calculator save (basic + fields + outputs in one action) ──────────────
 
 export type FullSavePayload = {
   basic: CalcPayload & { id?: string }
   fields: FieldInput[]
   outputs: OutputInput[]
+  referenceTables: ReferenceTableInput[]
 }
 
 export async function saveFullCalculator(payload: FullSavePayload): Promise<Calculator> {
@@ -304,6 +333,7 @@ export async function saveFullCalculator(payload: FullSavePayload): Promise<Calc
   await Promise.all([
     saveCalculatorFields(calc.id, payload.fields),
     saveCalculatorOutputs(calc.id, payload.outputs),
+    saveCalculatorReferenceTables(calc.id, payload.referenceTables),
   ])
 
   revalidatePath("/tools")

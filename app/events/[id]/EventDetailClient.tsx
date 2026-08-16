@@ -67,7 +67,7 @@ function ErrorState() {
       </p>
       <Link
         href="/events"
-        className="mt-6 text-sm text-primary underline underline-offset-2 hover:opacity-70 transition-opacity"
+        className="mt-6 text-sm text-primary no-underline underline-offset-2 hover:underline hover:opacity-70 transition-opacity"
       >
         Back to Events
       </Link>
@@ -86,7 +86,7 @@ function NotFoundState() {
       </p>
       <Link
         href="/events"
-        className="mt-6 text-sm text-primary underline underline-offset-2 hover:opacity-70 transition-opacity"
+        className="mt-6 text-sm text-primary no-underline underline-offset-2 hover:underline hover:opacity-70 transition-opacity"
       >
         Back to Events
       </Link>

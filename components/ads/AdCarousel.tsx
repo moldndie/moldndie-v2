@@ -8,7 +8,12 @@ import { useCarousel } from "@/hooks/useCarousel"
 import { AdViewTracker } from "./AdViewTracker"
 import type { Ad } from "@/types"
 
-const AUTOPLAY_MS = 5000
+const AUTOPLAY_MS = 8000
+
+/** Circular arrow pinned to the vertical middle of the card row, half outside it. */
+const ARROW_CLASS =
+  "ui-pill absolute top-1/2 z-10 hidden -translate-y-1/2 size-9 items-center justify-center " +
+  "rounded-full border shadow-sm sm:flex"
 
 /**
  * Ads advance on their own timer and are otherwise independent of the page they
@@ -58,60 +63,63 @@ export function AdCarousel({ ads, className }: { ads: Ad[]; className?: string }
 
   return (
     <div className={className}>
-      <div className="mb-3 flex items-center justify-between">
-        <p className="select-none text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
-          Sponsored
-        </p>
+      <p className="mb-3 select-none text-[10px] font-semibold uppercase tracking-widest text-zinc-400">
+        Sponsored
+      </p>
+
+      {/* Arrows flank the track rather than sitting in the header, matching the
+          homepage hero. `relative` here is what they anchor to. */}
+      <div className="relative">
         {hasPager && (
-          <div className="flex items-center gap-1.5">
+          <>
             <button
               type="button"
               onClick={prev}
               aria-label="Previous ads"
-              className="flex size-7 items-center justify-center rounded-full border border-zinc-200 text-zinc-500 transition-colors hover:border-zinc-300 hover:text-zinc-800"
+              className={ARROW_CLASS + " left-0 -translate-x-1/2"}
             >
-              <ChevronLeft className="size-4" />
+              <ChevronLeft className="size-5" />
             </button>
             <button
               type="button"
               onClick={next}
               aria-label="Next ads"
-              className="flex size-7 items-center justify-center rounded-full border border-zinc-200 text-zinc-500 transition-colors hover:border-zinc-300 hover:text-zinc-800"
+              className={ARROW_CLASS + " right-0 translate-x-1/2"}
             >
-              <ChevronRight className="size-4" />
+              <ChevronRight className="size-5" />
             </button>
-          </div>
+          </>
         )}
-      </div>
 
-      <div
-        ref={trackRef}
-        className="scrollbar-hide -mx-1 flex gap-4 overflow-x-auto px-1 pb-1"
-      >
-        {ads.map((ad) => (
-          <AdViewTracker
-            key={ad.id}
-            adId={ad.id}
-            href={ad.link}
-            aria-label={ad.title}
-            className="group block shrink-0 rounded-2xl border border-zinc-100 bg-white p-3 transition-all duration-200 hover:scale-[1.015] hover:border-zinc-200 hover:shadow-lg w-[85vw] sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)]"
-          >
-            <div className="relative aspect-video w-full overflow-hidden rounded-xl">
-              <Image
-                src={getFileUrl(ad.image_path)}
-                alt={ad.title}
-                fill
-                className="object-contain transition-transform duration-300 group-hover:scale-105"
-                sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 33vw"
-              />
-            </div>
-            {ad.title && (
-              <p className="mt-2.5 line-clamp-1 text-xs font-medium text-zinc-500 transition-colors group-hover:text-zinc-700">
-                {ad.title}
-              </p>
-            )}
-          </AdViewTracker>
-        ))}
+        <div
+          ref={trackRef}
+          className="scrollbar-hide -mx-1 flex gap-4 overflow-x-auto px-1 pb-1"
+        >
+          {ads.map((ad) => (
+            <AdViewTracker
+              key={ad.id}
+              adId={ad.id}
+              href={ad.link}
+              aria-label={ad.title}
+              className="group block shrink-0 rounded-2xl border border-zinc-100 bg-white p-3 transition-all duration-200 hover:scale-[1.015] hover:border-zinc-200 hover:shadow-lg w-[85vw] sm:w-[calc(50%-0.5rem)] lg:w-[calc(33.333%-0.667rem)]"
+            >
+              <div className="relative aspect-video w-full overflow-hidden rounded-xl">
+                <Image
+                  src={getFileUrl(ad.image_path)}
+                  alt={ad.title}
+                  fill
+                  className="object-contain transition-transform duration-300 group-hover:scale-105"
+                  sizes="(max-width: 640px) 85vw, (max-width: 1024px) 50vw, 33vw"
+                />
+              </div>
+              {ad.title && (
+                <p className="mt-2.5 line-clamp-1 text-xs font-medium text-zinc-500 transition-colors group-hover:text-zinc-700">
+                  {ad.title}
+                </p>
+              )}
+            </AdViewTracker>
+          ))}
+        </div>
       </div>
 
       {/* Dots — same treatment as the homepage hero, tinted for a light background */}

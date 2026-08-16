@@ -406,7 +406,7 @@ export default function SuppliersListingClient() {
           {hasActiveFilters && (
             <button
               onClick={clearAll}
-              className="mt-4 text-sm text-primary underline underline-offset-2 hover:opacity-70"
+              className="mt-4 text-sm text-primary no-underline underline-offset-2 hover:underline hover:opacity-70"
             >
               Clear all filters
             </button>

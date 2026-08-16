@@ -257,7 +257,7 @@ export default function ServicesContent({
                 </p>
                 <button
                   onClick={() => setSuccess(false)}
-                  className="text-sm text-primary font-semibold underline underline-offset-2 hover:opacity-80 transition-opacity"
+                  className="text-sm text-primary font-semibold no-underline underline-offset-2 hover:underline hover:opacity-80 transition-opacity"
                 >
                   Submit another request
                 </button>

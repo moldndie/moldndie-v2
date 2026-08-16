@@ -41,6 +41,9 @@ export function BlogFiltersBar({
       if (value) params.set(key, value)
       else params.delete(key)
     }
+    // Any filter change means a new result set — staying on page 3 of the old
+    // one showed "N blogs found" above an empty grid.
+    params.delete("page")
     const qs = params.toString()
     startTransition(() => {
       router.replace(qs ? `${pathname}?${qs}` : pathname)
@@ -131,11 +134,8 @@ export function BlogFiltersBar({
               <button
                 key={tag.id}
                 onClick={() => toggleTag(tag.id)}
-                className={`h-7 rounded-full border px-3 text-xs font-medium transition-colors whitespace-nowrap ${
-                  active
-                    ? "border-primary bg-primary text-white"
-                    : "border-input bg-background text-zinc-600 hover:border-zinc-400"
-                }`}
+                aria-pressed={active}
+                className="ui-pill h-7 rounded-full border px-3 text-xs font-medium whitespace-nowrap"
               >
                 {tag.name}
               </button>

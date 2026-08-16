@@ -103,7 +103,7 @@ export default async function ServiceDetailPage({ params }: Props) {
           </div>
         </div>
 
-        <PortfolioSection items={portfolio} heading="Previous Work" />
+        <PortfolioSection items={portfolio} heading="Examples" />
 
         <div className="max-w-7xl mx-auto px-6 pb-12">
           <hr className="border-zinc-100 mb-8" />

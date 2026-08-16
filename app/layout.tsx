@@ -4,8 +4,11 @@ import "./globals.css";
 import { Providers } from "./providers";
 import { Analytics } from "@vercel/analytics/next"
 
+// The fallback behind Aptos — see --font-sans in globals.css. Aptos itself is
+// Microsoft-proprietary and can't be self-hosted, so it is named in the stack
+// and picked up from the reader's machine when they have it.
 const funnelDisplay = Funnel_Display({
-  variable: "--font-sans",
+  variable: "--font-funnel",
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
 });

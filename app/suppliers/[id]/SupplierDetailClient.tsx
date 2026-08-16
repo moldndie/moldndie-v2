@@ -50,7 +50,7 @@ function ErrorState() {
       <p className="text-zinc-400 text-sm mt-1">We couldn't load this supplier. Please try again.</p>
       <Link
         href="/suppliers"
-        className="mt-6 text-sm text-primary underline underline-offset-2 hover:opacity-70 transition-opacity"
+        className="mt-6 text-sm text-primary no-underline underline-offset-2 hover:underline hover:opacity-70 transition-opacity"
       >
         Back to Suppliers
       </Link>
@@ -67,7 +67,7 @@ function NotFoundState() {
       <p className="text-zinc-400 text-sm mt-1">This supplier may have been removed or doesn't exist.</p>
       <Link
         href="/suppliers"
-        className="mt-6 text-sm text-primary underline underline-offset-2 hover:opacity-70 transition-opacity"
+        className="mt-6 text-sm text-primary no-underline underline-offset-2 hover:underline hover:opacity-70 transition-opacity"
       >
         Back to Suppliers
       </Link>

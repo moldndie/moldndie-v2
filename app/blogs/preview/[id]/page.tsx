@@ -7,6 +7,8 @@ import { getBlogPreview, getRelatedBlogs, getBlogLikeData, getBlogComments } fro
 import { getCurrentUser, isAdmin } from "@/services/auth.service"
 import { BlockRenderer } from "@/modules/blog/components/BlockRenderer"
 import { getFileUrl } from "@/lib/utils"
+import { docToText } from "@/lib/richtext"
+import RichTextRenderer from "@/components/editor/RichTextRenderer"
 import { LikeButton } from "@/app/blogs/_components/LikeButton"
 import { CommentsSection } from "@/app/blogs/_components/CommentsSection"
 import { createClient } from "@/lib/supabase/server"
@@ -53,7 +55,7 @@ function RelatedBlogCard({ blog }: { blog: Blog }) {
         </p>
         {blog.introduction && (
           <p className="text-xs text-zinc-500 line-clamp-2 leading-relaxed">
-            {blog.introduction}
+            {docToText(blog.introduction)}
           </p>
         )}
       </div>
@@ -138,9 +140,10 @@ export default async function BlogPreviewPage({ params }: Props) {
           </h1>
 
           {blog.introduction && (
-            <p className="mt-4 text-lg text-zinc-500 leading-relaxed">
-              {blog.introduction}
-            </p>
+            <RichTextRenderer
+              content={blog.introduction}
+              className="mt-4 text-lg text-zinc-500 leading-relaxed"
+            />
           )}
 
           {blogTags.length > 0 && (
@@ -161,7 +164,7 @@ export default async function BlogPreviewPage({ params }: Props) {
         {/* ── Cover image ── */}
         {blog.cover_image_path && (
           <div className="w-fullpx-4 sm:px-6 mt-8">
-            <div className="rounded-2xl overflow-hidden shadow-sm bg-zinc-50">
+            <div className="overflow-hidden bg-white">
               <Image
                 src={getFileUrl(blog.cover_image_path)}
                 alt={blog.title}
