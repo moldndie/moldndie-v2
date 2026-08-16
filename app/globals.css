@@ -434,6 +434,24 @@
   outline-offset: 2px;
 }
 
+/* ─── Calculator card palette ─────────────────────────────────
+   The tool sits as one dark card on a white page. The dark is a deep tint of
+   the brand maroon (same hue 22 as --primary), never neutral black, so the
+   card reads as ours rather than as a generic dark mode.
+
+   The accent is a *light* tint of the same hue — brand maroon on a dark maroon
+   surface has almost no contrast, so the readable version is lifted instead. */
+:root {
+  --calc-surface: oklch(0.19 0.045 22);
+  --calc-surface-2: oklch(0.245 0.05 22);
+  --calc-surface-3: oklch(0.30 0.055 22);
+  --calc-border: oklch(1 0 0 / 0.14);
+  --calc-border-strong: oklch(1 0 0 / 0.24);
+  --calc-accent: oklch(0.78 0.13 22);
+  --calc-text: oklch(0.97 0.006 22);
+  --calc-muted: oklch(0.76 0.02 22);
+}
+
 /* ─── Rich text on a dark surface ─────────────────────────────
    The CMS styles hard-code near-black text, which disappears on the dark
    tool pages. Same markup, inverted palette. */

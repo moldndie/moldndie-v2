@@ -168,7 +168,7 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
             <h2 className={cn("text-base font-bold", HEADING(dark))}>Inputs</h2>
             <button
               onClick={reset}
-              className="flex items-center gap-1.5 text-xs text-zinc-400 hover:text-zinc-700 transition-colors"
+              className={cn("flex items-center gap-1.5 text-xs transition-colors", dark ? "text-[var(--calc-muted)] hover:text-[var(--calc-text)]" : "text-zinc-400 hover:text-zinc-700")}
             >
               <RotateCcw className="size-3.5" /> Reset
             </button>
@@ -176,8 +176,8 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
 
           {unitSystems.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-medium text-zinc-500">Unit system</span>
-              <div className={cn("flex rounded-lg border p-0.5", dark ? "border-white/15" : "border-zinc-200")}>
+              <span className={cn("text-xs font-semibold uppercase tracking-widest", MUTED_TEXT(dark))}>Unit system</span>
+              <div className={cn("flex rounded-lg border p-0.5", dark ? "border-[var(--calc-border)]" : "border-zinc-200")}>
                 {unitSystems.map((u) => (
                   <button
                     key={u.key}
@@ -187,7 +187,7 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
                       "rounded-md px-3 py-1.5 text-xs font-semibold transition-colors",
                       system === u.key
                         ? "bg-primary text-white"
-                        : dark ? "text-zinc-400 hover:text-zinc-100" : "text-zinc-500 hover:text-zinc-800",
+                        : dark ? "text-[var(--calc-muted)] hover:text-[var(--calc-text)]" : "text-zinc-500 hover:text-zinc-800",
                     )}
                   >
                     {u.label}
@@ -198,12 +198,12 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
           )}
 
           {calculator.fields.length === 0 ? (
-            <p className="text-sm text-zinc-400">This calculator has no input fields.</p>
+            <p className={cn("text-sm", MUTED_TEXT(dark))}>This calculator has no input fields.</p>
           ) : (
             groups.map((group) => (
               <div key={group.name || "_ungrouped"} className="space-y-5">
                 {group.name && (
-                  <p className="text-xs font-bold uppercase tracking-wide text-zinc-400 pt-1">{group.name}</p>
+                  <p className={cn("text-xs font-bold uppercase tracking-widest pt-1", MUTED_TEXT(dark))}>{group.name}</p>
                 )}
                 {group.fields.map((field) => (
                   <FieldInput
@@ -222,20 +222,20 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
         {/* ── Right: Results ───────────────────────────────────────────────────── */}
         <div className={cn(CARD(dark), "space-y-5")}>
           <div className="flex items-center gap-2">
-            <Zap className={cn("size-4", dark ? "text-primary-foreground/70" : "text-primary")} />
+            <Zap className={cn("size-4", dark ? "text-[var(--calc-accent)]" : "text-primary")} />
             <h2 className={cn("text-base font-bold", HEADING(dark))}>Results</h2>
           </div>
 
           {!allFilled ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
-              <div className="size-12 rounded-full bg-zinc-100 flex items-center justify-center mb-3">
-                <Zap className="size-5 text-zinc-300" />
+              <div className={cn("size-12 rounded-full flex items-center justify-center mb-3", dark ? "bg-[var(--calc-surface-3)]" : "bg-zinc-100")}>
+                <Zap className={cn("size-5", dark ? "text-[var(--calc-muted)]" : "text-zinc-300")} />
               </div>
-              <p className="text-sm font-medium text-zinc-400">Fill in all required fields</p>
-              <p className="text-xs text-zinc-300 mt-1">Results will appear automatically</p>
+              <p className={cn("text-sm font-medium", MUTED_TEXT(dark))}>Fill in all required fields</p>
+              <p className={cn("text-xs mt-1", dark ? "text-[var(--calc-muted)] opacity-70" : "text-zinc-300")}>Results will appear automatically</p>
             </div>
           ) : calculator.outputs.length === 0 ? (
-            <p className="text-sm text-zinc-400">No outputs defined for this calculator.</p>
+            <p className={cn("text-sm", MUTED_TEXT(dark))}>No outputs defined for this calculator.</p>
           ) : (
             <div className="space-y-4">
               {results?.map(({ output, result }) => {
@@ -245,24 +245,24 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
                   "rounded-xl p-4 border",
                   "error" in result
                     ? dark ? "border-red-500/40 bg-red-500/10" : "border-red-200 bg-red-50"
-                    : dark ? "border-white/15 bg-white/[0.06]" : "border-primary/20 bg-primary/5"
+                    : dark ? "border-[var(--calc-border)] bg-[var(--calc-surface-3)]" : "border-primary/20 bg-primary/5"
                 )}>
                   <div className="flex items-start justify-between gap-2">
                     <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">{output.label}</p>
+                      <p className={cn("text-xs font-semibold uppercase tracking-widest", dark ? "text-[var(--calc-muted)]" : "text-zinc-500")}>{output.label}</p>
                       {"error" in result ? (
                         <div className="flex items-center gap-1.5 mt-1 text-red-600">
                           <AlertCircle className="size-4 shrink-0" />
                           <p className="text-sm">{result.error}</p>
                         </div>
                       ) : (
-                        <p className={cn("text-3xl font-black mt-1 leading-none", dark ? "text-white" : "text-zinc-900")}>
+                        <p className={cn("text-4xl font-black mt-1 leading-none tracking-tight", dark ? "text-[var(--calc-accent)]" : "text-zinc-900")}>
                           {fromBase(result.value, ou).toFixed(output.decimals)}
-                          {ou.unit && <span className="text-base font-medium text-zinc-500 ml-2">{ou.unit}</span>}
+                          {ou.unit && <span className={cn("text-base font-medium ml-2", dark ? "text-[var(--calc-muted)]" : "text-zinc-500")}>{ou.unit}</span>}
                         </p>
                       )}
                       {output.description && (
-                        <p className="text-xs text-zinc-400 mt-1.5">{output.description}</p>
+                        <p className={cn("text-xs mt-1.5", MUTED_TEXT(dark))}>{output.description}</p>
                       )}
                     </div>
                   </div>
@@ -281,9 +281,14 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
 }
 
 /** Card, heading and muted-text treatments for the two themes. */
+/* On dark the runner sits inside one maroon card, so its panels are inset
+   surfaces rather than free-floating white cards. --calc-* tokens: globals.css */
 const CARD = (dark: boolean) =>
-  dark ? "rounded-2xl border border-white/10 bg-white/[0.04] p-6" : "rounded-2xl border border-zinc-200 bg-white p-6"
-const HEADING = (dark: boolean) => (dark ? "text-zinc-50" : "text-zinc-900")
+  dark
+    ? "rounded-2xl border border-[var(--calc-border)] bg-[var(--calc-surface-2)] p-6"
+    : "rounded-2xl border border-zinc-200 bg-white p-6"
+const HEADING = (dark: boolean) => (dark ? "text-[var(--calc-text)]" : "text-zinc-900")
+const MUTED_TEXT = (dark: boolean) => (dark ? "text-[var(--calc-muted)]" : "text-zinc-400")
 
 // ── Reference tables ───────────────────────────────────────────────────────────
 // One renderer for both sources — preset dropdowns and standalone tables. Search
@@ -328,7 +333,7 @@ function ReferenceTables({ tables }: { tables: NormalizedTable[] }) {
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-3">
         <div className="relative min-w-56 flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-400" />
+          <Search className={cn("pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2", MUTED_TEXT(dark))} />
           <input
             type="search"
             value={query}
@@ -336,7 +341,9 @@ function ReferenceTables({ tables }: { tables: NormalizedTable[] }) {
             placeholder="Search reference values…"
             className={cn(
               "w-full rounded-lg border py-2.5 pl-9 pr-3 text-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30",
-              dark ? "border-white/15 bg-white/5 text-zinc-100 placeholder:text-zinc-500" : "border-zinc-200",
+              dark
+                ? "border-[var(--calc-border)] bg-[var(--calc-surface)] text-[var(--calc-text)] placeholder:text-[var(--calc-muted)]"
+                : "border-zinc-200",
             )}
           />
         </div>
@@ -354,7 +361,7 @@ function ReferenceTables({ tables }: { tables: NormalizedTable[] }) {
       </div>
 
       {visible.length === 0 ? (
-        <p className={cn(CARD(dark), "text-sm text-zinc-400")}>
+        <p className={cn(CARD(dark), "text-sm", MUTED_TEXT(dark))}>
           No reference values match “{query}”.
         </p>
       ) : (
@@ -382,10 +389,10 @@ function ReferenceTable({ table }: { table: NormalizedTable }) {
   return (
     <div className={CARD(dark)}>
       <div className="mb-4 flex flex-wrap items-center gap-2">
-        <Table2 className="size-4 text-primary" />
+        <Table2 className={cn("size-4", dark ? "text-[var(--calc-accent)]" : "text-primary")} />
         <h2 className={cn("text-base font-bold", HEADING(dark))}>{table.title}</h2>
         {table.category && (
-          <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide", dark ? "bg-white/10 text-zinc-300" : "bg-zinc-100 text-zinc-500")}>
+          <span className={cn("rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide", dark ? "bg-[var(--calc-surface-3)] text-[var(--calc-muted)]" : "bg-zinc-100 text-zinc-500")}>
             {table.category}
           </span>
         )}
@@ -393,20 +400,20 @@ function ReferenceTable({ table }: { table: NormalizedTable }) {
       <div className="overflow-x-auto">
         <table className="w-full border-collapse text-sm">
           <thead>
-            <tr className={cn("border-b text-left", dark ? "border-white/15" : "border-zinc-200")}>
+            <tr className={cn("border-b text-left", dark ? "border-[var(--calc-border-strong)]" : "border-zinc-200")}>
               {table.columns.map((c) => (
-                <th key={c.key} className={cn("whitespace-nowrap px-4 py-2 font-semibold first:pl-0", dark ? "text-zinc-200" : "text-zinc-700")}>
+                <th key={c.key} className={cn("whitespace-nowrap px-4 py-2 font-semibold first:pl-0", dark ? "text-[var(--calc-text)]" : "text-zinc-700")}>
                   {c.label}
-                  {c.unit && <span className="ml-1 text-xs font-normal text-zinc-400">({c.unit})</span>}
+                  {c.unit && <span className={cn("ml-1 text-xs font-normal", MUTED_TEXT(dark))}>({c.unit})</span>}
                 </th>
               ))}
             </tr>
           </thead>
           <tbody>
             {table.rows.map((row, i) => (
-              <tr key={i} className={cn("border-b last:border-0", dark ? "border-white/10" : "border-zinc-100")}>
+              <tr key={i} className={cn("border-b last:border-0", dark ? "border-[var(--calc-border)]" : "border-zinc-100")}>
                 {table.columns.map((c) => (
-                  <td key={c.key} className={cn("px-4 py-2 tabular-nums first:pl-0 first:font-medium", dark ? "text-zinc-300 first:text-white" : "text-zinc-600 first:text-zinc-900")}>
+                  <td key={c.key} className={cn("px-4 py-2 tabular-nums first:pl-0 first:font-medium", dark ? "text-[var(--calc-muted)] first:text-[var(--calc-text)]" : "text-zinc-600 first:text-zinc-900")}>
                     {row[c.key] ?? "—"}
                   </td>
                 ))}
@@ -425,20 +432,22 @@ function FieldInput({ field, system, value, onChange }: { field: CalcField; syst
   const dark = useDark()
   const baseClass = cn(
     "w-full rounded-lg border px-3 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary",
-    dark ? "border-white/15 bg-white/5 text-zinc-100 placeholder:text-zinc-500" : "border-zinc-200",
+    dark
+      ? "border-[var(--calc-border)] bg-[var(--calc-surface)] text-[var(--calc-text)] placeholder:text-[var(--calc-muted)]"
+      : "border-zinc-200",
   )
   const { unit } = unitFor(field.units, system, field.unit)
 
   return (
     <div className="space-y-1.5">
-      <label className={cn("block text-sm font-medium", dark ? "text-zinc-200" : "text-zinc-800")}>
+      <label className={cn("block text-xs font-semibold uppercase tracking-widest", dark ? "text-[var(--calc-muted)]" : "text-zinc-800")}>
         {field.label}
-        {unit && <span className="ml-1 text-xs text-zinc-400">({unit})</span>}
+        {unit && <span className={cn("ml-1 text-xs", MUTED_TEXT(dark))}>({unit})</span>}
         {field.is_required && <span className="ml-0.5 text-red-500">*</span>}
       </label>
 
       {field.field_type === "select" && field.options ? (
-        <select value={value} onChange={(e) => onChange(e.target.value)} className={cn(baseClass, dark ? "bg-zinc-900" : "bg-white")}>
+        <select value={value} onChange={(e) => onChange(e.target.value)} className={cn(baseClass, !dark && "bg-white")}>
           <option value="">— Select —</option>
           {field.options.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -452,7 +461,7 @@ function FieldInput({ field, system, value, onChange }: { field: CalcField; syst
             onChange={(e) => onChange(e.target.checked ? "1" : "0")}
             className="rounded"
           />
-          <span className={cn("text-sm", dark ? "text-zinc-300" : "text-zinc-700")}>{field.placeholder || "Yes"}</span>
+          <span className={cn("text-sm", dark ? "text-[var(--calc-text)]" : "text-zinc-700")}>{field.placeholder || "Yes"}</span>
         </label>
       ) : field.field_type === "range" ? (
         <div className="space-y-1">
@@ -465,9 +474,9 @@ function FieldInput({ field, system, value, onChange }: { field: CalcField; syst
             onChange={(e) => onChange(e.target.value)}
             className="w-full accent-primary"
           />
-          <div className="flex justify-between text-xs text-zinc-400">
+          <div className={cn("flex justify-between text-xs", MUTED_TEXT(dark))}>
             <span>{field.min_value ?? 0}</span>
-            <span className={cn("font-semibold", dark ? "text-zinc-200" : "text-zinc-700")}>{value || (field.min_value ?? 0)}{unit ? ` ${unit}` : ""}</span>
+            <span className={cn("font-semibold", dark ? "text-[var(--calc-accent)]" : "text-zinc-700")}>{value || (field.min_value ?? 0)}{unit ? ` ${unit}` : ""}</span>
             <span>{field.max_value ?? 100}</span>
           </div>
         </div>
@@ -485,7 +494,7 @@ function FieldInput({ field, system, value, onChange }: { field: CalcField; syst
       )}
 
       {field.help_text && (
-        <p className="text-xs text-zinc-400">{field.help_text}</p>
+        <p className={cn("text-xs", MUTED_TEXT(dark))}>{field.help_text}</p>
       )}
     </div>
   )
