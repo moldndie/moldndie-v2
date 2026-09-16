@@ -590,7 +590,7 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
             <button
               onClick={handleSave}
               disabled={isPending}
-              className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
             >
               <Check className="size-4" />
               {isPending ? "Saving…" : calculator ? "Save changes" : "Create tool"}

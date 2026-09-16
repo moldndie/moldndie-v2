@@ -186,7 +186,7 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
                     className={cn(
                       "rounded-md px-3 py-1.5 text-xs font-semibold transition-colors",
                       system === u.key
-                        ? "bg-primary text-white"
+                        ? dark ? "bg-white text-primary" : "bg-primary text-white"
                         : dark ? "text-[var(--calc-muted)] hover:text-[var(--calc-text)]" : "text-zinc-500 hover:text-zinc-800",
                     )}
                   >
@@ -281,8 +281,8 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
 }
 
 /** Card, heading and muted-text treatments for the two themes. */
-/* On dark the runner sits inside one maroon card, so its panels are inset
-   surfaces rather than free-floating white cards. --calc-* tokens: globals.css */
+/* On dark the panels are footer-maroon surfaces inside one white card.
+   --calc-* tokens: globals.css */
 const CARD = (dark: boolean) =>
   dark
     ? "rounded-2xl border border-[var(--calc-border)] bg-[var(--calc-surface-2)] p-6"
@@ -397,9 +397,10 @@ function ReferenceTable({ table }: { table: NormalizedTable }) {
           </span>
         )}
       </div>
-      <div className="overflow-x-auto">
+      {/* Long tables scroll inside their card, like the moldminds reference the client sent. */}
+      <div className="max-h-96 overflow-auto">
         <table className="w-full border-collapse text-sm">
-          <thead>
+          <thead className={cn("sticky top-0", dark ? "bg-[var(--calc-surface-2)]" : "bg-white")}>
             <tr className={cn("border-b text-left", dark ? "border-[var(--calc-border-strong)]" : "border-zinc-200")}>
               {table.columns.map((c) => (
                 <th key={c.key} className={cn("whitespace-nowrap px-4 py-2 font-semibold first:pl-0", dark ? "text-[var(--calc-text)]" : "text-zinc-700")}>

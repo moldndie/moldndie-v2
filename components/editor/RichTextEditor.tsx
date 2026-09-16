@@ -427,12 +427,11 @@ const BG_COLORS = [
   { name: "None", value: "#ffffff" },
 ]
 
-// Aptos first — the client's requested font, which Windows/Office machines have.
-// Everything else falls back the same way the page font does.
+// "" = the site font (Aptos, or its Inter stand-in — see app/layout.tsx). A
+// separate "Default" entry rendered identically to "Aptos" and read as broken.
 const FONT_OPTIONS = [
-  { label: "Default", value: "" },
-  { label: "Aptos", value: 'Aptos, "Segoe UI", system-ui, sans-serif' },
-  { label: "Sans", value: "system-ui, sans-serif" },
+  { label: "Aptos", value: "" },
+  { label: "System", value: "system-ui, sans-serif" },
   { label: "Serif", value: 'Georgia, "Times New Roman", serif' },
   { label: "Mono", value: 'ui-monospace, "Courier New", monospace' },
 ]

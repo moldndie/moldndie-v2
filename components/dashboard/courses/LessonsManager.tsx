@@ -67,7 +67,7 @@ function FreeSwitch({
         onClick={() => onChange(!checked)}
         className={cn(
           "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500",
-          checked ? "bg-zinc-900" : "bg-zinc-200"
+          checked ? "bg-primary" : "bg-zinc-200"
         )}
       >
         <span

@@ -75,7 +75,7 @@ export default async function CmsPagesPage() {
                   <td className="px-5 py-4 text-right">
                     <Link
                       href={`/dashboard/cms-pages/${page.id}`}
-                      className="inline-flex items-center gap-1.5 rounded-lg bg-zinc-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-zinc-700 transition-colors"
+                      className="inline-flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1.5 text-xs font-medium text-white hover:bg-primary/90 transition-colors"
                     >
                       <Pencil className="size-3" />
                       Edit

@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Funnel_Display, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Analytics } from "@vercel/analytics/next"
 
-// The fallback behind Aptos — see --font-sans in globals.css. Aptos itself is
-// Microsoft-proprietary and can't be self-hosted, so it is named in the stack
-// and picked up from the reader's machine when they have it.
-const funnelDisplay = Funnel_Display({
-  variable: "--font-funnel",
+// The stand-in for Aptos — see --font-sans in globals.css. Aptos is
+// Microsoft-proprietary and can't be served, and Office installs it where
+// browsers can't see it, so most visitors (the client included) never get it.
+// Inter with its tailed "l" (cv05, set on body) is the closest free match.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 const geistMono = Geist_Mono({
@@ -47,7 +47,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning className={`${funnelDisplay.variable} ${geistMono.variable}`}>
+    <html lang="en" suppressHydrationWarning className={`${inter.variable} ${geistMono.variable}`}>
       <body className="antialiased">
         <Providers>{children}</Providers>
         <Analytics />

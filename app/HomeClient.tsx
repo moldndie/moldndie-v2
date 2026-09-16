@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { motion, useInView, type Variants } from "framer-motion"
-import { Layers, BookOpen, Users, Calendar, Globe } from "lucide-react"
 import { buttonVariants } from "@/components/ui/button"
 import HeroCarousel from "@/components/home/HeroCarousel"
 import type { HeroSlide } from "@/services/heroSlides.service"
@@ -119,12 +118,14 @@ function WhyCard({ card }: { card: HomeWhyCard }) {
 }
 
 // ── Counter helpers ─────────────────────────────────────────────────────────
-const statIcons: Record<string, React.ElementType> = {
-  toolings: Layers,
-  courses:  BookOpen,
-  users:    Users,
-  events:   Calendar,
-  visitors: Globe,
+// Each counter borrows the icon of its "What We Offer" card (matched by title),
+// so changing an offer icon changes the counter too. Fallbacks = seeded icons.
+const statIconSource: Record<string, { offer: string; fallback: string }> = {
+  blog:     { offer: "blog",    fallback: "BookOpen" },
+  toolings: { offer: "library", fallback: "FolderOpen" },
+  courses:  { offer: "academy", fallback: "GraduationCap" },
+  events:   { offer: "events",  fallback: "Calendar" },
+  users:    { offer: "members", fallback: "Users" },
 }
 
 function parseCounter(raw: string): { num: number; suffix: string } {
@@ -153,13 +154,12 @@ function useCountUp(end: number, active: boolean, duration = 1600) {
 }
 
 function StatItem({
-  statKey, value, label, delay,
+  icon, value, label, delay,
 }: {
-  statKey: string; value: string; label: string; delay: number
+  icon: string; value: string; label: string; delay: number
 }) {
   const ref    = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: "-60px" })
-  const Icon   = statIcons[statKey] ?? Globe
   const { num, suffix } = parseCounter(value)
   const displayed = useCountUp(num, inView)
 
@@ -171,9 +171,7 @@ function StatItem({
       transition={{ duration: 0.5, delay, ease: "easeOut" }}
       className="flex flex-col items-center gap-3 px-8 py-6"
     >
-      <div className="w-11 h-11 rounded-full flex items-center justify-center" style={{ background: "#FDE8E8", border: "1px solid #F5C0C0" }}>
-        <Icon size={18} strokeWidth={1.5} style={{ color: "#5C1515" }} />
-      </div>
+      <DynamicIcon name={icon} size={36} strokeWidth={1.5} className="text-primary" />
       <div className="text-center">
         <p className="text-4xl md:text-5xl font-black tabular-nums tracking-tight leading-none" style={{ color: "#5C1515" }}>
           {displayed.toLocaleString()}{suffix}
@@ -187,11 +185,11 @@ function StatItem({
 // ── Main component ─────────────────────────────────────────────────────────
 interface HomeClientProps {
   counters?: {
+    blog?:     string
     toolings?: string
     courses?:  string
-    users?:    string
     events?:   string
-    visitors?: string
+    users?:    string
   }
   heroSlides?: HeroSlide[]
   offerItems?: HomeOfferItem[]
@@ -209,12 +207,17 @@ export default function HomeClient({
   const validSlides = heroSlides.filter((s) => isValidImageUrl(s.image_url))
 
   const counterEntries = [
-    { key: "toolings", label: "Toolings",   value: counters.toolings },
-    { key: "courses",  label: "Courses",    value: counters.courses  },
-    { key: "users",    label: "Members",    value: counters.users    },
-    { key: "events",   label: "Events",     value: counters.events   },
-    { key: "visitors", label: "Visitors",   value: counters.visitors },
+    { key: "blog",     label: "Blog",     value: counters.blog     },
+    { key: "toolings", label: "Tooling",  value: counters.toolings },
+    { key: "courses",  label: "Courses",  value: counters.courses  },
+    { key: "events",   label: "Events",   value: counters.events   },
+    { key: "users",    label: "Members",  value: counters.users    },
   ].filter((c) => c.value && c.value.trim() !== "")
+
+  const statIcon = (key: string) => {
+    const src = statIconSource[key]
+    return offerItems.find((o) => o.title.trim().toLowerCase() === src.offer)?.icon || src.fallback
+  }
 
   const heroTitle       = settings.hero_title       || "Start Your Journey with MoldNdie"
   const heroSubtitle    = settings.hero_subtitle     || "The ultimate resource for plastic injection mold, metal die-casting mold, and sheet metal die design and manufacture know-how"
@@ -360,7 +363,7 @@ export default function HomeClient({
               {counterEntries.map((c, i) => (
                 <StatItem
                   key={c.key}
-                  statKey={c.key}
+                  icon={statIcon(c.key)}
                   value={c.value!}
                   label={c.label}
                   delay={i * 0.1}

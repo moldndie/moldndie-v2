@@ -151,7 +151,10 @@ export async function getBlogById(id: string): Promise<Blog> {
 }
 
 export async function getBlogTagIds(blogId: string): Promise<string[]> {
-  const supabase = await createClient()
+  // Admin client, like saveBlogTags: RLS hides blog_tag_relations from the
+  // session client, so saved tags read back as none and the edit form showed
+  // every tag unselected — the next save then wiped them.
+  const supabase = createAdminClient()
   const { data, error } = await supabase
     .from("blog_tag_relations")
     .select("tag_id")
