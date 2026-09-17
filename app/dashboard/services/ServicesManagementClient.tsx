@@ -1,8 +1,9 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, ArrowUp, ArrowDown, Loader2, X } from "lucide-react"
+import { Plus, Pencil, Trash2, ToggleLeft, ToggleRight, ArrowUp, ArrowDown, Loader2, X, Images } from "lucide-react"
 import {
   getServices,
   createService,
@@ -444,6 +445,13 @@ export default function ServicesManagementClient() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1 justify-end">
+                      <Link
+                        href={`/dashboard/portfolio?service=${s.id}`}
+                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-primary"
+                        title="Examples for this service"
+                      >
+                        <Images size={14} /> Examples
+                      </Link>
                       <button
                         onClick={() => openEdit(s)}
                         className="p-1.5 text-zinc-400 hover:text-zinc-700 rounded-lg hover:bg-zinc-100 transition-colors"

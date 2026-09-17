@@ -2,7 +2,7 @@
 
 import { useRef, useTransition } from "react"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
-import { Search, X } from "lucide-react"
+import { Loader2, Search, X } from "lucide-react"
 import { Select } from "@/components/ui/select"
 import type { BlogCategory, BlogTag } from "@/types"
 
@@ -32,7 +32,9 @@ export function BlogFiltersBar({
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
-  const [, startTransition] = useTransition()
+  // Filtering re-renders the page on the server; without a pending cue a tag
+  // click looked like it did nothing.
+  const [isPending, startTransition] = useTransition()
   const debounceRef = useRef<ReturnType<typeof setTimeout>>(undefined)
 
   function updateParams(updates: Record<string, string | null>) {
@@ -108,6 +110,13 @@ export function BlogFiltersBar({
               <X className="size-3.5" />
               Clear filters
             </button>
+          )}
+
+          {isPending && (
+            <span className="flex items-center gap-1 text-xs text-zinc-400" role="status">
+              <Loader2 className="size-3.5 animate-spin" />
+              Updating…
+            </span>
           )}
         </div>
 
