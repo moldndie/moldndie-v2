@@ -474,6 +474,14 @@ export default function SiteContentClient({ initialSettings }: Props) {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
               <Field
+                label="Blog"
+                icon={<BarChart3 className="size-3.5" />}
+                name="counter_blog"
+                value={v("counter_blog")}
+                onChange={handleChange}
+                placeholder="100+"
+              />
+              <Field
                 label="Library Toolings"
                 icon={<BarChart3 className="size-3.5" />}
                 name="counter_toolings"
@@ -497,6 +505,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 value={v("counter_users")}
                 onChange={handleChange}
                 placeholder="1,000+"
+                hint="Leave blank to show the real number of registered members"
               />
               <Field
                 label="Industry Events"

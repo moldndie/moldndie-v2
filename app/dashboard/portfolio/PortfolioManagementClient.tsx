@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import {
   Plus, Pencil, Trash2, ToggleLeft, ToggleRight, ArrowUp, ArrowDown, Loader2,
@@ -200,13 +201,16 @@ function PortfolioForm({
 
 export default function PortfolioManagementClient() {
   const qc = useQueryClient()
+  const router = useRouter()
+  // Opened from a service's "Examples" button → show and add that service's examples.
+  const serviceFilter = useSearchParams().get("service") ?? ""
 
   const [createOpen, setCreateOpen] = useState(false)
   const [editing, setEditing] = useState<PortfolioItem | null>(null)
   const [deleting, setDeleting] = useState<PortfolioItem | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
 
-  const { data: items = [], isLoading } = useQuery({
+  const { data: allItems = [], isLoading } = useQuery({
     queryKey: QUERY_KEYS.PORTFOLIO,
     queryFn: getPortfolioItems,
     staleTime: 2 * 60 * 1000,
@@ -218,6 +222,8 @@ export default function PortfolioManagementClient() {
     queryFn: getServices,
     staleTime: 2 * 60 * 1000,
   })
+
+  const items = serviceFilter ? allItems.filter((i) => i.service_id === serviceFilter) : allItems
 
   const invalidate = () => qc.invalidateQueries({ queryKey: QUERY_KEYS.PORTFOLIO })
 
@@ -259,9 +265,9 @@ export default function PortfolioManagementClient() {
     orderMut.mutate({ id: other.id, sort_order: item.sort_order })
   }
 
-  const maxOrder = items.reduce((acc, s) => Math.max(acc, s.sort_order), 0)
+  const maxOrder = allItems.reduce((acc, s) => Math.max(acc, s.sort_order), 0)
 
-  const createInitial: PortfolioItemFormValues = { ...EMPTY_FORM, sort_order: maxOrder + 1 }
+  const createInitial: PortfolioItemFormValues = { ...EMPTY_FORM, service_id: serviceFilter, sort_order: maxOrder + 1 }
 
   const editInitial: PortfolioItemFormValues = editing
     ? {
@@ -278,10 +284,20 @@ export default function PortfolioManagementClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <p className="text-sm text-zinc-500">
-          {items.length} item{items.length !== 1 ? "s" : ""}
-        </p>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-3">
+          <select
+            value={serviceFilter}
+            onChange={(e) => router.replace(e.target.value ? `?service=${e.target.value}` : "?")}
+            className="h-9 rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-700"
+          >
+            <option value="">All services</option>
+            {services.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
+          </select>
+          <p className="text-sm text-zinc-500">
+            {items.length} example{items.length !== 1 ? "s" : ""}
+          </p>
+        </div>
         <button
           onClick={() => { setFormError(null); setCreateOpen(true) }}
           className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-4 py-2 rounded-xl transition-colors"
@@ -296,8 +312,8 @@ export default function PortfolioManagementClient() {
         </div>
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center border-2 border-dashed border-zinc-200 rounded-2xl">
-          <p className="text-zinc-500 font-medium">No portfolio items yet</p>
-          <p className="text-zinc-400 text-sm mt-1">Add your first previous work</p>
+          <p className="text-zinc-500 font-medium">No examples yet</p>
+          <p className="text-zinc-400 text-sm mt-1">Add the first example — each can have rich text, several images and a video</p>
           <button
             onClick={() => { setFormError(null); setCreateOpen(true) }}
             className="mt-4 text-sm text-primary underline underline-offset-2 hover:opacity-70"
@@ -387,7 +403,7 @@ export default function PortfolioManagementClient() {
       <Modal
         open={createOpen}
         onClose={() => { setCreateOpen(false); setFormError(null) }}
-        title="Add Portfolio Item"
+        title="Add Example"
         size="md"
       >
         <PortfolioForm
@@ -403,7 +419,7 @@ export default function PortfolioManagementClient() {
       <Modal
         open={!!editing}
         onClose={() => { setEditing(null); setFormError(null) }}
-        title="Edit Portfolio Item"
+        title="Edit Example"
         size="md"
       >
         <PortfolioForm

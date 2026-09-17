@@ -67,6 +67,7 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
     calculator?.images?.length ? calculator.images : calculator?.cover_image ? [calculator.cover_image] : []
   )
   const [unitSystems, setUnitSystems] = useState<UnitSystem[]>(calculator?.unit_systems ?? [])
+  const [customHtml, setCustomHtml] = useState<string | null>(calculator?.custom_html ?? null)
   const [categoryId, setCategoryId] = useState(calculator?.category_id ?? "")
   const [isFeatured, setIsFeatured] = useState(calculator?.is_featured ?? false)
   const [isPublished, setIsPublished] = useState(calculator?.is_published ?? false)
@@ -295,6 +296,8 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
 
     if (!title.trim()) general.push("Add a title on the Details step")
     if (!slug.trim()) general.push("Add a URL slug on the Details step")
+    // Custom code does its own inputs and results — nothing below applies.
+    if (customHtml) return { byField, byOutput, missingByOutput, general, count: general.length }
     if (fields.length === 0) general.push("Add at least one input")
     if (outputs.length === 0) general.push("Add at least one result")
 
@@ -314,14 +317,14 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
       if (r.error) byOutput.set(o._uid, r.error)
     }
     return { byField, byOutput, missingByOutput, general, count: byField.size + byOutput.size + general.length }
-  }, [title, slug, fields, outputs, knownKeys, samples, sampleScopes])
+  }, [title, slug, customHtml, fields, outputs, knownKeys, samples, sampleScopes])
 
   const stepProblems = useMemo(() => [
     problems.general.filter((g) => g.includes("Details")).length,
-    problems.byField.size + (fields.length === 0 ? 1 : 0),
-    problems.byOutput.size + (outputs.length === 0 ? 1 : 0),
+    customHtml ? 0 : problems.byField.size + (fields.length === 0 ? 1 : 0),
+    customHtml ? 0 : problems.byOutput.size + (outputs.length === 0 ? 1 : 0),
     0,
-  ], [problems, fields.length, outputs.length])
+  ], [problems, customHtml, fields.length, outputs.length])
 
   // ── Preview ────────────────────────────────────────────────────────────────
 
@@ -329,7 +332,7 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
     id: "preview", category_id: null,
     title: title || "Untitled Engineering Tool", slug: slug || "preview",
     short_description: shortDesc || null, description: null, icon: null, cover_image: null,
-    images: [], unit_systems: unitSystems.length ? unitSystems : null,
+    images: [], unit_systems: unitSystems.length ? unitSystems : null, custom_html: null,
     is_featured: false, is_published: true, sort_order: 0, seo_title: null, seo_description: null,
     views_count: 0, created_by: null, created_at: "", updated_at: "", category: null,
     fields: fields.map((f, i): CalcField => ({
@@ -385,6 +388,7 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
             cover_image: images[0] ?? null,
             images,
             unit_systems: unitSystems.length ? unitSystems : null,
+            custom_html: customHtml,
             category_id: categoryId || null,
             is_featured: isFeatured,
             is_published: isPublished,
@@ -450,9 +454,16 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
           description={description} onDescription={setDescription}
           images={images} onImages={setImages}
           unitSystems={unitSystems} onUnitSystems={setUnitSystems}
+          customHtml={customHtml} onCustomHtml={setCustomHtml}
           categoryId={categoryId} onCategory={setCategoryId}
           categories={categories}
         />
+      )}
+
+      {customHtml && (step === 1 || step === 2) && (
+        <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+          This tool uses uploaded custom code (Details step), so the inputs and results below are not shown on the site.
+        </p>
       )}
 
       {step === 1 && (
@@ -590,7 +601,7 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
             <button
               onClick={handleSave}
               disabled={isPending}
-              className="inline-flex items-center gap-2 rounded-lg bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
             >
               <Check className="size-4" />
               {isPending ? "Saving…" : calculator ? "Save changes" : "Create tool"}
@@ -764,6 +775,7 @@ function StepDetails(props: {
   description: string; onDescription: (v: string) => void
   images: string[]; onImages: (v: string[]) => void
   unitSystems: UnitSystem[]; onUnitSystems: (v: UnitSystem[]) => void
+  customHtml: string | null; onCustomHtml: (v: string | null) => void
   categoryId: string; onCategory: (v: string) => void
   categories: CalcCategory[]
 }) {
@@ -807,6 +819,33 @@ function StepDetails(props: {
         </div>
         <p className="mt-1 text-xs text-zinc-400">
           Optional. One image is centred above the tool; several become a gallery.
+        </p>
+      </div>
+
+      <div>
+        <Label>Custom code</Label>
+        {props.customHtml ? (
+          <div className="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 px-3 py-2 text-sm">
+            <span className="text-zinc-700">HTML file uploaded ({Math.round(props.customHtml.length / 1024)} KB)</span>
+            <button type="button" onClick={() => props.onCustomHtml(null)} className="text-xs font-medium text-red-600 hover:underline">
+              Remove
+            </button>
+          </div>
+        ) : (
+          <input
+            type="file"
+            accept=".html,.htm,text/html"
+            onChange={async (e) => {
+              const file = e.target.files?.[0]
+              if (file) props.onCustomHtml(await file.text())
+            }}
+            className="block w-full text-sm text-zinc-600 file:mr-3 file:rounded-lg file:border-0 file:bg-primary file:px-3 file:py-2 file:text-sm file:font-semibold file:text-white"
+          />
+        )}
+        <p className="mt-1 text-xs text-zinc-400">
+          Optional. A single self-contained .html file (styles and scripts inside it), e.g. a calculator made with ChatGPT.
+          It replaces the inputs and results below, and shows between the site&apos;s own header and footer — so leave the file&apos;s own header/footer out.
+          Remember to save.
         </p>
       </div>
 

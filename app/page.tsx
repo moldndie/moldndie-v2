@@ -2,14 +2,14 @@ import type { Metadata } from "next"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 
-// Always fetch live visitor + member counts — do not cache
+// Always fetch the live member count — do not cache
 export const dynamic = "force-dynamic"
 import HomeClient from "./HomeClient"
 import { getSiteSettings } from "@/services/siteSettings.service"
 import { getActiveHeroSlides } from "@/services/heroSlides.service"
 import { getActiveOfferItems } from "@/services/homeOfferItems.service"
 import { getActiveWhyCards } from "@/services/homeWhyCards.service"
-import { getTotalVisitorCount, getMemberCount } from "@/services/visitorCount.service"
+import { getMemberCount } from "@/services/visitorCount.service"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 import type { HeroSlide } from "@/services/heroSlides.service"
 import type { HomeOfferItem } from "@/services/homeOfferItems.service"
@@ -27,7 +27,6 @@ export default async function HomePage() {
   let heroSlides: HeroSlide[] = []
   let offerItems: HomeOfferItem[] = []
   let whyCards: HomeWhyCard[] = []
-  let visitorCount = 0
   let memberCount  = 0
 
   await Promise.allSettled([
@@ -35,17 +34,17 @@ export default async function HomePage() {
     getActiveHeroSlides().then((s) => { heroSlides = s }).catch(() => {}),
     getActiveOfferItems().then((s) => { offerItems = s }).catch(() => {}),
     getActiveWhyCards().then((s) => { whyCards = s }).catch(() => {}),
-    getTotalVisitorCount().then((n) => { visitorCount = n }).catch(() => {}),
     getMemberCount().then((n)        => { memberCount  = n }).catch(() => {}),
   ])
 
+  // All editable in Site Content → Counters. Members falls back to the real
+  // count only when the admin leaves it blank.
   const counters = {
+    blog:     settings.counter_blog,
     toolings: settings.counter_toolings,
     courses:  settings.counter_courses,
-    // Real member count from profiles table; fall back to CMS value if DB returns 0
-    users:    memberCount > 0 ? memberCount.toLocaleString() : settings.counter_users,
     events:   settings.counter_events,
-    visitors: visitorCount > 0 ? visitorCount.toLocaleString() : undefined,
+    users:    settings.counter_users || (memberCount > 0 ? memberCount.toLocaleString() : undefined),
   }
 
   return (

@@ -7,7 +7,7 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: Aptos, "Segoe UI", var(--font-funnel), system-ui, sans-serif;
+  --font-sans: Aptos, var(--font-inter), system-ui, sans-serif;
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -205,6 +205,8 @@
   }
   html {
     @apply font-sans;
+    /* Inter's tailed "l" — the Aptos letterform the client pointed at. */
+    font-feature-settings: "cv05";
   }
 }
 
@@ -223,6 +225,11 @@
 }
 
 /* ─── Shared typography for editor + renderer ────────────────── */
+/* ProseMirror sets font-feature-settings: "liga" 0, which drops the tailed-l cv05. */
+.cms-editor.ProseMirror { font-feature-settings: "liga" 0, "cv05"; }
+/* Equations on their own line: centred and larger, as on the public page. */
+.cms-editor .block-math-inner { text-align: center; font-size: 1.21em; margin: 1em 0; }
+
 .cms-editor,
 .cms-content {
   word-break: break-word;
@@ -442,9 +449,11 @@
    The accent is a *light* tint of the same hue — brand maroon on a dark maroon
    surface has almost no contrast, so the readable version is lifted instead. */
 :root {
-  --calc-surface: oklch(0.19 0.045 22);
-  --calc-surface-2: oklch(0.245 0.05 22);
-  --calc-surface-3: oklch(0.30 0.055 22);
+  /* Panels are the footer maroon (#5C1515) — the client's pick; the big card
+     around them is white (see app/tools/[slug]/page.tsx). */
+  --calc-surface: #4a1010;
+  --calc-surface-2: #5c1515;
+  --calc-surface-3: #702222;
   --calc-border: oklch(1 0 0 / 0.14);
   --calc-border-strong: oklch(1 0 0 / 0.24);
   --calc-accent: oklch(0.78 0.13 22);

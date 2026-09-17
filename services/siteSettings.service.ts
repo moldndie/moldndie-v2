@@ -21,6 +21,7 @@ export type SiteSettingKey =
   | "hero_description"
   | "footer_cta_text"
   | "footer_tagline"
+  | "counter_blog"
   | "counter_toolings"
   | "counter_courses"
   | "counter_users"

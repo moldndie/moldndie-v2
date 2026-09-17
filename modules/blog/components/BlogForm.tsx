@@ -232,11 +232,8 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
                         key={tag.id}
                         type="button"
                         onClick={() => toggleTag(tag.id)}
-                        className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
-                          active
-                            ? "border-zinc-900 bg-zinc-900 text-white"
-                            : "border-zinc-200 bg-white text-zinc-600 hover:border-zinc-400"
-                        }`}
+                        aria-pressed={active}
+                        className="ui-pill rounded-full border px-3 py-1 text-xs font-medium"
                       >
                         {tag.name}
                       </button>

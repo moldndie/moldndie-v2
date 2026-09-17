@@ -9,6 +9,7 @@ import Footer from "@/components/layout/Footer"
 import { ContentViewTracker } from "@/components/analytics/ContentViewTracker"
 import { getCalculatorBySlug, getCalculators } from "@/services/calculator.service"
 import CalculatorRunner from "./CalculatorRunner"
+import CustomCalculatorFrame from "./CustomCalculatorFrame"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 
@@ -95,15 +96,17 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
             )
           })()}
 
-          {/* The tool is a single dark card on the white page — a deep tint of
-              the brand maroon, not a neutral black. Tokens live in globals.css
-              under --calc-*. */}
-          <div className="overflow-hidden rounded-3xl bg-[var(--calc-surface)] shadow-2xl shadow-zinc-900/10 ring-1 ring-black/5">
-            <div className="h-px w-full bg-gradient-to-r from-transparent via-[var(--calc-accent)] to-transparent opacity-70" />
-            <div className="p-6 sm:p-8">
-              <CalculatorRunner calculator={calc} theme="dark" />
+          {calc.custom_html ? (
+            <CustomCalculatorFrame html={calc.custom_html} title={calc.title} />
+          ) : (
+            /* White card holding footer-maroon panels (client's colour pick).
+               Tokens live in globals.css under --calc-*. */
+            <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-xl shadow-zinc-900/5">
+              <div className="p-6 sm:p-8">
+                <CalculatorRunner calculator={calc} theme="dark" />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Description */}
           {calc.description && (

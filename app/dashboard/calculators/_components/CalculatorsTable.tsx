@@ -7,7 +7,6 @@ import {
   Search, Edit2, Trash2, Copy, Eye, EyeOff, Star, StarOff,
   Calculator, CheckCircle2, Clock,
 } from "lucide-react"
-import { cn } from "@/lib/utils"
 import type { Calculator as Calc, CalcCategory } from "@/types/calculator"
 import {
   deleteCalculator,
@@ -89,12 +88,8 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
             <button
               key={s}
               onClick={() => setStatusFilter(s)}
-              className={cn(
-                "rounded-lg px-3 py-2 text-sm font-medium capitalize transition-colors",
-                statusFilter === s
-                  ? "bg-zinc-900 text-white"
-                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-              )}
+              aria-pressed={statusFilter === s}
+              className="ui-pill rounded-lg border px-3 py-2 text-sm font-medium capitalize"
             >
               {s}
             </button>

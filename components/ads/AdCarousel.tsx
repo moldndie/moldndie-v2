@@ -8,7 +8,7 @@ import { useCarousel } from "@/hooks/useCarousel"
 import { AdViewTracker } from "./AdViewTracker"
 import type { Ad } from "@/types"
 
-const AUTOPLAY_MS = 8000
+const AUTOPLAY_MS = 10000
 
 /** Circular arrow pinned to the vertical middle of the card row, half outside it. */
 const ARROW_CLASS =
@@ -48,15 +48,14 @@ export function AdCarousel({ ads, className }: { ads: Ad[]; className?: string }
   const pages = Math.max(1, Math.ceil(ads.length / perPage))
   const { index, next, prev, select } = useCarousel({ length: pages, intervalMs: AUTOPLAY_MS })
 
-  // Scroll the first card of the page to the left edge. Plain assignment, no
-  // smooth behaviour: `scroll-snap-type: mandatory` re-snaps smooth
-  // programmatic scrolls back to the first card, and a `scroll-behavior:
-  // smooth` container can swallow the assignment entirely.
+  // Slide the first card of the page to the left edge. Smooth, not a plain
+  // scrollLeft jump — the instant swap read as the screen blinking off and on.
+  // (The track has no scroll-snap, which is what used to swallow smooth scrolls.)
   useEffect(() => {
     const el = trackRef.current
     const first = el?.children[index * perPage] as HTMLElement | undefined
     if (!el || !first) return
-    el.scrollLeft = first.offsetLeft - (el.firstElementChild as HTMLElement).offsetLeft
+    el.scrollTo({ left: first.offsetLeft - (el.firstElementChild as HTMLElement).offsetLeft, behavior: "smooth" })
   }, [index, perPage])
 
   const hasPager = pages > 1

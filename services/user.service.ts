@@ -78,7 +78,7 @@ export async function createUser(payload: {
   last_name: string
   country_code?: string
   role: "admin" | "user"
-}): Promise<Profile> {
+}): Promise<Profile & { invite_url: string }> {
   const admin = createAdminClient()
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? ""
 
@@ -138,7 +138,7 @@ export async function createUser(payload: {
 
   if (existing) {
     revalidatePath("/dashboard/users")
-    return { ...existing, email: payload.email, email_confirmed_at: null } as Profile
+    return { ...existing, email: payload.email, email_confirmed_at: null, invite_url: inviteUrl } as Profile & { invite_url: string }
   }
 
   const { data, error } = await admin
@@ -158,7 +158,8 @@ export async function createUser(payload: {
   }
 
   revalidatePath("/dashboard/users")
-  return { ...data, email: payload.email, email_confirmed_at: null } as Profile
+  // Returned so the dashboard can also send it by WhatsApp / SMS / Telegram.
+  return { ...data, email: payload.email, email_confirmed_at: null, invite_url: inviteUrl } as Profile & { invite_url: string }
 }
 
 export async function resendVerificationEmail(email: string): Promise<void> {
