@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import StarterKit from "@tiptap/starter-kit"
 import Link from "@tiptap/extension-link"
 import Underline from "@tiptap/extension-underline"
@@ -13,6 +13,8 @@ import TableCell from "@tiptap/extension-table-cell"
 import TableHeader from "@tiptap/extension-table-header"
 import { TextStyle, FontFamily, BackgroundColor } from "@tiptap/extension-text-style"
 import Color from "@tiptap/extension-color"
+import { InlineMath, BlockMath } from "@tiptap/extension-mathematics"
+import "katex/dist/katex.min.css"
 import { toDoc, isDocEmpty } from "@/lib/richtext"
 
 // Extensions are configured at module level — they don't touch the DOM.
@@ -35,6 +37,9 @@ const extensions = [
   FontFamily,
   BackgroundColor,
   Color,
+  // generateHTML leaves these as empty [data-latex] elements; KaTeX fills them below.
+  InlineMath,
+  BlockMath,
 ]
 
 interface RichTextRendererProps {
@@ -48,6 +53,20 @@ export default function RichTextRenderer({ content, className, emptyMessage = ""
   // ""    = rendered but empty / error
   // str   = valid HTML
   const [html, setHtml] = useState<string | null>(null)
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const math = ref.current?.querySelectorAll<HTMLElement>("[data-latex]")
+    if (!math?.length) return
+    import("katex").then(({ default: katex }) => {
+      math.forEach((el) =>
+        katex.render(el.dataset.latex ?? "", el, {
+          displayMode: el.dataset.type === "block-math",
+          throwOnError: false,
+        }),
+      )
+    })
+  }, [html])
 
   useEffect(() => {
     const parsed = toDoc(content)
@@ -80,6 +99,7 @@ export default function RichTextRenderer({ content, className, emptyMessage = ""
 
   return (
     <div
+      ref={ref}
       className={`cms-content ${className ?? ""}`}
       dangerouslySetInnerHTML={{ __html: html }}
     />

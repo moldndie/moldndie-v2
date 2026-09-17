@@ -14,7 +14,11 @@ import TableHeader from "@tiptap/extension-table-header"
 import Placeholder from "@tiptap/extension-placeholder"
 import { TextStyle, FontFamily, BackgroundColor } from "@tiptap/extension-text-style"
 import Color from "@tiptap/extension-color"
-import { useEffect, useCallback, useState } from "react"
+import Mathematics from "@tiptap/extension-mathematics"
+import type { Editor } from "@tiptap/core"
+import type { Mark } from "@tiptap/pm/model"
+import "katex/dist/katex.min.css"
+import { useEffect, useCallback, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 
 // ——— Toolbar button ———
@@ -40,7 +44,7 @@ function ToolBtn({
       className={cn(
         "flex h-7 w-7 items-center justify-center rounded text-xs font-medium transition-colors",
         active
-          ? "bg-zinc-900 text-white"
+          ? "bg-primary text-white"
           : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
       )}
     >
@@ -74,6 +78,10 @@ export default function RichTextEditor({
   const [showYoutubeInput, setShowYoutubeInput] = useState(false)
   const [showColorPicker, setShowColorPicker] = useState(false)
   const [showBgPicker, setShowBgPicker] = useState(false)
+  // Format painter: marks copied from the cursor, applied to the next selection.
+  const [painter, setPainter] = useState<readonly Mark[] | null>(null)
+  // Math click handlers are created with the editor, before `editor` exists.
+  const editorRef = useRef<Editor | null>(null)
 
   const editor = useEditor({
     extensions: [
@@ -96,9 +104,15 @@ export default function RichTextEditor({
       BackgroundColor,
       Color,
       Placeholder.configure({ placeholder }),
+      Mathematics.configure({
+        katexOptions: { throwOnError: false },
+        inlineOptions: { onClick: (node, pos) => editMath(editorRef, "inline", node.attrs.latex, pos) },
+        blockOptions: { onClick: (node, pos) => editMath(editorRef, "block", node.attrs.latex, pos) },
+      }),
     ],
     content: value ?? undefined,
     editorProps: {
+      transformPastedHTML: katexToMathNodes,
       attributes: {
         class: "cms-editor focus:outline-none",
         style: `min-height: ${minHeight}px; padding: 1rem;`,
@@ -108,6 +122,24 @@ export default function RichTextEditor({
       onChange(editor.getJSON() as Record<string, unknown>)
     },
   })
+
+  editorRef.current = editor
+
+  // Format painter: once armed, the next mouse selection takes the copied marks.
+  useEffect(() => {
+    if (!editor || !painter) return
+    const dom = editor.view.dom
+    // Deferred: ProseMirror reads the DOM selection after mouseup, not before.
+    const apply = () => setTimeout(() => {
+      if (editor.state.selection.empty) return
+      const chain = editor.chain().focus().unsetAllMarks()
+      for (const m of painter) chain.setMark(m.type.name, m.attrs)
+      chain.run()
+      setPainter(null)
+    })
+    dom.addEventListener("mouseup", apply)
+    return () => dom.removeEventListener("mouseup", apply)
+  }, [editor, painter])
 
   // Sync external value changes (e.g. on page load)
   useEffect(() => {
@@ -289,6 +321,24 @@ export default function RichTextEditor({
           <ClearFormatIcon />
         </ToolBtn>
 
+        {/* Format painter — ponytail: copies text marks only (bold, colour,
+            font…), not paragraph formatting like alignment or heading level. */}
+        <ToolBtn
+          title={painter ? "Format painter — now select the text to format (click to cancel)" : "Format painter — copy formatting from the cursor"}
+          active={!!painter}
+          onClick={() => setPainter(painter ? null : editor.state.selection.$from.marks())}
+        >
+          <PaintbrushIcon />
+        </ToolBtn>
+
+        {/* Equations — LaTeX, rendered with KaTeX */}
+        <ToolBtn title="Insert equation (inline)" onClick={() => editMath(editorRef, "inline")}>
+          <span className="font-serif italic">∑</span>
+        </ToolBtn>
+        <ToolBtn title="Insert equation (own line)" onClick={() => editMath(editorRef, "block")}>
+          <span className="font-serif italic text-[10px]">∑¶</span>
+        </ToolBtn>
+
         <Divider />
 
         {/* Link */}
@@ -436,6 +486,46 @@ const FONT_OPTIONS = [
   { label: "Mono", value: 'ui-monospace, "Courier New", monospace' },
 ]
 
+// ——— Equations ———
+
+/** Insert (no pos) or edit (pos) an equation via a LaTeX prompt; empty input deletes an existing one. */
+function editMath(ref: { current: Editor | null }, kind: "inline" | "block", latex = "", pos?: number) {
+  const editor = ref.current
+  if (!editor) return
+  const next = window.prompt("Equation in LaTeX, e.g.  F = \\frac{P \\cdot A}{1000}", latex)
+  if (next === null) return
+  const chain = editor.chain().focus()
+  if (pos === undefined) {
+    if (!next.trim()) return
+    ;(kind === "inline" ? chain.insertInlineMath({ latex: next }) : chain.insertBlockMath({ latex: next })).run()
+  } else if (!next.trim()) {
+    ;(kind === "inline" ? chain.deleteInlineMath({ pos }) : chain.deleteBlockMath({ pos })).run()
+  } else {
+    ;(kind === "inline" ? chain.updateInlineMath({ latex: next, pos }) : chain.updateBlockMath({ latex: next, pos })).run()
+  }
+}
+
+/**
+ * ChatGPT (and other KaTeX pages) copy equations as rendered KaTeX markup with
+ * the source LaTeX kept in an <annotation>. Swap each for a math node so the
+ * equation survives the paste instead of turning into garbled letters.
+ */
+function katexToMathNodes(html: string): string {
+  if (!html.includes("katex")) return html
+  const doc = new DOMParser().parseFromString(html, "text/html")
+  doc.querySelectorAll(".katex-display, .katex").forEach((el) => {
+    if (!el.isConnected) return
+    const latex = el.querySelector('annotation[encoding="application/x-tex"]')?.textContent?.trim()
+    if (!latex) return
+    const block = el.classList.contains("katex-display")
+    const node = doc.createElement(block ? "div" : "span")
+    node.setAttribute("data-type", block ? "block-math" : "inline-math")
+    node.setAttribute("data-latex", latex)
+    el.replaceWith(node)
+  })
+  return doc.body.innerHTML
+}
+
 // ——— Inline SVG icons ———
 function HighlightIcon({ color }: { color: string }) {
   return (
@@ -445,6 +535,15 @@ function HighlightIcon({ color }: { color: string }) {
       </svg>
       <span className="mt-0.5 block h-1 w-3.5 rounded-sm border border-zinc-300" style={{ backgroundColor: color }} />
     </span>
+  )
+}
+
+function PaintbrushIcon() {
+  return (
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M18.37 2.63 14 7l-1.59-1.59a2 2 0 0 0-2.82 0L8 7l9 9 1.59-1.59a2 2 0 0 0 0-2.82L17 10l4.37-4.37a2.12 2.12 0 1 0-3-3Z" />
+      <path d="M9 8c-2 3-4 3.5-7 4l8 10c2-1 6-5 6-7" />
+    </svg>
   )
 }
 

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
-import { Inter, Geist_Mono } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
+import localFont from "next/font/local";
 import "./globals.css";
 import { Providers } from "./providers";
 import { Analytics } from "@vercel/analytics/next"
@@ -7,10 +8,13 @@ import { Analytics } from "@vercel/analytics/next"
 // The stand-in for Aptos — see --font-sans in globals.css. Aptos is
 // Microsoft-proprietary and can't be served, and Office installs it where
 // browsers can't see it, so most visitors (the client included) never get it.
-// Inter with its tailed "l" (cv05, set on body) is the closest free match.
-const inter = Inter({
+// Inter with its tailed "l" (cv05, set in globals.css) is the closest free
+// match. Self-hosted from the official release (OFL, app/fonts): the Google
+// Fonts build strips cv05.
+const inter = localFont({
+  src: "./fonts/InterVariable-latin.woff2",
   variable: "--font-inter",
-  subsets: ["latin"],
+  weight: "100 900",
 });
 
 const geistMono = Geist_Mono({

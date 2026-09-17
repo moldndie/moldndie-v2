@@ -225,6 +225,11 @@
 }
 
 /* ─── Shared typography for editor + renderer ────────────────── */
+/* ProseMirror sets font-feature-settings: "liga" 0, which drops the tailed-l cv05. */
+.cms-editor.ProseMirror { font-feature-settings: "liga" 0, "cv05"; }
+/* Equations on their own line: centred and larger, as on the public page. */
+.cms-editor .block-math-inner { text-align: center; font-size: 1.21em; margin: 1em 0; }
+
 .cms-editor,
 .cms-content {
   word-break: break-word;

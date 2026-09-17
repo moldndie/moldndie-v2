@@ -2,12 +2,16 @@
 
 import { useEffect, useRef, useState } from "react"
 
-// Posts the page height to the parent so the iframe grows with its content
-// instead of showing its own scrollbar.
+// Posts the content height to the parent so the iframe fits its content
+// instead of showing its own scrollbar. Measured from <body>, not
+// documentElement.scrollHeight, which never drops below the frame's own height.
 // The style stops 100vh layouts from growing forever as the iframe grows.
 const RESIZE_SCRIPT = `<style>html,body{min-height:0!important;height:auto!important}</style><script>(function(){
-  function send(){ parent.postMessage({ mndHeight: document.documentElement.scrollHeight }, "*") }
-  new ResizeObserver(send).observe(document.documentElement);
+  function send(){
+    var b = document.body, m = parseFloat(getComputedStyle(b).marginBottom) || 0;
+    parent.postMessage({ mndHeight: Math.ceil(b.getBoundingClientRect().bottom + m) }, "*");
+  }
+  new ResizeObserver(send).observe(document.body);
   addEventListener("load", send);
 })()</script>`
 
