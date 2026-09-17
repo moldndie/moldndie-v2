@@ -38,6 +38,8 @@ export interface Calculator {
   images: string[]
   /** null / empty = no unit switcher on this calculator. */
   unit_systems: UnitSystem[] | null
+  /** Self-contained HTML page; when set it replaces fields/outputs on the public page. */
+  custom_html: string | null
   is_featured: boolean
   is_published: boolean
   sort_order: number

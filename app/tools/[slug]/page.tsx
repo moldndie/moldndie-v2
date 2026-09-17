@@ -9,6 +9,7 @@ import Footer from "@/components/layout/Footer"
 import { ContentViewTracker } from "@/components/analytics/ContentViewTracker"
 import { getCalculatorBySlug, getCalculators } from "@/services/calculator.service"
 import CalculatorRunner from "./CalculatorRunner"
+import CustomCalculatorFrame from "./CustomCalculatorFrame"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 
@@ -95,13 +96,17 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
             )
           })()}
 
-          {/* White card holding footer-maroon panels (client's colour pick).
-              Tokens live in globals.css under --calc-*. */}
-          <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-xl shadow-zinc-900/5">
-            <div className="p-6 sm:p-8">
-              <CalculatorRunner calculator={calc} theme="dark" />
+          {calc.custom_html ? (
+            <CustomCalculatorFrame html={calc.custom_html} title={calc.title} />
+          ) : (
+            /* White card holding footer-maroon panels (client's colour pick).
+               Tokens live in globals.css under --calc-*. */
+            <div className="overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-xl shadow-zinc-900/5">
+              <div className="p-6 sm:p-8">
+                <CalculatorRunner calculator={calc} theme="dark" />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Description */}
           {calc.description && (

@@ -187,6 +187,7 @@ type CalcPayload = {
   cover_image?: string | null
   images?: string[]
   unit_systems?: UnitSystem[] | null
+  custom_html?: string | null
   is_featured?: boolean
   is_published?: boolean
   sort_order?: number

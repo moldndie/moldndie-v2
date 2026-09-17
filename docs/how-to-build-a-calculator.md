@@ -123,6 +123,24 @@ Sort order and SEO text are under **Advanced**.
 
 ---
 
+## Using your own code (e.g. from ChatGPT)
+
+For a tool too complex for the builder, you can upload a finished page instead.
+
+1. Ask ChatGPT for **one single `.html` file** with the styles and scripts inside it (no separate
+   `styles.css` / `calculator.js`, no images loaded from files), **without** the site header,
+   footer, breadcrumb or page title — the website adds those itself.
+2. `Dashboard → Engineering Tools → New → Start from scratch`.
+3. Fill in **Title**, **Short description**, **Category** and any **Images**.
+4. Under **Custom code**, choose the `.html` file. You can skip the Inputs and Results steps.
+5. Tick **Published** and **Save**.
+
+The page shows your code between the normal header and footer, growing to its full height. For
+safety it runs in an isolated frame and can't see visitors' accounts. To replace it, click
+**Remove**, choose the new file and save.
+
+---
+
 ## Quick checklist
 
 - [ ] Title and short description
