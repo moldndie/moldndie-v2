@@ -2,6 +2,7 @@
 
 import { Type, AlignLeft, ImageIcon, Quote, List, Play, Paperclip } from "lucide-react"
 import type { EditorBlock } from "../types"
+import { Button } from "@/components/ui/button"
 
 const BLOCK_OPTIONS: { block_type: EditorBlock["block_type"]; label: string; icon: React.ElementType }[] = [
   { block_type: "heading",   label: "Heading",   icon: Type },
@@ -19,19 +20,19 @@ interface BlockToolbarProps {
 
 export function BlockToolbar({ onAdd }: BlockToolbarProps) {
   return (
-    <div className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50/50 p-3">
+    <div className="rounded-2xl border border-dashed border-zinc-200 bg-zinc-50/50 p-3">
       <p className="mb-2 text-xs font-medium text-zinc-400 uppercase tracking-wide">Add block</p>
       <div className="flex flex-wrap gap-1.5">
         {BLOCK_OPTIONS.map(({ block_type, label, icon: Icon }) => (
-          <button
+          <Button
             key={block_type}
             type="button"
             onClick={() => onAdd(block_type)}
-            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-white px-3 py-1.5 text-xs font-medium text-zinc-600 shadow-sm hover:border-zinc-300 hover:bg-zinc-50 hover:text-zinc-900 transition-colors"
+            variant="outline" size="sm" className="px-3"
           >
             <Icon className="size-3.5 shrink-0" />
             {label}
-          </button>
+          </Button>
         ))}
       </div>
     </div>

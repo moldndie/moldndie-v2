@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { Component, type ReactNode } from "react"
 import { AlertTriangle, RotateCcw } from "lucide-react"
 
@@ -38,13 +39,10 @@ export class ErrorBoundary extends Component<Props, State> {
           <p className="text-zinc-400 text-sm mt-1 max-w-sm">
             An unexpected error occurred. Try refreshing the page.
           </p>
-          <button
-            onClick={this.handleReset}
-            className="mt-6 inline-flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors"
-          >
+          <Button onClick={this.handleReset} className="mt-6 h-auto gap-2 px-5 py-2.5 font-semibold">
             <RotateCcw size={14} />
             Try Again
-          </button>
+          </Button>
         </div>
       )
     }

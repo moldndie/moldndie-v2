@@ -10,6 +10,8 @@ import PhoneInputField from "@/components/ui/PhoneInputField";
 import type { Country as LibCountry } from "@/lib/countries";
 import type { Country as PhoneCountry } from "react-phone-number-input";
 import type { Profile } from "@/types/profile";
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 type Props = { profile: Profile };
 
@@ -61,12 +63,12 @@ export default function ProfileForm({ profile }: Props) {
           <label htmlFor="first_name" className="block text-sm font-medium text-zinc-700">
             First Name <span className="text-red-500">*</span>
           </label>
-          <input
+          <Input
             id="first_name"
             type="text"
             placeholder="John"
             {...register("first_name")}
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+            className="w-full"
           />
           {errors.first_name && (
             <p className="text-xs text-red-600">{errors.first_name.message}</p>
@@ -77,12 +79,12 @@ export default function ProfileForm({ profile }: Props) {
           <label htmlFor="last_name" className="block text-sm font-medium text-zinc-700">
             Last Name <span className="text-red-500">*</span>
           </label>
-          <input
+          <Input
             id="last_name"
             type="text"
             placeholder="Doe"
             {...register("last_name")}
-            className="w-full rounded-lg border border-zinc-300 px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+            className="w-full"
           />
           {errors.last_name && (
             <p className="text-xs text-red-600">{errors.last_name.message}</p>
@@ -127,13 +129,9 @@ export default function ProfileForm({ profile }: Props) {
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="rounded-lg bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50"
-      >
+      <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Saving..." : "Save changes"}
-      </button>
+      </Button>
     </form>
   );
 }

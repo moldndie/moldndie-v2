@@ -1,5 +1,6 @@
 "use client"
 
+import { Input } from "@/components/ui/input"
 import { useState, useTransition } from "react"
 import Image from "next/image"
 import { toast } from "sonner"
@@ -25,6 +26,7 @@ import {
 } from "@/services/heroSlides.service"
 import type { HeroSlide } from "@/services/heroSlides.service"
 import { MAX_HERO_SLIDES, isValidImageUrl } from "@/lib/heroSlides.constants"
+import { Button } from "@/components/ui/button"
 
 interface Props {
   initialSlides: HeroSlide[]
@@ -69,11 +71,11 @@ function FormField({
         {label}{" "}
         {optional && <span className="text-zinc-400 font-normal">(optional)</span>}
       </label>
-      <input
+      <Input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+        className="h-auto px-3 py-2.5"
       />
     </div>
   )
@@ -290,19 +292,19 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
           )}
         </p>
 
-        <button
+        <Button size="lg"
           onClick={() => { setShowForm((v) => !v); closeEdit() }}
           disabled={isPending}
-          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 text-white font-semibold text-sm px-4 py-2 rounded-lg transition-colors"
+         
         >
           <Plus className="size-4" />
           Add Slide
-        </button>
+        </Button>
       </div>
 
       {/* ── Add form ── */}
       {showForm && (
-        <div className="bg-white rounded-xl border border-zinc-200 p-6 space-y-5">
+        <div className="bg-white rounded-2xl border border-zinc-200 p-6 space-y-5">
           <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">New Slide</h3>
 
           {/* Images */}
@@ -396,18 +398,18 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
           )}
 
           <div className="flex items-center justify-end gap-3">
-            <button
+            <Button variant="ghost" size="lg"
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+              className="px-4"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button size="lg"
               type="button"
               onClick={handleAdd}
               disabled={isPending || isUploading || !isValidImageUrl(form.image_url)}
-              className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm px-6 py-2 rounded-lg transition-colors"
+              className="px-6"
             >
               {isPending || isUploading ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -415,14 +417,14 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                 <Plus className="size-4" />
               )}
               {isUploading ? "Uploading…" : "Add Slide"}
-            </button>
+            </Button>
           </div>
         </div>
       )}
 
       {/* ── Slide list ── */}
       {slides.length === 0 ? (
-        <div className="bg-white rounded-xl border-2 border-dashed border-zinc-200 p-16 flex flex-col items-center gap-3 text-center">
+        <div className="bg-white rounded-2xl border-2 border-dashed border-zinc-200 p-16 flex flex-col items-center gap-3 text-center">
           <Images className="size-10 text-zinc-300" />
           <p className="text-sm font-medium text-zinc-400">No slides yet</p>
           <p className="text-xs text-zinc-400">
@@ -435,7 +437,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
             <div key={slide.id} className="space-y-2">
             <div
               className={cn(
-                "bg-white rounded-xl border border-zinc-200 p-4 flex gap-4 items-center transition-opacity duration-200",
+                "bg-white rounded-2xl border border-zinc-200 p-4 flex gap-4 items-center transition-opacity duration-200",
                 !slide.is_active && "opacity-55",
                 pendingId === slide.id && "opacity-30 pointer-events-none",
               )}
@@ -495,64 +497,59 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
 
               {/* Action buttons */}
               <div className="flex items-center gap-1 shrink-0">
-                <button
+                <Button
                   onClick={() => handleMove(slide.id, "up")}
                   disabled={idx === 0 || isPending}
                   title="Move up"
-                  className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  variant="ghost" size="icon-sm" className="text-zinc-400"
                 >
                   <ChevronUp className="size-4" />
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => handleMove(slide.id, "down")}
                   disabled={idx === slides.length - 1 || isPending}
                   title="Move down"
-                  className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  variant="ghost" size="icon-sm" className="text-zinc-400"
                 >
                   <ChevronDown className="size-4" />
-                </button>
+                </Button>
 
-                <button
+                <Button variant="ghost" size="icon-sm" aria-pressed={editingId === slide.id}
                   onClick={() => (editingId === slide.id ? closeEdit() : openEdit(slide))}
                   disabled={isPending}
                   title={editingId === slide.id ? "Cancel edit" : "Edit slide"}
-                  className={cn(
-                    "p-1.5 rounded-md transition-colors disabled:opacity-30",
-                    editingId === slide.id
-                      ? "text-primary bg-primary/10 hover:bg-primary/20"
-                      : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100",
-                  )}
+                  className="text-zinc-400"
                 >
                   <Pencil className="size-4" />
-                </button>
+                </Button>
 
-                <button
+                <Button
                   onClick={() => handleToggle(slide)}
                   disabled={isPending}
                   title={slide.is_active ? "Deactivate" : "Activate"}
-                  className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 disabled:opacity-30 transition-colors"
+                  variant="ghost" size="icon-sm" className="text-zinc-400"
                 >
                   {slide.is_active ? (
                     <EyeOff className="size-4" />
                   ) : (
                     <Eye className="size-4" />
                   )}
-                </button>
+                </Button>
 
-                <button
+                <Button
                   onClick={() => handleDelete(slide.id)}
                   disabled={isPending}
                   title="Delete slide"
-                  className="p-1.5 rounded-md text-zinc-400 hover:text-red-600 hover:bg-red-50 disabled:opacity-30 transition-colors"
+                  variant="ghost-danger" size="icon-sm" className="text-zinc-400"
                 >
                   <Trash2 className="size-4" />
-                </button>
+                </Button>
               </div>
             </div>
 
             {/* ── Inline edit form ── */}
             {editingId === slide.id && (
-              <div className="bg-zinc-50 rounded-xl border border-primary/20 p-6 space-y-5">
+              <div className="bg-zinc-50 rounded-2xl border border-primary/20 p-6 space-y-5">
                 <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">
                   Edit Slide
                 </h3>
@@ -638,18 +635,18 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                 </div>
 
                 <div className="flex items-center justify-end gap-3">
-                  <button
+                  <Button variant="ghost" size="lg"
                     type="button"
                     onClick={closeEdit}
-                    className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                    className="px-4"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </Button>
+                  <Button size="lg"
                     type="button"
                     onClick={handleSaveEdit}
                     disabled={isPending || isEditUploading || !isValidImageUrl(editForm.image_url)}
-                    className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm px-6 py-2 rounded-lg transition-colors"
+                    className="px-6"
                   >
                     {isPending || isEditUploading ? (
                       <Loader2 className="size-4 animate-spin" />
@@ -657,7 +654,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                       <Pencil className="size-4" />
                     )}
                     {isEditUploading ? "Uploading…" : "Save Changes"}
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}

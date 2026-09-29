@@ -3,6 +3,7 @@
 import { Eye, Pencil, Globe, EyeOff, ExternalLink } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSetBlogPublished } from "@/hooks/queries/useBlog"
+import { Button } from "@/components/ui/button"
 
 interface PreviewBannerProps {
   blogId: string
@@ -43,27 +44,27 @@ export function PreviewBanner({ blogId, blogSlug, isPublished }: PreviewBannerPr
         {/* Edit */}
         <a
           href={`/dashboard/blogs/${blogId}/edit`}
-          className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 transition-colors"
+          className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-600 hover:bg-primary hover:text-primary-foreground transition-colors"
         >
           <Pencil className="size-3" />
           Edit
         </a>
 
         {/* Publish / Unpublish */}
-        <button
+        <Button variant="unstyled"
           type="button"
           onClick={handleToggle}
           disabled={setPublished.isPending}
           className={[
             "flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors disabled:opacity-50",
             isPublished
-              ? "text-zinc-600 hover:bg-zinc-100"
-              : "bg-zinc-900 text-white hover:bg-zinc-700",
+              ? "text-zinc-600 hover:bg-primary hover:text-primary-foreground"
+              : "bg-primary text-white hover:bg-primary/90",
           ].join(" ")}
         >
           {isPublished ? <EyeOff className="size-3" /> : <Globe className="size-3" />}
           {setPublished.isPending ? "Saving…" : isPublished ? "Unpublish" : "Publish"}
-        </button>
+        </Button>
 
         {/* View live — only when published */}
         {isPublished && (
@@ -71,7 +72,7 @@ export function PreviewBanner({ blogId, blogSlug, isPublished }: PreviewBannerPr
             href={`/blogs/${blogSlug}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 transition-colors"
+            className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-600 hover:bg-primary hover:text-primary-foreground transition-colors"
           >
             <ExternalLink className="size-3" />
             View Live

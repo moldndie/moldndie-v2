@@ -79,7 +79,7 @@ export function SuppliersTable() {
       cell: ({ row }) => {
         const cat = categories.find((c) => c.id === row.original.category_id)
         return cat ? (
-          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
+          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">
             {cat.name}
           </span>
         ) : (
@@ -92,7 +92,7 @@ export function SuppliersTable() {
       header: "Sponsored",
       cell: ({ row }) =>
         row.original.sponsored ? (
-          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
             Sponsored
           </span>
         ) : (
@@ -104,18 +104,18 @@ export function SuppliersTable() {
       header: "",
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
-          <button
+          <Button
             onClick={() => setEditingSupplier(row.original)}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+            variant="ghost" size="icon-sm" className="text-zinc-400"
           >
             <Pencil className="size-3.5" />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setDeletingSupplier(row.original)}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+            variant="ghost-danger" size="icon-sm" className="text-zinc-400"
           >
             <Trash2 className="size-3.5" />
-          </button>
+          </Button>
         </div>
       ),
     },

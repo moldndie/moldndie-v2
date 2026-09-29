@@ -1,9 +1,11 @@
 "use client"
 
+import { Input as CellInput } from "@/components/ui/input"
 import { Plus, Trash2, Table2, MousePointerClick } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Input } from "./ui"
 import { uid, slugKey, type DraftTable } from "./builder-types"
+import { Button } from "@/components/ui/button"
 
 /**
  * One place for tables, whether or not visitors pick from them.
@@ -27,13 +29,13 @@ export function DataTables({ tables, onChange }: { tables: DraftTable[]; onChang
             published page.
           </p>
         </div>
-        <button
+        <Button
           type="button"
           onClick={() => onChange([...tables, newTable()])}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-primary hover:text-primary"
+          variant="outline" size="lg" className="px-3 shrink-0"
         >
           <Plus className="size-4" /> Add table
-        </button>
+        </Button>
       </div>
 
       {tables.length === 0 && (
@@ -69,7 +71,7 @@ function TableCard({ table, onChange, onRemove }: {
   onRemove: () => void
 }) {
   const cellCls =
-    "w-full rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-xs transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+    "h-auto rounded-md px-2 py-1.5 text-xs md:text-xs"
 
   const isPicker = table.pickerFieldUid !== undefined
 
@@ -90,9 +92,9 @@ function TableCard({ table, onChange, onRemove }: {
       <div className="flex items-center gap-2">
         <Input value={table.title} onChange={(e) => onChange({ title: e.target.value })} placeholder="Table name, e.g. Material Properties" />
         <Input value={table.category} onChange={(e) => onChange({ category: e.target.value })} placeholder="Category (optional)" className="max-w-48" />
-        <button type="button" onClick={onRemove} className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600">
+        <Button type="button" onClick={onRemove} variant="ghost-danger" size="icon-sm" className="text-zinc-400">
           <Trash2 className="size-4" />
-        </button>
+        </Button>
       </div>
 
       <label className={cn(
@@ -123,27 +125,27 @@ function TableCard({ table, onChange, onRemove }: {
               {table.columns.map((c, ci) => (
                 <th key={c.id} className="text-left">
                   <div className="flex items-center gap-0.5">
-                    <input
+                    <CellInput
                       value={c.label}
                       onChange={(e) => setColumn(c.id, { label: e.target.value })}
                       placeholder={ci === 0 ? "Name" : "Column"}
                       className={cn(cellCls, "min-w-28 font-medium")}
                     />
-                    <input
+                    <CellInput
                       value={c.unit}
                       onChange={(e) => setColumn(c.id, { unit: e.target.value })}
                       placeholder="unit"
                       className={cn(cellCls, "w-16")}
                     />
                     {table.columns.length > 1 && (
-                      <button
+                      <Button
                         type="button"
                         onClick={() => onChange({ columns: table.columns.filter((x) => x.id !== c.id) })}
-                        className="rounded p-1 text-zinc-300 hover:text-red-600"
+                        variant="ghost-danger" size="icon-xs" className="text-zinc-400"
                         title="Remove column"
                       >
                         <Trash2 className="size-3" />
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </th>
@@ -156,7 +158,7 @@ function TableCard({ table, onChange, onRemove }: {
               <tr key={r.id}>
                 {table.columns.map((c) => (
                   <td key={c.id}>
-                    <input
+                    <CellInput
                       value={r.cells[c.key] ?? ""}
                       onChange={(e) => onChange({
                         rows: table.rows.map((x) => x.id === r.id ? { ...x, cells: { ...x.cells, [c.key]: e.target.value } } : x),
@@ -166,14 +168,14 @@ function TableCard({ table, onChange, onRemove }: {
                   </td>
                 ))}
                 <td>
-                  <button
+                  <Button
                     type="button"
                     onClick={() => onChange({ rows: table.rows.filter((x) => x.id !== r.id) })}
-                    className="rounded p-1 text-zinc-300 hover:text-red-600"
+                    variant="ghost-danger" size="icon-xs" className="text-zinc-400"
                     title="Remove row"
                   >
                     <Trash2 className="size-3.5" />
-                  </button>
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -182,20 +184,20 @@ function TableCard({ table, onChange, onRemove }: {
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <button
+        <Button
           type="button"
           onClick={() => onChange({ columns: [...table.columns, { id: uid(), key: `col_${table.columns.length + 1}`, label: "", unit: "" }] })}
-          className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:border-primary hover:text-primary"
+          variant="outline" size="sm" className="px-3"
         >
           <Plus className="size-3.5" /> Add column
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
           onClick={() => onChange({ rows: [...table.rows, { id: uid(), cells: {} }] })}
-          className="inline-flex items-center gap-1 rounded-md border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:border-primary hover:text-primary"
+          variant="outline" size="sm" className="px-3"
         >
           <Plus className="size-3.5" /> Add row
-        </button>
+        </Button>
         {isPicker && (
           <span className="text-[11px] text-zinc-400">
             Numeric columns become formula values; text cells still show in the published table.

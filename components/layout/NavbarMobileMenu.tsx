@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -21,13 +22,14 @@ export default function NavbarMobileMenu() {
 
   return (
     <div className="md:hidden">
-      <button
+      <Button
+        variant="ghost"
+        size="icon"
         onClick={() => setOpen((v) => !v)}
-        className="p-2 text-zinc-600 hover:text-zinc-900 transition-colors"
         aria-label={open ? "Close menu" : "Open menu"}
       >
         {open ? <X size={22} /> : <Menu size={22} />}
-      </button>
+      </Button>
 
       {open && (
         <div className="absolute left-0 right-0 top-16 z-40 bg-white border-b border-zinc-100 shadow-sm px-6 py-4 flex flex-col gap-1">

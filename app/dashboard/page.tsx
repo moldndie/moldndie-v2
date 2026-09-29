@@ -8,7 +8,7 @@ const DashboardStats = dynamic(() => import("@/components/dashboard/DashboardSta
   loading: () => (
     <div className="space-y-4">
       {[1, 2, 3].map((i) => (
-        <div key={i} className="h-28 rounded-xl bg-zinc-100 animate-pulse" />
+        <div key={i} className="h-28 rounded-2xl bg-zinc-100 animate-pulse" />
       ))}
     </div>
   ),
@@ -26,7 +26,7 @@ export default function AdminDashboardPage() {
       <Suspense fallback={
         <div className="space-y-4 mt-8">
           {[1, 2].map((i) => (
-            <div key={i} className="h-28 rounded-xl bg-zinc-100 animate-pulse" />
+            <div key={i} className="h-28 rounded-2xl bg-zinc-100 animate-pulse" />
           ))}
         </div>
       }>

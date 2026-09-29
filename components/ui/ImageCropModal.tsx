@@ -158,13 +158,13 @@ export function ImageCropModal({
         {/* Header */}
         <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100">
           <h2 className="text-base font-semibold text-zinc-900">Crop Image</h2>
-          <button
+          <Button
             type="button"
             onClick={onCancel}
-            className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 transition-colors"
+            variant="ghost" size="icon-sm" className="text-zinc-400"
           >
             <X className="size-4" />
-          </button>
+          </Button>
         </div>
 
         {/* Crop area */}

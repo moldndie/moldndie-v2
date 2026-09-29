@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
@@ -25,7 +26,7 @@ const SORT_OPTIONS: { label: string; value: SortOption }[] = [
 
 function SkeletonCard() {
   return (
-    <div className="rounded-xl overflow-hidden border border-zinc-100 bg-white animate-pulse">
+    <div className="rounded-2xl overflow-hidden border border-zinc-200 bg-white animate-pulse">
       <div className="aspect-square bg-zinc-200" />
       <div className="p-4 space-y-2">
         <div className="h-4 bg-zinc-200 rounded w-3/4" />
@@ -46,7 +47,7 @@ function MoldCard({ mold, views }: {
   return (
     <Link
       href={`/molds/${mold.id}`}
-      className="group rounded-xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col"
+      className="group rounded-2xl overflow-hidden border border-zinc-200 bg-white shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col"
     >
       <div className="aspect-square relative bg-white overflow-hidden">
         {imgSrc ? (
@@ -166,7 +167,7 @@ export default function MoldsListingClient() {
           <p className="text-zinc-500 font-medium">No molds found</p>
           <p className="text-zinc-400 text-sm mt-1">Try adjusting your search or filters</p>
           {hasActiveFilters && (
-            <button onClick={clearAll} className="mt-4 text-sm text-primary no-underline underline-offset-2 hover:underline hover:opacity-70">Clear all filters</button>
+            <Button variant="link" size="sm" onClick={clearAll} className="mt-4">Clear all filters</Button>
           )}
         </div>
       ) : (

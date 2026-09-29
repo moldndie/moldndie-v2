@@ -1,5 +1,6 @@
 "use client"
 
+import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Plus, Trash2, ArrowUp, ArrowDown, Loader2, ToggleLeft, ToggleRight } from "lucide-react"
@@ -12,9 +13,8 @@ import {
   updateProcessStepOrder,
   type ServiceProcessStep,
 } from "@/services/serviceProcessSteps.service"
+import { Button } from "@/components/ui/button"
 
-const inputCls =
-  "w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
 
 /**
  * The numbered "How It Works" strip on /services. Edited inline rather than in
@@ -86,7 +86,7 @@ export default function ProcessStepsManager() {
             The numbered steps shown above the services on the public page.
           </p>
         </div>
-        <button
+        <Button size="lg"
           onClick={() => {
             setError(null)
             createMut.mutate({
@@ -97,10 +97,10 @@ export default function ProcessStepsManager() {
             })
           }}
           disabled={createMut.isPending}
-          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 text-white font-bold text-sm px-4 py-2 rounded-xl transition-colors"
+         
         >
           <Plus size={15} /> Add Step
-        </button>
+        </Button>
       </div>
 
       {error && (
@@ -122,56 +122,56 @@ export default function ProcessStepsManager() {
           {steps.map((step, idx) => (
             <div
               key={step.id}
-              className="flex flex-col gap-2 rounded-xl border border-zinc-200 p-3 sm:flex-row sm:items-center"
+              className="flex flex-col gap-2 rounded-2xl border border-zinc-200 p-3 sm:flex-row sm:items-center"
             >
               <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                 {idx + 1}
               </span>
-              <input
-                className={`${inputCls} sm:w-48`}
+              <Input
+                className={`h-auto py-2 sm:w-48`}
                 defaultValue={step.label}
                 onBlur={(e) => save(step, { label: e.target.value })}
                 placeholder="Step name"
               />
-              <input
-                className={`${inputCls} flex-1`}
+              <Input
+                className={`h-auto py-2 flex-1`}
                 defaultValue={step.description ?? ""}
                 onBlur={(e) => save(step, { description: e.target.value })}
                 placeholder="One-line description"
               />
               <div className="flex items-center gap-1">
-                <button
+                <Button
                   onClick={() => move(step, idx, -1)}
                   disabled={idx === 0}
-                  className="p-1 text-zinc-400 hover:text-zinc-700 disabled:opacity-30 transition-colors"
+                  variant="ghost" size="icon-xs" className="text-zinc-400"
                   title="Move up"
                 >
                   <ArrowUp size={13} />
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => move(step, idx, 1)}
                   disabled={idx === steps.length - 1}
-                  className="p-1 text-zinc-400 hover:text-zinc-700 disabled:opacity-30 transition-colors"
+                  variant="ghost" size="icon-xs" className="text-zinc-400"
                   title="Move down"
                 >
                   <ArrowDown size={13} />
-                </button>
-                <button
+                </Button>
+                <Button variant="ghost" size="icon-xs" aria-pressed={step.is_active}
                   onClick={() => toggleMut.mutate({ id: step.id, is_active: !step.is_active })}
-                  className={`p-1 transition-colors ${step.is_active ? "text-emerald-600" : "text-zinc-400"}`}
+                  className="text-zinc-400"
                   title={step.is_active ? "Visible" : "Hidden"}
                 >
                   {step.is_active ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => {
                     if (confirm(`Delete the "${step.label}" step?`)) deleteMut.mutate(step.id)
                   }}
-                  className="p-1 text-zinc-400 hover:text-red-600 transition-colors"
+                  variant="ghost-danger" size="icon-xs" className="text-zinc-400"
                   title="Delete"
                 >
                   <Trash2 size={14} />
-                </button>
+                </Button>
               </div>
             </div>
           ))}

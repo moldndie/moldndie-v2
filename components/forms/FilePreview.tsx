@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { ExternalLink, FileText, RefreshCw, Trash2 } from "lucide-react"
 import { cn, getFileUrl } from "@/lib/utils"
 
@@ -82,24 +83,16 @@ export function FilePreview({
         </span>
         <div className="flex items-center gap-3">
           {onReplace && (
-            <button
-              type="button"
-              onClick={onReplace}
-              className="flex items-center gap-1 text-xs text-zinc-500 transition-colors hover:text-zinc-800"
-            >
+            <Button type="button" variant="ghost" size="xs" onClick={onReplace}>
               <RefreshCw className="size-3" />
               Replace
-            </button>
+            </Button>
           )}
           {onClear && (
-            <button
-              type="button"
-              onClick={onClear}
-              className="flex items-center gap-1 text-xs text-zinc-500 transition-colors hover:text-red-600"
-            >
+            <Button type="button" variant="ghost-danger" size="xs" onClick={onClear}>
               <Trash2 className="size-3" />
               Remove
-            </button>
+            </Button>
           )}
         </div>
       </div>

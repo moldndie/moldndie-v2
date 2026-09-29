@@ -183,14 +183,16 @@ export default function SignupForm() {
             {...register("password")}
             className="pl-9 pr-10 h-10"
           />
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon-xs"
             onClick={() => setShowPassword((v) => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
-          </button>
+          </Button>
         </div>
         {errors.password && <p className="text-xs text-destructive">{errors.password.message}</p>}
       </div>
@@ -208,14 +210,16 @@ export default function SignupForm() {
             {...register("confirm_password")}
             className="pl-9 pr-10 h-10"
           />
-          <button
+          <Button
             type="button"
+            variant="ghost"
+            size="icon-xs"
             onClick={() => setShowConfirm((v) => !v)}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground"
             aria-label={showConfirm ? "Hide password" : "Show password"}
           >
             {showConfirm ? <EyeOff size={15} /> : <Eye size={15} />}
-          </button>
+          </Button>
         </div>
         {errors.confirm_password && <p className="text-xs text-destructive">{errors.confirm_password.message}</p>}
       </div>
@@ -260,11 +264,12 @@ export default function SignupForm() {
       </div>
 
       {/* Google Sign In */}
-      <button
+      <Button
         type="button"
+        variant="outline"
         onClick={handleGoogleSignIn}
         disabled={googleLoading || isSubmitting}
-        className="w-full flex items-center justify-center gap-3 h-10 rounded-md border border-zinc-200 bg-white text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        className="h-10 w-full gap-3"
       >
         {googleLoading ? (
           <span className="size-4 border-2 border-zinc-300 border-t-zinc-600 rounded-full animate-spin" />
@@ -277,7 +282,7 @@ export default function SignupForm() {
           </svg>
         )}
         {googleLoading ? "Redirecting…" : "Continue with Google"}
-      </button>
+      </Button>
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}

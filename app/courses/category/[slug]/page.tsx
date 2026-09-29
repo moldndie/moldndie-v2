@@ -45,7 +45,7 @@ function CourseCard({ course }: { course: Course }) {
   return (
     <Link
       href={`/courses/${course.id}`}
-      className="group rounded-xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col h-full"
+      className="group rounded-2xl overflow-hidden border border-zinc-200 bg-white shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col h-full"
     >
       <div className="aspect-video relative bg-zinc-50 overflow-hidden">
         {imgSrc ? (
@@ -91,7 +91,7 @@ function SkeletonGrid() {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
       {Array.from({ length: 6 }).map((_, i) => (
-        <div key={i} className="rounded-xl overflow-hidden border border-zinc-100 bg-white animate-pulse">
+        <div key={i} className="rounded-2xl overflow-hidden border border-zinc-200 bg-white animate-pulse">
           <div className="aspect-video bg-zinc-200" />
           <div className="p-4 space-y-2.5">
             <div className="h-4 bg-zinc-200 rounded w-3/4" />
@@ -180,7 +180,7 @@ export default async function AcademyCategoryPage({
                 {page > 1 && (
                   <Link
                     href={buildPageHref(page - 1)}
-                    className="rounded-lg px-3 py-1.5 text-sm text-zinc-600 border border-zinc-200 hover:border-zinc-400 transition-colors"
+                    className="rounded-lg px-3 py-1.5 text-sm text-zinc-600 border border-zinc-200 hover:border-primary transition-colors"
                   >
                     Previous
                   </Link>
@@ -192,7 +192,7 @@ export default async function AcademyCategoryPage({
                     className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                       p === page
                         ? "bg-primary text-white"
-                        : "text-zinc-600 border border-zinc-200 hover:border-zinc-400"
+                        : "text-zinc-600 border border-zinc-200 hover:border-primary"
                     }`}
                   >
                     {p}
@@ -201,7 +201,7 @@ export default async function AcademyCategoryPage({
                 {page < totalPages && (
                   <Link
                     href={buildPageHref(page + 1)}
-                    className="rounded-lg px-3 py-1.5 text-sm text-zinc-600 border border-zinc-200 hover:border-zinc-400 transition-colors"
+                    className="rounded-lg px-3 py-1.5 text-sm text-zinc-600 border border-zinc-200 hover:border-primary transition-colors"
                   >
                     Next
                   </Link>

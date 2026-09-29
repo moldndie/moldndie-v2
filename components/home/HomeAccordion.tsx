@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus, Globe, Heart, FileText, GraduationCap, Network } from "lucide-react";
+import { Button } from "@/components/ui/button"
 
 
 const items = [
@@ -48,20 +50,21 @@ export default function HomeAccordion() {
         const isOpen = openIndex === i;
         return (
           <div key={i}>
-            <button
+            <Button variant="unstyled"
               onClick={() => setOpenIndex(isOpen ? -1 : i)}
-              className="w-full flex items-center justify-between gap-4 py-5 text-left"
+              aria-expanded={isOpen}
+              className="group w-full flex items-center justify-between gap-4 py-5 text-left rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
             >
               <div className="flex items-center gap-3">
                 <Icon size={18} className="shrink-0 text-primary" />
-                <span className="text-sm font-medium text-zinc-800">{item.title}</span>
+                <span className={cn("text-sm font-medium transition-colors [@media(hover:hover)]:group-hover:text-primary", isOpen ? "text-primary" : "text-zinc-800")}>{item.title}</span>
               </div>
               {isOpen ? (
                 <Minus size={16} className="shrink-0 text-zinc-400" />
               ) : (
                 <Plus size={16} className="shrink-0 text-zinc-400" />
               )}
-            </button>
+            </Button>
             <AnimatePresence initial={false}>
               {isOpen && (
                 <motion.div

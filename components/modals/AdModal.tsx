@@ -136,7 +136,7 @@ export function AdModal({ open, onClose, ad, onSuccess }: AdModalProps) {
                       className={`flex items-center gap-2 cursor-pointer rounded-lg border px-2.5 py-1.5 text-xs transition-colors ${
                         checked
                           ? "border-primary bg-primary/5 text-primary font-medium"
-                          : "border-zinc-200 text-zinc-600 hover:border-zinc-400"
+                          : "border-zinc-200 text-zinc-600 hover:border-primary"
                       }`}
                     >
                       <input

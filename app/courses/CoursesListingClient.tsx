@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
@@ -34,7 +35,7 @@ const TRAINEE_LEVELS: { label: string; value: TraineeLevel | "" }[] = [
 
 function SkeletonCard() {
   return (
-    <div className="rounded-xl overflow-hidden border border-zinc-100 bg-white animate-pulse">
+    <div className="rounded-2xl overflow-hidden border border-zinc-200 bg-white animate-pulse">
       <div className="aspect-video bg-zinc-200" />
       <div className="p-4 space-y-2.5">
         <div className="h-4 bg-zinc-200 rounded w-3/4" />
@@ -60,7 +61,7 @@ function CourseCard({ course, views }: { course: Course; views: number }) {
   return (
     <Link
       href={`/courses/${course.id}`}
-      className="group rounded-xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col"
+      className="group rounded-2xl overflow-hidden border border-zinc-200 bg-white shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col"
     >
       <div className="aspect-video relative bg-white overflow-hidden">
         {imgSrc ? (
@@ -201,11 +202,8 @@ export default function CoursesListingClient() {
             <button
               key={opt.value}
               onClick={() => handleTraineeLevel(traineeLevel === opt.value ? "" : opt.value)}
-              className={`h-8 px-3 rounded-lg border text-xs font-medium transition-colors whitespace-nowrap ${
-                traineeLevel === opt.value
-                  ? "bg-primary text-white border-primary"
-                  : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400"
-              }`}
+              aria-pressed={traineeLevel === opt.value}
+              className="ui-pill h-8 px-3 rounded-lg border text-xs font-medium whitespace-nowrap"
             >
               {opt.label}
             </button>
@@ -229,9 +227,9 @@ export default function CoursesListingClient() {
           <p className="text-zinc-500 font-medium">No courses found</p>
           <p className="text-zinc-400 text-sm mt-1">Try adjusting your search or filters</p>
           {hasActiveFilters && (
-            <button onClick={clearAll} className="mt-4 text-sm text-primary no-underline underline-offset-2 hover:underline hover:opacity-70">
+            <Button variant="link" size="sm" onClick={clearAll} className="mt-4">
               Clear all filters
-            </button>
+            </Button>
           )}
         </div>
       ) : (

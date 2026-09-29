@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { useMolds, useMoldCategories, useDeleteMold, type MoldsParams } from "@/hooks/queries/useMolds"
 import { getFileUrl } from "@/lib/utils"
 import type { Mold } from "@/types"
+import { Input } from "@/components/ui/input"
 
 type FilterType = "all" | "free" | "paid"
 
@@ -69,7 +70,7 @@ export function MoldsTable() {
       cell: ({ row }) => {
         const cat = categories.find((c) => c.id === row.original.category_id)
         return cat ? (
-          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
+          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">
             {cat.name}
           </span>
         ) : (
@@ -84,7 +85,7 @@ export function MoldsTable() {
       cell: ({ row }) => {
         const price = row.original.price
         if (price === null || price === 0) {
-          return <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">Free</span>
+          return <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">Free</span>
         }
         return <span className="text-zinc-700">{price.toFixed(2)} EGP</span>
       },
@@ -94,7 +95,7 @@ export function MoldsTable() {
       header: "File",
       cell: ({ row }) =>
         row.original.file_key ? (
-          <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-600">Uploaded</span>
+          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">Uploaded</span>
         ) : (
           <span className="text-zinc-300 text-xs">—</span>
         ),
@@ -115,18 +116,18 @@ export function MoldsTable() {
       header: "",
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
-          <button
+          <Button
             onClick={() => setEditingMold(row.original)}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+            variant="ghost" size="icon-sm" className="text-zinc-400"
           >
             <Pencil className="size-3.5" />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setDeletingMold(row.original)}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+            variant="ghost-danger" size="icon-sm" className="text-zinc-400"
           >
             <Trash2 className="size-3.5" />
-          </button>
+          </Button>
         </div>
       ),
     },
@@ -138,11 +139,11 @@ export function MoldsTable() {
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-48 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 pointer-events-none" />
-          <input
+          <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search molds…"
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-zinc-200 bg-white focus:outline-none focus:ring-2 focus:ring-zinc-300 transition"
+            className="w-full pl-9"
           />
         </div>
         <Select

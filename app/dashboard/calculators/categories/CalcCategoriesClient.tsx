@@ -167,7 +167,7 @@ export default function CalcCategoriesClient({ initialCategories }: Props) {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="rounded-xl border border-zinc-200 bg-zinc-50 p-5 space-y-4"
+          className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 space-y-4"
         >
           <h3 className="text-sm font-semibold text-zinc-700">
             {editingId ? "Edit Category" : "New Category"}
@@ -228,17 +228,17 @@ export default function CalcCategoriesClient({ initialCategories }: Props) {
 
       {/* Categories list */}
       {categories.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-200 py-16 text-center">
+        <div className="rounded-2xl border border-dashed border-zinc-200 py-16 text-center">
           <p className="text-sm text-zinc-400">No categories yet.</p>
-          <button
+          <Button variant="link"
             onClick={openCreate}
-            className="mt-2 text-sm text-primary underline underline-offset-2 hover:opacity-70"
+            className="mt-2 h-auto px-0 underline underline-offset-2"
           >
             Create your first category
-          </button>
+          </Button>
         </div>
       ) : (
-        <div className="rounded-xl border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
+        <div className="rounded-2xl border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
           {categories.map((cat, i) => (
             <div
               key={cat.id}
@@ -246,20 +246,20 @@ export default function CalcCategoriesClient({ initialCategories }: Props) {
             >
               {/* Reorder */}
               <div className="flex flex-col gap-0.5">
-                <button
+                <Button
                   onClick={() => handleMove(cat.id, "up")}
                   disabled={i === 0 || isPending}
-                  className="rounded p-0.5 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+                  variant="ghost" size="icon-xs" className="text-zinc-400"
                 >
                   <ChevronUp className="size-3.5" />
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => handleMove(cat.id, "down")}
                   disabled={i === categories.length - 1 || isPending}
-                  className="rounded p-0.5 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+                  variant="ghost" size="icon-xs" className="text-zinc-400"
                 >
                   <ChevronDown className="size-3.5" />
-                </button>
+                </Button>
               </div>
 
               {/* Info */}
@@ -282,27 +282,27 @@ export default function CalcCategoriesClient({ initialCategories }: Props) {
 
               {/* Actions */}
               <div className="flex items-center gap-1">
-                <button
+                <Button
                   onClick={() => handleToggleActive(cat)}
                   disabled={isPending}
-                  className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+                  variant="ghost" size="icon-sm" className="text-zinc-400"
                   title={cat.is_active ? "Deactivate" : "Activate"}
                 >
                   {cat.is_active ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => openEdit(cat)}
-                  className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+                  variant="ghost" size="icon-sm" className="text-zinc-400"
                 >
                   <Pencil className="size-3.5" />
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => handleDelete(cat.id, cat.name)}
                   disabled={isPending}
-                  className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-40"
+                  variant="ghost-danger" size="icon-sm" className="text-zinc-400"
                 >
                   <Trash2 className="size-3.5" />
-                </button>
+                </Button>
               </div>
             </div>
           ))}

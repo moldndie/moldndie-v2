@@ -88,14 +88,14 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
           {lessons.length} lesson{lessons.length !== 1 ? "s" : ""}
         </p>
         {!form && (
-          <button
+          <Button
             type="button"
             onClick={openAdd}
-            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-600 hover:bg-zinc-50 transition-colors"
+            variant="outline"
           >
             <Plus className="size-3.5" />
             Add Lesson
-          </button>
+          </Button>
         )}
       </div>
 
@@ -109,22 +109,22 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
             >
               {/* Reorder buttons */}
               <div className="flex flex-col">
-                <button
+                <Button
                   type="button"
                   onClick={() => handleMove(index, -1)}
                   disabled={index === 0}
-                  className="text-zinc-300 hover:text-zinc-500 disabled:opacity-20"
+                  variant="ghost" size="icon-xs"
                 >
                   <ChevronUp className="size-3.5" />
-                </button>
-                <button
+                </Button>
+                <Button
                   type="button"
                   onClick={() => handleMove(index, 1)}
                   disabled={index === lessons.length - 1}
-                  className="text-zinc-300 hover:text-zinc-500 disabled:opacity-20"
+                  variant="ghost" size="icon-xs"
                 >
                   <ChevronDown className="size-3.5" />
-                </button>
+                </Button>
               </div>
 
               <span className="w-5 shrink-0 text-center text-xs text-zinc-400">{index + 1}</span>
@@ -137,20 +137,12 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
                 </span>
               )}
               <div className="flex gap-1">
-                <button
-                  type="button"
-                  onClick={() => openEdit(index)}
-                  className="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
-                >
+                <Button type="button" variant="ghost" size="icon-xs" onClick={() => openEdit(index)}>
                   <Pencil className="size-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(index)}
-                  className="rounded p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600"
-                >
+                </Button>
+                <Button type="button" variant="ghost-danger" size="icon-xs" onClick={() => handleDelete(index)}>
                   <Trash2 className="size-3.5" />
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -159,14 +151,14 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
 
       {/* Empty state */}
       {lessons.length === 0 && !form && (
-        <button
+        <Button variant="unstyled"
           type="button"
           onClick={openAdd}
-          className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-zinc-300 hover:text-zinc-500 transition-colors"
+          className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors"
         >
           <Plus className="size-4" />
           Add your first lesson
-        </button>
+        </Button>
       )}
 
       {/* Inline lesson form */}
@@ -176,13 +168,13 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
             <p className="text-sm font-medium text-zinc-700">
               {form.index !== null ? "Edit Lesson" : "New Lesson"}
             </p>
-            <button
+            <Button
               type="button"
               onClick={closeForm}
-              className="text-zinc-400 hover:text-zinc-600"
+              variant="ghost" size="icon-sm" aria-label="Close"
             >
               <X className="size-4" />
-            </button>
+            </Button>
           </div>
 
           <div className="space-y-1.5">

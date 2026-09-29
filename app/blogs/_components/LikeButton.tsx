@@ -51,13 +51,10 @@ export function LikeButton({ blogId, initialLiked, initialCount, isLoggedIn }: L
       onClick={handleClick}
       disabled={isPending}
       title={isLoggedIn ? (liked ? "Unlike" : "Like") : "Sign in to like"}
-      className={`flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-medium transition-all ${
-        liked
-          ? "border-red-200 bg-red-50 text-red-500"
-          : "border-zinc-200 bg-white text-zinc-500 hover:border-red-200 hover:text-red-400"
-      } disabled:opacity-60`}
+      aria-pressed={liked}
+      className="ui-pill flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-medium"
     >
-      <Heart className={`size-4 transition-transform ${liked ? "fill-red-500 scale-110" : ""}`} />
+      <Heart className={`size-4 transition-transform ${liked ? "fill-current scale-110" : ""}`} />
       <span>{count}</span>
     </button>
   )

@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { Mail, Phone, Tag, Clock, CheckCheck, Loader2, Trash2 } from "lucide-react"
@@ -204,22 +205,22 @@ function RequestCard({
 
         <div className="flex shrink-0 items-center gap-2">
           {!req.is_read && (
-            <button
+            <Button variant="secondary" size="sm"
               onClick={onMarkRead}
               disabled={isMarking}
-              className="inline-flex items-center gap-1.5 text-xs font-medium text-zinc-500 hover:text-zinc-900 bg-zinc-100 hover:bg-zinc-200 disabled:opacity-50 disabled:cursor-not-allowed px-3 py-1.5 rounded-lg transition-colors"
+             
             >
               {isMarking ? <Loader2 size={12} className="animate-spin" /> : <CheckCheck size={13} />}
               Mark as read
-            </button>
+            </Button>
           )}
-          <button
+          <Button variant="ghost-danger" size="sm"
             onClick={onDelete}
             aria-label="Delete request"
-            className="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600"
+            className="text-zinc-400"
           >
             <Trash2 size={13} />
-          </button>
+          </Button>
         </div>
       </div>
 

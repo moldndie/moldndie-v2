@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Cookie, Shield, BarChart3, ChevronDown, CheckCircle2 } from "lucide-react"
@@ -33,13 +34,13 @@ function CategoryRow({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-zinc-200 overflow-hidden">
-      <button
+    <div className="rounded-2xl border border-zinc-200 overflow-hidden">
+      <Button variant="unstyled"
         type="button"
         onClick={onToggle}
         aria-expanded={open}
         aria-controls={`cookie-${id}`}
-        className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-zinc-50 transition-colors text-left"
+        className="w-full flex items-center justify-between px-4 py-3.5 [@media(hover:hover)]:hover:bg-zinc-50 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40"
       >
         <div className="flex items-center gap-2.5">
           {icon}
@@ -52,7 +53,7 @@ function CategoryRow({
           size={14}
           className={`text-zinc-400 transition-transform duration-200 shrink-0 ml-2 ${open ? "rotate-180" : ""}`}
         />
-      </button>
+      </Button>
       <AnimatePresence initial={false}>
         {open && (
           <motion.div
@@ -121,7 +122,7 @@ export function CookieConsent() {
             className="w-full max-w-2xl bg-white rounded-2xl shadow-[0_-4px_32px_rgba(0,0,0,0.12)] border border-zinc-200 overflow-hidden"
           >
             {/* ── Coloured header strip ── */}
-            <div className="bg-[#5C1515] px-6 py-3.5 flex items-center justify-between">
+            <div className="bg-primary px-6 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Cookie size={15} className="text-white/70" strokeWidth={1.8} />
                 <span id="cookie-title" className="text-sm font-bold text-white">
@@ -193,20 +194,21 @@ export function CookieConsent() {
                     . Change preferences anytime via the footer.
                   </p>
                   <div className="flex gap-2.5 shrink-0">
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
                       onClick={() => decide("rejected")}
-                      className="px-5 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-semibold text-zinc-600 hover:border-zinc-400 hover:text-zinc-800 transition-colors whitespace-nowrap"
+                      className="h-auto px-5 py-2.5 font-semibold whitespace-nowrap"
                     >
                       Reject Non-Essential
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => decide("accepted")}
-                      className="px-5 py-2.5 rounded-xl bg-[#5C1515] hover:bg-[#7C2020] text-white text-sm font-bold transition-colors shadow-sm whitespace-nowrap"
+                      className="h-auto px-5 py-2.5 font-bold shadow-sm whitespace-nowrap"
                     >
                       Accept All
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

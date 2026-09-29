@@ -1,5 +1,6 @@
 "use client"
 
+import { Switch } from "@/components/ui/switch"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -226,23 +227,7 @@ export function MoldModal({ open, onClose, mold, categories, onSuccess }: MoldMo
                 <p className="text-sm font-medium text-zinc-800">Free mold</p>
                 <p className="text-xs text-zinc-500">Toggle off to set a price</p>
               </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={isFree}
-                onClick={handleFreeToggle}
-                className={cn(
-                  "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500",
-                  isFree ? "bg-primary" : "bg-zinc-200"
-                )}
-              >
-                <span
-                  className={cn(
-                    "inline-block size-4 rounded-full bg-white shadow transition-transform",
-                    isFree ? "translate-x-6" : "translate-x-1"
-                  )}
-                />
-              </button>
+              <Switch checked={isFree} onCheckedChange={() => handleFreeToggle()} size="md" />
             </div>
 
             {!isFree && (

@@ -18,6 +18,7 @@ import { ListBlock } from "./blocks/ListBlock"
 import { VideoBlock } from "./blocks/VideoBlock"
 import { FileBlock } from "./blocks/FileBlock"
 import type { FileContent } from "./blocks/FileBlock"
+import { Button } from "@/components/ui/button"
 
 // ─── Block type catalogue ─────────────────────────────────────────────────────
 
@@ -246,30 +247,30 @@ function SectionComposer({
   // ── Closed state ─────────────────────────────────────────────────────────────
   if (step === "closed") {
     return isEmpty ? (
-      <button
+      <Button variant="unstyled"
         type="button"
         onClick={() => setStep("layout")}
-        className="w-full rounded-xl border-2 border-dashed border-zinc-200 py-10 text-center hover:border-zinc-400 transition-colors group"
+        className="w-full rounded-lg border-2 border-dashed border-zinc-200 py-10 text-center hover:border-primary transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
       >
         <div className="flex justify-center mb-2.5">
-          <div className="rounded-xl bg-zinc-100 p-2.5 group-hover:bg-zinc-200 transition-colors">
+          <div className="rounded-lg bg-zinc-100 p-2.5 group-hover:bg-zinc-200 transition-colors">
             <LayoutTemplate className="size-5 text-zinc-400" />
           </div>
         </div>
-        <p className="text-sm font-medium text-zinc-400 group-hover:text-zinc-600 transition-colors">
+        <p className="text-sm font-medium text-zinc-400 group-hover:text-primary transition-colors">
           No sections yet
         </p>
         <p className="mt-1 text-xs text-zinc-300">Click to add your first section</p>
-      </button>
+      </Button>
     ) : (
-      <button
+      <Button variant="unstyled"
         type="button"
         onClick={() => setStep("layout")}
-        className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-zinc-200 py-2.5 text-sm font-medium text-zinc-400 hover:border-zinc-400 hover:text-zinc-600 transition-colors"
+        className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 py-2.5 text-sm font-medium text-zinc-400 hover:border-primary hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
       >
         <Plus className="size-3.5" />
         Add Section
-      </button>
+      </Button>
     )
   }
 
@@ -280,30 +281,30 @@ function SectionComposer({
   }
 
   return (
-    <div className="rounded-xl border border-zinc-300 bg-zinc-50 p-4 space-y-4">
+    <div className="rounded-2xl border border-zinc-300 bg-zinc-50 p-4 space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2">
         {step !== "layout" && (
-          <button
+          <Button
             type="button"
             onClick={() => setStep("layout")}
-            className="rounded-md p-1 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200 transition-colors"
+            variant="ghost" size="icon-xs" className="text-zinc-400"
             title="Back"
           >
             <ArrowLeft className="size-3.5" />
-          </button>
+          </Button>
         )}
         <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wide flex-1">
           {stepLabel[step]}
         </span>
-        <button
+        <Button
           type="button"
           onClick={reset}
-          className="rounded-md p-1 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200 transition-colors"
+          variant="ghost" size="icon-xs" className="text-zinc-400"
           title="Cancel"
         >
           <X className="size-3.5" />
-        </button>
+        </Button>
       </div>
 
       {/* Step: layout choice */}
@@ -336,15 +337,12 @@ function SectionComposer({
       {/* Step: full-width block type */}
       {step === "full-type" && (
         <div className="flex flex-wrap gap-2">
-          {BLOCK_TYPES.map(({ type, label, icon: Icon, pill }) => (
+          {BLOCK_TYPES.map(({ type, label, icon: Icon }) => (
             <button
               key={type}
               type="button"
               onClick={() => handleAddFull(type)}
-              className={cn(
-                "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-all",
-                pill,
-              )}
+              className="ui-pill flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium"
             >
               <Icon className="size-3.5 shrink-0" />
               {label}
@@ -370,15 +368,15 @@ function LayoutOption({
   onClick: () => void
 }) {
   return (
-    <button
+    <Button variant="unstyled"
       type="button"
       onClick={onClick}
-      className="group rounded-xl border-2 border-zinc-200 bg-white p-3 text-left hover:border-zinc-800 transition-all"
+      className="group rounded-lg border-2 border-zinc-200 bg-white p-3 text-left hover:border-primary transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
     >
       <div className="mb-2 rounded-lg bg-zinc-100">{preview}</div>
       <p className="text-sm font-semibold text-zinc-900">{label}</p>
       <p className="mt-0.5 text-xs text-zinc-500">{description}</p>
-    </button>
+    </Button>
   )
 }
 
@@ -404,11 +402,11 @@ function SectionCard({
   const isTwoCol = section.type === "two-column"
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
       {/* Header */}
       <div className="flex flex-wrap items-center gap-2 px-3 py-2 bg-zinc-50 border-b border-zinc-100">
         {/* Layout badge */}
-        <span className="flex items-center gap-1.5 rounded-md bg-zinc-100 border border-zinc-200 px-2 py-0.5 text-[11px] font-semibold text-zinc-500">
+        <span className="flex items-center gap-1.5 rounded-full bg-zinc-100 border border-zinc-200 px-2 py-0.5 text-[11px] font-semibold text-zinc-500">
           {isTwoCol
             ? <Columns2 className="size-3" />
             : <LayoutTemplate className="size-3" />}
@@ -420,18 +418,14 @@ function SectionCard({
 
         {/* Ratio switch (two-column only) */}
         {section.type === "two-column" && (
-          <div className="flex items-center gap-0.5 rounded-md border border-zinc-200 bg-white p-0.5">
+          <div className="flex items-center gap-0.5 rounded-lg border border-zinc-200 bg-white p-0.5">
             {RATIO_PRESETS.map((r) => (
               <button
                 key={r}
                 type="button"
                 onClick={() => onSetRatio(section.id, r)}
-                className={cn(
-                  "rounded px-1.5 py-0.5 text-[10px] font-semibold tabular-nums transition-colors",
-                  section.ratio === r
-                    ? "bg-zinc-900 text-white"
-                    : "text-zinc-500 hover:bg-zinc-100",
-                )}
+                aria-pressed={section.ratio === r}
+                className="ui-pill rounded border px-1.5 py-0.5 text-[10px] font-semibold tabular-nums"
               >
                 {r}/{100 - r}
               </button>
@@ -448,32 +442,32 @@ function SectionCard({
 
         {/* Controls */}
         <div className="flex items-center gap-0.5 ml-1">
-          <button
+          <Button
             type="button"
             onClick={() => onMove(section.id, "up")}
             disabled={index === 0}
-            className="rounded p-1 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+            variant="ghost" size="icon-xs" className="text-zinc-400"
             title="Move up"
           >
             <ChevronUp className="size-3.5" />
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={() => onMove(section.id, "down")}
             disabled={index === total - 1}
-            className="rounded p-1 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+            variant="ghost" size="icon-xs" className="text-zinc-400"
             title="Move down"
           >
             <ChevronDown className="size-3.5" />
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={() => onRemove(section.id)}
-            className="rounded p-1 text-zinc-300 hover:text-red-500 transition-colors ml-0.5"
+            variant="ghost-danger" size="icon-xs" className="text-zinc-400"
             title="Remove section"
           >
             <Trash2 className="size-3.5" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -544,32 +538,32 @@ function ColumnEditor({
           <div className="flex items-center gap-1 px-2 py-1 border-b border-zinc-100">
             <BlockBadge type={block.block_type} />
             <div className="flex-1" />
-            <button
+            <Button
               type="button"
               onClick={() => onMove(sectionId, side, block.id, "up")}
               disabled={idx === 0}
-              className="rounded p-0.5 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+              variant="ghost" size="icon-xs" className="text-zinc-400"
               title="Move up"
             >
               <ChevronUp className="size-3" />
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => onMove(sectionId, side, block.id, "down")}
               disabled={idx === blocks.length - 1}
-              className="rounded p-0.5 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+              variant="ghost" size="icon-xs" className="text-zinc-400"
               title="Move down"
             >
               <ChevronDown className="size-3" />
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => onRemove(sectionId, side, block.id)}
-              className="rounded p-0.5 text-zinc-300 hover:text-red-500 transition-colors ml-0.5"
+              variant="ghost-danger" size="icon-xs" className="text-zinc-400"
               title="Remove block"
             >
               <Trash2 className="size-3" />
-            </button>
+            </Button>
           </div>
           <div className="p-2">
             <BlockInput
@@ -586,41 +580,41 @@ function ColumnEditor({
             <span className="text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
               Add block
             </span>
-            <button
+            <Button
               type="button"
               onClick={() => setPicking(false)}
-              className="rounded p-0.5 text-zinc-400 hover:text-zinc-700 transition-colors"
+              variant="ghost" size="icon-xs" className="text-zinc-400"
               title="Cancel"
             >
               <X className="size-3" />
-            </button>
+            </Button>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {BLOCK_TYPES.map(({ type, label, icon: Icon }) => (
-              <button
+              <Button
                 key={type}
                 type="button"
                 onClick={() => {
                   onAdd(sectionId, side, type)
                   setPicking(false)
                 }}
-                className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[11px] font-medium text-zinc-600 hover:border-zinc-400 hover:bg-zinc-50 transition-all"
+                variant="outline" size="sm" className="px-3"
               >
                 <Icon className="size-3 shrink-0" />
                 {label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>
       ) : (
-        <button
+        <Button variant="unstyled"
           type="button"
           onClick={() => setPicking(true)}
-          className="w-full flex items-center justify-center gap-1 rounded-lg border border-dashed border-zinc-200 py-1.5 text-[11px] font-medium text-zinc-400 hover:border-zinc-400 hover:text-zinc-600 transition-colors"
+          className="w-full flex items-center justify-center gap-1 rounded-lg border border-dashed border-zinc-200 py-1.5 text-[11px] font-medium text-zinc-400 hover:border-primary hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
         >
           <Plus className="size-3" />
           Add to {side}
-        </button>
+        </Button>
       )}
     </div>
   )
@@ -631,7 +625,7 @@ function ColumnEditor({
 function BlockBadge({ type }: { type: BlockType }) {
   const { label, icon: Icon, badge } = blockMeta(type)
   return (
-    <span className={cn("flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium", badge)}>
+    <span className={cn("flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium", badge)}>
       <Icon className="size-3" />
       {label}
     </span>

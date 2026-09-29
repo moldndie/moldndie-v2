@@ -1,5 +1,6 @@
 "use client"
 
+import { Input } from "@/components/ui/input"
 import { useEffect, useState } from "react"
 import Link from "next/link"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -21,6 +22,7 @@ import { CroppableFileUploadField } from "@/components/forms/CroppableFileUpload
 import IconPicker from "@/components/dashboard/IconPicker"
 import RichTextEditor from "@/components/editor/RichTextEditor"
 import { toDoc, fromDoc } from "@/lib/richtext"
+import { Button } from "@/components/ui/button"
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -82,16 +84,15 @@ function ServiceForm({
     onSave(form)
   }
 
-  const inputCls = "w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
   const labelCls = "block text-xs font-semibold text-zinc-700 mb-1"
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className={labelCls}>Title *</label>
-        <input
+        <Input
           required
-          className={inputCls}
+          className="h-auto py-2"
           value={form.title}
           onChange={(e) => handleTitleChange(e.target.value)}
           placeholder="Turnkey Project Management"
@@ -100,9 +101,9 @@ function ServiceForm({
 
       <div>
         <label className={labelCls}>Slug *</label>
-        <input
+        <Input
           required
-          className={inputCls}
+          className="h-auto py-2"
           value={form.slug}
           onChange={(e) => set("slug", e.target.value)}
           placeholder="turnkey-project-management"
@@ -111,8 +112,8 @@ function ServiceForm({
 
       <div>
         <label className={labelCls}>Tagline</label>
-        <input
-          className={inputCls}
+        <Input
+          className="h-auto py-2"
           value={form.tagline ?? ""}
           onChange={(e) => set("tagline", e.target.value)}
           placeholder="One team. Start to finish."
@@ -134,8 +135,8 @@ function ServiceForm({
         <div className="space-y-2">
           {(form.highlights ?? [""]).map((h, i) => (
             <div key={i} className="flex gap-2">
-              <input
-                className={inputCls}
+              <Input
+                className="h-auto py-2"
                 value={h}
                 onChange={(e) => {
                   const next = [...(form.highlights ?? [""])]
@@ -144,25 +145,25 @@ function ServiceForm({
                 }}
                 placeholder={`Highlight ${i + 1}`}
               />
-              <button
+              <Button variant="ghost-danger" size="icon-sm"
                 type="button"
                 onClick={() => {
                   const next = (form.highlights ?? [""]).filter((_, j) => j !== i)
                   set("highlights", next.length > 0 ? next : [""])
                 }}
-                className="p-2 text-zinc-400 hover:text-red-500 transition-colors"
+                className="text-zinc-400"
               >
                 <X size={14} />
-              </button>
+              </Button>
             </div>
           ))}
-          <button
+          <Button variant="link" size="xs"
             type="button"
             onClick={() => set("highlights", [...(form.highlights ?? [""]), ""])}
-            className="text-xs text-primary font-semibold hover:opacity-70 transition-opacity"
+            className="h-auto px-0 font-semibold"
           >
             + Add highlight
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -192,9 +193,9 @@ function ServiceForm({
 
       <div>
         <label className={labelCls}>Sort Order</label>
-        <input
+        <Input
           type="number"
-          className={inputCls}
+          className="h-auto py-2"
           value={form.sort_order}
           onChange={(e) => set("sort_order", Number(e.target.value))}
         />
@@ -228,14 +229,14 @@ function ServiceForm({
       )}
 
       <div className="flex gap-3 pt-1">
-        <button
+        <Button size="lg"
           type="submit"
           disabled={isPending || imageUploading}
-          className="flex-1 inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 text-white font-bold text-sm py-2.5 rounded-xl transition-colors"
+          className="flex-1"
         >
           {(isPending || imageUploading) && <Loader2 size={14} className="animate-spin" />}
           {imageUploading ? "Uploading…" : isPending ? "Saving…" : "Save Service"}
-        </button>
+        </Button>
       </div>
     </form>
   )
@@ -352,12 +353,12 @@ export default function ServicesManagementClient() {
         <p className="text-sm text-zinc-500">
           {services.length} service{services.length !== 1 ? "s" : ""} configured
         </p>
-        <button
+        <Button size="lg"
           onClick={openCreate}
-          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-4 py-2 rounded-xl transition-colors"
+         
         >
           <Plus size={15} /> Add Service
-        </button>
+        </Button>
       </div>
 
       {/* Table */}
@@ -369,12 +370,12 @@ export default function ServicesManagementClient() {
         <div className="flex flex-col items-center justify-center py-24 text-center border-2 border-dashed border-zinc-200 rounded-2xl">
           <p className="text-zinc-500 font-medium">No services yet</p>
           <p className="text-zinc-400 text-sm mt-1">Add your first service offering</p>
-          <button
+          <Button variant="link"
             onClick={openCreate}
-            className="mt-4 text-sm text-primary underline underline-offset-2 hover:opacity-70"
+            className="mt-4 h-auto px-0 underline underline-offset-2"
           >
             Add Service
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="border border-zinc-200 rounded-2xl overflow-hidden">
@@ -404,20 +405,20 @@ export default function ServicesManagementClient() {
                 <tr key={s.id} className="hover:bg-zinc-50 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      <button
+                      <Button
                         onClick={() => moveUp(s, idx)}
                         disabled={idx === 0}
-                        className="p-1 text-zinc-400 hover:text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        variant="ghost" size="icon-xs" className="text-zinc-400"
                       >
                         <ArrowUp size={13} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => moveDown(s, idx)}
                         disabled={idx === services.length - 1}
-                        className="p-1 text-zinc-400 hover:text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        variant="ghost" size="icon-xs" className="text-zinc-400"
                       >
                         <ArrowDown size={13} />
-                      </button>
+                      </Button>
                       <span className="text-xs text-zinc-400 ml-1">{s.sort_order}</span>
                     </div>
                   </td>
@@ -426,13 +427,9 @@ export default function ServicesManagementClient() {
                     {s.tagline ?? "—"}
                   </td>
                   <td className="px-4 py-3">
-                    <button
+                    <button aria-pressed={s.is_active}
                       onClick={() => toggleMut.mutate({ id: s.id, is_active: !s.is_active })}
-                      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full transition-colors ${
-                        s.is_active
-                          ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                          : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
-                      }`}
+                      className="ui-pill inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border"
                     >
                       {s.is_active ? <ToggleRight size={13} /> : <ToggleLeft size={13} />}
                       {s.is_active ? "Active" : "Hidden"}
@@ -447,25 +444,25 @@ export default function ServicesManagementClient() {
                     <div className="flex items-center gap-1 justify-end">
                       <Link
                         href={`/dashboard/portfolio?service=${s.id}`}
-                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-primary"
+                        className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-primary hover:text-primary-foreground"
                         title="Examples for this service"
                       >
                         <Images size={14} /> Examples
                       </Link>
-                      <button
+                      <Button
                         onClick={() => openEdit(s)}
-                        className="p-1.5 text-zinc-400 hover:text-zinc-700 rounded-lg hover:bg-zinc-100 transition-colors"
+                        variant="ghost" size="icon-sm" className="text-zinc-400"
                         title="Edit"
                       >
                         <Pencil size={14} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => setDeletingService(s)}
-                        className="p-1.5 text-zinc-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                        variant="ghost-danger" size="icon-sm" className="text-zinc-400"
                         title="Delete"
                       >
                         <Trash2 size={14} />
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>

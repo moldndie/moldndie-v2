@@ -3,6 +3,7 @@
 import { useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { X } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 interface DrawerProps {
   open: boolean
@@ -52,24 +53,24 @@ export function Drawer({ open, onClose, title, children }: DrawerProps) {
             animate={{ x: 0 }}
             exit={{ x: "100%" }}
             transition={{ duration: 0.3, ease: [0.32, 0.72, 0, 1] }}
-            className="fixed top-0 right-0 z-50 h-full w-full sm:w-[65%] lg:w-115 bg-white shadow-2xl flex flex-col"
+            className="fixed top-0 right-0 z-50 h-full w-full sm:w-[65%] lg:w-115 bg-white shadow-xl flex flex-col"
           >
             {/* Header */}
-            <div className="flex items-center gap-3 px-5 py-4 border-b border-zinc-100 shrink-0 bg-white">
+            <div className="flex items-center gap-3 px-6 py-4 border-b border-zinc-200 shrink-0 bg-white">
               {title && (
-                <h2 className="flex-1 text-sm font-bold text-zinc-900 uppercase tracking-wider truncate">
+                <h2 className="flex-1 text-base font-semibold text-zinc-900 truncate">
                   {title}
                 </h2>
               )}
-              <motion.button
+              <Button
                 onClick={onClose}
-                whileTap={{ scale: 0.9 }}
-                transition={{ duration: 0.1 }}
+                variant="ghost"
+                size="icon-sm"
                 aria-label="Close drawer"
-                className="p-2 rounded-lg text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors shrink-0"
+                className="text-zinc-500 shrink-0"
               >
-                <X size={18} />
-              </motion.button>
+                <X className="size-4" />
+              </Button>
             </div>
 
             {/* Scrollable body */}

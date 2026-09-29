@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { useRef } from "react"
 import { Upload, X } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -39,23 +40,25 @@ export function ImageUploadField({ value, onChange, className }: ImageUploadFiel
             alt="Preview"
             className="h-32 w-auto rounded-lg border border-zinc-200 object-cover"
           />
-          <button
+          <Button
             type="button"
+            size="icon-xs"
+            aria-label="Remove image"
             onClick={() => onChange(null)}
-            className="absolute -right-2 -top-2 flex size-5 items-center justify-center rounded-full bg-zinc-900 text-white hover:bg-zinc-700 transition-colors"
+            className="absolute -right-2 -top-2 size-5 rounded-full"
           >
             <X className="size-3" />
-          </button>
+          </Button>
         </div>
       ) : (
-        <button
+        <Button variant="unstyled"
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-700"
+          className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-500 transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
         >
           <Upload className="size-4" />
           Click to select image
-        </button>
+        </Button>
       )}
       <input
         ref={inputRef}

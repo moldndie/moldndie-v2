@@ -34,6 +34,7 @@ import {
   uniqueKey, unitsToDb, unitsToDraft,
   type DraftField, type DraftOutput, type DraftTable,
 } from "./builder-types"
+import { Button } from "@/components/ui/button"
 
 const STEP_META = [
   { label: "Details", icon: Settings },
@@ -470,27 +471,27 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-zinc-500">The boxes people fill in before they get a result.</p>
-            <button type="button" onClick={addField} className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90">
+            <Button size="lg" type="button" onClick={addField} className="shrink-0">
               <Plus className="size-4" /> Add input
-            </button>
+            </Button>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-zinc-400">Ready-made:</span>
             {FIELD_TEMPLATES.map((t) => (
-              <button
+              <Button
                 key={t.key}
                 type="button"
                 onClick={() => addTemplateField(t.build())}
-                className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:border-primary hover:text-primary"
+                variant="outline" size="sm" className="px-3"
               >
                 <Plus className="size-3.5" /> {t.label}
-              </button>
+              </Button>
             ))}
           </div>
 
           {fields.length === 0 && (
-            <div className="rounded-xl border-2 border-dashed border-zinc-200 py-12 text-center">
+            <div className="rounded-2xl border-2 border-dashed border-zinc-200 py-12 text-center">
               <FlaskConical className="mx-auto mb-2 size-8 text-zinc-200" />
               <p className="text-sm text-zinc-400">No inputs yet. Add your first one.</p>
             </div>
@@ -528,13 +529,13 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
               What the tool works out. Build each formula by clicking — results compute top to
               bottom, so a later one can use an earlier one.
             </p>
-            <button type="button" onClick={addOutput} className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90">
+            <Button size="lg" type="button" onClick={addOutput} className="shrink-0">
               <Plus className="size-4" /> Add result
-            </button>
+            </Button>
           </div>
 
           {outputs.length === 0 && (
-            <div className="rounded-xl border-2 border-dashed border-zinc-200 py-12 text-center">
+            <div className="rounded-2xl border-2 border-dashed border-zinc-200 py-12 text-center">
               <Zap className="mx-auto mb-2 size-8 text-zinc-200" />
               <p className="text-sm text-zinc-400">No results yet. Add a formula.</p>
             </div>
@@ -575,44 +576,44 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
 
       {/* Navigation */}
       <div className="flex items-center justify-between gap-3 border-t border-zinc-200 pt-5">
-        <button
+        <Button variant="ghost" size="lg"
           onClick={() => setStep((s) => Math.max(0, s - 1))}
           disabled={step === 0}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 disabled:opacity-30 disabled:hover:bg-transparent"
+         
         >
           <ArrowLeft className="size-4" /> Back
-        </button>
+        </Button>
 
         <div className="flex items-center gap-3">
-          <button
+          <Button
             onClick={() => setPreviewOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 lg:hidden"
+            variant="outline" size="lg" className="px-3 lg:hidden"
           >
             <Eye className="size-4" /> Preview
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
             disabled={isPending}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-60"
+            variant="outline" size="lg" className="px-3 font-semibold"
           >
             {isPending ? "Saving…" : "Save"}
-          </button>
+          </Button>
           {isLast ? (
-            <button
+            <Button size="lg"
               onClick={handleSave}
               disabled={isPending}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
+              className="px-5"
             >
               <Check className="size-4" />
               {isPending ? "Saving…" : calculator ? "Save changes" : "Create tool"}
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button size="lg"
               onClick={() => setStep((s) => Math.min(STEP_META.length - 1, s + 1))}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
+              className="px-5"
             >
               Next <ArrowRight className="size-4" />
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -620,13 +621,13 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
   )
 
   const preview = (
-    <div className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-4">
+    <div className="rounded-2xl border border-zinc-200 bg-zinc-50/60 p-4">
       <div className="mb-3 flex items-center gap-2">
         <Eye className="size-4 text-primary" />
         <p className="text-sm font-bold text-zinc-900">Live preview</p>
       </div>
       {fields.length === 0 && outputs.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-200 bg-white py-12 text-center">
+        <div className="rounded-2xl border border-dashed border-zinc-200 bg-white py-12 text-center">
           <Eye className="mx-auto mb-2 size-7 text-zinc-200" />
           <p className="text-sm text-zinc-400">Your tool appears here as you build it.</p>
         </div>
@@ -682,40 +683,41 @@ function StartScreen({ existing, onTemplate, onScratch, onDuplicate }: {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {Object.entries(TEMPLATES).map(([key, tpl]) => (
-          <button
+          <Button variant="unstyled"
             key={key}
+            type="button"
             onClick={() => onTemplate(key)}
-            className="rounded-xl border border-zinc-200 bg-white p-4 text-left transition-colors hover:border-primary hover:bg-primary/5"
+            className="rounded-2xl border border-zinc-200 bg-white p-4 text-left transition-colors hover:border-primary hover:bg-primary/5 outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
           >
             <p className="text-sm font-semibold text-zinc-900">{tpl.title}</p>
             <p className="mt-1 line-clamp-2 text-xs text-zinc-400">{tpl.description}</p>
             <p className="mt-2 text-[11px] text-zinc-400">
               {tpl.fields.length} input{tpl.fields.length !== 1 ? "s" : ""} · {tpl.outputs.length} result{tpl.outputs.length !== 1 ? "s" : ""}
             </p>
-          </button>
+          </Button>
         ))}
       </div>
 
       <div className="flex flex-wrap items-center gap-3 border-t border-zinc-200 pt-5">
-        <button
+        <Button
           onClick={onScratch}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-4 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+          variant="outline" size="lg" className="px-3 font-semibold"
         >
           <FileText className="size-4" /> Start from scratch
-        </button>
+        </Button>
 
         {existing.length > 0 && (
           <label className="flex items-center gap-2 text-sm text-zinc-500">
             <Copy className="size-4 text-zinc-400" />
             Or copy an existing tool:
-            <select
+            <Select
               defaultValue=""
               onChange={(e) => e.target.value && onDuplicate(e.target.value)}
-              className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="py-1.5"
             >
               <option value="">— pick one —</option>
               {existing.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
-            </select>
+            </Select>
           </label>
         )}
       </div>
@@ -739,7 +741,7 @@ function Stepper({ current, counts, problems, onGo }: {
         const count = counts[i]
         return (
           <div key={label} className="flex flex-1 items-center last:flex-none">
-            <button type="button" onClick={() => onGo(i)} className="group flex items-center gap-2.5">
+            <Button variant="unstyled" type="button" onClick={() => onGo(i)} className="group flex items-center gap-2.5 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
               <span className={cn(
                 "flex size-8 shrink-0 items-center justify-center rounded-full border text-sm font-semibold transition-colors",
                 active ? "border-primary bg-primary text-white"
@@ -757,7 +759,7 @@ function Stepper({ current, counts, problems, onGo }: {
                   {bad ? `${problems[i]} to fix` : `Step ${i + 1}`}
                 </span>
               </span>
-            </button>
+            </Button>
             {i < STEP_META.length - 1 && <span className="mx-3 h-px min-w-4 flex-1 bg-zinc-200" />}
           </div>
         )
@@ -780,7 +782,7 @@ function StepDetails(props: {
   categories: CalcCategory[]
 }) {
   return (
-    <div className="space-y-5 rounded-xl border border-zinc-200 bg-white p-6">
+    <div className="space-y-5 rounded-2xl border border-zinc-200 bg-white p-6">
       <div>
         <Label required>Title</Label>
         <Input value={props.title} onChange={(e) => props.onTitle(e.target.value)} placeholder="e.g. Injection Molding Cycle Time" />
@@ -827,9 +829,9 @@ function StepDetails(props: {
         {props.customHtml ? (
           <div className="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 px-3 py-2 text-sm">
             <span className="text-zinc-700">HTML file uploaded ({Math.round(props.customHtml.length / 1024)} KB)</span>
-            <button type="button" onClick={() => props.onCustomHtml(null)} className="text-xs font-medium text-red-600 hover:underline">
+            <Button variant="ghost-danger" size="xs" type="button" onClick={() => props.onCustomHtml(null)}>
               Remove
-            </button>
+            </Button>
           </div>
         ) : (
           <input
@@ -852,13 +854,13 @@ function StepDetails(props: {
       <div>
         <Label>Unit switcher</Label>
         {props.unitSystems.length === 0 ? (
-          <button
+          <Button
             type="button"
             onClick={() => props.onUnitSystems(DEFAULT_UNIT_SYSTEMS)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-primary hover:text-primary"
+            variant="outline" size="lg" className="px-3"
           >
             <Plus className="size-4" /> Offer Metric and Imperial
-          </button>
+          </Button>
         ) : (
           <div className="space-y-2">
             {props.unitSystems.map((u, i) => (
@@ -871,9 +873,9 @@ function StepDetails(props: {
                 />
               </div>
             ))}
-            <button type="button" onClick={() => props.onUnitSystems([])} className="text-xs text-zinc-400 transition-colors hover:text-red-600">
+            <Button variant="ghost-danger" size="xs" type="button" onClick={() => props.onUnitSystems([])} className="text-zinc-400">
               Remove the unit switcher
-            </button>
+            </Button>
           </div>
         )}
         <p className="mt-1 text-xs text-zinc-400">
@@ -924,7 +926,7 @@ function StepPublish(props: {
   const ready = props.problems.count === 0
   return (
     <div className="space-y-5">
-      <div className={cn("rounded-xl border p-5", ready ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50")}>
+      <div className={cn("rounded-2xl border p-5", ready ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50")}>
         <div className="mb-2 flex items-center gap-2">
           {ready ? <CheckCircle2 className="size-5 text-emerald-600" /> : <AlertTriangle className="size-5 text-amber-600" />}
           <p className={cn("text-sm font-bold", ready ? "text-emerald-800" : "text-amber-800")}>
@@ -945,8 +947,8 @@ function StepPublish(props: {
               )}
             </ul>
             <div className="mt-3 flex gap-2">
-              <button onClick={() => props.onGo(1)} className="text-xs font-medium text-amber-800 underline hover:no-underline">Go to Inputs</button>
-              <button onClick={() => props.onGo(2)} className="text-xs font-medium text-amber-800 underline hover:no-underline">Go to Results</button>
+              <Button variant="link" size="xs" onClick={() => props.onGo(1)} className="h-auto px-0 text-amber-800 underline hover:no-underline">Go to Inputs</Button>
+              <Button variant="link" size="xs" onClick={() => props.onGo(2)} className="h-auto px-0 text-amber-800 underline hover:no-underline">Go to Results</Button>
             </div>
           </>
         )}

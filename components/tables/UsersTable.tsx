@@ -35,6 +35,8 @@ import {
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import type { Profile } from "@/types"
 import type { UserEditValues, UserCreateValues } from "@/schemas/user.schema"
+import { Input } from "@/components/ui/input"
+import { Select } from "@/components/ui/select"
 
 
 // ---------------------------------------------------------------------------
@@ -230,7 +232,7 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
         <span
           className={
             row.original.role === "admin"
-              ? "rounded-full bg-zinc-900 px-2 py-0.5 text-xs font-medium text-white"
+              ? "rounded-full bg-primary px-2 py-0.5 text-xs font-medium text-primary-foreground"
               : "rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600"
           }
         >
@@ -243,11 +245,11 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
       header: "Status",
       cell: ({ row }) =>
         row.original.is_active ? (
-          <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">
+          <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
             Active
           </span>
         ) : (
-          <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-medium text-red-600">
+          <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-medium text-red-700">
             Inactive
           </span>
         ),
@@ -257,12 +259,12 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
       header: "Email Verified",
       cell: ({ row }) =>
         row.original.email_confirmed_at ? (
-          <span className="inline-flex items-center gap-1 rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">
+          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">
             <MailCheck className="size-3" />
             Verified
           </span>
         ) : (
-          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-700">
+          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
             Pending
           </span>
         ),
@@ -290,65 +292,65 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
         return (
           <div className="flex items-center justify-end gap-1">
             {/* Edit */}
-            <button
+            <Button
               onClick={() => setEditingUser(user)}
               title="Edit"
-              className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700"
+              variant="ghost" size="icon-sm" className="text-zinc-400"
             >
               <Pencil className="size-3.5" />
-            </button>
+            </Button>
 
             {/* Deactivate / Reactivate */}
             {user.is_active ? (
-              <button
+              <Button
                 onClick={() => setTogglingUser(user)}
                 disabled={isSelf}
                 title={isSelf ? "You cannot deactivate your own account." : "Deactivate"}
-                className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+                variant="ghost-danger" size="icon-sm" className="text-zinc-400"
               >
                 <UserX className="size-3.5" />
-              </button>
+              </Button>
             ) : (
-              <button
+              <Button
                 onClick={() => setTogglingUser(user)}
                 title="Reactivate"
-                className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-green-50 hover:text-green-600"
+                variant="ghost" size="icon-sm" className="text-zinc-400"
               >
                 <UserCheck className="size-3.5" />
-              </button>
+              </Button>
             )}
 
             {/* Reset Password */}
-            <button
+            <Button
               onClick={() => { if (hasEmail) resetPasswordMutation.mutate(user.email!) }}
               disabled={!hasEmail || resetPasswordMutation.isPending}
               title={hasEmail ? "Send password reset email" : "No email on file"}
-              className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+              variant="ghost" size="icon-sm" className="text-zinc-400"
             >
               <KeyRound className="size-3.5" />
-            </button>
+            </Button>
 
             {/* Resend Verification — hidden once verified */}
             {!isVerified && (
-              <button
+              <Button
                 onClick={() => { if (hasEmail) resendMutation.mutate(user.email!) }}
                 disabled={resendMutation.isPending}
                 title="Resend verification email"
-                className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-amber-50 hover:text-amber-600 disabled:opacity-40"
+                variant="ghost" size="icon-sm" className="text-zinc-400"
               >
                 <Send className="size-3.5" />
-              </button>
+              </Button>
             )}
 
             {/* Delete */}
-            <button
+            <Button
               onClick={() => setDeletingUser(user)}
               disabled={isSelf}
               title={isSelf ? "You cannot delete your own account." : "Delete permanently"}
-              className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+              variant="ghost-danger" size="icon-sm" className="text-zinc-400"
             >
               <Trash2 className="size-3.5" />
-            </button>
+            </Button>
           </div>
         )
       },
@@ -361,25 +363,25 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-45 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-zinc-400 pointer-events-none" />
-          <input
+          <Input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by name or email…"
-            className="w-full pl-8 pr-3 py-2 text-sm border border-zinc-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+            className="w-full pl-8"
           />
         </div>
-        <select
+        <Select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-          className="h-9 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-700 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white"
+          className="h-9"
         >
           <option value="all">All users</option>
           <option value="active">Active</option>
           <option value="inactive">Inactive</option>
           <option value="verified">Verified</option>
           <option value="pending">Pending verification</option>
-        </select>
+        </Select>
         <span className="text-xs text-zinc-400 ml-1">{filtered.length} result{filtered.length !== 1 ? "s" : ""}</span>
         {currentUserRole === "admin" && (
           <Button onClick={() => setCreating(true)} className="ml-auto">

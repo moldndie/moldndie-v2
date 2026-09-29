@@ -1,5 +1,7 @@
 "use client"
 
+import { Input } from "@/components/ui/input"
+import { Select } from "@/components/ui/select"
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -25,6 +27,7 @@ import { FileUploadField } from "@/components/forms/FileUploadField"
 import { FilePreview } from "@/components/forms/FilePreview"
 import RichTextEditor from "@/components/editor/RichTextEditor"
 import { toDoc, fromDoc } from "@/lib/richtext"
+import { Button } from "@/components/ui/button"
 
 const EMPTY_FORM: PortfolioItemFormValues = {
   title: "",
@@ -81,9 +84,9 @@ function PortfolioForm({
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
         <label className={labelCls}>Title *</label>
-        <input
+        <Input
           required
-          className={inputCls}
+          className="h-auto py-2"
           value={form.title}
           onChange={(e) => set("title", e.target.value)}
           placeholder="e.g. 8-cavity hot runner mold for automotive clips"
@@ -92,8 +95,7 @@ function PortfolioForm({
 
       <div>
         <label className={labelCls}>Service</label>
-        <select
-          className={inputCls}
+        <Select
           value={form.service_id ?? ""}
           onChange={(e) => set("service_id", e.target.value)}
         >
@@ -101,7 +103,7 @@ function PortfolioForm({
           {services.map((s) => (
             <option key={s.id} value={s.id}>{s.title}</option>
           ))}
-        </select>
+        </Select>
         <p className="text-xs text-zinc-400 mt-1">
           Pick a service to show this example on that service&apos;s own page instead.
         </p>
@@ -161,8 +163,8 @@ function PortfolioForm({
 
       <div>
         <label className={labelCls}>Video link</label>
-        <input
-          className={inputCls}
+        <Input
+          className="h-auto py-2"
           value={form.video_url ?? ""}
           onChange={(e) => set("video_url", e.target.value)}
           placeholder="https://youtube.com/watch?v=…"
@@ -185,14 +187,14 @@ function PortfolioForm({
         </p>
       )}
 
-      <button
+      <Button size="lg"
         type="submit"
         disabled={isPending || uploading}
-        className="w-full inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 text-white font-bold text-sm py-2.5 rounded-xl transition-colors"
+        className="w-full"
       >
         {(isPending || uploading) && <Loader2 size={14} className="animate-spin" />}
         {uploading ? "Uploading…" : isPending ? "Saving…" : "Save Item"}
-      </button>
+      </Button>
     </form>
   )
 }
@@ -286,24 +288,24 @@ export default function PortfolioManagementClient() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <select
+          <Select
             value={serviceFilter}
             onChange={(e) => router.replace(e.target.value ? `?service=${e.target.value}` : "?")}
-            className="h-9 rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-700"
+            className="text-zinc-700"
           >
             <option value="">All services</option>
             {services.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
-          </select>
+          </Select>
           <p className="text-sm text-zinc-500">
             {items.length} example{items.length !== 1 ? "s" : ""}
           </p>
         </div>
-        <button
+        <Button size="lg"
           onClick={() => { setFormError(null); setCreateOpen(true) }}
-          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-4 py-2 rounded-xl transition-colors"
+         
         >
           <Plus size={15} /> Add Item
-        </button>
+        </Button>
       </div>
 
       {isLoading ? (
@@ -314,12 +316,12 @@ export default function PortfolioManagementClient() {
         <div className="flex flex-col items-center justify-center py-24 text-center border-2 border-dashed border-zinc-200 rounded-2xl">
           <p className="text-zinc-500 font-medium">No examples yet</p>
           <p className="text-zinc-400 text-sm mt-1">Add the first example — each can have rich text, several images and a video</p>
-          <button
+          <Button variant="link"
             onClick={() => { setFormError(null); setCreateOpen(true) }}
-            className="mt-4 text-sm text-primary underline underline-offset-2 hover:opacity-70"
+            className="mt-4 h-auto px-0 underline underline-offset-2"
           >
             Add Item
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="border border-zinc-200 rounded-2xl overflow-hidden">
@@ -338,20 +340,20 @@ export default function PortfolioManagementClient() {
                 <tr key={item.id} className="hover:bg-zinc-50 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      <button
+                      <Button
                         onClick={() => move(item, idx, -1)}
                         disabled={idx === 0}
-                        className="p-1 text-zinc-400 hover:text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        variant="ghost" size="icon-xs" className="text-zinc-400"
                       >
                         <ArrowUp size={13} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => move(item, idx, 1)}
                         disabled={idx === items.length - 1}
-                        className="p-1 text-zinc-400 hover:text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        variant="ghost" size="icon-xs" className="text-zinc-400"
                       >
                         <ArrowDown size={13} />
-                      </button>
+                      </Button>
                       <span className="text-xs text-zinc-400 ml-1">{item.sort_order}</span>
                     </div>
                   </td>
@@ -363,13 +365,9 @@ export default function PortfolioManagementClient() {
                     ].filter(Boolean).join(" · ") || "—"}
                   </td>
                   <td className="px-4 py-3">
-                    <button
+                    <button aria-pressed={item.is_active}
                       onClick={() => toggleMut.mutate({ id: item.id, is_active: !item.is_active })}
-                      className={`inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full transition-colors ${
-                        item.is_active
-                          ? "bg-emerald-100 text-emerald-700 hover:bg-emerald-200"
-                          : "bg-zinc-100 text-zinc-500 hover:bg-zinc-200"
-                      }`}
+                      className="ui-pill inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-1 rounded-full border"
                     >
                       {item.is_active ? <ToggleRight size={13} /> : <ToggleLeft size={13} />}
                       {item.is_active ? "Active" : "Hidden"}
@@ -377,20 +375,20 @@ export default function PortfolioManagementClient() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1 justify-end">
-                      <button
+                      <Button
                         onClick={() => { setFormError(null); setEditing(item) }}
-                        className="p-1.5 text-zinc-400 hover:text-zinc-700 rounded-lg hover:bg-zinc-100 transition-colors"
+                        variant="ghost" size="icon-sm" className="text-zinc-400"
                         title="Edit"
                       >
                         <Pencil size={14} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => setDeleting(item)}
-                        className="p-1.5 text-zinc-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                        variant="ghost-danger" size="icon-sm" className="text-zinc-400"
                         title="Delete"
                       >
                         <Trash2 size={14} />
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>

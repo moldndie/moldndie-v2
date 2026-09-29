@@ -11,6 +11,7 @@ import {
   Archive,
   File,
 } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export interface FileContent {
   file_path: string
@@ -118,29 +119,29 @@ export function FileBlock({ value, onChange }: FileBlockProps) {
             )}
           </div>
         </div>
-        <button
+        <Button
           type="button"
           onClick={() => onChange({ file_path: "", file_name: "", file_type: "" })}
-          className="shrink-0 rounded-md p-1 text-zinc-400 hover:bg-zinc-200 hover:text-zinc-700 transition-colors"
+          variant="ghost" size="icon-xs" className="text-zinc-400"
         >
           <X className="size-4" />
-        </button>
+        </Button>
       </div>
     )
   }
 
   return (
     <div className="space-y-2">
-      <button
+      <Button variant="unstyled"
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={uploading}
-        className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 px-4 py-6 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-700 disabled:opacity-50"
+        className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 px-4 py-6 text-sm text-zinc-500 transition-colors hover:border-primary hover:text-primary disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
       >
         <Upload className="size-5" />
         <span>{uploading ? progress ?? "Uploading…" : "Click to upload file"}</span>
         <span className="text-xs text-zinc-400">PDF, PPT, DOC, XLS, JPG, PNG, MP4, ZIP, RAR — max {MAX_SIZE_MB} MB</span>
-      </button>
+      </Button>
       <input
         ref={inputRef}
         type="file"

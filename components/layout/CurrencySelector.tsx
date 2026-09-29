@@ -29,16 +29,13 @@ export function CurrencySelector() {
   if (!showsPrices(pathname)) return null
 
   return (
-    <div className="flex items-center rounded-lg border border-zinc-200 bg-zinc-50 text-xs font-semibold overflow-hidden">
+    <div className="flex items-center gap-1 text-xs font-semibold">
       {OPTIONS.map((opt) => (
         <button
           key={opt.value}
           onClick={() => setCurrency(opt.value)}
-          className={`px-2.5 py-1 transition-colors ${
-            currency === opt.value
-              ? "bg-primary text-white"
-              : "text-zinc-500 hover:text-zinc-800"
-          }`}
+          aria-pressed={currency === opt.value}
+          className="ui-pill rounded-lg border px-2.5 py-1"
         >
           {opt.label}
         </button>

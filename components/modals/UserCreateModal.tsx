@@ -172,13 +172,14 @@ function InviteShare({ url, name, onDone }: { url: string; name: string; onDone:
         <a className={SHARE_BTN} href={`https://wa.me/?text=${text}`} target="_blank" rel="noopener noreferrer">WhatsApp</a>
         <a className={SHARE_BTN} href={`sms:?&body=${text}`}>SMS</a>
         <a className={SHARE_BTN} href={`https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(`Hi ${name}, you're invited to join MoldNdie. Set your password here:`)}`} target="_blank" rel="noopener noreferrer">Telegram</a>
-        <button
+        <Button
           type="button"
-          className={SHARE_BTN}
+          variant="outline"
+          className="h-auto px-3 py-2"
           onClick={() => navigator.clipboard.writeText(msg).then(() => setCopied(true))}
         >
           {copied ? "Copied" : "Copy message"}
-        </button>
+        </Button>
       </div>
       <p className="text-xs text-zinc-400">This link is personal — send it only to {name}.</p>
 

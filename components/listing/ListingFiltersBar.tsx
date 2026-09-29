@@ -1,7 +1,9 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { Search, X } from "lucide-react"
 import { Select } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
 
 export interface SortOption {
   label: string
@@ -60,12 +62,12 @@ export function ListingFiltersBar({
               size={15}
               className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400"
             />
-            <input
+            <Input
               type="text"
               value={searchValue}
               onChange={(e) => onSearchChange(e.target.value)}
               placeholder={searchPlaceholder}
-              className="h-9 w-full sm:w-52 rounded-lg border border-input bg-background pl-9 pr-3 py-2 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+              className="h-9 w-full sm:w-52 pl-9"
             />
           </div>
 
@@ -83,13 +85,10 @@ export function ListingFiltersBar({
           )}
 
           {hasActiveFilters && (
-            <button
-              onClick={onClear}
-              className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-900 transition-colors whitespace-nowrap"
-            >
+            <Button variant="link" size="sm" onClick={onClear} className="whitespace-nowrap">
               <X size={13} />
               Clear filters
-            </button>
+            </Button>
           )}
         </div>
 

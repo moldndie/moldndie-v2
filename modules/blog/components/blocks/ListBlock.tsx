@@ -2,6 +2,7 @@
 
 import { Plus, X } from "lucide-react"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 interface ListContent {
   items: string[]
@@ -38,23 +39,23 @@ export function ListBlock({ value, onChange }: ListBlockProps) {
             onChange={(e) => updateItem(i, e.target.value)}
             placeholder={`Item ${i + 1}`}
           />
-          <button
+          <Button
             type="button"
             onClick={() => removeItem(i)}
-            className="shrink-0 rounded p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-red-500 transition-colors"
+            variant="ghost-danger" size="icon-sm" className="text-zinc-400"
           >
             <X className="size-4" />
-          </button>
+          </Button>
         </div>
       ))}
-      <button
+      <Button
         type="button"
         onClick={addItem}
-        className="flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-700 transition-colors"
+        variant="link" size="sm"
       >
         <Plus className="size-3.5" />
         Add item
-      </button>
+      </Button>
     </div>
   )
 }

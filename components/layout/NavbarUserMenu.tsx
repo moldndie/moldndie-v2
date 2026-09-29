@@ -21,7 +21,7 @@ function CartButton() {
   return (
     <Link
       href="/cart"
-      className="relative p-2 text-zinc-600 hover:text-zinc-900 transition-colors"
+      className="relative p-2 text-zinc-600 hover:text-primary transition-colors"
       aria-label="Cart"
     >
       <ShoppingCart size={20} />
@@ -122,18 +122,18 @@ export default function NavbarUserMenu() {
       <CartButton />
 
       <div className="relative" ref={dropdownRef}>
-        <button
+        <Button variant="unstyled"
           onClick={() => setOpen((v) => !v)}
-          className="flex items-center gap-1.5 cursor-pointer rounded-full p-1 hover:bg-zinc-100 transition-colors"
+          className="flex items-center gap-1.5 cursor-pointer rounded-full p-1 [@media(hover:hover)]:hover:bg-primary [@media(hover:hover)]:hover:text-primary-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
         >
           <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold shrink-0">
             {initial}
           </div>
           <ChevronDown className={`size-3.5 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`} />
-        </button>
+        </Button>
 
         {open && (
-          <div className="absolute right-0 mt-2 w-56 rounded-xl border border-zinc-200 bg-white shadow-md py-1 z-50">
+          <div className="absolute right-0 mt-2 w-56 rounded-2xl border border-zinc-200 bg-white shadow-md py-1 z-50">
             {/* Identity header */}
             <div className="px-4 py-2.5 border-b border-zinc-100 mb-1">
               {fullName && (
@@ -144,7 +144,7 @@ export default function NavbarUserMenu() {
             <Link
               href="/profile"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
+              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors"
             >
               <UserCircle className="size-4 text-zinc-400" />
               My Profile
@@ -152,7 +152,7 @@ export default function NavbarUserMenu() {
             <Link
               href="/my-courses"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
+              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors"
             >
               <GraduationCap className="size-4 text-zinc-400" />
               My Courses
@@ -160,7 +160,7 @@ export default function NavbarUserMenu() {
             <Link
               href="/purchases"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
+              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors"
             >
               <ShoppingBag className="size-4 text-zinc-400" />
               My Purchases
@@ -169,19 +169,19 @@ export default function NavbarUserMenu() {
               <Link
                 href="/dashboard"
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
+                className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 <LayoutDashboard className="size-4 text-zinc-400" />
                 Dashboard
               </Link>
             )}
-            <button
+            <Button variant="unstyled"
               onClick={handleLogout}
-              className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
+              className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 [@media(hover:hover)]:hover:bg-primary [@media(hover:hover)]:hover:text-primary-foreground transition-colors focus-visible:outline-none focus-visible:bg-primary focus-visible:text-primary-foreground"
             >
               <LogOut className="size-4 text-zinc-400" />
               Logout
-            </button>
+            </Button>
           </div>
         )}
       </div>

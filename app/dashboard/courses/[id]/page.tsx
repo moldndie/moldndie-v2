@@ -11,7 +11,7 @@ import { docToText } from "@/lib/richtext"
 const LessonsManager = dynamic(
   () => import("@/components/dashboard/courses/LessonsManager").then((m) => m.LessonsManager),
   {
-    loading: () => <div className="h-48 rounded-xl bg-gray-100 animate-pulse" />,
+    loading: () => <div className="h-48 rounded-2xl bg-gray-100 animate-pulse" />,
   }
 )
 
@@ -44,7 +44,7 @@ export default async function CourseEditPage({ params }: Props) {
       {/* Back link */}
       <Link
         href="/dashboard/courses"
-        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-800 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-primary transition-colors"
       >
         <ChevronLeft className="size-4" />
         Back to Courses
@@ -74,7 +74,7 @@ export default async function CourseEditPage({ params }: Props) {
       <div className="border-t border-zinc-200" />
 
       {/* Lessons section */}
-      <Suspense fallback={<div className="h-48 rounded-xl bg-gray-100 animate-pulse" />}>
+      <Suspense fallback={<div className="h-48 rounded-2xl bg-gray-100 animate-pulse" />}>
         <LessonsManager courseId={id} />
       </Suspense>
     </div>

@@ -1,5 +1,6 @@
 "use client"
 
+import { Switch } from "@/components/ui/switch"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -14,6 +15,7 @@ import { useCreateCourse, useUpdateCourse, useAcademyCategories } from "@/hooks/
 import { cn } from "@/lib/utils"
 import { toDoc, fromDoc } from "@/lib/richtext"
 import type { Course } from "@/types"
+import { Select } from "@/components/ui/select"
 
 const TRAINEE_LEVELS = [
   { label: "Beginner",     value: "beginner" },
@@ -144,13 +146,13 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
           {/* Category */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700">Category</label>
-            <select
+            <Select
               value={categoryId ?? ""}
               onChange={(e) =>
-                setValue("category_id", e.target.value || null, { shouldValidate: true })
-              }
-              className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white"
-            >
+ setValue("category_id", e.target.value || null, { shouldValidate: true })
+ }
+ className="w-full"
+ >
               <option value="">No category</option>
               {categories
                 .filter((c) => c.is_active)
@@ -159,30 +161,30 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
                     {cat.name}
                   </option>
                 ))}
-            </select>
+            </Select>
           </div>
 
           {/* Trainee level */}
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700">Level</label>
-            <select
+            <Select
               value={traineeLevel ?? ""}
               onChange={(e) =>
-                setValue(
-                  "trainee_level",
-                  (e.target.value as CourseFormValues["trainee_level"]) || null,
-                  { shouldValidate: true }
-                )
-              }
-              className="w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary bg-white"
-            >
+ setValue(
+ "trainee_level",
+ (e.target.value as CourseFormValues["trainee_level"]) || null,
+ { shouldValidate: true }
+ )
+ }
+ className="w-full"
+ >
               <option value="">No level</option>
               {TRAINEE_LEVELS.map((l) => (
                 <option key={l.value} value={l.value}>
                   {l.label}
                 </option>
               ))}
-            </select>
+            </Select>
           </div>
 
           {/* Free / Paid toggle */}
@@ -191,23 +193,7 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
               <p className="text-sm font-medium text-zinc-800">Free course</p>
               <p className="text-xs text-zinc-500">Toggle off to set a price</p>
             </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={isFree}
-              onClick={handleFreeToggle}
-              className={cn(
-                "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500",
-                isFree ? "bg-zinc-900" : "bg-zinc-200"
-              )}
-            >
-              <span
-                className={cn(
-                  "inline-block size-4 rounded-full bg-white shadow transition-transform",
-                  isFree ? "translate-x-6" : "translate-x-1"
-                )}
-              />
-            </button>
+            <Switch checked={isFree} onCheckedChange={() => handleFreeToggle()} size="md" />
           </div>
 
           {!isFree && (
@@ -243,23 +229,7 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
               <p className="text-sm font-medium text-zinc-800">Published</p>
               <p className="text-xs text-zinc-500">Make this course visible to students</p>
             </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={isPublished}
-              onClick={() => setValue("is_published", !isPublished, { shouldValidate: true })}
-              className={cn(
-                "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500",
-                isPublished ? "bg-zinc-900" : "bg-zinc-200"
-              )}
-            >
-              <span
-                className={cn(
-                  "inline-block size-4 rounded-full bg-white shadow transition-transform",
-                  isPublished ? "translate-x-6" : "translate-x-1"
-                )}
-              />
-            </button>
+            <Switch checked={isPublished} onCheckedChange={() => setValue("is_published", !isPublished, { shouldValidate: true })} size="md" />
           </div>
 
           {mutationError && (

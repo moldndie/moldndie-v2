@@ -22,7 +22,7 @@ export default async function CmsPageEditPage({ params }: Props) {
       <div className="flex items-center gap-3">
         <Link
           href="/dashboard/cms-pages"
-          className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-900 transition-colors"
+          className="flex items-center gap-1 text-xs text-zinc-500 hover:text-primary transition-colors"
         >
           <ChevronLeft className="size-3.5" />
           CMS Pages

@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { useRef, useState } from "react"
 import { X, Plus, Loader2 } from "lucide-react"
 import { getFileUrl } from "@/lib/utils"
@@ -105,14 +106,10 @@ export function GalleryGrid({ items, onAdd, onRemove, onUploadingChange }: Galle
         <p className="text-sm text-zinc-500">
           {totalCount} item{totalCount !== 1 ? "s" : ""}
         </p>
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-600 hover:bg-zinc-50 transition-colors"
-        >
+        <Button type="button" variant="outline" onClick={() => inputRef.current?.click()}>
           <Plus className="size-3.5" />
           Add Media
-        </button>
+        </Button>
       </div>
 
       <input
@@ -125,14 +122,14 @@ export function GalleryGrid({ items, onAdd, onRemove, onUploadingChange }: Galle
       />
 
       {totalCount === 0 ? (
-        <button
+        <Button variant="unstyled"
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-zinc-300 hover:text-zinc-500 transition-colors"
+          className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors"
         >
           <Plus className="size-4" />
           Upload gallery images or videos
-        </button>
+        </Button>
       ) : (
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
           {items.map((item, index) => (
@@ -154,13 +151,13 @@ export function GalleryGrid({ items, onAdd, onRemove, onUploadingChange }: Galle
                   preload="metadata"
                 />
               )}
-              <button
+              <Button variant="unstyled"
                 type="button"
                 onClick={() => onRemove(index)}
-                className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               >
                 <X className="size-3" />
-              </button>
+              </Button>
               {item.type === "video" && (
                 <span className="absolute bottom-1 left-1 rounded bg-black/50 px-1 py-0.5 text-[10px] text-white">
                   VIDEO
@@ -182,13 +179,13 @@ export function GalleryGrid({ items, onAdd, onRemove, onUploadingChange }: Galle
                 />
               </div>
               <p className="w-full truncate text-center text-[10px] text-zinc-500">{upload.name}</p>
-              <button
+              <Button variant="unstyled"
                 type="button"
                 onClick={() => upload.xhr?.abort()}
-                className="absolute right-1 top-1 rounded-full bg-black/40 p-0.5 text-white"
+                className="absolute right-1 top-1 rounded-full bg-black/40 p-0.5 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               >
                 <X className="size-3" />
-              </button>
+              </Button>
             </div>
           ))}
         </div>

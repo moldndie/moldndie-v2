@@ -12,7 +12,7 @@ export default function CoursesPage() {
         description="Manage academy courses and lessons."
         action={<Button>Create Course</Button>}
       />
-      <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-400">
+      <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-400">
         No courses yet. Courses table will appear here.
       </div>
     </div>

@@ -4,6 +4,7 @@ import { useState, useEffect, useTransition } from "react"
 import { Heart, MessageSquare, Trash2, X } from "lucide-react"
 import { getBlogEngagement, deleteComment } from "@/services/blog.service"
 import type { BlogComment } from "@/services/blog.service"
+import { Button } from "@/components/ui/button"
 
 interface EngagementModalProps {
   blogId: string
@@ -63,12 +64,12 @@ export function EngagementModal({ blogId, blogTitle, open, onClose }: Engagement
             <h2 className="text-sm font-semibold text-zinc-900 line-clamp-1">{blogTitle}</h2>
             <p className="text-xs text-zinc-400 mt-0.5">Engagement</p>
           </div>
-          <button
+          <Button
             onClick={onClose}
-            className="rounded-md p-1 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 transition-colors"
+            variant="ghost" size="icon-xs" className="text-zinc-400"
           >
             <X className="size-4" />
-          </button>
+          </Button>
         </div>
 
         {loading ? (
@@ -115,13 +116,13 @@ export function EngagementModal({ blogId, blogTitle, open, onClose }: Engagement
                             })}
                           </span>
                         </div>
-                        <button
+                        <Button
                           onClick={() => handleDelete(comment.id)}
                           disabled={deletingId === comment.id}
-                          className="opacity-0 group-hover:opacity-100 rounded p-0.5 text-zinc-300 hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-40"
+                          variant="ghost-danger" size="icon-xs" className="text-zinc-400"
                         >
                           <Trash2 className="size-3.5" />
-                        </button>
+                        </Button>
                       </div>
                       <p className="mt-0.5 text-xs text-zinc-600 leading-relaxed whitespace-pre-wrap">
                         {comment.content}

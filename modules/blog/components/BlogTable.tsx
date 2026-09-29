@@ -107,58 +107,54 @@ export function BlogTable() {
         return (
           <div className="flex items-center justify-end gap-1">
             {/* Analytics */}
-            <button
+            <Button
               onClick={() => setEngagementBlog(blog)}
-              className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+              variant="ghost" size="icon-sm" className="text-zinc-400"
               title="View engagement"
             >
               <BarChart2 className="size-3.5" />
-            </button>
+            </Button>
 
             {/* Preview — opens full frontend preview in new tab */}
-            <button
+            <Button
               onClick={() => window.open(`/blogs/preview/${blog.id}`, "_blank")}
-              className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+              variant="ghost" size="icon-sm" className="text-zinc-400"
               title="Preview"
             >
               <Eye className="size-3.5" />
-            </button>
+            </Button>
 
             {/* Edit */}
-            <button
+            <Button
               onClick={() => router.push(`/dashboard/blogs/${blog.id}/edit`)}
-              className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+              variant="ghost" size="icon-sm" className="text-zinc-400"
               title="Edit"
             >
               <Pencil className="size-3.5" />
-            </button>
+            </Button>
 
             {/* Publish / Unpublish */}
-            <button
+            <Button
               onClick={() => handleTogglePublish(blog.id, blog.is_published)}
               disabled={isToggling}
-              className={[
-                "rounded-md p-1.5 transition-colors disabled:opacity-40",
-                blog.is_published
-                  ? "text-green-600 hover:bg-red-50 hover:text-red-600"
-                  : "text-zinc-400 hover:bg-green-50 hover:text-green-600",
-              ].join(" ")}
+              variant="ghost" size="icon-sm"
+              className={blog.is_published ? "text-green-600" : "text-zinc-400"}
               title={blog.is_published ? "Unpublish" : "Publish"}
             >
               {blog.is_published
                 ? <Globe className="size-3.5" />
                 : <EyeOff className="size-3.5" />}
-            </button>
+            </Button>
 
             {/* Delete */}
-            <button
+            <Button
               onClick={() => handleDelete(blog.id)}
               disabled={deletingId === blog.id}
-              className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-40"
+              variant="ghost-danger" size="icon-sm" className="text-zinc-400"
               title="Delete"
             >
               <Trash2 className="size-3.5" />
-            </button>
+            </Button>
           </div>
         )
       },

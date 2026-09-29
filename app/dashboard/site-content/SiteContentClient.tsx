@@ -1,5 +1,8 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
 import { useState, useTransition } from "react"
 import Image from "next/image"
 import { toast } from "sonner"
@@ -7,7 +10,6 @@ import { Save, Phone, Mail, MapPin, Clock, Globe, MessageCircle, Share2, Type, B
 import { upsertSiteSettings } from "@/services/siteSettings.service"
 import type { SiteSettings } from "@/services/siteSettings.service"
 import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
-import { cn } from "@/lib/utils"
 
 const TABS = [
   { id: "contact",  label: "Contact Info" },
@@ -37,12 +39,12 @@ function Field({ label, icon, name, value, onChange, placeholder, hint, type = "
         {icon && <span className="text-zinc-400">{icon}</span>}
         {label}
       </label>
-      <input
+      <Input
         type={type}
         value={value}
         onChange={(e) => onChange(name, e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+        className="h-auto px-3 py-2.5"
       />
       {hint && <p className="text-xs text-zinc-400">{hint}</p>}
     </div>
@@ -56,12 +58,12 @@ function TextareaField({ label, icon, name, value, onChange, placeholder, hint }
         {icon && <span className="text-zinc-400">{icon}</span>}
         {label}
       </label>
-      <textarea
+      <Textarea
         rows={3}
         value={value}
         onChange={(e) => onChange(name, e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition resize-none"
+        className="px-3 py-2.5 resize-none"
       />
       {hint && <p className="text-xs text-zinc-400">{hint}</p>}
     </div>
@@ -102,15 +104,10 @@ export default function SiteContentClient({ initialSettings }: Props) {
       {/* Tabs */}
       <div className="flex gap-1 border-b border-zinc-200">
         {TABS.map((tab) => (
-          <button
+          <button aria-pressed={activeTab === tab.id}
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={cn(
-              "px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px",
-              activeTab === tab.id
-                ? "border-zinc-900 text-zinc-900"
-                : "border-transparent text-zinc-500 hover:text-zinc-700 hover:border-zinc-300"
-            )}
+            className="ui-pill rounded-lg border px-4 py-2 text-sm font-medium"
           >
             {tab.label}
           </button>
@@ -118,7 +115,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white rounded-xl border border-zinc-200 p-6">
+      <div className="bg-white rounded-2xl border border-zinc-200 p-6">
         {activeTab === "contact" && (
           <div className="space-y-5">
             <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">Contact Information</h3>
@@ -522,14 +519,10 @@ export default function SiteContentClient({ initialSettings }: Props) {
 
       {/* Save button */}
       <div className="flex justify-end">
-        <button
-          onClick={handleSave}
-          disabled={isPending}
-          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm px-6 py-2.5 rounded-lg transition-colors"
-        >
+        <Button onClick={handleSave} disabled={isPending} className="px-6">
           <Save className="size-4" />
           {isPending ? "Saving…" : "Save Changes"}
-        </button>
+        </Button>
       </div>
     </div>
   )

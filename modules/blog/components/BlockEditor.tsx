@@ -12,6 +12,7 @@ import { ListBlock } from "./blocks/ListBlock"
 import { VideoBlock } from "./blocks/VideoBlock"
 import { FileBlock } from "./blocks/FileBlock"
 import type { FileContent } from "./blocks/FileBlock"
+import { Button } from "@/components/ui/button"
 
 const BLOCK_META: Record<EditorBlock["block_type"], { label: string; icon: React.ElementType; accent: string; badge: string }> = {
   heading:   { label: "Heading",   icon: Type,       accent: "border-l-blue-400",   badge: "bg-blue-50 text-blue-700" },
@@ -99,7 +100,7 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
   return (
     <div className="space-y-3">
       {value.length === 0 ? (
-        <div className="rounded-xl border-2 border-dashed border-zinc-200 py-12 text-center">
+        <div className="rounded-2xl border-2 border-dashed border-zinc-200 py-12 text-center">
           <p className="text-sm text-zinc-400">No content blocks yet</p>
           <p className="mt-1 text-xs text-zinc-300">Use the buttons below to add blocks</p>
         </div>
@@ -114,14 +115,14 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
               <div
                 key={block.id}
                 className={cn(
-                  "rounded-xl border border-zinc-200 border-l-4 bg-white shadow-sm overflow-hidden",
+                  "rounded-2xl border border-zinc-200 border-l-4 bg-white shadow-sm overflow-hidden",
                   meta.accent
                 )}
               >
                 {/* Block header */}
                 <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-100 bg-zinc-50/60">
                   {/* Type badge */}
-                  <span className={cn("flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold", meta.badge)}>
+                  <span className={cn("flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold", meta.badge)}>
                     <Icon className="size-3" />
                     {meta.label}
                   </span>
@@ -132,24 +133,16 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
                     <button
                       type="button"
                       onClick={() => patchBlock(block.id, { layout: null, column_position: null })}
-                      className={cn(
-                        "rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors",
-                        !isTwoCol
-                          ? "bg-zinc-800 text-white"
-                          : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
-                      )}
+                      aria-pressed={!isTwoCol}
+                      className="ui-pill rounded border px-1.5 py-0.5 text-[11px] font-medium"
                     >
                       Full
                     </button>
                     <button
                       type="button"
                       onClick={() => patchBlock(block.id, { layout: "two-column", column_position: block.column_position ?? "left" })}
-                      className={cn(
-                        "rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors",
-                        isTwoCol
-                          ? "bg-zinc-800 text-white"
-                          : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
-                      )}
+                      aria-pressed={isTwoCol}
+                      className="ui-pill rounded border px-1.5 py-0.5 text-[11px] font-medium"
                     >
                       ½
                     </button>
@@ -159,24 +152,16 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
                         <button
                           type="button"
                           onClick={() => patchBlock(block.id, { column_position: "left" })}
-                          className={cn(
-                            "rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors",
-                            block.column_position === "left"
-                              ? "bg-zinc-800 text-white"
-                              : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
-                          )}
+                          aria-pressed={block.column_position === "left"}
+                          className="ui-pill rounded border px-1.5 py-0.5 text-[11px] font-medium"
                         >
                           Left
                         </button>
                         <button
                           type="button"
                           onClick={() => patchBlock(block.id, { column_position: "right" })}
-                          className={cn(
-                            "rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors",
-                            block.column_position === "right"
-                              ? "bg-zinc-800 text-white"
-                              : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
-                          )}
+                          aria-pressed={block.column_position === "right"}
+                          className="ui-pill rounded border px-1.5 py-0.5 text-[11px] font-medium"
                         >
                           Right
                         </button>
@@ -189,32 +174,32 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
 
                   {/* Move + delete */}
                   <div className="flex items-center gap-0.5">
-                    <button
+                    <Button
                       type="button"
                       onClick={() => moveBlock(block.id, "up")}
                       disabled={i === 0}
-                      className="rounded p-1 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+                      variant="ghost" size="icon-xs" className="text-zinc-400"
                       title="Move up"
                     >
                       <ChevronUp className="size-3.5" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => moveBlock(block.id, "down")}
                       disabled={i === value.length - 1}
-                      className="rounded p-1 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+                      variant="ghost" size="icon-xs" className="text-zinc-400"
                       title="Move down"
                     >
                       <ChevronDown className="size-3.5" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => removeBlock(block.id)}
-                      className="rounded p-1 text-zinc-300 hover:text-red-500 transition-colors ml-0.5"
+                      variant="ghost-danger" size="icon-xs" className="text-zinc-400"
                       title="Remove block"
                     >
                       <Trash2 className="size-3.5" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
@@ -17,6 +18,7 @@ import {
 import type { SupplierSort } from "@/hooks/queries/useSuppliers"
 import { createClient } from "@/lib/supabase/client"
 import RichTextRenderer from "@/components/editor/RichTextRenderer"
+import { Select } from "@/components/ui/select"
 
 const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
@@ -122,7 +124,7 @@ function SupplierExpandedContent({ supplier }: {
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-white font-bold text-sm py-2.5 rounded-xl transition-colors"
+          className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-white font-bold text-sm py-2.5 rounded-lg transition-colors"
         >
           <Globe size={14} />
           Visit Website
@@ -161,7 +163,7 @@ function SupplierCard({
   return (
     <motion.div
       variants={cardVariants}
-      className={`rounded-xl overflow-hidden border bg-white shadow-sm transition-colors duration-200 flex flex-col h-full ${
+      className={`rounded-2xl overflow-hidden border bg-white shadow-sm transition-colors duration-200 flex flex-col h-full ${
         expanded
           ? "border-primary shadow-md"
           : "border-zinc-100 hover:shadow-lg hover:border-zinc-200"
@@ -251,9 +253,9 @@ function SupplierCard({
 
 function SkeletonCard() {
   return (
-    <div className="rounded-xl overflow-hidden border border-zinc-100 bg-white animate-pulse">
+    <div className="rounded-2xl overflow-hidden border border-zinc-200 bg-white animate-pulse">
       <div className="p-5 flex flex-col gap-4">
-        <div className="w-full h-28 bg-zinc-200 rounded-xl" />
+        <div className="w-full h-28 bg-zinc-200 rounded-lg" />
         <div className="h-5 bg-zinc-200 rounded w-2/3" />
         <div className="h-3 bg-zinc-100 rounded w-1/3" />
       </div>
@@ -369,16 +371,16 @@ export default function SuppliersListingClient() {
 
         {/* Country filter */}
         {countryList.length > 0 && (
-          <select
+          <Select
             value={selectedCountry ?? ""}
             onChange={(e) => { setSelectedCountry(e.target.value || null); setCurrentPage(1) }}
-            className="h-9 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition w-full sm:w-52"
+            className="h-9 w-full sm:w-52"
           >
             <option value="">All countries</option>
             {countryList.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
-          </select>
+          </Select>
         )}
       </div>
 
@@ -404,12 +406,9 @@ export default function SuppliersListingClient() {
           <p className="text-zinc-500 font-medium">No suppliers found</p>
           <p className="text-zinc-400 text-sm mt-1">Try adjusting your search or filters</p>
           {hasActiveFilters && (
-            <button
-              onClick={clearAll}
-              className="mt-4 text-sm text-primary no-underline underline-offset-2 hover:underline hover:opacity-70"
-            >
+            <Button variant="link" size="sm" onClick={clearAll} className="mt-4">
               Clear all filters
-            </button>
+            </Button>
           )}
         </motion.div>
       ) : (

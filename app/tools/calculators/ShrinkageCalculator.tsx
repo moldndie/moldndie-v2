@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { Select } from "@/components/ui/select"
 import { ResultCard } from "../_components/ResultCard"
 
 const MATERIALS = [
@@ -38,39 +40,36 @@ export function ShrinkageCalculator() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-zinc-700 mb-1.5">Material</label>
-          <select
+          <Select
             value={matIdx}
             onChange={(e) => setMatIdx(Number(e.target.value))}
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white"
           >
             {MATERIALS.map((m, i) => (
               <option key={i} value={i}>{m.label} ({m.shrinkMin}–{m.shrinkMax}%)</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-zinc-700 mb-1.5">
             Part dimension (mm)
           </label>
-          <input
+          <Input
             type="number"
             min="0"
             step="0.01"
             value={partDim}
             onChange={(e) => setPartDim(e.target.value)}
-            placeholder="e.g. 50.00"
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+            placeholder="e.g. 50.00" className="h-auto py-2.5"
           />
         </div>
 
         <div className="sm:col-span-2 flex items-center gap-2">
-          <input
+          <Input
             id="useCustom"
             type="checkbox"
             checked={useCustom}
-            onChange={(e) => setUseCustom(e.target.checked)}
-            className="rounded border-zinc-300 text-primary focus:ring-primary/30"
+            onChange={(e) => setUseCustom(e.target.checked)} className="h-auto py-2.5"
           />
           <label htmlFor="useCustom" className="text-sm text-zinc-600 cursor-pointer">
             Use custom shrinkage from datasheet (%)
@@ -80,15 +79,14 @@ export function ShrinkageCalculator() {
         {useCustom && (
           <div className="sm:col-span-2">
             <label className="block text-sm font-medium text-zinc-700 mb-1.5">Custom shrinkage (%)</label>
-            <input
+            <Input
               type="number"
               min="0"
               max="10"
               step="0.01"
               value={customShrink}
               onChange={(e) => setCustom(e.target.value)}
-              placeholder="e.g. 1.80"
-              className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+              placeholder="e.g. 1.80" className="h-auto py-2.5"
             />
           </div>
         )}

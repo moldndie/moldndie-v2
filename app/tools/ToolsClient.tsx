@@ -7,6 +7,7 @@ import { Wrench, ArrowRight, Zap } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import type { Calculator as DBCalc, CalcCategory } from "@/types/calculator"
+import { Input } from "@/components/ui/input"
 
 const reveal = {
   initial: { opacity: 0, y: 14 },
@@ -91,12 +92,12 @@ export function ToolsClient({ dbCalculators, categories }: Props) {
 
         {/* Search bar */}
         <div className="mb-4">
-          <input
+          <Input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search tools…"
-            className="w-full sm:max-w-sm rounded-xl border border-zinc-200 px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+            className="w-full sm:max-w-sm rounded-xl px-4 py-3"
           />
         </div>
 
@@ -105,12 +106,8 @@ export function ToolsClient({ dbCalculators, categories }: Props) {
           <div className="flex flex-wrap gap-2 mb-8">
             <button
               onClick={() => setActiveCat("all")}
-              className={cn(
-                "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-                activeCat === "all"
-                  ? "bg-primary text-white"
-                  : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-              )}
+              aria-pressed={activeCat === "all"}
+              className="ui-pill rounded-full border px-4 py-1.5 text-sm font-medium"
             >
               All
             </button>
@@ -118,12 +115,8 @@ export function ToolsClient({ dbCalculators, categories }: Props) {
               <button
                 key={cat.id}
                 onClick={() => setActiveCat(cat.id)}
-                className={cn(
-                  "rounded-full px-4 py-1.5 text-sm font-medium transition-colors",
-                  activeCat === cat.id
-                    ? "bg-primary text-white"
-                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
-                )}
+                aria-pressed={activeCat === cat.id}
+                className="ui-pill rounded-full border px-4 py-1.5 text-sm font-medium"
               >
                 {cat.name}
               </button>

@@ -1,5 +1,8 @@
 "use client"
 
+import { Input } from "@/components/ui/input"
+import { Textarea } from "@/components/ui/textarea"
+import { Button } from "@/components/ui/button"
 import { useState, useTransition, lazy, Suspense } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -9,7 +12,6 @@ import { Save, Globe, EyeOff, Eye } from "lucide-react"
 import { cmsPageSchema, type CmsPageFormValues } from "@/schemas/cmsPage.schema"
 import { updateCmsPage, setCmsPagePublished } from "@/services/cmsPage.service"
 import type { CmsPage } from "@/services/cmsPage.service"
-import { cn } from "@/lib/utils"
 
 const RichTextEditor = lazy(() => import("@/components/editor/RichTextEditor"))
 
@@ -69,7 +71,7 @@ export default function CmsPageEditClient({ page }: Props) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Top action bar */}
-      <div className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white p-4">
+      <div className="flex items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-white p-4">
         <div className="flex items-center gap-2">
           {isPublished ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
@@ -93,41 +95,36 @@ export default function CmsPageEditClient({ page }: Props) {
           </a>
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button variant={isPublished ? "outline" : "default"} size="lg"
             type="button"
             onClick={togglePublish}
             disabled={isPublishing}
-            className={cn(
-              "inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-medium transition-colors disabled:opacity-60",
-              isPublished
-                ? "border border-zinc-200 text-zinc-600 hover:bg-zinc-50"
-                : "bg-emerald-600 text-white hover:bg-emerald-700"
-            )}
+            className="text-xs"
           >
             {isPublished ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
             {isPublishing ? "Updating…" : isPublished ? "Unpublish" : "Publish"}
-          </button>
-          <button
+          </Button>
+          <Button size="lg"
             type="submit"
             disabled={isPending}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary/90 disabled:opacity-60 transition-colors"
+            className="px-4 text-xs"
           >
             <Save className="size-3.5" />
             {isPending ? "Saving…" : "Save Changes"}
-          </button>
+          </Button>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Main content area */}
         <div className="lg:col-span-2 space-y-5">
-          <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-5 space-y-4">
             <h2 className="text-sm font-bold uppercase tracking-wide text-zinc-500">Page Content</h2>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700">Page Title</label>
-              <input
+              <Input
                 {...register("title")}
-                className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                className="h-auto px-3 py-2.5"
                 placeholder="Privacy Policy"
               />
               {errors.title && <p className="text-xs text-red-500">{errors.title.message}</p>}
@@ -155,7 +152,7 @@ export default function CmsPageEditClient({ page }: Props) {
 
         {/* Sidebar: SEO + settings */}
         <div className="space-y-5">
-          <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-5 space-y-4">
             <h2 className="text-sm font-bold uppercase tracking-wide text-zinc-500">Page Settings</h2>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700">URL Slug</label>
@@ -174,22 +171,22 @@ export default function CmsPageEditClient({ page }: Props) {
             </div>
           </div>
 
-          <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-5 space-y-4">
             <h2 className="text-sm font-bold uppercase tracking-wide text-zinc-500">SEO</h2>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700">SEO Title</label>
-              <input
+              <Input
                 {...register("seo_title")}
-                className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                className="h-auto px-3 py-2.5"
                 placeholder="Leave blank to use page title"
               />
             </div>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700">Meta Description</label>
-              <textarea
+              <Textarea
                 {...register("seo_description")}
                 rows={3}
-                className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition resize-none"
+                className="px-3 py-2.5 resize-none"
                 placeholder="Short description for search engines (150–160 chars)"
               />
               <p className="text-xs text-zinc-400">Shown in Google search results.</p>

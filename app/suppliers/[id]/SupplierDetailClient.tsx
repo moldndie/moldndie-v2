@@ -34,7 +34,7 @@ function SkeletonDetail() {
             <div className="h-3 bg-zinc-100 rounded w-5/6" />
             <div className="h-3 bg-zinc-100 rounded w-4/6" />
           </div>
-          <div className="h-11 w-40 bg-zinc-200 rounded-xl" />
+          <div className="h-11 w-40 bg-zinc-200 rounded-lg" />
         </div>
       </div>
     </div>
@@ -209,7 +209,7 @@ export default function SupplierDetailClient({ supplierId }: { supplierId: strin
                 href={supplier.website}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors"
+                className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-6 py-3 rounded-lg transition-colors"
               >
                 <Globe size={16} />
                 Visit Website
