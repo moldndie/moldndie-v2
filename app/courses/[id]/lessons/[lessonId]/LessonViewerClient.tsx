@@ -74,7 +74,7 @@ function NextLessonCard({
     <div className="aspect-video w-full rounded-2xl bg-zinc-900 flex flex-col items-center justify-center gap-5 text-center px-8 relative shadow-lg">
       <button
         onClick={onDismiss}
-        className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-300 transition-colors text-lg leading-none"
+        className="absolute top-4 right-4 text-zinc-500 hover:text-primary transition-colors text-lg leading-none"
       >
         ✕
       </button>
@@ -115,7 +115,7 @@ function PdfPrimaryCard({ pdfUrl }: { pdfUrl: string }) {
         <a
           href={pdfUrl}
           download
-          className="flex items-center gap-2 bg-white hover:bg-zinc-50 text-zinc-700 border border-zinc-200 font-semibold text-sm px-6 py-3 rounded-xl transition-colors"
+          className="flex items-center gap-2 bg-white hover:bg-primary hover:text-primary-foreground text-zinc-700 border border-zinc-200 font-semibold text-sm px-6 py-3 rounded-xl transition-colors"
         >
           <Download size={16} />
           Download
@@ -149,7 +149,7 @@ function FileCard({ url, label }: { url: string; label: string }) {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-3 p-4 rounded-xl border border-zinc-200 bg-white hover:border-zinc-300 hover:bg-zinc-50 hover:shadow-sm transition-all group"
+      className="flex items-center gap-3 p-4 rounded-xl border border-zinc-200 bg-white hover:border-primary hover:bg-zinc-50 hover:shadow-sm transition-all group"
     >
       <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200 transition-colors">
         <FileIcon filename={name} />
@@ -212,7 +212,7 @@ function LockedLesson({
       ) : (
         <button
           onClick={onAddToCart}
-          className="flex items-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors"
+          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors"
         >
           <ShoppingCart size={15} />
           {price ? `Buy Course — ${price} EGP` : "Buy Course"}
@@ -220,7 +220,7 @@ function LockedLesson({
       )}
       <Link
         href={`/courses/${courseId}`}
-        className="text-sm text-zinc-400 hover:text-zinc-600 no-underline underline-offset-2 hover:underline transition-colors"
+        className="text-sm text-zinc-400 hover:text-primary no-underline underline-offset-2 hover:underline transition-colors"
       >
         Back to course
       </Link>
@@ -550,7 +550,7 @@ export default function LessonViewerClient({
             {prevLesson && prevAccessible ? (
               <Link
                 href={`/courses/${courseId}/lessons/${prevLesson.id}`}
-                className="flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-zinc-900 transition-colors min-w-0"
+                className="flex items-center gap-2 text-sm font-medium text-zinc-500 hover:text-primary transition-colors min-w-0"
               >
                 <ChevronLeft size={16} className="shrink-0" />
                 <span className="truncate max-w-44">{prevLesson.title}</span>

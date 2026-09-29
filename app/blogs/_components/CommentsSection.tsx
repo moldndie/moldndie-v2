@@ -3,6 +3,8 @@
 import { useState, useRef, useTransition } from "react"
 import { MessageSquare, Send } from "lucide-react"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Textarea } from "@/components/ui/textarea"
 import { usePathname } from "next/navigation"
 import { addBlogComment, type BlogComment } from "@/services/blog.service"
 
@@ -86,26 +88,22 @@ export function CommentsSection({ blogId, initialComments, currentUserId }: Comm
             autoComplete="off"
             style={{ position: "absolute", left: "-9999px", width: "1px", height: "1px", opacity: 0 }}
           />
-          <textarea
+          <Textarea
             ref={textareaRef}
             value={content}
             onChange={(e) => setContent(e.target.value)}
             placeholder="Write a comment…"
             rows={3}
             maxLength={2000}
-            className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary resize-none"
+            className="rounded-xl px-4 py-3 resize-none"
           />
           {error && <p className="text-xs text-red-500">{error}</p>}
           <div className="flex items-center justify-between">
             <span className="text-xs text-zinc-400">{content.length}/2000</span>
-            <button
-              type="submit"
-              disabled={isPending || !content.trim()}
-              className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90 transition-colors disabled:opacity-50"
-            >
+            <Button type="submit" disabled={isPending || !content.trim()} className="h-auto gap-1.5 px-4 py-2">
               <Send className="size-3.5" />
               {isPending ? "Posting…" : "Post"}
-            </button>
+            </Button>
           </div>
         </form>
       ) : (

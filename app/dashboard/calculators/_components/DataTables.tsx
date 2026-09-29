@@ -1,5 +1,6 @@
 "use client"
 
+import { Input as CellInput } from "@/components/ui/input"
 import { Plus, Trash2, Table2, MousePointerClick } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Input } from "./ui"
@@ -70,7 +71,7 @@ function TableCard({ table, onChange, onRemove }: {
   onRemove: () => void
 }) {
   const cellCls =
-    "w-full rounded-md border border-zinc-200 bg-white px-2 py-1.5 text-xs transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+    "h-auto rounded-md px-2 py-1.5 text-xs md:text-xs"
 
   const isPicker = table.pickerFieldUid !== undefined
 
@@ -124,13 +125,13 @@ function TableCard({ table, onChange, onRemove }: {
               {table.columns.map((c, ci) => (
                 <th key={c.id} className="text-left">
                   <div className="flex items-center gap-0.5">
-                    <input
+                    <CellInput
                       value={c.label}
                       onChange={(e) => setColumn(c.id, { label: e.target.value })}
                       placeholder={ci === 0 ? "Name" : "Column"}
                       className={cn(cellCls, "min-w-28 font-medium")}
                     />
-                    <input
+                    <CellInput
                       value={c.unit}
                       onChange={(e) => setColumn(c.id, { unit: e.target.value })}
                       placeholder="unit"
@@ -157,7 +158,7 @@ function TableCard({ table, onChange, onRemove }: {
               <tr key={r.id}>
                 {table.columns.map((c) => (
                   <td key={c.id}>
-                    <input
+                    <CellInput
                       value={r.cells[c.key] ?? ""}
                       onChange={(e) => onChange({
                         rows: table.rows.map((x) => x.id === r.id ? { ...x, cells: { ...x.cells, [c.key]: e.target.value } } : x),

@@ -18,22 +18,22 @@ const options: Option[] = countries.map((c) => ({
 const styles: StylesConfig<Option, false> = {
   control: (base, state) => ({
     ...base,
-    minHeight: "38px",
+    minHeight: "36px",
     borderRadius: "0.5rem",
-    borderColor: state.isFocused ? "#71717a" : "#d4d4d8",
-    boxShadow: state.isFocused ? "0 0 0 1px #71717a" : "none",
-    "&:hover": { borderColor: "#71717a" },
+    borderColor: state.isFocused ? "var(--primary)" : "var(--input)",
+    boxShadow: state.isFocused ? "0 0 0 3px color-mix(in oklab, var(--primary) 20%, transparent)" : "none",
+    "&:hover": { borderColor: state.isFocused ? "var(--primary)" : "var(--input)" },
     fontSize: "0.875rem",
     cursor: "pointer",
   }),
   option: (base, state) => ({
     ...base,
     backgroundColor: state.isSelected
-      ? "#f4f4f5"
+      ? "var(--primary)"
       : state.isFocused
-      ? "#fafafa"
+      ? "var(--primary)"
       : "#fff",
-    color: "#18181b",
+    color: state.isSelected || state.isFocused ? "var(--primary-foreground)" : "#18181b",
     cursor: "pointer",
     fontSize: "0.875rem",
     padding: "8px 12px",

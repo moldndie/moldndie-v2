@@ -25,7 +25,7 @@ export default function TopNavbar({ user, onMenuClick }: TopNavbarProps) {
       {/* Mobile menu button */}
       <button
         onClick={onMenuClick}
-        className="rounded-md p-2 text-zinc-500 hover:bg-zinc-100 lg:hidden"
+        className="rounded-md p-2 text-zinc-500 hover:bg-primary hover:text-primary-foreground lg:hidden"
         aria-label="Open navigation"
       >
         <Menu className="size-5" />
@@ -51,7 +51,7 @@ export default function TopNavbar({ user, onMenuClick }: TopNavbarProps) {
         <form action={logoutAction}>
           <button
             type="submit"
-            className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-600 transition-colors hover:bg-zinc-50 cursor-pointer"
+            className="ui-pill rounded-lg border px-3 py-1.5 text-sm cursor-pointer"
           >
             Sign out
           </button>

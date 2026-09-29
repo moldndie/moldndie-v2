@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button"
 import { useMolds, useMoldCategories, useDeleteMold, type MoldsParams } from "@/hooks/queries/useMolds"
 import { getFileUrl } from "@/lib/utils"
 import type { Mold } from "@/types"
+import { Input } from "@/components/ui/input"
 
 type FilterType = "all" | "free" | "paid"
 
@@ -138,11 +139,11 @@ export function MoldsTable() {
       <div className="flex flex-wrap items-center gap-3 mb-4">
         <div className="relative flex-1 min-w-48 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-zinc-400 pointer-events-none" />
-          <input
+          <Input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search molds…"
-            className="w-full pl-9 pr-3 py-2 text-sm rounded-lg border border-zinc-200 bg-white focus:outline-none focus:ring-2 focus:ring-zinc-300 transition"
+            className="w-full pl-9"
           />
         </div>
         <Select

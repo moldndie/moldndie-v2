@@ -134,21 +134,17 @@ export function BlogTable() {
             </Button>
 
             {/* Publish / Unpublish */}
-            <button
+            <Button
               onClick={() => handleTogglePublish(blog.id, blog.is_published)}
               disabled={isToggling}
-              className={[
-                "rounded-md p-1.5 transition-colors disabled:opacity-40",
-                blog.is_published
-                  ? "text-green-600 hover:bg-red-50 hover:text-red-600"
-                  : "text-zinc-400 hover:bg-green-50 hover:text-green-600",
-              ].join(" ")}
+              variant="ghost" size="icon-sm"
+              className={blog.is_published ? "text-green-600" : "text-zinc-400"}
               title={blog.is_published ? "Unpublish" : "Publish"}
             >
               {blog.is_published
                 ? <Globe className="size-3.5" />
                 : <EyeOff className="size-3.5" />}
-            </button>
+            </Button>
 
             {/* Delete */}
             <Button

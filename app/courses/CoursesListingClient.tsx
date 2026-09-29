@@ -201,11 +201,8 @@ export default function CoursesListingClient() {
             <button
               key={opt.value}
               onClick={() => handleTraineeLevel(traineeLevel === opt.value ? "" : opt.value)}
-              className={`h-8 px-3 rounded-lg border text-xs font-medium transition-colors whitespace-nowrap ${
-                traineeLevel === opt.value
-                  ? "bg-primary text-white border-primary"
-                  : "bg-white text-zinc-600 border-zinc-200 hover:border-zinc-400"
-              }`}
+              aria-pressed={traineeLevel === opt.value}
+              className="ui-pill h-8 px-3 rounded-lg border text-xs font-medium whitespace-nowrap"
             >
               {opt.label}
             </button>

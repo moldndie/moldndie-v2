@@ -1,5 +1,6 @@
 "use client"
 
+import { Input } from "@/components/ui/input"
 import { useMemo, useState } from "react"
 import { Plus, RotateCcw, Delete } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -64,10 +65,10 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
   if (tokens === null) {
     return (
       <div className="space-y-1.5">
-        <input
+        <Input
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className="w-full rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 font-mono text-sm focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="h-auto border-amber-300 bg-amber-50 px-3 py-2 font-mono text-sm"
         />
         <p className="text-xs text-amber-700">
           Advanced formula — edited as text. Clear it to go back to the visual builder.
@@ -132,7 +133,7 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
   const selectCls =
     "rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 focus:outline-none focus:ring-2 focus:ring-primary/30"
   const btnCls =
-    "rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-semibold text-zinc-700 transition-colors hover:border-primary hover:text-primary"
+    "ui-pill rounded-lg border px-2.5 py-1.5 text-xs font-semibold"
 
   return (
     <div className="space-y-2">
@@ -159,7 +160,7 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
           <span key={i} className="flex items-center">
             <Caret active={pos === i} />
             {t.kind === "num" && editingNum === i ? (
-              <input
+              <Input
                 autoFocus
                 value={t.text}
                 onChange={(e) => {
@@ -170,7 +171,7 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
                 onBlur={() => setEditingNum(null)}
                 onKeyDown={(e) => { if (e.key === "Enter") setEditingNum(null) }}
                 onClick={(e) => e.stopPropagation()}
-                className="w-20 rounded-md border border-primary px-2 py-1 text-sm tabular-nums focus:outline-none"
+                className="h-auto w-20 rounded-md border-primary px-2 py-1 text-sm tabular-nums"
               />
             ) : (
               <button

@@ -5,6 +5,7 @@ import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { Loader2, Search, X } from "lucide-react"
 import { Select } from "@/components/ui/select"
 import type { BlogCategory, BlogTag } from "@/types"
+import { Input } from "@/components/ui/input"
 
 const SORT_OPTIONS = [
   { label: "Newest first", value: "newest" },
@@ -78,12 +79,12 @@ export function BlogFiltersBar({
           {/* Search */}
           <div className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-zinc-400" />
-            <input
+            <Input
               type="text"
               placeholder="Search blogs…"
               defaultValue={currentQ}
               onChange={(e) => handleSearch(e.target.value)}
-              className="h-9 w-full sm:w-52 rounded-lg border border-input bg-background pl-9 pr-3 py-2 text-sm outline-none transition-colors focus-visible:border-ring focus-visible:ring-2 focus-visible:ring-ring/50"
+              className="h-9 w-full sm:w-52 pl-9"
             />
           </div>
 
@@ -105,7 +106,7 @@ export function BlogFiltersBar({
           {hasFilters && (
             <button
               onClick={() => startTransition(() => router.replace(pathname))}
-              className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-900 transition-colors whitespace-nowrap"
+              className="flex items-center gap-1 text-xs text-zinc-500 hover:text-primary transition-colors whitespace-nowrap"
             >
               <X className="size-3.5" />
               Clear filters

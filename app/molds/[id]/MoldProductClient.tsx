@@ -116,7 +116,7 @@ function Thumbnail({
       className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 shrink-0 transition-all duration-150 ${
         active
           ? "border-primary shadow-sm"
-          : "border-zinc-200 hover:border-zinc-400"
+          : "border-zinc-200 hover:border-primary"
       }`}
     >
       {media.type === "video" ? (
@@ -343,7 +343,7 @@ export default function MoldProductClient({ moldId, viewCount }: { moldId: strin
           ) : (
             <button
               onClick={handleAddToCart}
-              className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
+              className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
             >
               <ShoppingCart size={18} />
               Add to Cart — {priceText}

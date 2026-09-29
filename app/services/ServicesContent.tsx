@@ -1,10 +1,12 @@
 "use client"
 
+import { Input } from "@/components/ui/input"
+import { Select } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 import { useState } from "react"
 import { motion } from "framer-motion"
 import {
   CheckCircle,
-  ChevronDown,
   Loader2,
   FolderKanban,
   Send,
@@ -42,8 +44,6 @@ const EMPTY_FORM: FormState = {
   _hp: "",
 }
 
-const inputClass =
-  "w-full border border-zinc-200 rounded-xl px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
 
 // ── Service card — same shape as the Blog/Library/Academy cards ─────────────
 function ServiceCard({ service }: { service: ServiceOffering }) {
@@ -269,22 +269,22 @@ export default function ServicesContent({
                     <label className="block text-sm font-medium text-zinc-700 mb-1.5" htmlFor="name">
                       Name <span className="text-red-500">*</span>
                     </label>
-                    <input
+                    <Input
                       id="name" name="name" type="text" required
                       value={form.name} onChange={handleChange}
                       placeholder="Your full name"
-                      className={inputClass}
+                      className="h-11 rounded-xl px-4"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-zinc-700 mb-1.5" htmlFor="email">
                       Email <span className="text-red-500">*</span>
                     </label>
-                    <input
+                    <Input
                       id="email" name="email" type="email" required
                       value={form.email} onChange={handleChange}
                       placeholder="you@example.com"
-                      className={inputClass}
+                      className="h-11 rounded-xl px-4"
                     />
                   </div>
                 </div>
@@ -294,33 +294,27 @@ export default function ServicesContent({
                     <label className="block text-sm font-medium text-zinc-700 mb-1.5" htmlFor="phone">
                       Phone <span className="text-zinc-400 font-normal">(optional)</span>
                     </label>
-                    <input
+                    <Input
                       id="phone" name="phone" type="tel"
                       value={form.phone} onChange={handleChange}
                       placeholder="+20 1XX XXX XXXX"
-                      className={inputClass}
+                      className="h-11 rounded-xl px-4"
                     />
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-zinc-700 mb-1.5" htmlFor="service_type">
                       Service Type
                     </label>
-                    <div className="relative">
-                      <select
+                    <Select
                         id="service_type" name="service_type"
                         value={form.service_type} onChange={handleChange}
-                        className={`${inputClass} appearance-none pr-10 bg-white`}
+                        className="h-11 rounded-xl pl-4"
                       >
                         <option value="">Select a service…</option>
                         {serviceTypes.map((s) => (
                           <option key={s} value={s}>{s}</option>
                         ))}
-                      </select>
-                      <ChevronDown
-                        size={16}
-                        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400"
-                      />
-                    </div>
+                    </Select>
                   </div>
                 </div>
 
@@ -335,11 +329,11 @@ export default function ServicesContent({
                   <label className="block text-sm font-medium text-zinc-700 mb-1.5" htmlFor="message">
                     Message <span className="text-red-500">*</span>
                   </label>
-                  <textarea
+                  <Textarea
                     id="message" name="message" required rows={5}
                     value={form.message} onChange={handleChange}
                     placeholder="Describe your project requirements, timeline, and any specific needs…"
-                    className={`${inputClass} resize-none`}
+                    className="rounded-xl px-4 py-3 resize-none"
                   />
                 </div>
 
@@ -363,7 +357,7 @@ export default function ServicesContent({
                   </button>
                   <a
                     href="mailto:moldndie.eg@gmail.com"
-                    className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 px-7 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+                    className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 px-7 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-primary hover:text-primary-foreground"
                   >
                     <Mail size={15} />
                     Email us

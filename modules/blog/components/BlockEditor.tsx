@@ -133,24 +133,16 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
                     <button
                       type="button"
                       onClick={() => patchBlock(block.id, { layout: null, column_position: null })}
-                      className={cn(
-                        "rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors",
-                        !isTwoCol
-                          ? "bg-zinc-800 text-white"
-                          : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
-                      )}
+                      aria-pressed={!isTwoCol}
+                      className="ui-pill rounded border px-1.5 py-0.5 text-[11px] font-medium"
                     >
                       Full
                     </button>
                     <button
                       type="button"
                       onClick={() => patchBlock(block.id, { layout: "two-column", column_position: block.column_position ?? "left" })}
-                      className={cn(
-                        "rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors",
-                        isTwoCol
-                          ? "bg-zinc-800 text-white"
-                          : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
-                      )}
+                      aria-pressed={isTwoCol}
+                      className="ui-pill rounded border px-1.5 py-0.5 text-[11px] font-medium"
                     >
                       ½
                     </button>
@@ -160,24 +152,16 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
                         <button
                           type="button"
                           onClick={() => patchBlock(block.id, { column_position: "left" })}
-                          className={cn(
-                            "rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors",
-                            block.column_position === "left"
-                              ? "bg-zinc-800 text-white"
-                              : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
-                          )}
+                          aria-pressed={block.column_position === "left"}
+                          className="ui-pill rounded border px-1.5 py-0.5 text-[11px] font-medium"
                         >
                           Left
                         </button>
                         <button
                           type="button"
                           onClick={() => patchBlock(block.id, { column_position: "right" })}
-                          className={cn(
-                            "rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors",
-                            block.column_position === "right"
-                              ? "bg-zinc-800 text-white"
-                              : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100"
-                          )}
+                          aria-pressed={block.column_position === "right"}
+                          className="ui-pill rounded border px-1.5 py-0.5 text-[11px] font-medium"
                         >
                           Right
                         </button>

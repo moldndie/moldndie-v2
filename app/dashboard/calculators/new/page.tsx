@@ -16,7 +16,7 @@ export default async function NewCalculatorPage() {
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-3">
-        <Link href="/dashboard/calculators" className="text-sm text-zinc-400 hover:text-zinc-700 flex items-center gap-1">
+        <Link href="/dashboard/calculators" className="text-sm text-zinc-400 hover:text-primary flex items-center gap-1">
           <ChevronLeft className="size-4" /> Engineering Tools
         </Link>
       </div>

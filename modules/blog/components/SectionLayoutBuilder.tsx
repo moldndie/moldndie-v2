@@ -250,14 +250,14 @@ function SectionComposer({
       <button
         type="button"
         onClick={() => setStep("layout")}
-        className="w-full rounded-xl border-2 border-dashed border-zinc-200 py-10 text-center hover:border-zinc-400 transition-colors group"
+        className="w-full rounded-xl border-2 border-dashed border-zinc-200 py-10 text-center hover:border-primary transition-colors group"
       >
         <div className="flex justify-center mb-2.5">
           <div className="rounded-xl bg-zinc-100 p-2.5 group-hover:bg-zinc-200 transition-colors">
             <LayoutTemplate className="size-5 text-zinc-400" />
           </div>
         </div>
-        <p className="text-sm font-medium text-zinc-400 group-hover:text-zinc-600 transition-colors">
+        <p className="text-sm font-medium text-zinc-400 group-hover:text-primary transition-colors">
           No sections yet
         </p>
         <p className="mt-1 text-xs text-zinc-300">Click to add your first section</p>
@@ -266,7 +266,7 @@ function SectionComposer({
       <button
         type="button"
         onClick={() => setStep("layout")}
-        className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-zinc-200 py-2.5 text-sm font-medium text-zinc-400 hover:border-zinc-400 hover:text-zinc-600 transition-colors"
+        className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-zinc-200 py-2.5 text-sm font-medium text-zinc-400 hover:border-primary hover:text-primary transition-colors"
       >
         <Plus className="size-3.5" />
         Add Section
@@ -337,15 +337,12 @@ function SectionComposer({
       {/* Step: full-width block type */}
       {step === "full-type" && (
         <div className="flex flex-wrap gap-2">
-          {BLOCK_TYPES.map(({ type, label, icon: Icon, pill }) => (
+          {BLOCK_TYPES.map(({ type, label, icon: Icon }) => (
             <button
               key={type}
               type="button"
               onClick={() => handleAddFull(type)}
-              className={cn(
-                "flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium transition-all",
-                pill,
-              )}
+              className="ui-pill flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-sm font-medium"
             >
               <Icon className="size-3.5 shrink-0" />
               {label}
@@ -374,7 +371,7 @@ function LayoutOption({
     <button
       type="button"
       onClick={onClick}
-      className="group rounded-xl border-2 border-zinc-200 bg-white p-3 text-left hover:border-zinc-800 transition-all"
+      className="group rounded-xl border-2 border-zinc-200 bg-white p-3 text-left hover:border-primary transition-all"
     >
       <div className="mb-2 rounded-lg bg-zinc-100">{preview}</div>
       <p className="text-sm font-semibold text-zinc-900">{label}</p>
@@ -427,12 +424,8 @@ function SectionCard({
                 key={r}
                 type="button"
                 onClick={() => onSetRatio(section.id, r)}
-                className={cn(
-                  "rounded px-1.5 py-0.5 text-[10px] font-semibold tabular-nums transition-colors",
-                  section.ratio === r
-                    ? "bg-zinc-900 text-white"
-                    : "text-zinc-500 hover:bg-zinc-100",
-                )}
+                aria-pressed={section.ratio === r}
+                className="ui-pill rounded border px-1.5 py-0.5 text-[10px] font-semibold tabular-nums"
               >
                 {r}/{100 - r}
               </button>
@@ -617,7 +610,7 @@ function ColumnEditor({
         <button
           type="button"
           onClick={() => setPicking(true)}
-          className="w-full flex items-center justify-center gap-1 rounded-lg border border-dashed border-zinc-200 py-1.5 text-[11px] font-medium text-zinc-400 hover:border-zinc-400 hover:text-zinc-600 transition-colors"
+          className="w-full flex items-center justify-center gap-1 rounded-lg border border-dashed border-zinc-200 py-1.5 text-[11px] font-medium text-zinc-400 hover:border-primary hover:text-primary transition-colors"
         >
           <Plus className="size-3" />
           Add to {side}

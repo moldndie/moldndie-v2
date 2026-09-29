@@ -106,7 +106,7 @@ function LessonForm({
         <p className="text-sm font-semibold text-zinc-800">
           {form.id ? "Edit Lesson" : "New Lesson"}
         </p>
-        <button type="button" onClick={onClose} className="text-zinc-400 hover:text-zinc-600 transition-colors">
+        <button type="button" onClick={onClose} className="text-zinc-400 hover:text-primary transition-colors">
           <X className="size-4" />
         </button>
       </div>
@@ -293,7 +293,7 @@ function LessonRow({
         )}
         <button
           onClick={onEdit}
-          className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+          className="rounded-md p-1.5 text-zinc-400 hover:bg-primary hover:text-primary-foreground transition-colors"
         >
           <Pencil className="size-3.5" />
         </button>
@@ -459,7 +459,7 @@ export function LessonsManager({ courseId }: { courseId: string }) {
         <button
           type="button"
           onClick={openAdd}
-          className="flex h-28 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-zinc-300 hover:text-zinc-500 transition-colors"
+          className="flex h-28 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-primary hover:text-zinc-500 transition-colors"
         >
           <Plus className="size-5" />
           Add your first lesson

@@ -38,7 +38,7 @@ function EmptyState() {
       </p>
       <Link
         href="/courses"
-        className="mt-6 inline-flex items-center gap-2 bg-zinc-900 hover:bg-zinc-700 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors"
+        className="mt-6 inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors"
       >
         Browse Academy
       </Link>

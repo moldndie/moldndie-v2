@@ -209,8 +209,8 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
               className={cn(
                 "h-1.5 rounded-full transition-all duration-400 focus-visible:outline-none",
                 i === index
-                  ? "w-8 bg-white"
-                  : "w-1.5 bg-white/45 hover:bg-white/70",
+                  ? "w-8 bg-primary ring-1 ring-white/80"
+                  : "w-1.5 bg-white/45 [@media(hover:hover)]:hover:bg-primary",
               )}
             />
           ))}

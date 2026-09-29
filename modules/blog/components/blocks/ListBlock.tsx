@@ -51,7 +51,7 @@ export function ListBlock({ value, onChange }: ListBlockProps) {
       <button
         type="button"
         onClick={addItem}
-        className="flex items-center gap-1 text-sm text-zinc-500 hover:text-zinc-700 transition-colors"
+        className="flex items-center gap-1 text-sm text-zinc-500 hover:text-primary transition-colors"
       >
         <Plus className="size-3.5" />
         Add item

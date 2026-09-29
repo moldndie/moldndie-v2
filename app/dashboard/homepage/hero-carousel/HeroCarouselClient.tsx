@@ -1,5 +1,6 @@
 "use client"
 
+import { Input } from "@/components/ui/input"
 import { useState, useTransition } from "react"
 import Image from "next/image"
 import { toast } from "sonner"
@@ -70,11 +71,11 @@ function FormField({
         {label}{" "}
         {optional && <span className="text-zinc-400 font-normal">(optional)</span>}
       </label>
-      <input
+      <Input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
-        className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+        className="h-auto px-3 py-2.5"
       />
     </div>
   )
@@ -291,14 +292,14 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
           )}
         </p>
 
-        <button
+        <Button size="lg"
           onClick={() => { setShowForm((v) => !v); closeEdit() }}
           disabled={isPending}
-          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 text-white font-semibold text-sm px-4 py-2 rounded-lg transition-colors"
+         
         >
           <Plus className="size-4" />
           Add Slide
-        </button>
+        </Button>
       </div>
 
       {/* ── Add form ── */}
@@ -397,18 +398,18 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
           )}
 
           <div className="flex items-center justify-end gap-3">
-            <button
+            <Button variant="ghost" size="lg"
               type="button"
               onClick={resetForm}
-              className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+              className="px-4"
             >
               Cancel
-            </button>
-            <button
+            </Button>
+            <Button size="lg"
               type="button"
               onClick={handleAdd}
               disabled={isPending || isUploading || !isValidImageUrl(form.image_url)}
-              className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm px-6 py-2 rounded-lg transition-colors"
+              className="px-6"
             >
               {isPending || isUploading ? (
                 <Loader2 className="size-4 animate-spin" />
@@ -416,7 +417,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                 <Plus className="size-4" />
               )}
               {isUploading ? "Uploading…" : "Add Slide"}
-            </button>
+            </Button>
           </div>
         </div>
       )}
@@ -513,19 +514,14 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                   <ChevronDown className="size-4" />
                 </Button>
 
-                <button
+                <Button variant="ghost" size="icon-sm" aria-pressed={editingId === slide.id}
                   onClick={() => (editingId === slide.id ? closeEdit() : openEdit(slide))}
                   disabled={isPending}
                   title={editingId === slide.id ? "Cancel edit" : "Edit slide"}
-                  className={cn(
-                    "p-1.5 rounded-md transition-colors disabled:opacity-30",
-                    editingId === slide.id
-                      ? "text-primary bg-primary/10 hover:bg-primary/20"
-                      : "text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100",
-                  )}
+                  className="text-zinc-400"
                 >
                   <Pencil className="size-4" />
-                </button>
+                </Button>
 
                 <Button
                   onClick={() => handleToggle(slide)}
@@ -639,18 +635,18 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                 </div>
 
                 <div className="flex items-center justify-end gap-3">
-                  <button
+                  <Button variant="ghost" size="lg"
                     type="button"
                     onClick={closeEdit}
-                    className="px-4 py-2 text-sm font-medium text-zinc-600 hover:text-zinc-900 transition-colors"
+                    className="px-4"
                   >
                     Cancel
-                  </button>
-                  <button
+                  </Button>
+                  <Button size="lg"
                     type="button"
                     onClick={handleSaveEdit}
                     disabled={isPending || isEditUploading || !isValidImageUrl(editForm.image_url)}
-                    className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm px-6 py-2 rounded-lg transition-colors"
+                    className="px-6"
                   >
                     {isPending || isEditUploading ? (
                       <Loader2 className="size-4 animate-spin" />
@@ -658,7 +654,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                       <Pencil className="size-4" />
                     )}
                     {isEditUploading ? "Uploading…" : "Save Changes"}
-                  </button>
+                  </Button>
                 </div>
               </div>
             )}

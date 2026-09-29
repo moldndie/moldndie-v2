@@ -230,12 +230,12 @@ export default function CalcCategoriesClient({ initialCategories }: Props) {
       {categories.length === 0 ? (
         <div className="rounded-xl border border-dashed border-zinc-200 py-16 text-center">
           <p className="text-sm text-zinc-400">No categories yet.</p>
-          <button
+          <Button variant="link"
             onClick={openCreate}
-            className="mt-2 text-sm text-primary underline underline-offset-2 hover:opacity-70"
+            className="mt-2 h-auto px-0 underline underline-offset-2"
           >
             Create your first category
-          </button>
+          </Button>
         </div>
       ) : (
         <div className="rounded-xl border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">

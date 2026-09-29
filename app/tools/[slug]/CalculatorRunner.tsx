@@ -168,7 +168,7 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
             <h2 className={cn("text-base font-bold", HEADING(dark))}>Inputs</h2>
             <button
               onClick={reset}
-              className={cn("flex items-center gap-1.5 text-xs transition-colors", dark ? "text-[var(--calc-muted)] hover:text-[var(--calc-text)]" : "text-zinc-400 hover:text-zinc-700")}
+              className={cn("flex items-center gap-1.5 text-xs transition-colors", dark ? "text-[var(--calc-muted)] hover:text-[var(--calc-text)]" : "text-zinc-400 hover:text-primary")}
             >
               <RotateCcw className="size-3.5" /> Reset
             </button>
@@ -183,11 +183,12 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
                     key={u.key}
                     type="button"
                     onClick={() => setSystem(u.key)}
+                    aria-pressed={system === u.key}
                     className={cn(
                       "rounded-md px-3 py-1.5 text-xs font-semibold transition-colors",
-                      system === u.key
-                        ? dark ? "bg-white text-primary" : "bg-primary text-white"
-                        : dark ? "text-[var(--calc-muted)] hover:text-[var(--calc-text)]" : "text-zinc-500 hover:text-zinc-800",
+                      dark
+                        ? "text-[var(--calc-muted)] hover:bg-primary hover:text-primary-foreground aria-pressed:bg-white aria-pressed:text-primary"
+                        : "ui-pill border",
                     )}
                   >
                     {u.label}

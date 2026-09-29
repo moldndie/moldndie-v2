@@ -86,7 +86,7 @@ export function CoursesTable() {
         <div className="flex items-center justify-end gap-1">
           <Link
             href={`/dashboard/courses/${row.original.id}`}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+            className="rounded-md p-1.5 text-zinc-400 hover:bg-primary hover:text-primary-foreground transition-colors"
             title="Manage lessons"
           >
             <BookOpen className="size-3.5" />

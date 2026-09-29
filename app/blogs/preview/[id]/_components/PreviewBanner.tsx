@@ -43,7 +43,7 @@ export function PreviewBanner({ blogId, blogSlug, isPublished }: PreviewBannerPr
         {/* Edit */}
         <a
           href={`/dashboard/blogs/${blogId}/edit`}
-          className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 transition-colors"
+          className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-600 hover:bg-primary hover:text-primary-foreground transition-colors"
         >
           <Pencil className="size-3" />
           Edit
@@ -57,8 +57,8 @@ export function PreviewBanner({ blogId, blogSlug, isPublished }: PreviewBannerPr
           className={[
             "flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium transition-colors disabled:opacity-50",
             isPublished
-              ? "text-zinc-600 hover:bg-zinc-100"
-              : "bg-zinc-900 text-white hover:bg-zinc-700",
+              ? "text-zinc-600 hover:bg-primary hover:text-primary-foreground"
+              : "bg-primary text-white hover:bg-primary/90",
           ].join(" ")}
         >
           {isPublished ? <EyeOff className="size-3" /> : <Globe className="size-3" />}
@@ -71,7 +71,7 @@ export function PreviewBanner({ blogId, blogSlug, isPublished }: PreviewBannerPr
             href={`/blogs/${blogSlug}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-600 hover:bg-zinc-100 transition-colors"
+            className="flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-xs font-medium text-zinc-600 hover:bg-primary hover:text-primary-foreground transition-colors"
           >
             <ExternalLink className="size-3" />
             View Live

@@ -193,7 +193,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
                 <button
                   type="button"
                   onClick={() => setCategoryModalOpen(true)}
-                  className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-800 transition-colors"
+                  className="flex items-center gap-1 text-xs text-zinc-500 hover:text-primary transition-colors"
                 >
                   <Plus className="size-3" />
                   New
@@ -215,7 +215,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
                 <button
                   type="button"
                   onClick={() => setTagModalOpen(true)}
-                  className="flex items-center gap-1 text-xs text-zinc-500 hover:text-zinc-800 transition-colors"
+                  className="flex items-center gap-1 text-xs text-zinc-500 hover:text-primary transition-colors"
                 >
                   <Plus className="size-3" />
                   New

@@ -80,7 +80,7 @@ export default function CartClient() {
           </Link>
           <Link
             href="/courses"
-            className="inline-block bg-zinc-900 text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-zinc-800 transition-colors"
+            className="inline-block bg-primary text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors"
           >
             Browse Academy
           </Link>
@@ -182,7 +182,7 @@ export default function CartClient() {
         <button
           onClick={handleCheckout}
           disabled={isCheckingOut}
-          className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
+          className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
         >
           {isCheckingOut ? (
             <>

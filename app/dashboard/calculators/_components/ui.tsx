@@ -3,6 +3,7 @@
 // Small shared controls for the builder. Nothing clever — they exist so the
 // cards read as content rather than as class-name soup.
 
+import { Input as BaseInput } from "@/components/ui/input"
 import { useState } from "react"
 import { ChevronDown, ChevronUp, Settings2 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -26,15 +27,7 @@ export function FieldLabel({ children, hint }: { children: React.ReactNode; hint
 }
 
 export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      {...props}
-      className={cn(
-        "w-full rounded-lg border border-zinc-200 px-3 py-2 text-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30",
-        props.className,
-      )}
-    />
-  )
+  return <BaseInput {...props} className={cn("h-auto px-3 py-2 text-sm", props.className)} />
 }
 
 export function Select({ children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement> & { children: React.ReactNode }) {
@@ -95,7 +88,7 @@ export function Advanced({ children, count }: { children: React.ReactNode; count
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-500 transition-colors hover:text-zinc-800"
+        className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-500 transition-colors hover:text-primary"
       >
         <Settings2 className="size-3.5" />
         Advanced

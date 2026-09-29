@@ -108,7 +108,7 @@ export function GalleryGrid({ items, onAdd, onRemove, onUploadingChange }: Galle
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-600 hover:bg-zinc-50 transition-colors"
+          className="flex items-center gap-1.5 ui-pill rounded-lg border px-3 py-1.5 text-sm transition-colors"
         >
           <Plus className="size-3.5" />
           Add Media
@@ -128,7 +128,7 @@ export function GalleryGrid({ items, onAdd, onRemove, onUploadingChange }: Galle
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-zinc-300 hover:text-zinc-500 transition-colors"
+          className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-primary hover:text-zinc-500 transition-colors"
         >
           <Plus className="size-4" />
           Upload gallery images or videos

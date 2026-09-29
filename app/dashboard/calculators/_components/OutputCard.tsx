@@ -50,14 +50,14 @@ export function OutputCard({ output, unitSystems, idx, total, vars, sampleVars, 
             {missing?.length && onCreateMissing ? (
               <span className="mt-2 flex flex-wrap gap-1.5">
                 {missing.map((key) => (
-                  <button
+                  <Button variant="ghost-danger" size="xs"
                     key={key}
                     type="button"
                     onClick={() => onCreateMissing(key)}
-                    className="rounded-md border border-red-300 bg-white px-2 py-1 text-[11px] font-semibold text-red-700 transition-colors hover:bg-red-100"
+                    className="border-red-300 bg-white text-red-700 font-semibold"
                   >
                     Create “{key}” as an input
-                  </button>
+                  </Button>
                 ))}
               </span>
             ) : null}

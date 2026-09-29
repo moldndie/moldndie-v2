@@ -52,7 +52,9 @@
   display: flex;
   align-items: center;
   gap: 0;
-  border: 1px solid #d4d4d8;
+  height: 2.25rem;
+  background: #fff;
+  border: 1px solid var(--input);
   border-radius: 0.5rem;
   overflow: hidden;
   background: #fff;
@@ -60,8 +62,8 @@
 }
 
 .phone-input-wrapper .PhoneInput:focus-within {
-  border-color: #71717a;
-  box-shadow: 0 0 0 1px #71717a;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 20%, transparent);
 }
 
 .phone-input-wrapper .PhoneInputCountry {
@@ -71,7 +73,7 @@
   border-right: 1px solid #e4e4e7;
   background: #fafafa;
   gap: 6px;
-  height: 38px;
+  height: 100%;
   cursor: pointer;
 }
 
@@ -120,7 +122,7 @@
   font-size: 0.875rem;
   color: #18181b;
   background: transparent;
-  height: 38px;
+  height: 100%;
 }
 
 .phone-input-wrapper .PhoneInputInput::placeholder {
@@ -424,6 +426,7 @@
 .ui-pill[aria-current="true"],
 .ui-pill[aria-current="page"],
 .ui-pill[aria-pressed="true"],
+.ui-pill[aria-selected="true"],
 .ui-pill[data-active="true"] {
   background-color: var(--primary);
   border-color: var(--primary);

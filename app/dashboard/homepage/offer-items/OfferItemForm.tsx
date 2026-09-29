@@ -1,5 +1,7 @@
 "use client"
 
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 import { useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -80,36 +82,36 @@ export default function OfferItemForm({ item }: Props) {
         <span className="text-sm text-zinc-500">{isEdit ? "Editing card" : "New card"}</span>
         <div className="flex items-center gap-2">
           {isEdit && (
-            <button
+            <Button variant="ghost-danger" size="lg"
               type="button"
               onClick={handleDelete}
               disabled={isDeleting}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-red-200 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 transition-colors"
+              className="border-red-200 text-red-600 text-xs"
             >
               <Trash2 className="size-3.5" />
               {isDeleting ? "Deleting…" : "Delete"}
-            </button>
+            </Button>
           )}
-          <button
+          <Button size="lg"
             type="button"
             onClick={handleSave}
             disabled={isSaving}
-            className="inline-flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-xs font-semibold text-white hover:bg-primary/90 disabled:opacity-60 transition-colors"
+            className="px-4 text-xs"
           >
             <Save className="size-3.5" />
             {isSaving ? "Saving…" : "Save Card"}
-          </button>
+          </Button>
         </div>
       </div>
 
       <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-5">
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Title <span className="text-red-500">*</span></label>
-          <input
+          <Input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Blog"
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+            className="h-auto px-3 py-2.5"
           />
         </div>
 
@@ -131,20 +133,20 @@ export default function OfferItemForm({ item }: Props) {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700">Button Text</label>
-            <input
+            <Input
               value={buttonText}
               onChange={(e) => setBtnText(e.target.value)}
               placeholder="Explore"
-              className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+              className="h-auto px-3 py-2.5"
             />
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700">Button URL</label>
-            <input
+            <Input
               value={buttonUrl}
               onChange={(e) => setBtnUrl(e.target.value)}
               placeholder="/blogs"
-              className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+              className="h-auto px-3 py-2.5"
             />
           </div>
         </div>
@@ -152,28 +154,23 @@ export default function OfferItemForm({ item }: Props) {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700">Sort Order</label>
-            <input
+            <Input
               type="number"
               value={sortOrder}
               onChange={(e) => setSort(e.target.value)}
               min="0"
-              className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm text-zinc-900 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+              className="h-auto px-3 py-2.5"
             />
             <p className="text-xs text-zinc-400">Lower number = shown first.</p>
           </div>
           <div className="space-y-1.5">
             <label className="text-sm font-medium text-zinc-700">Status</label>
-            <button
+            <button aria-pressed={isActive}
               type="button"
               onClick={() => setActive((v) => !v)}
-              className={cn(
-                "flex items-center gap-2 w-full rounded-lg border px-3 py-2.5 text-sm font-medium transition-colors",
-                isActive
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                  : "border-zinc-200 bg-zinc-50 text-zinc-500"
-              )}
+              className="ui-pill flex items-center gap-2 w-full rounded-lg border px-3 py-2.5 text-sm font-medium"
             >
-              <span className={cn("size-2 rounded-full", isActive ? "bg-emerald-500" : "bg-zinc-300")} />
+              <span className={cn("size-2 rounded-full", isActive ? "bg-current" : "bg-zinc-300")} />
               {isActive ? "Active (visible)" : "Inactive (hidden)"}
             </button>
           </div>

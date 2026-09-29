@@ -264,7 +264,7 @@ export default function SignupForm() {
         type="button"
         onClick={handleGoogleSignIn}
         disabled={googleLoading || isSubmitting}
-        className="w-full flex items-center justify-center gap-3 h-10 rounded-md border border-zinc-200 bg-white text-sm font-medium text-zinc-700 hover:bg-zinc-50 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        className="w-full flex items-center justify-center gap-3 h-10 rounded-md border border-zinc-200 bg-white text-sm font-medium text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
       >
         {googleLoading ? (
           <span className="size-4 border-2 border-zinc-300 border-t-zinc-600 rounded-full animate-spin" />

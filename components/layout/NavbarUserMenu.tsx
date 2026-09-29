@@ -21,7 +21,7 @@ function CartButton() {
   return (
     <Link
       href="/cart"
-      className="relative p-2 text-zinc-600 hover:text-zinc-900 transition-colors"
+      className="relative p-2 text-zinc-600 hover:text-primary transition-colors"
       aria-label="Cart"
     >
       <ShoppingCart size={20} />
@@ -124,7 +124,7 @@ export default function NavbarUserMenu() {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setOpen((v) => !v)}
-          className="flex items-center gap-1.5 cursor-pointer rounded-full p-1 hover:bg-zinc-100 transition-colors"
+          className="flex items-center gap-1.5 cursor-pointer rounded-full p-1 hover:bg-primary hover:text-primary-foreground transition-colors"
         >
           <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold shrink-0">
             {initial}
@@ -144,7 +144,7 @@ export default function NavbarUserMenu() {
             <Link
               href="/profile"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
+              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors"
             >
               <UserCircle className="size-4 text-zinc-400" />
               My Profile
@@ -152,7 +152,7 @@ export default function NavbarUserMenu() {
             <Link
               href="/my-courses"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
+              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors"
             >
               <GraduationCap className="size-4 text-zinc-400" />
               My Courses
@@ -160,7 +160,7 @@ export default function NavbarUserMenu() {
             <Link
               href="/purchases"
               onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
+              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors"
             >
               <ShoppingBag className="size-4 text-zinc-400" />
               My Purchases
@@ -169,7 +169,7 @@ export default function NavbarUserMenu() {
               <Link
                 href="/dashboard"
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
+                className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors"
               >
                 <LayoutDashboard className="size-4 text-zinc-400" />
                 Dashboard
@@ -177,7 +177,7 @@ export default function NavbarUserMenu() {
             )}
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-zinc-50 transition-colors"
+              className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors"
             >
               <LogOut className="size-4 text-zinc-400" />
               Logout

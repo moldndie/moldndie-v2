@@ -18,7 +18,7 @@ export default function IconPicker({ value, onChange }: Props) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2.5 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 hover:border-zinc-300 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+        className="flex items-center gap-2.5 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
       >
         {value ? (
           <>
@@ -44,7 +44,7 @@ export default function IconPicker({ value, onChange }: Props) {
                   "flex flex-col items-center gap-1 p-2 rounded-lg text-[10px] font-medium transition-colors",
                   value === name
                     ? "bg-primary text-white"
-                    : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+                    : "text-zinc-600 hover:bg-primary hover:text-primary-foreground"
                 )}
               >
                 <DynamicIcon

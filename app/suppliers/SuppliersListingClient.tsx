@@ -17,6 +17,7 @@ import {
 import type { SupplierSort } from "@/hooks/queries/useSuppliers"
 import { createClient } from "@/lib/supabase/client"
 import RichTextRenderer from "@/components/editor/RichTextRenderer"
+import { Select } from "@/components/ui/select"
 
 const DEFAULT_PAGE_SIZE = 6
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
@@ -369,16 +370,16 @@ export default function SuppliersListingClient() {
 
         {/* Country filter */}
         {countryList.length > 0 && (
-          <select
+          <Select
             value={selectedCountry ?? ""}
             onChange={(e) => { setSelectedCountry(e.target.value || null); setCurrentPage(1) }}
-            className="h-9 rounded-lg border border-zinc-200 px-3 text-sm text-zinc-700 bg-white focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition w-full sm:w-52"
+            className="h-9 w-full sm:w-52"
           >
             <option value="">All countries</option>
             {countryList.map((c) => (
               <option key={c} value={c}>{c}</option>
             ))}
-          </select>
+          </Select>
         )}
       </div>
 

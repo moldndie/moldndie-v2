@@ -68,7 +68,7 @@ function MailIcon() {
 }
 
 const BTN =
-  "inline-flex items-center justify-center size-8 rounded-full border border-zinc-200 text-zinc-400 transition-colors"
+  "ui-pill inline-flex items-center justify-center size-8 rounded-full border"
 
 export function ShareButtons({ url, title, image }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false)
@@ -83,13 +83,11 @@ export function ShareButtons({ url, title, image }: ShareButtonsProps) {
       label: "LinkedIn",
       icon: <LinkedInIcon />,
       href: `https://www.linkedin.com/sharing/share-offsite/?url=${encoded}`,
-      color: "hover:bg-[#0a66c2]/10 hover:text-[#0a66c2] hover:border-[#0a66c2]/30",
     },
     {
       label: "Facebook",
       icon: <FBIcon />,
       href: `https://www.facebook.com/sharer/sharer.php?u=${encoded}`,
-      color: "hover:bg-[#1877f2]/10 hover:text-[#1877f2] hover:border-[#1877f2]/30",
     },
     {
       label: "Pinterest",
@@ -97,19 +95,16 @@ export function ShareButtons({ url, title, image }: ShareButtonsProps) {
       href:
         `https://www.pinterest.com/pin/create/button/?url=${encoded}&description=${encodedTitle}` +
         (image ? `&media=${encodeURIComponent(image)}` : ""),
-      color: "hover:bg-[#e60023]/10 hover:text-[#e60023] hover:border-[#e60023]/30",
     },
     {
       label: "Telegram",
       icon: <TelegramIcon />,
       href: `https://t.me/share/url?url=${encoded}&text=${encodedTitle}`,
-      color: "hover:bg-[#229ed9]/10 hover:text-[#229ed9] hover:border-[#229ed9]/30",
     },
     {
       label: "WhatsApp",
       icon: <WhatsAppIcon />,
       href: `https://wa.me/?text=${encodedTitle}%20${encoded}`,
-      color: "hover:bg-[#25d366]/10 hover:text-[#25d366] hover:border-[#25d366]/30",
     },
     {
       // Subject + a body that actually reads as a message. Previously the body
@@ -117,7 +112,6 @@ export function ShareButtons({ url, title, image }: ShareButtonsProps) {
       label: "Email",
       icon: <MailIcon />,
       href: `mailto:?subject=${encodedTitle}&body=${encodedTitle}%0A%0A${encoded}`,
-      color: "hover:bg-primary/10 hover:text-primary hover:border-primary/30",
     },
   ]
 
@@ -146,7 +140,7 @@ export function ShareButtons({ url, title, image }: ShareButtonsProps) {
     <div className="flex flex-wrap items-center gap-2">
       <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mr-1">Share</span>
 
-      {shareLinks.slice(0, insertAt).map(({ label, icon, href, color }) => (
+      {shareLinks.slice(0, insertAt).map(({ label, icon, href }) => (
         <a
           key={label}
           href={href}
@@ -154,7 +148,7 @@ export function ShareButtons({ url, title, image }: ShareButtonsProps) {
           rel="noopener noreferrer"
           title={`Share on ${label}`}
           aria-label={`Share on ${label}`}
-          className={`${BTN} ${color}`}
+          className={BTN}
         >
           {icon}
         </a>
@@ -164,12 +158,12 @@ export function ShareButtons({ url, title, image }: ShareButtonsProps) {
         onClick={shareInstagram}
         title="Copy link and open Instagram"
         aria-label="Copy link and open Instagram"
-        className={`${BTN} hover:bg-[#e1306c]/10 hover:text-[#e1306c] hover:border-[#e1306c]/30`}
+        className={BTN}
       >
         {igCopied ? <Check className="size-3.5" /> : <InstagramIcon />}
       </button>
 
-      {shareLinks.slice(insertAt).map(({ label, icon, href, color }) => (
+      {shareLinks.slice(insertAt).map(({ label, icon, href }) => (
         <a
           key={label}
           href={href}
@@ -177,7 +171,7 @@ export function ShareButtons({ url, title, image }: ShareButtonsProps) {
           rel="noopener noreferrer"
           title={`Share on ${label}`}
           aria-label={`Share on ${label}`}
-          className={`${BTN} ${color}`}
+          className={BTN}
         >
           {icon}
         </a>
@@ -187,7 +181,7 @@ export function ShareButtons({ url, title, image }: ShareButtonsProps) {
         onClick={() => copy(setCopied)}
         title="Copy link"
         aria-label="Copy link"
-        className={`${BTN} hover:bg-primary/10 hover:text-primary hover:border-primary/30`}
+        className={BTN}
       >
         {copied ? <Check className="size-3.5" /> : <Link2 className="size-3.5" />}
       </button>

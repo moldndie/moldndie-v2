@@ -48,7 +48,7 @@ export function Modal({ open, onClose, title, children, size = "md" }: ModalProp
       onClick={(e) => { if (e.target === overlayRef.current) onClose() }}
     >
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-black/50 backdrop-blur-[1px]" />
 
       {/* Panel */}
       <div
@@ -67,7 +67,7 @@ export function Modal({ open, onClose, title, children, size = "md" }: ModalProp
           </h2>
           <Button
             onClick={onClose}
-            variant="ghost" size="icon-sm" className="text-zinc-400"
+            variant="ghost" size="icon-sm" aria-label="Close" className="text-zinc-500"
           >
             <X className="size-4" />
           </Button>

@@ -140,7 +140,7 @@ function PaymentSuccessContent({
           {hasCourse && (
             <Link
               href="/my-courses"
-              className="inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-zinc-200 text-zinc-700 font-semibold text-sm px-8 py-3 rounded-xl transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-primary hover:text-primary-foreground text-zinc-700 font-semibold text-sm px-8 py-3 rounded-xl transition-colors"
             >
               <BookOpen size={15} />
               My Courses
@@ -149,7 +149,7 @@ function PaymentSuccessContent({
 
           <Link
             href="/purchases"
-            className="inline-flex items-center justify-center bg-zinc-50 hover:bg-zinc-100 text-zinc-500 text-sm px-8 py-2.5 rounded-xl transition-colors"
+            className="inline-flex items-center justify-center bg-zinc-50 hover:bg-primary hover:text-primary-foreground text-zinc-500 text-sm px-8 py-2.5 rounded-xl transition-colors"
           >
             View All Purchases
           </Link>
@@ -169,7 +169,7 @@ function PaymentFailedContent() {
       </p>
       <Link
         href="/cart"
-        className="inline-flex items-center justify-center bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-sm px-8 py-3 rounded-xl transition-colors"
+        className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-white font-bold text-sm px-8 py-3 rounded-xl transition-colors"
       >
         Try Again
       </Link>

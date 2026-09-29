@@ -471,9 +471,9 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-sm text-zinc-500">The boxes people fill in before they get a result.</p>
-            <button type="button" onClick={addField} className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90">
+            <Button size="lg" type="button" onClick={addField} className="shrink-0">
               <Plus className="size-4" /> Add input
-            </button>
+            </Button>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
@@ -529,9 +529,9 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
               What the tool works out. Build each formula by clicking — results compute top to
               bottom, so a later one can use an earlier one.
             </p>
-            <button type="button" onClick={addOutput} className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-primary px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90">
+            <Button size="lg" type="button" onClick={addOutput} className="shrink-0">
               <Plus className="size-4" /> Add result
-            </button>
+            </Button>
           </div>
 
           {outputs.length === 0 && (
@@ -576,13 +576,13 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
 
       {/* Navigation */}
       <div className="flex items-center justify-between gap-3 border-t border-zinc-200 pt-5">
-        <button
+        <Button variant="ghost" size="lg"
           onClick={() => setStep((s) => Math.max(0, s - 1))}
           disabled={step === 0}
-          className="inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 disabled:opacity-30 disabled:hover:bg-transparent"
+         
         >
           <ArrowLeft className="size-4" /> Back
-        </button>
+        </Button>
 
         <div className="flex items-center gap-3">
           <Button
@@ -599,21 +599,21 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
             {isPending ? "Saving…" : "Save"}
           </Button>
           {isLast ? (
-            <button
+            <Button size="lg"
               onClick={handleSave}
               disabled={isPending}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
+              className="px-5"
             >
               <Check className="size-4" />
               {isPending ? "Saving…" : calculator ? "Save changes" : "Create tool"}
-            </button>
+            </Button>
           ) : (
-            <button
+            <Button size="lg"
               onClick={() => setStep((s) => Math.min(STEP_META.length - 1, s + 1))}
-              className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
+              className="px-5"
             >
               Next <ArrowRight className="size-4" />
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -828,9 +828,9 @@ function StepDetails(props: {
         {props.customHtml ? (
           <div className="flex items-center justify-between gap-3 rounded-lg border border-zinc-200 px-3 py-2 text-sm">
             <span className="text-zinc-700">HTML file uploaded ({Math.round(props.customHtml.length / 1024)} KB)</span>
-            <button type="button" onClick={() => props.onCustomHtml(null)} className="text-xs font-medium text-red-600 hover:underline">
+            <Button variant="ghost-danger" size="xs" type="button" onClick={() => props.onCustomHtml(null)}>
               Remove
-            </button>
+            </Button>
           </div>
         ) : (
           <input
@@ -872,9 +872,9 @@ function StepDetails(props: {
                 />
               </div>
             ))}
-            <button type="button" onClick={() => props.onUnitSystems([])} className="text-xs text-zinc-400 transition-colors hover:text-red-600">
+            <Button variant="ghost-danger" size="xs" type="button" onClick={() => props.onUnitSystems([])} className="text-zinc-400">
               Remove the unit switcher
-            </button>
+            </Button>
           </div>
         )}
         <p className="mt-1 text-xs text-zinc-400">
@@ -946,8 +946,8 @@ function StepPublish(props: {
               )}
             </ul>
             <div className="mt-3 flex gap-2">
-              <button onClick={() => props.onGo(1)} className="text-xs font-medium text-amber-800 underline hover:no-underline">Go to Inputs</button>
-              <button onClick={() => props.onGo(2)} className="text-xs font-medium text-amber-800 underline hover:no-underline">Go to Results</button>
+              <Button variant="link" size="xs" onClick={() => props.onGo(1)} className="h-auto px-0 text-amber-800 underline hover:no-underline">Go to Inputs</Button>
+              <Button variant="link" size="xs" onClick={() => props.onGo(2)} className="h-auto px-0 text-amber-800 underline hover:no-underline">Go to Results</Button>
             </div>
           </>
         )}

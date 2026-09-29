@@ -45,7 +45,7 @@ function ToolBtn({
         "flex h-7 w-7 items-center justify-center rounded text-xs font-medium transition-colors",
         active
           ? "bg-primary text-white"
-          : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900"
+          : "text-zinc-600 hover:bg-primary hover:text-primary-foreground"
       )}
     >
       {children}
@@ -252,7 +252,7 @@ export default function RichTextEditor({
               <button
                 type="button"
                 onClick={() => { editor.chain().focus().unsetColor().run(); setShowColorPicker(false) }}
-                className="mt-2 w-full rounded px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100"
+                className="mt-2 w-full rounded px-2 py-1 text-xs text-zinc-500 hover:bg-primary hover:text-primary-foreground"
               >
                 Reset colour
               </button>
@@ -287,7 +287,7 @@ export default function RichTextEditor({
               <button
                 type="button"
                 onClick={() => { editor.chain().focus().unsetBackgroundColor().run(); setShowBgPicker(false) }}
-                className="mt-2 w-full rounded px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100"
+                className="mt-2 w-full rounded px-2 py-1 text-xs text-zinc-500 hover:bg-primary hover:text-primary-foreground"
               >
                 Remove background
               </button>
@@ -362,7 +362,7 @@ export default function RichTextEditor({
                 className="w-48 rounded border border-zinc-200 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
               />
               <button type="button" onClick={insertLink} className="rounded bg-primary px-2 py-1 text-xs text-white hover:bg-primary/90">Add</button>
-              <button type="button" onClick={() => { editor.chain().focus().unsetLink().run(); setShowLinkInput(false) }} className="rounded px-2 py-1 text-xs text-zinc-500 hover:bg-zinc-100">Remove</button>
+              <button type="button" onClick={() => { editor.chain().focus().unsetLink().run(); setShowLinkInput(false) }} className="rounded px-2 py-1 text-xs text-zinc-500 hover:bg-primary hover:text-primary-foreground">Remove</button>
             </div>
           )}
         </div>

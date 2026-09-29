@@ -23,7 +23,7 @@ export default function NavbarMobileMenu() {
     <div className="md:hidden">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="p-2 text-zinc-600 hover:text-zinc-900 transition-colors"
+        className="p-2 text-zinc-600 hover:text-primary transition-colors"
         aria-label={open ? "Close menu" : "Open menu"}
       >
         {open ? <X size={22} /> : <Menu size={22} />}

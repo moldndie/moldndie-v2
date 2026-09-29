@@ -44,7 +44,7 @@ export default async function CourseEditPage({ params }: Props) {
       {/* Back link */}
       <Link
         href="/dashboard/courses"
-        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-800 transition-colors"
+        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-primary transition-colors"
       >
         <ChevronLeft className="size-4" />
         Back to Courses

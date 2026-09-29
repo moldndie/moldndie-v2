@@ -147,7 +147,7 @@ export function DataTable<TData>({
           <button
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
-            className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-600 hover:bg-zinc-50 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+            className="ui-pill rounded-lg border px-3 py-1.5 text-sm"
           >
             Previous
           </button>
@@ -157,7 +157,7 @@ export function DataTable<TData>({
           <button
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
-            className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-600 hover:bg-zinc-50 disabled:opacity-40 disabled:pointer-events-none transition-colors"
+            className="ui-pill rounded-lg border px-3 py-1.5 text-sm"
           >
             Next
           </button>

@@ -91,7 +91,7 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
           <button
             type="button"
             onClick={openAdd}
-            className="flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-1.5 text-sm text-zinc-600 hover:bg-zinc-50 transition-colors"
+            className="flex items-center gap-1.5 ui-pill rounded-lg border px-3 py-1.5 text-sm transition-colors"
           >
             <Plus className="size-3.5" />
             Add Lesson
@@ -113,7 +113,7 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
                   type="button"
                   onClick={() => handleMove(index, -1)}
                   disabled={index === 0}
-                  className="text-zinc-300 hover:text-zinc-500 disabled:opacity-20"
+                  className="text-zinc-300 hover:text-primary disabled:opacity-20"
                 >
                   <ChevronUp className="size-3.5" />
                 </button>
@@ -121,7 +121,7 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
                   type="button"
                   onClick={() => handleMove(index, 1)}
                   disabled={index === lessons.length - 1}
-                  className="text-zinc-300 hover:text-zinc-500 disabled:opacity-20"
+                  className="text-zinc-300 hover:text-primary disabled:opacity-20"
                 >
                   <ChevronDown className="size-3.5" />
                 </button>
@@ -140,7 +140,7 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
                 <button
                   type="button"
                   onClick={() => openEdit(index)}
-                  className="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700"
+                  className="rounded p-1 text-zinc-400 hover:bg-primary hover:text-primary-foreground"
                 >
                   <Pencil className="size-3.5" />
                 </button>
@@ -162,7 +162,7 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
         <button
           type="button"
           onClick={openAdd}
-          className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-zinc-300 hover:text-zinc-500 transition-colors"
+          className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-primary hover:text-zinc-500 transition-colors"
         >
           <Plus className="size-4" />
           Add your first lesson
@@ -179,7 +179,7 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
             <button
               type="button"
               onClick={closeForm}
-              className="text-zinc-400 hover:text-zinc-600"
+              className="text-zinc-400 hover:text-primary"
             >
               <X className="size-4" />
             </button>

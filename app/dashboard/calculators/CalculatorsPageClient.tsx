@@ -3,7 +3,6 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Plus } from "lucide-react"
-import { cn } from "@/lib/utils"
 import CalculatorsTable from "./_components/CalculatorsTable"
 import CalcCategoriesClient from "./categories/CalcCategoriesClient"
 import type { Calculator, CalcCategory } from "@/types/calculator"
@@ -36,15 +35,10 @@ export default function CalculatorsPageClient({
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div className="flex rounded-lg border border-zinc-200 bg-zinc-50 p-1 gap-1">
           {tabs.map((tab) => (
-            <button
+            <button aria-pressed={activeTab === tab.id}
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={cn(
-                "rounded-md px-4 py-1.5 text-sm font-medium transition-colors",
-                activeTab === tab.id
-                  ? "bg-white text-zinc-900 shadow-sm"
-                  : "text-zinc-500 hover:text-zinc-700"
-              )}
+              className="ui-pill rounded-md border px-4 py-1.5 text-sm font-medium"
             >
               {tab.label}
             </button>

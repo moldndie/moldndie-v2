@@ -42,7 +42,7 @@ export function ImageUploadField({ value, onChange, className }: ImageUploadFiel
           <button
             type="button"
             onClick={() => onChange(null)}
-            className="absolute -right-2 -top-2 flex size-5 items-center justify-center rounded-full bg-zinc-900 text-white hover:bg-zinc-700 transition-colors"
+            className="absolute -right-2 -top-2 flex size-5 items-center justify-center rounded-full bg-primary text-white hover:bg-primary/90 transition-colors"
           >
             <X className="size-3" />
           </button>

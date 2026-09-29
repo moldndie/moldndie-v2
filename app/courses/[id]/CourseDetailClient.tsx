@@ -212,7 +212,7 @@ export default function CourseDetailClient({ courseId, viewCount }: { courseId: 
             ) : (
               <button
                 onClick={handleAddToCart}
-                className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
+                className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
               >
                 <ShoppingCart size={18} />
                 Buy Course — {priceText}
@@ -230,7 +230,7 @@ export default function CourseDetailClient({ courseId, viewCount }: { courseId: 
             inCart ? (
               <Link
                 href="/cart"
-                className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
+                className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
               >
                 <CheckCircle size={18} />
                 View in Cart
@@ -238,7 +238,7 @@ export default function CourseDetailClient({ courseId, viewCount }: { courseId: 
             ) : (
               <button
                 onClick={handleAddToCart}
-                className="w-full flex items-center justify-center gap-2 bg-zinc-900 hover:bg-zinc-800 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
+                className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
               >
                 <ShoppingCart size={18} />
                 Buy Course — {priceText}

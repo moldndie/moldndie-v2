@@ -180,7 +180,7 @@ export default async function AcademyCategoryPage({
                 {page > 1 && (
                   <Link
                     href={buildPageHref(page - 1)}
-                    className="rounded-lg px-3 py-1.5 text-sm text-zinc-600 border border-zinc-200 hover:border-zinc-400 transition-colors"
+                    className="rounded-lg px-3 py-1.5 text-sm text-zinc-600 border border-zinc-200 hover:border-primary transition-colors"
                   >
                     Previous
                   </Link>
@@ -192,7 +192,7 @@ export default async function AcademyCategoryPage({
                     className={`rounded-lg px-3 py-1.5 text-sm font-medium transition-colors ${
                       p === page
                         ? "bg-primary text-white"
-                        : "text-zinc-600 border border-zinc-200 hover:border-zinc-400"
+                        : "text-zinc-600 border border-zinc-200 hover:border-primary"
                     }`}
                   >
                     {p}
@@ -201,7 +201,7 @@ export default async function AcademyCategoryPage({
                 {page < totalPages && (
                   <Link
                     href={buildPageHref(page + 1)}
-                    className="rounded-lg px-3 py-1.5 text-sm text-zinc-600 border border-zinc-200 hover:border-zinc-400 transition-colors"
+                    className="rounded-lg px-3 py-1.5 text-sm text-zinc-600 border border-zinc-200 hover:border-primary transition-colors"
                   >
                     Next
                   </Link>

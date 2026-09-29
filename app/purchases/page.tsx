@@ -153,7 +153,7 @@ export default function PurchasesPage() {
         </p>
         <Link
           href="/"
-          className="mt-6 inline-flex items-center gap-2 bg-zinc-900 hover:bg-zinc-700 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors"
+          className="mt-6 inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors"
         >
           Browse Products
         </Link>
@@ -235,7 +235,7 @@ export default function PurchasesPage() {
                       <button
                         onClick={() => handleDownload(item)}
                         disabled={isThisDownloading}
-                        className="shrink-0 flex items-center gap-1.5 bg-zinc-900 hover:bg-zinc-700 disabled:opacity-60 disabled:cursor-not-allowed text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+                        className="shrink-0 flex items-center gap-1.5 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
                       >
                         {isThisDownloading ? (
                           <Loader2 size={13} className="animate-spin" />
