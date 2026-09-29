@@ -9,6 +9,7 @@ import { buttonVariants } from "@/components/ui/button"
 import { useCarousel } from "@/hooks/useCarousel"
 import type { HeroSlide } from "@/services/heroSlides.service"
 import { isValidImageUrl } from "@/lib/heroSlides.constants"
+import { Button } from "@/components/ui/button"
 
 interface HeroCarouselProps {
   slides: HeroSlide[]
@@ -174,21 +175,21 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
       {/* Prev / Next arrows — only if more than 1 slide */}
       {slides.length > 1 && (
         <>
-          <button
+          <Button variant="unstyled"
             onClick={handlePrev}
             aria-label="Previous slide"
             className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex size-10 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm hover:bg-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
           >
             <ChevronLeft className="size-5" />
-          </button>
+          </Button>
 
-          <button
+          <Button variant="unstyled"
             onClick={handleNext}
             aria-label="Next slide"
             className="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex size-10 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm hover:bg-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
           >
             <ChevronRight className="size-5" />
-          </button>
+          </Button>
         </>
       )}
 
@@ -200,7 +201,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
           className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 flex items-center gap-2"
         >
           {slides.map((_, i) => (
-            <button
+            <Button variant="unstyled"
               key={i}
               role="tab"
               aria-selected={i === index}

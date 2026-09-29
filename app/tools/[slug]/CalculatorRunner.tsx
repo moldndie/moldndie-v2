@@ -12,6 +12,7 @@ import type {
 import { evaluateFormula } from "@/lib/formula-engine"
 import { unitFor, toBase, fromBase } from "@/lib/units"
 import { recordRun } from "@/services/calculator.service"
+import { Button } from "@/components/ui/button"
 
 /**
  * The public tool pages are dark; the dashboard live preview sits on a light
@@ -167,12 +168,12 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
         <div className={cn(CARD(dark), "space-y-5")}>
           <div className="flex items-center justify-between">
             <h2 className={cn("text-base font-bold", HEADING(dark))}>Inputs</h2>
-            <button
+            <Button variant="unstyled"
               onClick={reset}
               className={cn("flex items-center gap-1.5 text-xs transition-colors", dark ? "text-[var(--calc-muted)] [@media(hover:hover)]:hover:text-[var(--calc-accent)]" : "text-zinc-400 [@media(hover:hover)]:hover:text-primary")}
             >
               <RotateCcw className="size-3.5" /> Reset
-            </button>
+            </Button>
           </div>
 
           {unitSystems.length > 0 && (

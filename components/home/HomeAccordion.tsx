@@ -4,6 +4,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Minus, Globe, Heart, FileText, GraduationCap, Network } from "lucide-react";
+import { Button } from "@/components/ui/button"
 
 
 const items = [
@@ -49,7 +50,7 @@ export default function HomeAccordion() {
         const isOpen = openIndex === i;
         return (
           <div key={i}>
-            <button
+            <Button variant="unstyled"
               onClick={() => setOpenIndex(isOpen ? -1 : i)}
               aria-expanded={isOpen}
               className="group w-full flex items-center justify-between gap-4 py-5 text-left rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
@@ -63,7 +64,7 @@ export default function HomeAccordion() {
               ) : (
                 <Plus size={16} className="shrink-0 text-zinc-400" />
               )}
-            </button>
+            </Button>
             <AnimatePresence initial={false}>
               {isOpen && (
                 <motion.div

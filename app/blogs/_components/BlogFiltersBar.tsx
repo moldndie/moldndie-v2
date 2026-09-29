@@ -6,6 +6,7 @@ import { Loader2, Search, X } from "lucide-react"
 import { Select } from "@/components/ui/select"
 import type { BlogCategory, BlogTag } from "@/types"
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 const SORT_OPTIONS = [
   { label: "Newest first", value: "newest" },
@@ -104,13 +105,13 @@ export function BlogFiltersBar({
 
           {/* Clear */}
           {hasFilters && (
-            <button
+            <Button variant="unstyled"
               onClick={() => startTransition(() => router.replace(pathname))}
               className="flex items-center gap-1 text-xs text-zinc-500 hover:text-primary transition-colors whitespace-nowrap"
             >
               <X className="size-3.5" />
               Clear filters
-            </button>
+            </Button>
           )}
 
           {isPending && (

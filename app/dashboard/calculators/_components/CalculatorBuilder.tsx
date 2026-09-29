@@ -683,7 +683,7 @@ function StartScreen({ existing, onTemplate, onScratch, onDuplicate }: {
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {Object.entries(TEMPLATES).map(([key, tpl]) => (
-          <button
+          <Button variant="unstyled"
             key={key}
             type="button"
             onClick={() => onTemplate(key)}
@@ -694,7 +694,7 @@ function StartScreen({ existing, onTemplate, onScratch, onDuplicate }: {
             <p className="mt-2 text-[11px] text-zinc-400">
               {tpl.fields.length} input{tpl.fields.length !== 1 ? "s" : ""} · {tpl.outputs.length} result{tpl.outputs.length !== 1 ? "s" : ""}
             </p>
-          </button>
+          </Button>
         ))}
       </div>
 
@@ -741,7 +741,7 @@ function Stepper({ current, counts, problems, onGo }: {
         const count = counts[i]
         return (
           <div key={label} className="flex flex-1 items-center last:flex-none">
-            <button type="button" onClick={() => onGo(i)} className="group flex items-center gap-2.5 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
+            <Button variant="unstyled" type="button" onClick={() => onGo(i)} className="group flex items-center gap-2.5 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
               <span className={cn(
                 "flex size-8 shrink-0 items-center justify-center rounded-full border text-sm font-semibold transition-colors",
                 active ? "border-primary bg-primary text-white"
@@ -759,7 +759,7 @@ function Stepper({ current, counts, problems, onGo }: {
                   {bad ? `${problems[i]} to fix` : `Step ${i + 1}`}
                 </span>
               </span>
-            </button>
+            </Button>
             {i < STEP_META.length - 1 && <span className="mx-3 h-px min-w-4 flex-1 bg-zinc-200" />}
           </div>
         )

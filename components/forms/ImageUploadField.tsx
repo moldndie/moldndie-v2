@@ -51,14 +51,14 @@ export function ImageUploadField({ value, onChange, className }: ImageUploadFiel
           </Button>
         </div>
       ) : (
-        <button
+        <Button variant="unstyled"
           type="button"
           onClick={() => inputRef.current?.click()}
           className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-500 transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
         >
           <Upload className="size-4" />
           Click to select image
-        </button>
+        </Button>
       )}
       <input
         ref={inputRef}

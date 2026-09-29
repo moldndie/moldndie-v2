@@ -4,6 +4,7 @@ import { useRef, useState } from "react"
 import { Upload, X } from "lucide-react"
 import { uploadFileToR2, getR2Url } from "@/services/upload.service"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 interface ImageUploadProps {
   bucket: string
@@ -48,17 +49,17 @@ export function ImageUpload({ bucket, value, onChange, onClear, className }: Ima
             className="h-32 w-auto rounded-lg border border-zinc-200 object-cover"
           />
           {onClear && (
-            <button
+            <Button variant="unstyled"
               type="button"
               onClick={onClear}
               className="absolute -right-2 -top-2 flex size-5 items-center justify-center rounded-full bg-zinc-900 text-white hover:bg-zinc-700"
             >
               <X className="size-3" />
-            </button>
+            </Button>
           )}
         </div>
       ) : (
-        <button
+        <Button variant="unstyled"
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
@@ -66,7 +67,7 @@ export function ImageUpload({ bucket, value, onChange, onClear, className }: Ima
         >
           <Upload className="size-4" />
           {uploading ? "Uploading…" : "Click to upload"}
-        </button>
+        </Button>
       )}
       <input
         ref={inputRef}

@@ -69,7 +69,7 @@ export function Advanced({ children, count }: { children: React.ReactNode; count
   const [open, setOpen] = useState(false)
   return (
     <div className="rounded-lg border border-zinc-200 bg-zinc-50/60">
-      <button
+      <Button variant="unstyled"
         type="button"
         onClick={() => setOpen((o) => !o)}
         className="flex w-full items-center gap-2 rounded-lg px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-primary/40 text-xs font-medium text-zinc-500 transition-colors hover:text-primary"
@@ -79,7 +79,7 @@ export function Advanced({ children, count }: { children: React.ReactNode; count
         {count ? <span className="rounded-full bg-zinc-200 px-1.5 text-[10px] text-zinc-600">{count}</span> : null}
         <span className="flex-1" />
         {open ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
-      </button>
+      </Button>
       {open && <div className="space-y-4 border-t border-zinc-200 p-3">{children}</div>}
     </div>
   )

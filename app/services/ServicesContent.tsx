@@ -256,12 +256,12 @@ export default function ServicesContent({
                 <p className="text-sm text-zinc-500 mb-6 max-w-xs">
                   We&apos;ve received your request and will reach out within 24 hours.
                 </p>
-                <button
+                <Button variant="unstyled"
                   onClick={() => setSuccess(false)}
                   className="text-sm text-primary font-semibold no-underline underline-offset-2 hover:underline hover:opacity-80 transition-opacity"
                 >
                   Submit another request
-                </button>
+                </Button>
               </div>
             ) : (
               <form onSubmit={handleSubmit} className="space-y-5">

@@ -3,6 +3,7 @@
 import { Eye, Pencil, Globe, EyeOff, ExternalLink } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useSetBlogPublished } from "@/hooks/queries/useBlog"
+import { Button } from "@/components/ui/button"
 
 interface PreviewBannerProps {
   blogId: string
@@ -50,7 +51,7 @@ export function PreviewBanner({ blogId, blogSlug, isPublished }: PreviewBannerPr
         </a>
 
         {/* Publish / Unpublish */}
-        <button
+        <Button variant="unstyled"
           type="button"
           onClick={handleToggle}
           disabled={setPublished.isPending}
@@ -63,7 +64,7 @@ export function PreviewBanner({ blogId, blogSlug, isPublished }: PreviewBannerPr
         >
           {isPublished ? <EyeOff className="size-3" /> : <Globe className="size-3" />}
           {setPublished.isPending ? "Saving…" : isPublished ? "Unpublish" : "Publish"}
-        </button>
+        </Button>
 
         {/* View live — only when published */}
         {isPublished && (

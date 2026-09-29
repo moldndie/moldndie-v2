@@ -37,7 +37,7 @@ function ToolBtn({
   children: React.ReactNode
 }) {
   return (
-    <button
+    <Button variant="unstyled"
       type="button"
       onMouseDown={(e) => {
         e.preventDefault()
@@ -48,11 +48,11 @@ function ToolBtn({
         "flex h-7 w-7 items-center justify-center rounded-lg text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
         active
           ? "bg-primary text-white"
-          : "text-zinc-600 hover:bg-primary hover:text-primary-foreground"
+          : "text-zinc-600 [@media(hover:hover)]:hover:bg-primary [@media(hover:hover)]:hover:text-primary-foreground"
       )}
     >
       {children}
-    </button>
+    </Button>
   )
 }
 
@@ -241,7 +241,7 @@ export default function RichTextEditor({
             <div className="absolute top-8 left-0 z-10 w-44 rounded-lg border border-zinc-200 bg-white p-2 shadow-lg">
               <div className="grid grid-cols-6 gap-1">
                 {TEXT_COLORS.map(({ name, value }) => (
-                  <button
+                  <Button variant="unstyled"
                     key={value}
                     type="button"
                     title={name}
@@ -272,7 +272,7 @@ export default function RichTextEditor({
             <div className="absolute top-8 left-0 z-10 w-44 rounded-lg border border-zinc-200 bg-white p-2 shadow-lg">
               <div className="grid grid-cols-6 gap-1">
                 {BG_COLORS.map(({ name, value }) => (
-                  <button
+                  <Button variant="unstyled"
                     key={value}
                     type="button"
                     title={name}

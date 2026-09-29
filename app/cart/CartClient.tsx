@@ -138,7 +138,7 @@ export default function CartClient() {
               </span>
 
               {/* Remove */}
-              <button
+              <Button variant="unstyled"
                 onClick={() =>
                   removeItem.mutate({
                     product_id: item.product_id,
@@ -153,7 +153,7 @@ export default function CartClient() {
                 aria-label={`Remove ${item.title}`}
               >
                 <Trash2 size={16} />
-              </button>
+              </Button>
             </li>
           )
         })}

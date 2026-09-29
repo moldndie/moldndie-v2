@@ -35,7 +35,7 @@ function CategoryRow({
 }) {
   return (
     <div className="rounded-2xl border border-zinc-200 overflow-hidden">
-      <button
+      <Button variant="unstyled"
         type="button"
         onClick={onToggle}
         aria-expanded={open}
@@ -53,7 +53,7 @@ function CategoryRow({
           size={14}
           className={`text-zinc-400 transition-transform duration-200 shrink-0 ml-2 ${open ? "rotate-180" : ""}`}
         />
-      </button>
+      </Button>
       <AnimatePresence initial={false}>
         {open && (
           <motion.div

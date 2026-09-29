@@ -434,14 +434,14 @@ export function LessonsManager({ courseId }: { courseId: string }) {
 
       {/* Empty state */}
       {!isLoading && lessons.length === 0 && !form && (
-        <button
+        <Button variant="unstyled"
           type="button"
           onClick={openAdd}
           className="flex h-28 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors"
         >
           <Plus className="size-5" />
           Add your first lesson
-        </button>
+        </Button>
       )}
     </div>
   )

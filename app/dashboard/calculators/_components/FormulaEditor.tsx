@@ -7,6 +7,7 @@ import { Plus, RotateCcw, Delete } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { evaluateFormula, FUNCTION_NAMES, CONSTANT_NAMES, FUNCTION_ARITY } from "@/lib/formula-engine"
 import { hydrate, serialize, type FormulaToken } from "@/lib/formula-tokens"
+import { Button } from "@/components/ui/button"
 
 /**
  * Formulas are built by clicking, not typing.
@@ -175,7 +176,7 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
                 className="h-auto w-20 rounded-lg border-primary px-2 py-1 text-sm tabular-nums"
               />
             ) : (
-              <button
+              <Button variant="unstyled"
                 type="button"
                 onClick={(e) => {
                   e.stopPropagation()
@@ -202,7 +203,7 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
                   : t.kind === "fn" ? `${t.name}(`
                   : t.kind === "const" ? t.name
                   : ","}
-              </button>
+              </Button>
             )}
           </span>
         ))}

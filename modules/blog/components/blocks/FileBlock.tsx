@@ -132,7 +132,7 @@ export function FileBlock({ value, onChange }: FileBlockProps) {
 
   return (
     <div className="space-y-2">
-      <button
+      <Button variant="unstyled"
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={uploading}
@@ -141,7 +141,7 @@ export function FileBlock({ value, onChange }: FileBlockProps) {
         <Upload className="size-5" />
         <span>{uploading ? progress ?? "Uploading…" : "Click to upload file"}</span>
         <span className="text-xs text-zinc-400">PDF, PPT, DOC, XLS, JPG, PNG, MP4, ZIP, RAR — max {MAX_SIZE_MB} MB</span>
-      </button>
+      </Button>
       <input
         ref={inputRef}
         type="file"

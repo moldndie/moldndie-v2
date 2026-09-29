@@ -6,6 +6,7 @@ import { motion } from "framer-motion"
 import { getFileUrl } from "@/lib/utils"
 import RichTextRenderer from "@/components/editor/RichTextRenderer"
 import type { PortfolioItem } from "@/services/portfolio.service"
+import { Button } from "@/components/ui/button"
 
 function getYouTubeEmbedUrl(url: string): string | null {
   const short = url.match(/youtu\.be\/([^?&]+)/)
@@ -42,7 +43,7 @@ function PortfolioCard({ item }: { item: PortfolioItem }) {
           {images.length > 1 && (
             <div className="flex gap-2 overflow-x-auto scrollbar-hide px-3 pt-3">
               {images.map((key, i) => (
-                <button
+                <Button variant="unstyled"
                   key={`${key}-${i}`}
                   type="button"
                   onClick={() => setActive(i)}
@@ -58,7 +59,7 @@ function PortfolioCard({ item }: { item: PortfolioItem }) {
                     className="object-cover"
                     sizes="48px"
                   />
-                </button>
+                </Button>
               ))}
             </div>
           )}

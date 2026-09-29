@@ -163,7 +163,7 @@ export function CroppableFileUploadField({
   // ── Idle ──────────────────────────────────────────────────────
   return (
     <div className={cn("space-y-2", className)}>
-      <button
+      <Button variant="unstyled"
         type="button"
         onClick={() => inputRef.current?.click()}
         className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-500 transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
@@ -174,7 +174,7 @@ export function CroppableFileUploadField({
         </div>
         {label}
         <span className="text-[10px] text-zinc-400">Image will be cropped before upload</span>
-      </button>
+      </Button>
       <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
       {cropSrc && (
         <ImageCropModal

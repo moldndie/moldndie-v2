@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { ChevronDown, Search, X } from "lucide-react";
 import { countries, getFlagUrl, type Country } from "@/lib/countries";
+import { Button } from "@/components/ui/button"
 
 type Props = {
   name: string;
@@ -53,7 +54,7 @@ export default function CountrySelect({
     <div ref={containerRef} className="relative">
       <input type="hidden" name={name} value={value} />
 
-      <button
+      <Button variant="unstyled"
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center gap-2.5 h-9 rounded-lg border border-input bg-white px-3 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
@@ -76,7 +77,7 @@ export default function CountrySelect({
           size={15}
           className={`shrink-0 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
         />
-      </button>
+      </Button>
 
       {open && (
         <div className="absolute z-50 mt-1 w-full rounded-lg border border-input bg-white shadow-lg">
@@ -91,9 +92,9 @@ export default function CountrySelect({
               className="flex-1 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none"
             />
             {search && (
-              <button type="button" onClick={() => setSearch("")}>
+              <Button variant="unstyled" type="button" onClick={() => setSearch("")}>
                 <X size={14} className="text-zinc-400 hover:text-zinc-600" />
-              </button>
+              </Button>
             )}
           </div>
 
@@ -103,7 +104,7 @@ export default function CountrySelect({
             ) : (
               filtered.map((country) => (
                 <li key={country.code}>
-                  <button
+                  <Button variant="unstyled"
                     type="button"
                     onClick={() => handleSelect(country)}
                     className={`flex w-full items-center gap-2.5 px-3 py-2 text-sm transition-colors [@media(hover:hover)]:hover:bg-primary [@media(hover:hover)]:hover:text-primary-foreground ${
@@ -119,7 +120,7 @@ export default function CountrySelect({
                     </span>
                     <span className="flex-1 text-left">{country.name}</span>
                     <span className="text-xs opacity-60">{country.dialCode}</span>
-                  </button>
+                  </Button>
                 </li>
               ))
             )}

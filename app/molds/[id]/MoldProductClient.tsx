@@ -112,7 +112,7 @@ function Thumbnail({
   onClick: () => void
 }) {
   return (
-    <button
+    <Button variant="unstyled"
       onClick={onClick}
       className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 shrink-0 transition-all duration-150 ${
         active
@@ -133,7 +133,7 @@ function Thumbnail({
           sizes="64px"
         />
       )}
-    </button>
+    </Button>
   )
 }
 

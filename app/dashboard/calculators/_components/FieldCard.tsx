@@ -36,13 +36,13 @@ export function FieldCard({ field, unitSystems, idx, total, problem, onUpdate, o
     <div className={cn("overflow-hidden rounded-2xl border bg-white", problem ? "border-red-300" : "border-zinc-200")}>
       <div className="flex items-center gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-3">
         <ReorderBtns idx={idx} total={total} onMove={(d) => onMove(idx, d)} />
-        <button onClick={() => setExpanded((e) => !e)} type="button" className="flex-1 rounded text-left transition-colors hover:text-primary outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
+        <Button variant="unstyled" onClick={() => setExpanded((e) => !e)} type="button" className="flex-1 rounded text-left transition-colors hover:text-primary outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
           <span className="text-sm font-semibold text-zinc-900">
             {field.label || <em className="font-normal text-zinc-400">Untitled input</em>}
           </span>
           <span className="ml-2 text-xs text-zinc-400">{FIELD_TYPE_LABELS[field.field_type]}</span>
           {field.unit && <span className="ml-1 text-xs text-zinc-400">· {field.unit}</span>}
-        </button>
+        </Button>
         {expanded ? <ChevronUp className="size-4 text-zinc-300" /> : <ChevronDown className="size-4 text-zinc-300" />}
         <Button onClick={() => onRemove(field._uid)} variant="ghost-danger" size="icon-xs" className="text-zinc-400">
           <Trash2 className="size-4" />
