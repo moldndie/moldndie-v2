@@ -19,6 +19,8 @@ const buttonVariants = cva(
           "[@media(hover:hover)]:hover:bg-primary [@media(hover:hover)]:hover:border-primary [@media(hover:hover)]:hover:text-primary-foreground aria-expanded:bg-primary aria-expanded:text-primary-foreground aria-pressed:bg-primary aria-pressed:text-primary-foreground data-[active=true]:bg-primary data-[active=true]:text-primary-foreground aria-[current=page]:bg-primary aria-[current=page]:text-primary-foreground",
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
+        "ghost-danger":
+          "hover:bg-red-50 hover:text-red-600 disabled:opacity-40",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {

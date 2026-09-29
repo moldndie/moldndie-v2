@@ -290,65 +290,65 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
         return (
           <div className="flex items-center justify-end gap-1">
             {/* Edit */}
-            <button
+            <Button
               onClick={() => setEditingUser(user)}
               title="Edit"
-              className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700"
+              variant="ghost" size="icon-sm" className="text-zinc-400"
             >
               <Pencil className="size-3.5" />
-            </button>
+            </Button>
 
             {/* Deactivate / Reactivate */}
             {user.is_active ? (
-              <button
+              <Button
                 onClick={() => setTogglingUser(user)}
                 disabled={isSelf}
                 title={isSelf ? "You cannot deactivate your own account." : "Deactivate"}
-                className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+                variant="ghost-danger" size="icon-sm" className="text-zinc-400"
               >
                 <UserX className="size-3.5" />
-              </button>
+              </Button>
             ) : (
-              <button
+              <Button
                 onClick={() => setTogglingUser(user)}
                 title="Reactivate"
-                className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-green-50 hover:text-green-600"
+                variant="ghost" size="icon-sm" className="text-zinc-400"
               >
                 <UserCheck className="size-3.5" />
-              </button>
+              </Button>
             )}
 
             {/* Reset Password */}
-            <button
+            <Button
               onClick={() => { if (hasEmail) resetPasswordMutation.mutate(user.email!) }}
               disabled={!hasEmail || resetPasswordMutation.isPending}
               title={hasEmail ? "Send password reset email" : "No email on file"}
-              className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-zinc-100 hover:text-zinc-700 disabled:cursor-not-allowed disabled:opacity-40"
+              variant="ghost" size="icon-sm" className="text-zinc-400"
             >
               <KeyRound className="size-3.5" />
-            </button>
+            </Button>
 
             {/* Resend Verification — hidden once verified */}
             {!isVerified && (
-              <button
+              <Button
                 onClick={() => { if (hasEmail) resendMutation.mutate(user.email!) }}
                 disabled={resendMutation.isPending}
                 title="Resend verification email"
-                className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-amber-50 hover:text-amber-600 disabled:opacity-40"
+                variant="ghost" size="icon-sm" className="text-zinc-400"
               >
                 <Send className="size-3.5" />
-              </button>
+              </Button>
             )}
 
             {/* Delete */}
-            <button
+            <Button
               onClick={() => setDeletingUser(user)}
               disabled={isSelf}
               title={isSelf ? "You cannot delete your own account." : "Delete permanently"}
-              className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:cursor-not-allowed disabled:opacity-40"
+              variant="ghost-danger" size="icon-sm" className="text-zinc-400"
             >
               <Trash2 className="size-3.5" />
-            </button>
+            </Button>
           </div>
         )
       },

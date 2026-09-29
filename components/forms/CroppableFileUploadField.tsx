@@ -124,11 +124,11 @@ export function CroppableFileUploadField({
       <div className={cn("space-y-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3", className)}>
         <p className="text-sm text-red-700">{error}</p>
         <div className="flex gap-3">
-          <button type="button" onClick={retry} className="flex items-center gap-1.5 text-xs font-medium text-zinc-700 hover:text-zinc-900 transition-colors">
+          <button type="button" onClick={retry} className="flex items-center gap-1.5 text-xs font-medium text-zinc-700 hover:text-primary transition-colors">
             <RotateCcw className="size-3" />
             Retry
           </button>
-          <button type="button" onClick={reset} className="text-xs text-zinc-500 hover:text-zinc-800 transition-colors">
+          <button type="button" onClick={reset} className="text-xs text-zinc-500 hover:text-primary transition-colors">
             Choose different file
           </button>
         </div>
@@ -165,7 +165,7 @@ export function CroppableFileUploadField({
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-700"
+        className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-500 transition-colors hover:border-primary hover:text-primary"
       >
         <div className="flex items-center gap-1.5">
           <Upload className="size-4" />

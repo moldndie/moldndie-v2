@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react"
 import { X } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 const sizeClasses = {
   sm: "max-w-md",
@@ -64,12 +65,12 @@ export function Modal({ open, onClose, title, children, size = "md" }: ModalProp
           <h2 id="modal-title" className="text-base font-semibold text-zinc-900">
             {title}
           </h2>
-          <button
+          <Button
             onClick={onClose}
-            className="rounded-md p-1 text-zinc-500 hover:bg-zinc-100 transition-colors"
+            variant="ghost" size="icon-sm" className="text-zinc-400"
           >
             <X className="size-4" />
-          </button>
+          </Button>
         </div>
 
         {/* Scrollable body */}

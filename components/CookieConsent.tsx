@@ -196,14 +196,14 @@ export function CookieConsent() {
                     <button
                       type="button"
                       onClick={() => decide("rejected")}
-                      className="px-5 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-semibold text-zinc-600 hover:border-zinc-400 hover:text-zinc-800 transition-colors whitespace-nowrap"
+                      className="px-5 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-semibold text-zinc-600 hover:border-primary hover:text-primary transition-colors whitespace-nowrap"
                     >
                       Reject Non-Essential
                     </button>
                     <button
                       type="button"
                       onClick={() => decide("accepted")}
-                      className="px-5 py-2.5 rounded-xl bg-[#5C1515] hover:bg-[#7C2020] text-white text-sm font-bold transition-colors shadow-sm whitespace-nowrap"
+                      className="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-sm font-bold transition-colors shadow-sm whitespace-nowrap"
                     >
                       Accept All
                     </button>

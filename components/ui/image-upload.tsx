@@ -62,7 +62,7 @@ export function ImageUpload({ bucket, value, onChange, onClear, className }: Ima
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={uploading}
-          className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-700 disabled:opacity-50"
+          className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-500 transition-colors hover:border-primary hover:text-primary disabled:opacity-50"
         >
           <Upload className="size-4" />
           {uploading ? "Uploading…" : "Click to upload"}

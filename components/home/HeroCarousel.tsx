@@ -177,7 +177,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
           <button
             onClick={handlePrev}
             aria-label="Previous slide"
-            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex size-10 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm hover:bg-black/55 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+            className="absolute left-4 top-1/2 -translate-y-1/2 z-10 flex size-10 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm hover:bg-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
           >
             <ChevronLeft className="size-5" />
           </button>
@@ -185,7 +185,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
           <button
             onClick={handleNext}
             aria-label="Next slide"
-            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex size-10 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm hover:bg-black/55 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
+            className="absolute right-4 top-1/2 -translate-y-1/2 z-10 flex size-10 items-center justify-center rounded-full bg-black/30 text-white backdrop-blur-sm hover:bg-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
           >
             <ChevronRight className="size-5" />
           </button>

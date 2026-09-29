@@ -85,7 +85,7 @@ export function FilePreview({
             <button
               type="button"
               onClick={onReplace}
-              className="flex items-center gap-1 text-xs text-zinc-500 transition-colors hover:text-zinc-800"
+              className="flex items-center gap-1 text-xs text-zinc-500 transition-colors hover:text-primary"
             >
               <RefreshCw className="size-3" />
               Replace

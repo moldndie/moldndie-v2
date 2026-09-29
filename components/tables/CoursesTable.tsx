@@ -91,20 +91,20 @@ export function CoursesTable() {
           >
             <BookOpen className="size-3.5" />
           </Link>
-          <button
+          <Button
             onClick={() => setEditingCourse(row.original)}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+            variant="ghost" size="icon-sm" className="text-zinc-400"
             title="Edit course"
           >
             <Pencil className="size-3.5" />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setDeletingCourse(row.original)}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+            variant="ghost-danger" size="icon-sm" className="text-zinc-400"
             title="Delete course"
           >
             <Trash2 className="size-3.5" />
-          </button>
+          </Button>
         </div>
       ),
     },

@@ -110,7 +110,7 @@ export function FileUploadField({
           <button
             type="button"
             onClick={retry}
-            className="flex items-center gap-1.5 text-xs font-medium text-zinc-700 hover:text-zinc-900 transition-colors"
+            className="flex items-center gap-1.5 text-xs font-medium text-zinc-700 hover:text-primary transition-colors"
           >
             <RotateCcw className="size-3" />
             Retry
@@ -118,7 +118,7 @@ export function FileUploadField({
           <button
             type="button"
             onClick={reset}
-            className="text-xs text-zinc-500 hover:text-zinc-800 transition-colors"
+            className="text-xs text-zinc-500 hover:text-primary transition-colors"
           >
             Choose different file
           </button>
@@ -153,7 +153,7 @@ export function FileUploadField({
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-500 transition-colors hover:border-zinc-400 hover:text-zinc-700"
+        className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-500 transition-colors hover:border-primary hover:text-primary"
       >
         <Upload className="size-4" />
         {label}
