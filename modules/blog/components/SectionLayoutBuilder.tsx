@@ -250,7 +250,7 @@ function SectionComposer({
       <button
         type="button"
         onClick={() => setStep("layout")}
-        className="w-full rounded-lg border-2 border-dashed border-zinc-200 py-10 text-center hover:border-primary transition-colors group"
+        className="w-full rounded-lg border-2 border-dashed border-zinc-200 py-10 text-center hover:border-primary transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
       >
         <div className="flex justify-center mb-2.5">
           <div className="rounded-lg bg-zinc-100 p-2.5 group-hover:bg-zinc-200 transition-colors">
@@ -266,7 +266,7 @@ function SectionComposer({
       <button
         type="button"
         onClick={() => setStep("layout")}
-        className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 py-2.5 text-sm font-medium text-zinc-400 hover:border-primary hover:text-primary transition-colors"
+        className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 py-2.5 text-sm font-medium text-zinc-400 hover:border-primary hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
       >
         <Plus className="size-3.5" />
         Add Section
@@ -371,7 +371,7 @@ function LayoutOption({
     <button
       type="button"
       onClick={onClick}
-      className="group rounded-lg border-2 border-zinc-200 bg-white p-3 text-left hover:border-primary transition-all"
+      className="group rounded-lg border-2 border-zinc-200 bg-white p-3 text-left hover:border-primary transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
     >
       <div className="mb-2 rounded-lg bg-zinc-100">{preview}</div>
       <p className="text-sm font-semibold text-zinc-900">{label}</p>
@@ -610,7 +610,7 @@ function ColumnEditor({
         <button
           type="button"
           onClick={() => setPicking(true)}
-          className="w-full flex items-center justify-center gap-1 rounded-lg border border-dashed border-zinc-200 py-1.5 text-[11px] font-medium text-zinc-400 hover:border-primary hover:text-primary transition-colors"
+          className="w-full flex items-center justify-center gap-1 rounded-lg border border-dashed border-zinc-200 py-1.5 text-[11px] font-medium text-zinc-400 hover:border-primary hover:text-primary transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
         >
           <Plus className="size-3" />
           Add to {side}

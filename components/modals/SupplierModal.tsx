@@ -1,5 +1,6 @@
 "use client"
 
+import { Switch } from "@/components/ui/switch"
 import { useEffect, useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -195,21 +196,7 @@ export function SupplierModal({ open, onClose, supplier, onSuccess }: SupplierMo
             <p className="text-sm font-medium text-zinc-800">Sponsored</p>
             <p className="text-xs text-zinc-400">Sponsored suppliers appear first in the listing</p>
           </div>
-          <button
-            type="button"
-            role="switch"
-            aria-checked={sponsored}
-            onClick={() => setValue("sponsored", !sponsored, { shouldValidate: true })}
-            className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${
-              sponsored ? "bg-primary" : "bg-zinc-200"
-            }`}
-          >
-            <span
-              className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
-                sponsored ? "translate-x-4.5" : "translate-x-0.5"
-              }`}
-            />
-          </button>
+          <Switch checked={sponsored} onCheckedChange={() => setValue("sponsored", !sponsored, { shouldValidate: true })} size="sm" />
         </div>
 
         {mutationError && (

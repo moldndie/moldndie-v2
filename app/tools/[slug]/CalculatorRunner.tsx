@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useMemo, useCallback, useEffect, useRef, createContext, useContext } from "react"
+import { Select } from "@/components/ui/select"
 import { AlertCircle, RotateCcw, Zap, Table2, Search } from "lucide-react"
 import { cn } from "@/lib/utils"
 import type {
@@ -168,7 +169,7 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
             <h2 className={cn("text-base font-bold", HEADING(dark))}>Inputs</h2>
             <button
               onClick={reset}
-              className={cn("flex items-center gap-1.5 text-xs transition-colors", dark ? "text-[var(--calc-muted)] hover:text-[var(--calc-text)]" : "text-zinc-400 hover:text-primary")}
+              className={cn("flex items-center gap-1.5 text-xs transition-colors", dark ? "text-[var(--calc-muted)] [@media(hover:hover)]:hover:text-[var(--calc-accent)]" : "text-zinc-400 [@media(hover:hover)]:hover:text-primary")}
             >
               <RotateCcw className="size-3.5" /> Reset
             </button>
@@ -187,7 +188,7 @@ export default function CalculatorRunner({ calculator, preview = false, theme = 
                     className={cn(
                       "rounded-md px-3 py-1.5 text-xs font-semibold transition-colors",
                       dark
-                        ? "text-[var(--calc-muted)] hover:bg-primary hover:text-primary-foreground aria-pressed:bg-white aria-pressed:text-primary"
+                        ? "text-[var(--calc-muted)] [@media(hover:hover)]:hover:bg-[var(--calc-accent)]/20 [@media(hover:hover)]:hover:text-[var(--calc-text)] aria-pressed:bg-[var(--calc-accent)]/30 aria-pressed:text-[var(--calc-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--calc-accent)]"
                         : "ui-pill border",
                     )}
                   >
@@ -341,10 +342,10 @@ function ReferenceTables({ tables }: { tables: NormalizedTable[] }) {
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search reference values…"
             className={cn(
-              "w-full rounded-lg border py-2.5 pl-9 pr-3 text-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30",
+              "w-full rounded-lg border py-2.5 pl-9 pr-3 text-sm transition focus:outline-none focus:ring-2",
               dark
-                ? "border-[var(--calc-border)] bg-[var(--calc-surface)] text-[var(--calc-text)] placeholder:text-[var(--calc-muted)]"
-                : "border-zinc-200",
+                ? "border-[var(--calc-border)] bg-[var(--calc-surface)] text-[var(--calc-text)] placeholder:text-[var(--calc-muted)] focus:border-[var(--calc-accent)] focus:ring-[var(--calc-accent)]/30 [@media(hover:hover)]:hover:border-[var(--calc-accent)]/60"
+                : "border-zinc-200 focus:border-primary focus:ring-primary/30",
             )}
           />
         </div>
@@ -433,10 +434,10 @@ function ReferenceTable({ table }: { table: NormalizedTable }) {
 function FieldInput({ field, system, value, onChange }: { field: CalcField; system: string | null; value: string; onChange: (v: string) => void }) {
   const dark = useDark()
   const baseClass = cn(
-    "w-full rounded-lg border px-3 py-2.5 text-sm transition focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary",
+    "w-full rounded-lg border px-3 py-2.5 text-sm transition focus:outline-none focus:ring-2",
     dark
-      ? "border-[var(--calc-border)] bg-[var(--calc-surface)] text-[var(--calc-text)] placeholder:text-[var(--calc-muted)]"
-      : "border-zinc-200",
+      ? "border-[var(--calc-border)] bg-[var(--calc-surface)] text-[var(--calc-text)] placeholder:text-[var(--calc-muted)] focus:border-[var(--calc-accent)] focus:ring-[var(--calc-accent)]/30 [@media(hover:hover)]:hover:border-[var(--calc-accent)]/60"
+      : "border-zinc-200 focus:border-primary focus:ring-primary/30",
   )
   const { unit } = unitFor(field.units, system, field.unit)
 
@@ -449,12 +450,12 @@ function FieldInput({ field, system, value, onChange }: { field: CalcField; syst
       </label>
 
       {field.field_type === "select" && field.options ? (
-        <select value={value} onChange={(e) => onChange(e.target.value)} className={cn(baseClass, !dark && "bg-white")}>
+        <Select value={value} onChange={(e) => onChange(e.target.value)} className={cn(baseClass, "h-auto pr-8", !dark && "bg-white")}>
           <option value="">— Select —</option>
           {field.options.map((opt) => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
           ))}
-        </select>
+        </Select>
       ) : field.field_type === "checkbox" ? (
         <label className="flex items-center gap-2 cursor-pointer">
           <input

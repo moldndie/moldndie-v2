@@ -45,12 +45,9 @@ export default function ForgotPasswordPage() {
         </p>
         <p className="mt-6 text-sm text-muted-foreground">
           Didn&apos;t receive it?{" "}
-          <button
-            onClick={() => setSent(false)}
-            className="font-semibold text-primary hover:underline"
-          >
+          <Button variant="link" size="sm" className="h-auto p-0 font-semibold align-baseline" onClick={() => setSent(false)}>
             Try again
-          </button>
+          </Button>
         </p>
         <Link
           href="/login"

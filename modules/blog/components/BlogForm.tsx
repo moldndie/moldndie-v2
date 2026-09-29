@@ -190,14 +190,14 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
             <div className="rounded-2xl border border-zinc-200 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-zinc-900">Category</p>
-                <button
+                <Button
                   type="button"
                   onClick={() => setCategoryModalOpen(true)}
-                  className="flex items-center gap-1 text-xs text-zinc-500 hover:text-primary transition-colors"
+                  variant="link" size="xs"
                 >
                   <Plus className="size-3" />
                   New
-                </button>
+                </Button>
               </div>
               <Select {...register("category_id")}>
                 <option value="">— No category —</option>
@@ -212,14 +212,14 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
             <div className="rounded-2xl border border-zinc-200 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-zinc-900">Tags</p>
-                <button
+                <Button
                   type="button"
                   onClick={() => setTagModalOpen(true)}
-                  className="flex items-center gap-1 text-xs text-zinc-500 hover:text-primary transition-colors"
+                  variant="link" size="xs"
                 >
                   <Plus className="size-3" />
                   New
-                </button>
+                </Button>
               </div>
               {localTags.length === 0 ? (
                 <p className="text-xs text-zinc-400">No tags yet.</p>

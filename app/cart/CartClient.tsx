@@ -95,13 +95,9 @@ export default function CartClient() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-extrabold text-zinc-900">Your Cart</h1>
-        <button
-          onClick={() => clearCart.mutate()}
-          disabled={clearCart.isPending}
-          className="text-xs text-zinc-400 hover:text-red-500 no-underline underline-offset-2 hover:underline transition-colors disabled:opacity-50"
-        >
+        <Button variant="ghost-danger" size="xs" onClick={() => clearCart.mutate()} disabled={clearCart.isPending}>
           Clear all
-        </button>
+        </Button>
       </div>
 
       {/* Items */}

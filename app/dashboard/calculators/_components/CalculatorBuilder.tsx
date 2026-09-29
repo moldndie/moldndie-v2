@@ -685,8 +685,9 @@ function StartScreen({ existing, onTemplate, onScratch, onDuplicate }: {
         {Object.entries(TEMPLATES).map(([key, tpl]) => (
           <button
             key={key}
+            type="button"
             onClick={() => onTemplate(key)}
-            className="rounded-2xl border border-zinc-200 bg-white p-4 text-left transition-colors hover:border-primary hover:bg-primary/5"
+            className="rounded-2xl border border-zinc-200 bg-white p-4 text-left transition-colors hover:border-primary hover:bg-primary/5 outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
           >
             <p className="text-sm font-semibold text-zinc-900">{tpl.title}</p>
             <p className="mt-1 line-clamp-2 text-xs text-zinc-400">{tpl.description}</p>
@@ -740,7 +741,7 @@ function Stepper({ current, counts, problems, onGo }: {
         const count = counts[i]
         return (
           <div key={label} className="flex flex-1 items-center last:flex-none">
-            <button type="button" onClick={() => onGo(i)} className="group flex items-center gap-2.5">
+            <button type="button" onClick={() => onGo(i)} className="group flex items-center gap-2.5 rounded-full outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
               <span className={cn(
                 "flex size-8 shrink-0 items-center justify-center rounded-full border text-sm font-semibold transition-colors",
                 active ? "border-primary bg-primary text-white"

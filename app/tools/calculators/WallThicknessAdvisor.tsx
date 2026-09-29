@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { Select } from "@/components/ui/select"
 import { ResultCard } from "../_components/ResultCard"
 
 const MATERIALS = [
@@ -46,28 +47,26 @@ export function WallThicknessAdvisor() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-zinc-700 mb-1.5">Material</label>
-          <select
+          <Select
             value={matIdx}
             onChange={(e) => setMatIdx(Number(e.target.value))}
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white"
           >
             {MATERIALS.map((m, i) => (
               <option key={i} value={i}>{m.label}</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-zinc-700 mb-1.5">Application</label>
-          <select
+          <Select
             value={appIdx}
             onChange={(e) => setAppIdx(Number(e.target.value))}
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white"
           >
             {APPLICATIONS.map((a, i) => (
               <option key={i} value={i}>{a.label}</option>
             ))}
-          </select>
+          </Select>
         </div>
       </div>
 

@@ -45,7 +45,7 @@ function ToolBtn({
       }}
       title={title}
       className={cn(
-        "flex h-7 w-7 items-center justify-center rounded-lg text-xs font-medium transition-colors",
+        "flex h-7 w-7 items-center justify-center rounded-lg text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
         active
           ? "bg-primary text-white"
           : "text-zinc-600 hover:bg-primary hover:text-primary-foreground"
@@ -247,7 +247,7 @@ export default function RichTextEditor({
                     title={name}
                     aria-label={name}
                     onClick={() => { editor.chain().focus().setColor(value).run(); setShowColorPicker(false) }}
-                    className="size-5 rounded border border-zinc-200 transition-transform hover:scale-110"
+                    className="size-5 rounded border border-zinc-200 transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                     style={{ backgroundColor: value }}
                   />
                 ))}
@@ -278,7 +278,7 @@ export default function RichTextEditor({
                     title={name}
                     aria-label={name}
                     onClick={() => { editor.chain().focus().setBackgroundColor(value).run(); setShowBgPicker(false) }}
-                    className="size-5 rounded border border-zinc-200 transition-transform hover:scale-110"
+                    className="size-5 rounded border border-zinc-200 transition-transform hover:scale-110 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
                     style={{ backgroundColor: value }}
                   />
                 ))}

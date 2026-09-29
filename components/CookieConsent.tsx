@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Cookie, Shield, BarChart3, ChevronDown, CheckCircle2 } from "lucide-react"
@@ -39,7 +40,7 @@ function CategoryRow({
         onClick={onToggle}
         aria-expanded={open}
         aria-controls={`cookie-${id}`}
-        className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-zinc-50 transition-colors text-left"
+        className="w-full flex items-center justify-between px-4 py-3.5 [@media(hover:hover)]:hover:bg-zinc-50 transition-colors text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary/40"
       >
         <div className="flex items-center gap-2.5">
           {icon}
@@ -193,20 +194,21 @@ export function CookieConsent() {
                     . Change preferences anytime via the footer.
                   </p>
                   <div className="flex gap-2.5 shrink-0">
-                    <button
+                    <Button
                       type="button"
+                      variant="outline"
                       onClick={() => decide("rejected")}
-                      className="px-5 py-2.5 rounded-lg border-2 border-zinc-200 text-sm font-semibold text-zinc-600 hover:border-primary hover:text-primary transition-colors whitespace-nowrap"
+                      className="h-auto px-5 py-2.5 font-semibold whitespace-nowrap"
                     >
                       Reject Non-Essential
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => decide("accepted")}
-                      className="px-5 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-white text-sm font-bold transition-colors shadow-sm whitespace-nowrap"
+                      className="h-auto px-5 py-2.5 font-bold shadow-sm whitespace-nowrap"
                     >
                       Accept All
-                    </button>
+                    </Button>
                   </div>
                 </div>
               </div>

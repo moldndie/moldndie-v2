@@ -136,7 +136,7 @@ export function FileBlock({ value, onChange }: FileBlockProps) {
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={uploading}
-        className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 px-4 py-6 text-sm text-zinc-500 transition-colors hover:border-primary hover:text-primary disabled:opacity-50"
+        className="flex w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 px-4 py-6 text-sm text-zinc-500 transition-colors hover:border-primary hover:text-primary disabled:opacity-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
       >
         <Upload className="size-5" />
         <span>{uploading ? progress ?? "Uploading…" : "Click to upload file"}</span>

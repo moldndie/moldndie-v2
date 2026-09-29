@@ -36,7 +36,7 @@ export function FieldCard({ field, unitSystems, idx, total, problem, onUpdate, o
     <div className={cn("overflow-hidden rounded-2xl border bg-white", problem ? "border-red-300" : "border-zinc-200")}>
       <div className="flex items-center gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-3">
         <ReorderBtns idx={idx} total={total} onMove={(d) => onMove(idx, d)} />
-        <button onClick={() => setExpanded((e) => !e)} className="flex-1 text-left transition-colors hover:text-primary">
+        <button onClick={() => setExpanded((e) => !e)} type="button" className="flex-1 rounded text-left transition-colors hover:text-primary outline-none focus-visible:ring-2 focus-visible:ring-primary/40">
           <span className="text-sm font-semibold text-zinc-900">
             {field.label || <em className="font-normal text-zinc-400">Untitled input</em>}
           </span>

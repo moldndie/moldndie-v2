@@ -41,7 +41,7 @@ export default function IconPicker({ value, onChange }: Props) {
                 title={name}
                 onClick={() => { onChange(name); setOpen(false) }}
                 className={cn(
-                  "flex flex-col items-center gap-1 p-2 rounded-lg text-[10px] font-medium transition-colors",
+                  "flex flex-col items-center gap-1 p-2 rounded-lg text-[10px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                   value === name
                     ? "bg-primary text-white"
                     : "text-zinc-600 hover:bg-primary hover:text-primary-foreground"

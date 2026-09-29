@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { useRef, useState } from "react"
 import { X, Plus, Loader2 } from "lucide-react"
 import { getFileUrl } from "@/lib/utils"
@@ -105,14 +106,10 @@ export function GalleryGrid({ items, onAdd, onRemove, onUploadingChange }: Galle
         <p className="text-sm text-zinc-500">
           {totalCount} item{totalCount !== 1 ? "s" : ""}
         </p>
-        <button
-          type="button"
-          onClick={() => inputRef.current?.click()}
-          className="flex items-center gap-1.5 ui-pill rounded-lg border px-3 py-1.5 text-sm transition-colors"
-        >
+        <Button type="button" variant="outline" onClick={() => inputRef.current?.click()}>
           <Plus className="size-3.5" />
           Add Media
-        </button>
+        </Button>
       </div>
 
       <input
@@ -128,7 +125,7 @@ export function GalleryGrid({ items, onAdd, onRemove, onUploadingChange }: Galle
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
-          className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-primary hover:text-zinc-500 transition-colors"
+          className="flex h-32 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors"
         >
           <Plus className="size-4" />
           Upload gallery images or videos
@@ -157,7 +154,7 @@ export function GalleryGrid({ items, onAdd, onRemove, onUploadingChange }: Galle
               <button
                 type="button"
                 onClick={() => onRemove(index)}
-                className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100"
+                className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               >
                 <X className="size-3" />
               </button>
@@ -185,7 +182,7 @@ export function GalleryGrid({ items, onAdd, onRemove, onUploadingChange }: Galle
               <button
                 type="button"
                 onClick={() => upload.xhr?.abort()}
-                className="absolute right-1 top-1 rounded-full bg-black/40 p-0.5 text-white"
+                className="absolute right-1 top-1 rounded-full bg-black/40 p-0.5 text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
               >
                 <X className="size-3" />
               </button>

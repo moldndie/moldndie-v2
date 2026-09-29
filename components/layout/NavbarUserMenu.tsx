@@ -124,7 +124,7 @@ export default function NavbarUserMenu() {
       <div className="relative" ref={dropdownRef}>
         <button
           onClick={() => setOpen((v) => !v)}
-          className="flex items-center gap-1.5 cursor-pointer rounded-full p-1 hover:bg-primary hover:text-primary-foreground transition-colors"
+          className="flex items-center gap-1.5 cursor-pointer rounded-full p-1 [@media(hover:hover)]:hover:bg-primary [@media(hover:hover)]:hover:text-primary-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
         >
           <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold shrink-0">
             {initial}
@@ -177,7 +177,7 @@ export default function NavbarUserMenu() {
             )}
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors"
+              className="w-full flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 [@media(hover:hover)]:hover:bg-primary [@media(hover:hover)]:hover:text-primary-foreground transition-colors focus-visible:outline-none focus-visible:bg-primary focus-visible:text-primary-foreground"
             >
               <LogOut className="size-4 text-zinc-400" />
               Logout

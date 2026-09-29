@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { Select } from "@/components/ui/select"
 import { ResultCard } from "../_components/ResultCard"
 
 const GATE_TYPES = [
@@ -51,53 +53,49 @@ export function GateAreaCalculator() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-zinc-700 mb-1.5">Material</label>
-          <select
+          <Select
             value={matIdx}
             onChange={(e) => setMatIdx(Number(e.target.value))}
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white"
           >
             {MATERIALS.map((m, i) => (
               <option key={i} value={i}>{m.label}</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-zinc-700 mb-1.5">Gate type</label>
-          <select
+          <Select
             value={gateIdx}
             onChange={(e) => setGateIdx(Number(e.target.value))}
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white"
           >
             {GATE_TYPES.map((g, i) => (
               <option key={i} value={i}>{g.label}</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-zinc-700 mb-1.5">Part weight (g)</label>
-          <input
+          <Input
             type="number"
             min="0"
             step="0.1"
             value={weight}
             onChange={(e) => setWeight(e.target.value)}
-            placeholder="e.g. 25"
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+            placeholder="e.g. 25" className="h-auto py-2.5"
           />
         </div>
 
         <div>
           <label className="block text-sm font-medium text-zinc-700 mb-1.5">Target fill time (s)</label>
-          <input
+          <Input
             type="number"
             min="0"
             step="0.1"
             value={fillTime}
             onChange={(e) => setFillTime(e.target.value)}
-            placeholder="e.g. 1.5"
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+            placeholder="e.g. 1.5" className="h-auto py-2.5"
           />
         </div>
       </div>

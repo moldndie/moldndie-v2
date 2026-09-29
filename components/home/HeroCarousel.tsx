@@ -207,7 +207,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
               aria-label={`Go to slide ${i + 1}`}
               onClick={() => handleDot(i)}
               className={cn(
-                "h-1.5 rounded-full transition-all duration-400 focus-visible:outline-none",
+                "h-1.5 rounded-full transition-all duration-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary",
                 i === index
                   ? "w-8 bg-primary ring-1 ring-white/80"
                   : "w-1.5 bg-white/45 [@media(hover:hover)]:hover:bg-primary",

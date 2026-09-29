@@ -1,5 +1,6 @@
 "use client"
 
+import { Switch } from "@/components/ui/switch"
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
@@ -192,23 +193,7 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
               <p className="text-sm font-medium text-zinc-800">Free course</p>
               <p className="text-xs text-zinc-500">Toggle off to set a price</p>
             </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={isFree}
-              onClick={handleFreeToggle}
-              className={cn(
-                "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
-                isFree ? "bg-primary" : "bg-zinc-200"
-              )}
-            >
-              <span
-                className={cn(
-                  "inline-block size-4 rounded-full bg-white shadow transition-transform",
-                  isFree ? "translate-x-6" : "translate-x-1"
-                )}
-              />
-            </button>
+            <Switch checked={isFree} onCheckedChange={() => handleFreeToggle()} size="md" />
           </div>
 
           {!isFree && (
@@ -244,23 +229,7 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
               <p className="text-sm font-medium text-zinc-800">Published</p>
               <p className="text-xs text-zinc-500">Make this course visible to students</p>
             </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={isPublished}
-              onClick={() => setValue("is_published", !isPublished, { shouldValidate: true })}
-              className={cn(
-                "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
-                isPublished ? "bg-primary" : "bg-zinc-200"
-              )}
-            >
-              <span
-                className={cn(
-                  "inline-block size-4 rounded-full bg-white shadow transition-transform",
-                  isPublished ? "translate-x-6" : "translate-x-1"
-                )}
-              />
-            </button>
+            <Switch checked={isPublished} onCheckedChange={() => setValue("is_published", !isPublished, { shouldValidate: true })} size="md" />
           </div>
 
           {mutationError && (

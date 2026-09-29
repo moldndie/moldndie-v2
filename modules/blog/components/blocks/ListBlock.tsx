@@ -48,14 +48,14 @@ export function ListBlock({ value, onChange }: ListBlockProps) {
           </Button>
         </div>
       ))}
-      <button
+      <Button
         type="button"
         onClick={addItem}
-        className="flex items-center gap-1 text-sm text-zinc-500 hover:text-primary transition-colors"
+        variant="link" size="sm"
       >
         <Plus className="size-3.5" />
         Add item
-      </button>
+      </Button>
     </div>
   )
 }

@@ -48,7 +48,7 @@ function PortfolioCard({ item }: { item: PortfolioItem }) {
                   onClick={() => setActive(i)}
                   aria-label={`View image ${i + 1}`}
                   className={`relative size-12 shrink-0 overflow-hidden rounded-lg border transition-colors ${
-                    i === active ? "border-primary" : "border-zinc-200 hover:border-primary"
+                    i === active ? "border-primary ring-2 ring-primary/30" : "border-zinc-200 [@media(hover:hover)]:hover:border-primary"
                   }`}
                 >
                   <Image

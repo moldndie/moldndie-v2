@@ -1,5 +1,6 @@
 "use client"
 
+import { Switch } from "@/components/ui/switch"
 import { useState } from "react"
 import { Plus, Pencil, Trash2, X, Lock, Unlock, Video } from "lucide-react"
 import { Input } from "@/components/ui/input"
@@ -60,23 +61,7 @@ function FreeSwitch({
         <p className="text-sm font-medium text-zinc-800">{title}</p>
         <p className="text-xs text-zinc-500">{hint}</p>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        onClick={() => onChange(!checked)}
-        className={cn(
-          "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500",
-          checked ? "bg-primary" : "bg-zinc-200"
-        )}
-      >
-        <span
-          className={cn(
-            "inline-block size-4 rounded-full bg-white shadow transition-transform",
-            checked ? "translate-x-6" : "translate-x-1"
-          )}
-        />
-      </button>
+      <Switch checked={checked} onCheckedChange={() => onChange(!checked)} size="md" />
     </div>
   )
 }
@@ -106,9 +91,9 @@ function LessonForm({
         <p className="text-sm font-semibold text-zinc-800">
           {form.id ? "Edit Lesson" : "New Lesson"}
         </p>
-        <button type="button" onClick={onClose} className="text-zinc-400 hover:text-primary transition-colors">
+        <Button type="button" variant="ghost" size="icon-sm" aria-label="Close" onClick={onClose}>
           <X className="size-4" />
-        </button>
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -452,7 +437,7 @@ export function LessonsManager({ courseId }: { courseId: string }) {
         <button
           type="button"
           onClick={openAdd}
-          className="flex h-28 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-primary hover:text-zinc-500 transition-colors"
+          className="flex h-28 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40 transition-colors"
         >
           <Plus className="size-5" />
           Add your first lesson

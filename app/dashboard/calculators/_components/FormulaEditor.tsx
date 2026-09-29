@@ -185,7 +185,7 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
                 onDoubleClick={(e) => { e.stopPropagation(); removeAt(i) }}
                 title="Click to place the cursor · double-click to delete"
                 className={cn(
-                  "rounded-lg px-2 py-1 text-sm font-medium transition-colors",
+                  "rounded-lg px-2 py-1 text-sm font-medium transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                   t.kind === "var" && "bg-primary/10 text-primary hover:bg-primary/20",
                   t.kind === "num" && "bg-white border border-zinc-200 text-zinc-800 tabular-nums hover:border-zinc-300",
                   t.kind === "op" && "font-bold text-zinc-500 hover:text-zinc-900",

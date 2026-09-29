@@ -116,8 +116,8 @@ function Thumbnail({
       onClick={onClick}
       className={`relative w-16 h-16 rounded-lg overflow-hidden border-2 shrink-0 transition-all duration-150 ${
         active
-          ? "border-primary shadow-sm"
-          : "border-zinc-200 hover:border-primary"
+          ? "border-primary ring-2 ring-primary/30"
+          : "border-zinc-200 [@media(hover:hover)]:hover:border-primary"
       }`}
     >
       {media.type === "video" ? (

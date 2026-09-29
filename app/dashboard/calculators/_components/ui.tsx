@@ -9,6 +9,7 @@ import { useState } from "react"
 import { ChevronDown, ChevronUp, Settings2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { Switch } from "@/components/ui/switch"
 
 export function Label({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
@@ -55,15 +56,7 @@ export function Toggle({ label, hint, checked, onChange }: { label: string; hint
         <p className="text-sm font-medium text-zinc-800">{label}</p>
         <p className="text-xs text-zinc-500">{hint}</p>
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={checked}
-        onClick={() => onChange(!checked)}
-        className={cn("relative h-6 w-11 shrink-0 rounded-full transition-colors", checked ? "bg-primary" : "bg-zinc-200")}
-      >
-        <span className={cn("absolute left-0.5 top-0.5 size-5 rounded-full bg-white shadow transition-transform", checked && "translate-x-5")} />
-      </button>
+      <Switch size="md" checked={checked} onCheckedChange={onChange} />
     </label>
   )
 }
@@ -79,7 +72,7 @@ export function Advanced({ children, count }: { children: React.ReactNode; count
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center gap-2 px-3 py-2 text-xs font-medium text-zinc-500 transition-colors hover:text-primary"
+        className="flex w-full items-center gap-2 rounded-lg px-3 py-2 outline-none focus-visible:ring-2 focus-visible:ring-primary/40 text-xs font-medium text-zinc-500 transition-colors hover:text-primary"
       >
         <Settings2 className="size-3.5" />
         Advanced

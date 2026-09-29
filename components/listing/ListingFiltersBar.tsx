@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { Search, X } from "lucide-react"
 import { Select } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
@@ -84,13 +85,10 @@ export function ListingFiltersBar({
           )}
 
           {hasActiveFilters && (
-            <button
-              onClick={onClear}
-              className="flex items-center gap-1 text-xs text-zinc-500 hover:text-primary transition-colors whitespace-nowrap"
-            >
+            <Button variant="link" size="sm" onClick={onClear} className="whitespace-nowrap">
               <X size={13} />
               Clear filters
-            </button>
+            </Button>
           )}
         </div>
 

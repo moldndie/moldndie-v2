@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect, useCallback } from "react"
+import { Button } from "@/components/ui/button"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
@@ -226,9 +227,9 @@ export default function CoursesListingClient() {
           <p className="text-zinc-500 font-medium">No courses found</p>
           <p className="text-zinc-400 text-sm mt-1">Try adjusting your search or filters</p>
           {hasActiveFilters && (
-            <button onClick={clearAll} className="mt-4 text-sm text-primary no-underline underline-offset-2 hover:underline hover:opacity-70">
+            <Button variant="link" size="sm" onClick={clearAll} className="mt-4">
               Clear all filters
-            </button>
+            </Button>
           )}
         </div>
       ) : (

@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { Input } from "@/components/ui/input"
+import { Select } from "@/components/ui/select"
 import { ResultCard } from "../_components/ResultCard"
 
 const SURFACE_TYPES = [
@@ -40,42 +42,39 @@ export function DraftAngleCalculator() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-zinc-700 mb-1.5">Surface Finish</label>
-          <select
+          <Select
             value={surface}
             onChange={(e) => setSurface(Number(e.target.value))}
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white"
           >
             {SURFACE_TYPES.map((s, i) => (
               <option key={i} value={i}>{s.label}</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div>
           <label className="block text-sm font-medium text-zinc-700 mb-1.5">Material</label>
-          <select
+          <Select
             value={material}
             onChange={(e) => setMaterial(Number(e.target.value))}
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition bg-white"
           >
             {MATERIALS.map((m, i) => (
               <option key={i} value={i}>{m.label}</option>
             ))}
-          </select>
+          </Select>
         </div>
 
         <div className="sm:col-span-2">
           <label className="block text-sm font-medium text-zinc-700 mb-1.5">
             Texture depth <span className="font-normal text-zinc-400">(mm, optional)</span>
           </label>
-          <input
+          <Input
             type="number"
             min="0"
             step="0.025"
             value={depth}
             onChange={(e) => setDepth(e.target.value)}
-            placeholder="e.g. 0.075"
-            className="w-full rounded-lg border border-zinc-200 px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+            placeholder="e.g. 0.075" className="h-auto py-2.5"
           />
         </div>
       </div>

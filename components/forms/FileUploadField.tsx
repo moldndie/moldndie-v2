@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { useRef } from "react"
 import { Upload, X, RotateCcw, Loader2 } from "lucide-react"
 import { cn } from "@/lib/utils"
@@ -87,14 +88,10 @@ export function FileUploadField({
             style={{ width: `${progress}%` }}
           />
         </div>
-        <button
-          type="button"
-          onClick={cancelUpload}
-          className="flex items-center gap-1.5 text-xs text-zinc-500 hover:text-red-600 transition-colors"
-        >
+        <Button type="button" variant="ghost-danger" size="sm" onClick={cancelUpload}>
           <X className="size-3" />
           Cancel
-        </button>
+        </Button>
       </div>
     )
   }
@@ -107,21 +104,13 @@ export function FileUploadField({
       >
         <p className="text-sm text-red-700">{error}</p>
         <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={retry}
-            className="flex items-center gap-1.5 text-xs font-medium text-zinc-700 hover:text-primary transition-colors"
-          >
+          <Button type="button" variant="link" size="sm" onClick={retry}>
             <RotateCcw className="size-3" />
             Retry
-          </button>
-          <button
-            type="button"
-            onClick={reset}
-            className="text-xs text-zinc-500 hover:text-primary transition-colors"
-          >
+          </Button>
+          <Button type="button" variant="link" size="sm" onClick={reset}>
             Choose different file
-          </button>
+          </Button>
         </div>
       </div>
     )
@@ -153,7 +142,7 @@ export function FileUploadField({
       <button
         type="button"
         onClick={() => inputRef.current?.click()}
-        className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-500 transition-colors hover:border-primary hover:text-primary"
+        className="flex h-24 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-500 transition-colors hover:border-primary hover:text-primary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
       >
         <Upload className="size-4" />
         {label}
