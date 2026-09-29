@@ -13,6 +13,7 @@ import {
   duplicateCalculator,
   togglePublished,
 } from "@/services/calculator.service"
+import { Button } from "@/components/ui/button"
 
 type Row = Calc & { category: CalcCategory | null }
 
@@ -177,22 +178,22 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
                         >
                           <Eye className="size-4" />
                         </Link>
-                        <button
+                        <Button
                           onClick={() => handleToggle(row.id, !row.is_published)}
                           disabled={isPending}
-                          className="rounded-md p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 transition-colors"
+                          variant="ghost" size="icon-sm" className="text-zinc-400"
                           title={row.is_published ? "Unpublish" : "Publish"}
                         >
                           {row.is_published ? <EyeOff className="size-4" /> : <Eye className="size-4 text-emerald-600" />}
-                        </button>
-                        <button
+                        </Button>
+                        <Button
                           onClick={() => handleDuplicate(row.id)}
                           disabled={isPending}
-                          className="rounded-md p-1.5 text-zinc-400 hover:text-zinc-600 hover:bg-zinc-100 transition-colors"
+                          variant="ghost" size="icon-sm" className="text-zinc-400"
                           title="Duplicate"
                         >
                           <Copy className="size-4" />
-                        </button>
+                        </Button>
                         <Link
                           href={`/dashboard/calculators/${row.id}/edit`}
                           className="rounded-md p-1.5 text-zinc-400 hover:text-primary hover:bg-primary/5 transition-colors"
@@ -200,14 +201,14 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
                         >
                           <Edit2 className="size-4" />
                         </Link>
-                        <button
+                        <Button
                           onClick={() => handleDelete(row.id, row.title)}
                           disabled={isPending}
-                          className="rounded-md p-1.5 text-zinc-400 hover:text-red-600 hover:bg-red-50 transition-colors"
+                          variant="ghost-danger" size="icon-sm" className="text-zinc-400"
                           title="Delete"
                         >
                           <Trash2 className="size-4" />
-                        </button>
+                        </Button>
                       </div>
                     </td>
                   </tr>

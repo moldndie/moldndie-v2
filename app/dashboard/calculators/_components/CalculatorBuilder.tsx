@@ -34,6 +34,7 @@ import {
   uniqueKey, unitsToDb, unitsToDraft,
   type DraftField, type DraftOutput, type DraftTable,
 } from "./builder-types"
+import { Button } from "@/components/ui/button"
 
 const STEP_META = [
   { label: "Details", icon: Settings },
@@ -478,14 +479,14 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
           <div className="flex flex-wrap items-center gap-2">
             <span className="text-xs text-zinc-400">Ready-made:</span>
             {FIELD_TEMPLATES.map((t) => (
-              <button
+              <Button
                 key={t.key}
                 type="button"
                 onClick={() => addTemplateField(t.build())}
-                className="inline-flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:border-primary hover:text-primary"
+                variant="outline" size="sm" className="px-3"
               >
                 <Plus className="size-3.5" /> {t.label}
-              </button>
+              </Button>
             ))}
           </div>
 
@@ -584,19 +585,19 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
         </button>
 
         <div className="flex items-center gap-3">
-          <button
+          <Button
             onClick={() => setPreviewOpen(true)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 lg:hidden"
+            variant="outline" size="lg" className="px-3 lg:hidden"
           >
             <Eye className="size-4" /> Preview
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={handleSave}
             disabled={isPending}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-4 py-2 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-60"
+            variant="outline" size="lg" className="px-3 font-semibold"
           >
             {isPending ? "Saving…" : "Save"}
-          </button>
+          </Button>
           {isLast ? (
             <button
               onClick={handleSave}
@@ -697,12 +698,12 @@ function StartScreen({ existing, onTemplate, onScratch, onDuplicate }: {
       </div>
 
       <div className="flex flex-wrap items-center gap-3 border-t border-zinc-200 pt-5">
-        <button
+        <Button
           onClick={onScratch}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-4 py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:bg-zinc-50"
+          variant="outline" size="lg" className="px-3 font-semibold"
         >
           <FileText className="size-4" /> Start from scratch
-        </button>
+        </Button>
 
         {existing.length > 0 && (
           <label className="flex items-center gap-2 text-sm text-zinc-500">
@@ -852,13 +853,13 @@ function StepDetails(props: {
       <div>
         <Label>Unit switcher</Label>
         {props.unitSystems.length === 0 ? (
-          <button
+          <Button
             type="button"
             onClick={() => props.onUnitSystems(DEFAULT_UNIT_SYSTEMS)}
-            className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-700 transition-colors hover:border-primary hover:text-primary"
+            variant="outline" size="lg" className="px-3"
           >
             <Plus className="size-4" /> Offer Metric and Imperial
-          </button>
+          </Button>
         ) : (
           <div className="space-y-2">
             {props.unitSystems.map((u, i) => (

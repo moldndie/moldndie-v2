@@ -18,6 +18,7 @@ import { ListBlock } from "./blocks/ListBlock"
 import { VideoBlock } from "./blocks/VideoBlock"
 import { FileBlock } from "./blocks/FileBlock"
 import type { FileContent } from "./blocks/FileBlock"
+import { Button } from "@/components/ui/button"
 
 // ─── Block type catalogue ─────────────────────────────────────────────────────
 
@@ -284,26 +285,26 @@ function SectionComposer({
       {/* Header */}
       <div className="flex items-center gap-2">
         {step !== "layout" && (
-          <button
+          <Button
             type="button"
             onClick={() => setStep("layout")}
-            className="rounded-md p-1 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200 transition-colors"
+            variant="ghost" size="icon-xs" className="text-zinc-400"
             title="Back"
           >
             <ArrowLeft className="size-3.5" />
-          </button>
+          </Button>
         )}
         <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wide flex-1">
           {stepLabel[step]}
         </span>
-        <button
+        <Button
           type="button"
           onClick={reset}
-          className="rounded-md p-1 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-200 transition-colors"
+          variant="ghost" size="icon-xs" className="text-zinc-400"
           title="Cancel"
         >
           <X className="size-3.5" />
-        </button>
+        </Button>
       </div>
 
       {/* Step: layout choice */}
@@ -448,32 +449,32 @@ function SectionCard({
 
         {/* Controls */}
         <div className="flex items-center gap-0.5 ml-1">
-          <button
+          <Button
             type="button"
             onClick={() => onMove(section.id, "up")}
             disabled={index === 0}
-            className="rounded p-1 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+            variant="ghost" size="icon-xs" className="text-zinc-400"
             title="Move up"
           >
             <ChevronUp className="size-3.5" />
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={() => onMove(section.id, "down")}
             disabled={index === total - 1}
-            className="rounded p-1 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+            variant="ghost" size="icon-xs" className="text-zinc-400"
             title="Move down"
           >
             <ChevronDown className="size-3.5" />
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={() => onRemove(section.id)}
-            className="rounded p-1 text-zinc-300 hover:text-red-500 transition-colors ml-0.5"
+            variant="ghost-danger" size="icon-xs" className="text-zinc-400"
             title="Remove section"
           >
             <Trash2 className="size-3.5" />
-          </button>
+          </Button>
         </div>
       </div>
 
@@ -544,32 +545,32 @@ function ColumnEditor({
           <div className="flex items-center gap-1 px-2 py-1 border-b border-zinc-100">
             <BlockBadge type={block.block_type} />
             <div className="flex-1" />
-            <button
+            <Button
               type="button"
               onClick={() => onMove(sectionId, side, block.id, "up")}
               disabled={idx === 0}
-              className="rounded p-0.5 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+              variant="ghost" size="icon-xs" className="text-zinc-400"
               title="Move up"
             >
               <ChevronUp className="size-3" />
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => onMove(sectionId, side, block.id, "down")}
               disabled={idx === blocks.length - 1}
-              className="rounded p-0.5 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+              variant="ghost" size="icon-xs" className="text-zinc-400"
               title="Move down"
             >
               <ChevronDown className="size-3" />
-            </button>
-            <button
+            </Button>
+            <Button
               type="button"
               onClick={() => onRemove(sectionId, side, block.id)}
-              className="rounded p-0.5 text-zinc-300 hover:text-red-500 transition-colors ml-0.5"
+              variant="ghost-danger" size="icon-xs" className="text-zinc-400"
               title="Remove block"
             >
               <Trash2 className="size-3" />
-            </button>
+            </Button>
           </div>
           <div className="p-2">
             <BlockInput
@@ -586,29 +587,29 @@ function ColumnEditor({
             <span className="text-[10px] font-semibold uppercase tracking-wide text-zinc-400">
               Add block
             </span>
-            <button
+            <Button
               type="button"
               onClick={() => setPicking(false)}
-              className="rounded p-0.5 text-zinc-400 hover:text-zinc-700 transition-colors"
+              variant="ghost" size="icon-xs" className="text-zinc-400"
               title="Cancel"
             >
               <X className="size-3" />
-            </button>
+            </Button>
           </div>
           <div className="flex flex-wrap gap-1.5">
             {BLOCK_TYPES.map(({ type, label, icon: Icon }) => (
-              <button
+              <Button
                 key={type}
                 type="button"
                 onClick={() => {
                   onAdd(sectionId, side, type)
                   setPicking(false)
                 }}
-                className="flex items-center gap-1 rounded-lg border border-zinc-200 bg-white px-2 py-1 text-[11px] font-medium text-zinc-600 hover:border-zinc-400 hover:bg-zinc-50 transition-all"
+                variant="outline" size="sm" className="px-3"
               >
                 <Icon className="size-3 shrink-0" />
                 {label}
-              </button>
+              </Button>
             ))}
           </div>
         </div>

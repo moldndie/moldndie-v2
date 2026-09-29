@@ -25,6 +25,7 @@ import { FileUploadField } from "@/components/forms/FileUploadField"
 import { FilePreview } from "@/components/forms/FilePreview"
 import RichTextEditor from "@/components/editor/RichTextEditor"
 import { toDoc, fromDoc } from "@/lib/richtext"
+import { Button } from "@/components/ui/button"
 
 const EMPTY_FORM: PortfolioItemFormValues = {
   title: "",
@@ -338,20 +339,20 @@ export default function PortfolioManagementClient() {
                 <tr key={item.id} className="hover:bg-zinc-50 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      <button
+                      <Button
                         onClick={() => move(item, idx, -1)}
                         disabled={idx === 0}
-                        className="p-1 text-zinc-400 hover:text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        variant="ghost" size="icon-xs" className="text-zinc-400"
                       >
                         <ArrowUp size={13} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => move(item, idx, 1)}
                         disabled={idx === items.length - 1}
-                        className="p-1 text-zinc-400 hover:text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        variant="ghost" size="icon-xs" className="text-zinc-400"
                       >
                         <ArrowDown size={13} />
-                      </button>
+                      </Button>
                       <span className="text-xs text-zinc-400 ml-1">{item.sort_order}</span>
                     </div>
                   </td>
@@ -377,20 +378,20 @@ export default function PortfolioManagementClient() {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1 justify-end">
-                      <button
+                      <Button
                         onClick={() => { setFormError(null); setEditing(item) }}
-                        className="p-1.5 text-zinc-400 hover:text-zinc-700 rounded-lg hover:bg-zinc-100 transition-colors"
+                        variant="ghost" size="icon-sm" className="text-zinc-400"
                         title="Edit"
                       >
                         <Pencil size={14} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => setDeleting(item)}
-                        className="p-1.5 text-zinc-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                        variant="ghost-danger" size="icon-sm" className="text-zinc-400"
                         title="Delete"
                       >
                         <Trash2 size={14} />
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>

@@ -80,19 +80,19 @@ export function AdsTable() {
       header: "",
       cell: ({ row }) => (
         <div className="flex items-center justify-end gap-1">
-          <button
+          <Button
             onClick={() => router.push(`/dashboard/ads/${row.original.id}/edit`)}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 transition-colors"
+            variant="ghost" size="icon-sm" className="text-zinc-400"
           >
             <Pencil className="size-3.5" />
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => handleDelete(row.original.id)}
             disabled={deleteMutation.isPending}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-40"
+            variant="ghost-danger" size="icon-sm" className="text-zinc-400"
           >
             <Trash2 className="size-3.5" />
-          </button>
+          </Button>
         </div>
       ),
     },

@@ -25,6 +25,7 @@ import {
 } from "@/services/heroSlides.service"
 import type { HeroSlide } from "@/services/heroSlides.service"
 import { MAX_HERO_SLIDES, isValidImageUrl } from "@/lib/heroSlides.constants"
+import { Button } from "@/components/ui/button"
 
 interface Props {
   initialSlides: HeroSlide[]
@@ -495,22 +496,22 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
 
               {/* Action buttons */}
               <div className="flex items-center gap-1 shrink-0">
-                <button
+                <Button
                   onClick={() => handleMove(slide.id, "up")}
                   disabled={idx === 0 || isPending}
                   title="Move up"
-                  className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  variant="ghost" size="icon-sm" className="text-zinc-400"
                 >
                   <ChevronUp className="size-4" />
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => handleMove(slide.id, "down")}
                   disabled={idx === slides.length - 1 || isPending}
                   title="Move down"
-                  className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                  variant="ghost" size="icon-sm" className="text-zinc-400"
                 >
                   <ChevronDown className="size-4" />
-                </button>
+                </Button>
 
                 <button
                   onClick={() => (editingId === slide.id ? closeEdit() : openEdit(slide))}
@@ -526,27 +527,27 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                   <Pencil className="size-4" />
                 </button>
 
-                <button
+                <Button
                   onClick={() => handleToggle(slide)}
                   disabled={isPending}
                   title={slide.is_active ? "Deactivate" : "Activate"}
-                  className="p-1.5 rounded-md text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 disabled:opacity-30 transition-colors"
+                  variant="ghost" size="icon-sm" className="text-zinc-400"
                 >
                   {slide.is_active ? (
                     <EyeOff className="size-4" />
                   ) : (
                     <Eye className="size-4" />
                   )}
-                </button>
+                </Button>
 
-                <button
+                <Button
                   onClick={() => handleDelete(slide.id)}
                   disabled={isPending}
                   title="Delete slide"
-                  className="p-1.5 rounded-md text-zinc-400 hover:text-red-600 hover:bg-red-50 disabled:opacity-30 transition-colors"
+                  variant="ghost-danger" size="icon-sm" className="text-zinc-400"
                 >
                   <Trash2 className="size-4" />
-                </button>
+                </Button>
               </div>
             </div>
 

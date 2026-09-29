@@ -11,6 +11,7 @@ import {
   Archive,
   File,
 } from "lucide-react"
+import { Button } from "@/components/ui/button"
 
 export interface FileContent {
   file_path: string
@@ -118,13 +119,13 @@ export function FileBlock({ value, onChange }: FileBlockProps) {
             )}
           </div>
         </div>
-        <button
+        <Button
           type="button"
           onClick={() => onChange({ file_path: "", file_name: "", file_type: "" })}
-          className="shrink-0 rounded-md p-1 text-zinc-400 hover:bg-zinc-200 hover:text-zinc-700 transition-colors"
+          variant="ghost" size="icon-xs" className="text-zinc-400"
         >
           <X className="size-4" />
-        </button>
+        </Button>
       </div>
     )
   }

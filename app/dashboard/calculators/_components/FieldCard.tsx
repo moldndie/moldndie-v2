@@ -7,6 +7,7 @@ import { Advanced, FieldLabel, Input, Problem, ReorderBtns, Select } from "./ui"
 import { UnitsEditor } from "./UnitsEditor"
 import type { DraftField } from "./builder-types"
 import type { FieldType, UnitSystem } from "@/types/calculator"
+import { Button } from "@/components/ui/button"
 
 const FIELD_TYPE_LABELS: Record<FieldType, string> = {
   number: "Number", text: "Text", select: "Dropdown", checkbox: "Checkbox", range: "Slider",
@@ -43,9 +44,9 @@ export function FieldCard({ field, unitSystems, idx, total, problem, onUpdate, o
           {field.unit && <span className="ml-1 text-xs text-zinc-400">· {field.unit}</span>}
         </button>
         {expanded ? <ChevronUp className="size-4 text-zinc-300" /> : <ChevronDown className="size-4 text-zinc-300" />}
-        <button onClick={() => onRemove(field._uid)} className="rounded-md p-1 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600">
+        <Button onClick={() => onRemove(field._uid)} variant="ghost-danger" size="icon-xs" className="text-zinc-400">
           <Trash2 className="size-4" />
-        </button>
+        </Button>
       </div>
 
       {expanded && (

@@ -7,6 +7,7 @@ import { UnitsEditor } from "./UnitsEditor"
 import FormulaEditor, { type VarOption } from "./FormulaEditor"
 import type { DraftOutput } from "./builder-types"
 import type { UnitSystem } from "@/types/calculator"
+import { Button } from "@/components/ui/button"
 
 /** One result. The formula is built by clicking; the key is derived. */
 export function OutputCard({ output, unitSystems, idx, total, vars, sampleVars, problem, missing, onCreateMissing, onUpdate, onRemove, onMove, onCreateInput }: {
@@ -37,9 +38,9 @@ export function OutputCard({ output, unitSystems, idx, total, vars, sampleVars, 
           </span>
           {output.unit && <span className="ml-2 text-xs text-zinc-400">{output.unit}</span>}
         </div>
-        <button onClick={() => onRemove(output._uid)} className="rounded-md p-1 text-zinc-400 transition-colors hover:bg-red-50 hover:text-red-600">
+        <Button onClick={() => onRemove(output._uid)} variant="ghost-danger" size="icon-xs" className="text-zinc-400">
           <Trash2 className="size-4" />
-        </button>
+        </Button>
       </div>
 
       <div className="space-y-4 p-4">

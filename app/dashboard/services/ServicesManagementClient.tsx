@@ -21,6 +21,7 @@ import { CroppableFileUploadField } from "@/components/forms/CroppableFileUpload
 import IconPicker from "@/components/dashboard/IconPicker"
 import RichTextEditor from "@/components/editor/RichTextEditor"
 import { toDoc, fromDoc } from "@/lib/richtext"
+import { Button } from "@/components/ui/button"
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -404,20 +405,20 @@ export default function ServicesManagementClient() {
                 <tr key={s.id} className="hover:bg-zinc-50 transition-colors">
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1">
-                      <button
+                      <Button
                         onClick={() => moveUp(s, idx)}
                         disabled={idx === 0}
-                        className="p-1 text-zinc-400 hover:text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        variant="ghost" size="icon-xs" className="text-zinc-400"
                       >
                         <ArrowUp size={13} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => moveDown(s, idx)}
                         disabled={idx === services.length - 1}
-                        className="p-1 text-zinc-400 hover:text-zinc-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                        variant="ghost" size="icon-xs" className="text-zinc-400"
                       >
                         <ArrowDown size={13} />
-                      </button>
+                      </Button>
                       <span className="text-xs text-zinc-400 ml-1">{s.sort_order}</span>
                     </div>
                   </td>
@@ -452,20 +453,20 @@ export default function ServicesManagementClient() {
                       >
                         <Images size={14} /> Examples
                       </Link>
-                      <button
+                      <Button
                         onClick={() => openEdit(s)}
-                        className="p-1.5 text-zinc-400 hover:text-zinc-700 rounded-lg hover:bg-zinc-100 transition-colors"
+                        variant="ghost" size="icon-sm" className="text-zinc-400"
                         title="Edit"
                       >
                         <Pencil size={14} />
-                      </button>
-                      <button
+                      </Button>
+                      <Button
                         onClick={() => setDeletingService(s)}
-                        className="p-1.5 text-zinc-400 hover:text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+                        variant="ghost-danger" size="icon-sm" className="text-zinc-400"
                         title="Delete"
                       >
                         <Trash2 size={14} />
-                      </button>
+                      </Button>
                     </div>
                   </td>
                 </tr>

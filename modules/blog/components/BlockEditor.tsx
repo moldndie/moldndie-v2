@@ -12,6 +12,7 @@ import { ListBlock } from "./blocks/ListBlock"
 import { VideoBlock } from "./blocks/VideoBlock"
 import { FileBlock } from "./blocks/FileBlock"
 import type { FileContent } from "./blocks/FileBlock"
+import { Button } from "@/components/ui/button"
 
 const BLOCK_META: Record<EditorBlock["block_type"], { label: string; icon: React.ElementType; accent: string; badge: string }> = {
   heading:   { label: "Heading",   icon: Type,       accent: "border-l-blue-400",   badge: "bg-blue-50 text-blue-700" },
@@ -189,32 +190,32 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
 
                   {/* Move + delete */}
                   <div className="flex items-center gap-0.5">
-                    <button
+                    <Button
                       type="button"
                       onClick={() => moveBlock(block.id, "up")}
                       disabled={i === 0}
-                      className="rounded p-1 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+                      variant="ghost" size="icon-xs" className="text-zinc-400"
                       title="Move up"
                     >
                       <ChevronUp className="size-3.5" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => moveBlock(block.id, "down")}
                       disabled={i === value.length - 1}
-                      className="rounded p-1 text-zinc-300 hover:text-zinc-600 disabled:opacity-20 transition-colors"
+                      variant="ghost" size="icon-xs" className="text-zinc-400"
                       title="Move down"
                     >
                       <ChevronDown className="size-3.5" />
-                    </button>
-                    <button
+                    </Button>
+                    <Button
                       type="button"
                       onClick={() => removeBlock(block.id)}
-                      className="rounded p-1 text-zinc-300 hover:text-red-500 transition-colors ml-0.5"
+                      variant="ghost-danger" size="icon-xs" className="text-zinc-400"
                       title="Remove block"
                     >
                       <Trash2 className="size-3.5" />
-                    </button>
+                    </Button>
                   </div>
                 </div>
 

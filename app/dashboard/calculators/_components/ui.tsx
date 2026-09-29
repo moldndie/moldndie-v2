@@ -6,6 +6,7 @@
 import { useState } from "react"
 import { ChevronDown, ChevronUp, Settings2 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 export function Label({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
@@ -53,12 +54,12 @@ export function Select({ children, ...props }: React.SelectHTMLAttributes<HTMLSe
 export function ReorderBtns({ idx, total, onMove }: { idx: number; total: number; onMove: (d: 1 | -1) => void }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <button type="button" onClick={() => onMove(-1)} disabled={idx === 0} className="rounded p-0.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 disabled:opacity-20">
+      <Button type="button" onClick={() => onMove(-1)} disabled={idx === 0} variant="ghost" size="icon-xs" className="text-zinc-400">
         <ChevronUp className="size-3.5" />
-      </button>
-      <button type="button" onClick={() => onMove(1)} disabled={idx === total - 1} className="rounded p-0.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-700 disabled:opacity-20">
+      </Button>
+      <Button type="button" onClick={() => onMove(1)} disabled={idx === total - 1} variant="ghost" size="icon-xs" className="text-zinc-400">
         <ChevronDown className="size-3.5" />
-      </button>
+      </Button>
     </div>
   )
 }

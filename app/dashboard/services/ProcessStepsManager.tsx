@@ -12,6 +12,7 @@ import {
   updateProcessStepOrder,
   type ServiceProcessStep,
 } from "@/services/serviceProcessSteps.service"
+import { Button } from "@/components/ui/button"
 
 const inputCls =
   "w-full border border-zinc-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary"
@@ -140,22 +141,22 @@ export default function ProcessStepsManager() {
                 placeholder="One-line description"
               />
               <div className="flex items-center gap-1">
-                <button
+                <Button
                   onClick={() => move(step, idx, -1)}
                   disabled={idx === 0}
-                  className="p-1 text-zinc-400 hover:text-zinc-700 disabled:opacity-30 transition-colors"
+                  variant="ghost" size="icon-xs" className="text-zinc-400"
                   title="Move up"
                 >
                   <ArrowUp size={13} />
-                </button>
-                <button
+                </Button>
+                <Button
                   onClick={() => move(step, idx, 1)}
                   disabled={idx === steps.length - 1}
-                  className="p-1 text-zinc-400 hover:text-zinc-700 disabled:opacity-30 transition-colors"
+                  variant="ghost" size="icon-xs" className="text-zinc-400"
                   title="Move down"
                 >
                   <ArrowDown size={13} />
-                </button>
+                </Button>
                 <button
                   onClick={() => toggleMut.mutate({ id: step.id, is_active: !step.is_active })}
                   className={`p-1 transition-colors ${step.is_active ? "text-emerald-600" : "text-zinc-400"}`}
@@ -163,15 +164,15 @@ export default function ProcessStepsManager() {
                 >
                   {step.is_active ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
                 </button>
-                <button
+                <Button
                   onClick={() => {
                     if (confirm(`Delete the "${step.label}" step?`)) deleteMut.mutate(step.id)
                   }}
-                  className="p-1 text-zinc-400 hover:text-red-600 transition-colors"
+                  variant="ghost-danger" size="icon-xs" className="text-zinc-400"
                   title="Delete"
                 >
                   <Trash2 size={14} />
-                </button>
+                </Button>
               </div>
             </div>
           ))}
