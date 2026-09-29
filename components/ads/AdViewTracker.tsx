@@ -8,6 +8,7 @@ interface AdViewTrackerProps {
   children: React.ReactNode
   href: string
   className?: string
+  style?: React.CSSProperties
   "aria-label"?: string
 }
 
@@ -38,7 +39,7 @@ async function trackView(adId: string, pagePath: string) {
   }
 }
 
-export function AdViewTracker({ adId, children, href, className, "aria-label": ariaLabel }: AdViewTrackerProps) {
+export function AdViewTracker({ adId, children, href, className, style, "aria-label": ariaLabel }: AdViewTrackerProps) {
   const pathname  = usePathname()
   const trackedRef = useRef(false)
 
@@ -55,6 +56,7 @@ export function AdViewTracker({ adId, children, href, className, "aria-label": a
       rel="noopener noreferrer sponsored"
       aria-label={ariaLabel}
       className={className}
+      style={style}
     >
       {children}
     </a>
