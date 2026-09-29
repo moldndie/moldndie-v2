@@ -70,7 +70,7 @@ export default async function TermsPage() {
         <div className="mt-12 pt-8 border-t border-zinc-200">
           <p className="text-sm text-zinc-500">
             If you have any questions about these Terms &amp; Conditions, please contact us at{" "}
-            <a href={`mailto:${contactEmail}`} className="text-[#7C2020] hover:underline">
+            <a href={`mailto:${contactEmail}`} className="text-primary hover:underline">
               {contactEmail}
             </a>
             .

@@ -20,6 +20,9 @@ import type { Mark } from "@tiptap/pm/model"
 import "katex/dist/katex.min.css"
 import { useEffect, useCallback, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
+import { Select } from "@/components/ui/select"
+import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 // ——— Toolbar button ———
 function ToolBtn({
@@ -42,7 +45,7 @@ function ToolBtn({
       }}
       title={title}
       className={cn(
-        "flex h-7 w-7 items-center justify-center rounded text-xs font-medium transition-colors",
+        "flex h-7 w-7 items-center justify-center rounded-lg text-xs font-medium transition-colors",
         active
           ? "bg-primary text-white"
           : "text-zinc-600 hover:bg-primary hover:text-primary-foreground"
@@ -249,13 +252,9 @@ export default function RichTextEditor({
                   />
                 ))}
               </div>
-              <button
-                type="button"
-                onClick={() => { editor.chain().focus().unsetColor().run(); setShowColorPicker(false) }}
-                className="mt-2 w-full rounded px-2 py-1 text-xs text-zinc-500 hover:bg-primary hover:text-primary-foreground"
-              >
+              <Button type="button" variant="ghost" size="xs" className="mt-2 w-full" onClick={() => { editor.chain().focus().unsetColor().run(); setShowColorPicker(false) }}>
                 Reset colour
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -284,13 +283,9 @@ export default function RichTextEditor({
                   />
                 ))}
               </div>
-              <button
-                type="button"
-                onClick={() => { editor.chain().focus().unsetBackgroundColor().run(); setShowBgPicker(false) }}
-                className="mt-2 w-full rounded px-2 py-1 text-xs text-zinc-500 hover:bg-primary hover:text-primary-foreground"
-              >
+              <Button type="button" variant="ghost" size="xs" className="mt-2 w-full" onClick={() => { editor.chain().focus().unsetBackgroundColor().run(); setShowBgPicker(false) }}>
                 Remove background
-              </button>
+              </Button>
             </div>
           )}
         </div>
@@ -298,7 +293,7 @@ export default function RichTextEditor({
         <Divider />
 
         {/* Font family */}
-        <select
+        <Select
           title="Font"
           value={(editor.getAttributes("textStyle").fontFamily as string) ?? ""}
           onChange={(e) => {
@@ -306,12 +301,12 @@ export default function RichTextEditor({
             if (v) editor.chain().focus().setFontFamily(v).run()
             else editor.chain().focus().unsetFontFamily().run()
           }}
-          className="h-7 rounded border border-zinc-200 bg-white px-1.5 text-xs text-zinc-700 focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="h-7 w-auto pl-1.5 pr-6 text-xs text-zinc-700"
         >
           {FONT_OPTIONS.map((f) => (
             <option key={f.label} value={f.value}>{f.label}</option>
           ))}
-        </select>
+        </Select>
 
         {/* Clear formatting */}
         <ToolBtn
@@ -352,17 +347,17 @@ export default function RichTextEditor({
           </ToolBtn>
           {showLinkInput && (
             <div className="absolute top-8 left-0 z-10 flex gap-1 rounded-lg border border-zinc-200 bg-white p-1.5 shadow-lg">
-              <input
+              <Input
                 autoFocus
                 type="url"
                 value={linkUrl}
                 onChange={(e) => setLinkUrl(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && insertLink()}
                 placeholder="https://…"
-                className="w-48 rounded border border-zinc-200 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
+                className="h-7 w-48 px-2 py-1 text-xs"
               />
-              <button type="button" onClick={insertLink} className="rounded bg-primary px-2 py-1 text-xs text-white hover:bg-primary/90">Add</button>
-              <button type="button" onClick={() => { editor.chain().focus().unsetLink().run(); setShowLinkInput(false) }} className="rounded px-2 py-1 text-xs text-zinc-500 hover:bg-primary hover:text-primary-foreground">Remove</button>
+              <Button type="button" size="xs" onClick={insertLink}>Add</Button>
+              <Button type="button" variant="ghost" size="xs" onClick={() => { editor.chain().focus().unsetLink().run(); setShowLinkInput(false) }}>Remove</Button>
             </div>
           )}
         </div>
@@ -378,16 +373,16 @@ export default function RichTextEditor({
           </ToolBtn>
           {showImageInput && (
             <div className="absolute top-8 left-0 z-10 flex gap-1 rounded-lg border border-zinc-200 bg-white p-1.5 shadow-lg">
-              <input
+              <Input
                 autoFocus
                 type="url"
                 value={imageUrl}
                 onChange={(e) => setImageUrl(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && insertImage()}
                 placeholder="https://… image URL"
-                className="w-52 rounded border border-zinc-200 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
+                className="h-7 w-52 px-2 py-1 text-xs"
               />
-              <button type="button" onClick={insertImage} className="rounded bg-primary px-2 py-1 text-xs text-white hover:bg-primary/90">Insert</button>
+              <Button type="button" size="xs" onClick={insertImage}>Insert</Button>
             </div>
           )}
         </div>
@@ -403,16 +398,16 @@ export default function RichTextEditor({
           </ToolBtn>
           {showYoutubeInput && (
             <div className="absolute top-8 left-0 z-10 flex gap-1 rounded-lg border border-zinc-200 bg-white p-1.5 shadow-lg">
-              <input
+              <Input
                 autoFocus
                 type="url"
                 value={youtubeUrl}
                 onChange={(e) => setYoutubeUrl(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && insertYoutube()}
                 placeholder="YouTube URL or ID"
-                className="w-52 rounded border border-zinc-200 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-primary/30"
+                className="h-7 w-52 px-2 py-1 text-xs"
               />
-              <button type="button" onClick={insertYoutube} className="rounded bg-primary px-2 py-1 text-xs text-white hover:bg-primary/90">Embed</button>
+              <Button type="button" size="xs" onClick={insertYoutube}>Embed</Button>
             </div>
           )}
         </div>

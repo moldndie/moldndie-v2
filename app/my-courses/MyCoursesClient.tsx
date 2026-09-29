@@ -17,7 +17,7 @@ function SkeletonGrid() {
           <div className="aspect-video bg-zinc-200" />
           <div className="p-4 space-y-3">
             <div className="h-4 bg-zinc-200 rounded w-3/4" />
-            <div className="h-9 bg-zinc-100 rounded-xl" />
+            <div className="h-9 bg-zinc-100 rounded-lg" />
           </div>
         </div>
       ))}
@@ -38,7 +38,7 @@ function EmptyState() {
       </p>
       <Link
         href="/courses"
-        className="mt-6 inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors"
+        className="mt-6 inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors"
       >
         Browse Academy
       </Link>
@@ -82,7 +82,7 @@ function CourseCard({ course }: { course: MyCourse }) {
         </p>
         <Link
           href={`/courses/${course.id}`}
-          className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-white text-sm font-bold py-2.5 rounded-xl transition-colors"
+          className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-white text-sm font-bold py-2.5 rounded-lg transition-colors"
         >
           <Play size={14} />
           Continue Course

@@ -27,7 +27,7 @@ function StatCard({ label, value, icon: Icon, iconBg, iconColor, suffix, isLoadi
         : value.toLocaleString()
 
   return (
-    <div className="group bg-white rounded-xl border border-zinc-100 p-5 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 cursor-default">
+    <div className="group bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all duration-200 cursor-default">
       <div className="flex items-start justify-between gap-3">
         <div className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${iconBg}`}>
           <Icon size={18} className={iconColor} strokeWidth={1.8} />
@@ -48,7 +48,7 @@ function StatCard({ label, value, icon: Icon, iconBg, iconColor, suffix, isLoadi
 // ── Secondary metric chip ──────────────────────────────────────────────
 function MetricChip({ label, value }: { label: string; value: number | undefined }) {
   return (
-    <div className="bg-white rounded-xl border border-zinc-100 px-5 py-4 shadow-sm flex items-center justify-between gap-4">
+    <div className="bg-white rounded-2xl border border-zinc-200 px-5 py-4 shadow-sm flex items-center justify-between gap-4">
       <p className="text-sm text-zinc-500">{label}</p>
       <p className="text-lg font-semibold text-zinc-900">
         {value === undefined ? "—" : value.toLocaleString()}
@@ -68,7 +68,7 @@ function RecentList({
   isLoading: boolean
 }) {
   return (
-    <div className="bg-white rounded-xl border border-zinc-100 p-5 shadow-sm">
+    <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm">
       <h2 className="text-sm font-semibold text-zinc-700 mb-4 uppercase tracking-wide">{title}</h2>
       {isLoading ? (
         <div className="space-y-3">

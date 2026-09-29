@@ -14,7 +14,8 @@ import {
   duplicateCalculator,
   togglePublished,
 } from "@/services/calculator.service"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 
 type Row = Calc & { category: CalcCategory | null }
 
@@ -82,16 +83,17 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
             placeholder="Search engineering tools…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="h-auto pl-9 pr-3 py-2"
+            className="h-9 pl-9 pr-3"
           />
         </div>
         <div className="flex gap-2">
           {(["all", "published", "draft"] as const).map((s) => (
             <button
+              type="button"
               key={s}
               onClick={() => setStatusFilter(s)}
               aria-pressed={statusFilter === s}
-              className="ui-pill rounded-lg border px-3 py-2 text-sm font-medium capitalize"
+              className="ui-pill h-9 rounded-lg border px-3 text-sm font-medium capitalize"
             >
               {s}
             </button>
@@ -107,9 +109,9 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
       </div>
 
       {/* Table */}
-      <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+      <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
         {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 text-zinc-400">
+          <div className="flex flex-col items-center justify-center py-12 text-zinc-400">
             <Calculator className="size-10 mb-3 text-zinc-200" />
             <p className="text-sm font-medium">No engineering tools found</p>
             <Link href="/dashboard/calculators/new" className="mt-4 text-sm text-primary hover:underline">
@@ -119,7 +121,7 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-zinc-50 border-b border-zinc-200">
+              <thead className="bg-zinc-50">
                 <tr>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">Engineering Tool</th>
                   <th className="text-left px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide hidden md:table-cell">Category</th>
@@ -129,9 +131,9 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
                   <th className="text-right px-4 py-3 text-xs font-semibold text-zinc-500 uppercase tracking-wide">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody>
                 {filtered.map((row) => (
-                  <tr key={row.id} className="hover:bg-zinc-50 transition-colors">
+                  <tr key={row.id} className="border-t border-zinc-100 hover:bg-zinc-50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="font-medium text-zinc-900">{row.title}</div>
                       {row.short_description && (
@@ -141,7 +143,7 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
                     </td>
                     <td className="px-4 py-3 hidden md:table-cell">
                       {row.category ? (
-                        <span className="inline-flex items-center rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-700">
+                        <span className="inline-flex items-center rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">
                           {row.category.name}
                         </span>
                       ) : (
@@ -154,7 +156,7 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
                           <CheckCircle2 className="size-3" /> Published
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">
                           <Clock className="size-3" /> Draft
                         </span>
                       )}
@@ -174,7 +176,7 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
                         <Link
                           href={`/tools/${row.slug}`}
                           target="_blank"
-                          className="rounded-md p-1.5 text-zinc-400 transition-colors hover:bg-primary hover:text-primary-foreground"
+                          className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "text-zinc-400")}
                           title="Preview"
                         >
                           <Eye className="size-4" />
@@ -197,7 +199,7 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
                         </Button>
                         <Link
                           href={`/dashboard/calculators/${row.id}/edit`}
-                          className="rounded-md p-1.5 text-zinc-400 hover:text-primary hover:bg-primary/5 transition-colors"
+                          className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "text-zinc-400")}
                           title="Edit"
                         >
                           <Edit2 className="size-4" />

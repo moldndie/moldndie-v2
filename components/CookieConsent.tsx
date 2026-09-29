@@ -33,7 +33,7 @@ function CategoryRow({
   children: React.ReactNode
 }) {
   return (
-    <div className="rounded-xl border border-zinc-200 overflow-hidden">
+    <div className="rounded-2xl border border-zinc-200 overflow-hidden">
       <button
         type="button"
         onClick={onToggle}
@@ -121,7 +121,7 @@ export function CookieConsent() {
             className="w-full max-w-2xl bg-white rounded-2xl shadow-[0_-4px_32px_rgba(0,0,0,0.12)] border border-zinc-200 overflow-hidden"
           >
             {/* ── Coloured header strip ── */}
-            <div className="bg-[#5C1515] px-6 py-3.5 flex items-center justify-between">
+            <div className="bg-primary px-6 py-3.5 flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Cookie size={15} className="text-white/70" strokeWidth={1.8} />
                 <span id="cookie-title" className="text-sm font-bold text-white">
@@ -196,14 +196,14 @@ export function CookieConsent() {
                     <button
                       type="button"
                       onClick={() => decide("rejected")}
-                      className="px-5 py-2.5 rounded-xl border-2 border-zinc-200 text-sm font-semibold text-zinc-600 hover:border-primary hover:text-primary transition-colors whitespace-nowrap"
+                      className="px-5 py-2.5 rounded-lg border-2 border-zinc-200 text-sm font-semibold text-zinc-600 hover:border-primary hover:text-primary transition-colors whitespace-nowrap"
                     >
                       Reject Non-Essential
                     </button>
                     <button
                       type="button"
                       onClick={() => decide("accepted")}
-                      className="px-5 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-white text-sm font-bold transition-colors shadow-sm whitespace-nowrap"
+                      className="px-5 py-2.5 rounded-lg bg-primary hover:bg-primary/90 text-white text-sm font-bold transition-colors shadow-sm whitespace-nowrap"
                     >
                       Accept All
                     </button>

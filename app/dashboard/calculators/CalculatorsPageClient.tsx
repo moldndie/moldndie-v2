@@ -38,7 +38,7 @@ export default function CalculatorsPageClient({
             <button aria-pressed={activeTab === tab.id}
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className="ui-pill rounded-md border px-4 py-1.5 text-sm font-medium"
+              className="ui-pill rounded-lg border px-4 py-1.5 text-sm font-medium"
             >
               {tab.label}
             </button>

@@ -32,7 +32,7 @@ export default function IconPicker({ value, onChange }: Props) {
       </button>
 
       {open && (
-        <div className="absolute z-50 top-full mt-1 left-0 right-0 bg-white border border-zinc-200 rounded-xl shadow-lg p-3 max-h-64 overflow-y-auto">
+        <div className="absolute z-50 top-full mt-1 left-0 right-0 bg-white border border-zinc-200 rounded-2xl shadow-lg p-3 max-h-64 overflow-y-auto">
           <div className="grid grid-cols-4 gap-1.5">
             {ICON_NAMES.map((name) => (
               <button

@@ -12,7 +12,7 @@ function StatCard({
   iconColor: string
 }) {
   return (
-    <div className="bg-white rounded-xl border border-zinc-100 p-5 shadow-sm">
+    <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm">
       <div className="flex items-start justify-between gap-3">
         <div className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${iconBg}`}>
           <Icon size={18} className={iconColor} strokeWidth={1.8} />
@@ -74,7 +74,7 @@ export async function AnalyticsSection() {
         </div>
 
         {adRows.length > 0 && (
-          <div className="bg-white rounded-xl border border-zinc-100 p-5 shadow-sm">
+          <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm">
             <h3 className="text-sm font-semibold text-zinc-700 mb-4 uppercase tracking-wide">Top Performing Ads</h3>
             <div className="divide-y divide-zinc-50">
               {adRows.slice(0, 8).map((row) => (
@@ -104,7 +104,7 @@ export async function AnalyticsSection() {
         </div>
 
         {topItems.length > 0 && (
-          <div className="bg-white rounded-xl border border-zinc-100 p-5 shadow-sm">
+          <div className="bg-white rounded-2xl border border-zinc-200 p-5 shadow-sm">
             <h3 className="text-sm font-semibold text-zinc-700 mb-4 uppercase tracking-wide">Most Viewed Content</h3>
             <div className="divide-y divide-zinc-50">
               {topItems.map((item) => (

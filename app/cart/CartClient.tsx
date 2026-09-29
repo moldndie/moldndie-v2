@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
@@ -74,13 +75,13 @@ export default function CartClient() {
         <div className="mt-6 flex flex-wrap justify-center gap-3">
           <Link
             href="/molds"
-            className="inline-block bg-primary text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors"
+            className="inline-block bg-primary text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
           >
             Browse Library
           </Link>
           <Link
             href="/courses"
-            className="inline-block bg-primary text-white text-sm font-semibold px-6 py-3 rounded-xl hover:bg-primary/90 transition-colors"
+            className="inline-block bg-primary text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
           >
             Browse Academy
           </Link>
@@ -110,7 +111,7 @@ export default function CartClient() {
           return (
             <li
               key={`${item.product_type}-${item.product_id}`}
-              className="flex items-center gap-4 bg-white border border-zinc-100 rounded-xl p-4 shadow-sm"
+              className="flex items-center gap-4 bg-white border border-zinc-200 rounded-2xl p-4 shadow-sm"
             >
               {/* Thumbnail */}
               <div className="w-16 h-16 rounded-lg overflow-hidden bg-zinc-50 border border-zinc-100 shrink-0 relative">
@@ -179,10 +180,10 @@ export default function CartClient() {
           </div>
         )}
 
-        <button
+        <Button
           onClick={handleCheckout}
           disabled={isCheckingOut}
-          className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
+          className="h-auto w-full flex items-center justify-center gap-2 font-bold text-base py-4 rounded-lg"
         >
           {isCheckingOut ? (
             <>
@@ -195,7 +196,7 @@ export default function CartClient() {
               Checkout — {totalText}
             </>
           )}
-        </button>
+        </Button>
 
         <p className="text-center text-xs text-zinc-400">
           Secure checkout · Instant access after payment

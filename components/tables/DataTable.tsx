@@ -44,10 +44,10 @@ export function DataTable<TData>({
   })
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="border-b border-zinc-200 bg-zinc-50">
+          <thead className="bg-zinc-50">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
                 {headerGroup.headers.map((header) => {
@@ -87,7 +87,7 @@ export function DataTable<TData>({
           <tbody>
             {isLoading ? (
               Array.from({ length: 5 }).map((_, i) => (
-                <tr key={i} className="border-b border-zinc-100 last:border-0">
+                <tr key={i} className="border-t border-zinc-100">
                   {columns.map((_, j) => (
                     <td key={j} className="px-4 py-3">
                       <div className="h-4 bg-zinc-100 rounded animate-pulse" style={{ width: `${60 + (j * 17 + i * 11) % 35}%` }} />
@@ -99,7 +99,7 @@ export function DataTable<TData>({
               table.getRowModel().rows.map((row) => (
                 <tr
                   key={row.id}
-                  className="border-b border-zinc-100 last:border-0 hover:bg-zinc-50 transition-colors"
+                  className="border-t border-zinc-100 hover:bg-zinc-50 transition-colors"
                 >
                   {row.getVisibleCells().map((cell) => (
                     <td key={cell.id} className="px-4 py-3 text-zinc-700">
@@ -109,7 +109,7 @@ export function DataTable<TData>({
                 </tr>
               ))
             ) : (
-              <tr>
+              <tr className="border-t border-zinc-100">
                 <td
                   colSpan={columns.length}
                   className="px-4 py-12 text-center text-sm text-zinc-400"
@@ -145,6 +145,7 @@ export function DataTable<TData>({
             ))}
           </Select>
           <button
+            type="button"
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
             className="ui-pill rounded-lg border px-3 py-1.5 text-sm"
@@ -155,6 +156,7 @@ export function DataTable<TData>({
             {table.getState().pagination.pageIndex + 1} / {Math.max(table.getPageCount(), 1)}
           </span>
           <button
+            type="button"
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
             className="ui-pill rounded-lg border px-3 py-1.5 text-sm"

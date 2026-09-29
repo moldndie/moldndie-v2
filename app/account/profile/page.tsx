@@ -22,7 +22,7 @@ export default async function ProfilePage() {
       </header>
 
       <main className="mx-auto max-w-2xl px-6 py-10">
-        <div className="rounded-xl border border-zinc-200 bg-white p-6">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6">
           <ProfileForm profile={profile} />
         </div>
       </main>

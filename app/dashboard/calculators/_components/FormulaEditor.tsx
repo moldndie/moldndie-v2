@@ -1,5 +1,6 @@
 "use client"
 
+import { Select } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { useMemo, useState } from "react"
 import { Plus, RotateCcw, Delete } from "lucide-react"
@@ -131,7 +132,7 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
   }
 
   const selectCls =
-    "rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-xs font-medium text-zinc-700 focus:outline-none focus:ring-2 focus:ring-primary/30"
+    "h-8 w-auto py-1 text-xs font-medium text-zinc-700"
   const btnCls =
     "ui-pill rounded-lg border px-2.5 py-1.5 text-xs font-semibold"
 
@@ -171,7 +172,7 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
                 onBlur={() => setEditingNum(null)}
                 onKeyDown={(e) => { if (e.key === "Enter") setEditingNum(null) }}
                 onClick={(e) => e.stopPropagation()}
-                className="h-auto w-20 rounded-md border-primary px-2 py-1 text-sm tabular-nums"
+                className="h-auto w-20 rounded-lg border-primary px-2 py-1 text-sm tabular-nums"
               />
             ) : (
               <button
@@ -184,7 +185,7 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
                 onDoubleClick={(e) => { e.stopPropagation(); removeAt(i) }}
                 title="Click to place the cursor · double-click to delete"
                 className={cn(
-                  "rounded-md px-2 py-1 text-sm font-medium transition-colors",
+                  "rounded-lg px-2 py-1 text-sm font-medium transition-colors",
                   t.kind === "var" && "bg-primary/10 text-primary hover:bg-primary/20",
                   t.kind === "num" && "bg-white border border-zinc-200 text-zinc-800 tabular-nums hover:border-zinc-300",
                   t.kind === "op" && "font-bold text-zinc-500 hover:text-zinc-900",
@@ -210,7 +211,7 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
 
       {/* Palette */}
       <div className="flex flex-wrap items-center gap-1.5">
-        <select className={selectCls} value="" onChange={(e) => handleVarPick(e.target.value)}>
+        <Select className={selectCls} value="" onChange={(e) => handleVarPick(e.target.value)}>
           <option value="">+ Input ▾</option>
           {grouped.map(([group, items]) => (
             <optgroup key={group} label={group}>
@@ -218,7 +219,7 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
             </optgroup>
           ))}
           {onCreateInput && <option value="__new__">＋ New input…</option>}
-        </select>
+        </Select>
 
         <button type="button" className={btnCls} onClick={() => insert({ kind: "num", text: "0" })}>
           <Plus className="mr-0.5 inline size-3" /> Number
@@ -234,7 +235,7 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
           <button type="button" className={cn(btnCls, "w-8 px-0 text-center")} onClick={() => insert({ kind: "paren", p: ")" })}>)</button>
         </span>
 
-        <select className={selectCls} value="" onChange={(e) => handleFnPick(e.target.value)}>
+        <Select className={selectCls} value="" onChange={(e) => handleFnPick(e.target.value)}>
           <option value="">+ Function ▾</option>
           <optgroup label="Functions">
             {FUNCTION_NAMES.map((f) => <option key={f} value={f}>{f}()</option>)}
@@ -242,7 +243,7 @@ export default function FormulaEditor({ value, onChange, vars, sampleVars, unit,
           <optgroup label="Constants">
             {CONSTANT_NAMES.map((c) => <option key={c} value={c}>{c}</option>)}
           </optgroup>
-        </select>
+        </Select>
 
         <span className="flex-1" />
 

@@ -1,6 +1,7 @@
 "use client"
 
 import { Input } from "@/components/ui/input"
+import { Select } from "@/components/ui/select"
 import { useEffect, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
@@ -94,8 +95,7 @@ function PortfolioForm({
 
       <div>
         <label className={labelCls}>Service</label>
-        <select
-          className={inputCls}
+        <Select
           value={form.service_id ?? ""}
           onChange={(e) => set("service_id", e.target.value)}
         >
@@ -103,7 +103,7 @@ function PortfolioForm({
           {services.map((s) => (
             <option key={s.id} value={s.id}>{s.title}</option>
           ))}
-        </select>
+        </Select>
         <p className="text-xs text-zinc-400 mt-1">
           Pick a service to show this example on that service&apos;s own page instead.
         </p>
@@ -288,14 +288,14 @@ export default function PortfolioManagementClient() {
     <div className="space-y-6">
       <div className="flex items-center justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <select
+          <Select
             value={serviceFilter}
             onChange={(e) => router.replace(e.target.value ? `?service=${e.target.value}` : "?")}
-            className="h-9 rounded-lg border border-zinc-200 bg-white px-3 text-sm text-zinc-700"
+            className="text-zinc-700"
           >
             <option value="">All services</option>
             {services.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
-          </select>
+          </Select>
           <p className="text-sm text-zinc-500">
             {items.length} example{items.length !== 1 ? "s" : ""}
           </p>

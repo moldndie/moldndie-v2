@@ -96,7 +96,7 @@ export default async function Footer() {
     s.contact_phone || s.contact_email || s.contact_address || s.contact_hours || s.contact_whatsapp
 
   return (
-    <footer className="bg-[#5C1515] text-white">
+    <footer className="bg-primary text-white">
       <div className="max-w-7xl mx-auto px-6 py-14">
 
         {/* Main 4-col grid */}

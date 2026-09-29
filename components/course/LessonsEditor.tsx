@@ -137,20 +137,12 @@ export function LessonsEditor({ lessons, onChange, onUploadingChange }: LessonsE
                 </span>
               )}
               <div className="flex gap-1">
-                <button
-                  type="button"
-                  onClick={() => openEdit(index)}
-                  className="rounded p-1 text-zinc-400 hover:bg-primary hover:text-primary-foreground"
-                >
+                <Button type="button" variant="ghost" size="icon-xs" onClick={() => openEdit(index)}>
                   <Pencil className="size-3.5" />
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleDelete(index)}
-                  className="rounded p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600"
-                >
+                </Button>
+                <Button type="button" variant="ghost-danger" size="icon-xs" onClick={() => handleDelete(index)}>
                   <Trash2 className="size-3.5" />
-                </button>
+                </Button>
               </div>
             </div>
           ))}

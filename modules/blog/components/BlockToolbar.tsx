@@ -20,7 +20,7 @@ interface BlockToolbarProps {
 
 export function BlockToolbar({ onAdd }: BlockToolbarProps) {
   return (
-    <div className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50/50 p-3">
+    <div className="rounded-2xl border border-dashed border-zinc-200 bg-zinc-50/50 p-3">
       <p className="mb-2 text-xs font-medium text-zinc-400 uppercase tracking-wide">Add block</p>
       <div className="flex flex-wrap gap-1.5">
         {BLOCK_OPTIONS.map(({ block_type, label, icon: Icon }) => (

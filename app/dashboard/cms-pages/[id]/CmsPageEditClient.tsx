@@ -71,7 +71,7 @@ export default function CmsPageEditClient({ page }: Props) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Top action bar */}
-      <div className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white p-4">
+      <div className="flex items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-white p-4">
         <div className="flex items-center gap-2">
           {isPublished ? (
             <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700">
@@ -118,7 +118,7 @@ export default function CmsPageEditClient({ page }: Props) {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Main content area */}
         <div className="lg:col-span-2 space-y-5">
-          <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-5 space-y-4">
             <h2 className="text-sm font-bold uppercase tracking-wide text-zinc-500">Page Content</h2>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700">Page Title</label>
@@ -152,7 +152,7 @@ export default function CmsPageEditClient({ page }: Props) {
 
         {/* Sidebar: SEO + settings */}
         <div className="space-y-5">
-          <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-5 space-y-4">
             <h2 className="text-sm font-bold uppercase tracking-wide text-zinc-500">Page Settings</h2>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700">URL Slug</label>
@@ -171,7 +171,7 @@ export default function CmsPageEditClient({ page }: Props) {
             </div>
           </div>
 
-          <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-4">
+          <div className="rounded-2xl border border-zinc-200 bg-white p-5 space-y-4">
             <h2 className="text-sm font-bold uppercase tracking-wide text-zinc-500">SEO</h2>
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700">SEO Title</label>

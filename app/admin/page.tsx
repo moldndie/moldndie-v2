@@ -25,7 +25,7 @@ export default async function AdminPage() {
       </header>
 
       <main className="mx-auto max-w-4xl px-6 py-10">
-        <div className="rounded-xl border border-zinc-200 bg-white p-6">
+        <div className="rounded-2xl border border-zinc-200 bg-white p-6">
           <p className="text-sm text-zinc-500">Logged in as admin</p>
           <p className="mt-1 font-medium text-zinc-900">{user.email}</p>
         </div>

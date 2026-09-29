@@ -95,7 +95,7 @@ export function CommentsSection({ blogId, initialComments, currentUserId }: Comm
             placeholder="Write a comment…"
             rows={3}
             maxLength={2000}
-            className="rounded-xl px-4 py-3 resize-none"
+            className="rounded-lg px-4 py-3 resize-none"
           />
           {error && <p className="text-xs text-red-500">{error}</p>}
           <div className="flex items-center justify-between">
@@ -107,7 +107,7 @@ export function CommentsSection({ blogId, initialComments, currentUserId }: Comm
           </div>
         </form>
       ) : (
-        <p className="mb-8 rounded-xl border border-zinc-100 bg-zinc-50 px-4 py-3 text-sm text-zinc-500">
+        <p className="mb-8 rounded-2xl border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm text-zinc-500">
           <Link
             href={`/login?callbackUrl=${encodeURIComponent(pathname)}`}
             className="font-medium text-primary hover:underline"

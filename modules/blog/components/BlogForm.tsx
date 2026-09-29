@@ -174,7 +174,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
 
           {/* Sidebar */}
           <div className="space-y-4">
-            <div className="rounded-xl border border-zinc-200 p-4 space-y-3">
+            <div className="rounded-2xl border border-zinc-200 p-4 space-y-3">
               <p className="text-sm font-semibold text-zinc-900">Cover Image</p>
               <FileUploadField
                 folder="blogs/covers"
@@ -187,7 +187,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
               />
             </div>
 
-            <div className="rounded-xl border border-zinc-200 p-4 space-y-3">
+            <div className="rounded-2xl border border-zinc-200 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-zinc-900">Category</p>
                 <button
@@ -209,7 +209,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
               </Select>
             </div>
 
-            <div className="rounded-xl border border-zinc-200 p-4 space-y-3">
+            <div className="rounded-2xl border border-zinc-200 p-4 space-y-3">
               <div className="flex items-center justify-between">
                 <p className="text-sm font-semibold text-zinc-900">Tags</p>
                 <button
@@ -243,7 +243,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
               )}
             </div>
 
-            <div className="rounded-xl border border-zinc-200 p-4 space-y-3">
+            <div className="rounded-2xl border border-zinc-200 p-4 space-y-3">
               <p className="text-sm font-semibold text-zinc-900">Publish</p>
               <div className="flex items-center gap-2">
                 <input

@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
@@ -55,7 +56,7 @@ function SkeletonProductPage() {
             <div className="h-3 bg-zinc-100 rounded w-5/6" />
             <div className="h-3 bg-zinc-100 rounded w-4/6" />
           </div>
-          <div className="h-12 bg-zinc-200 rounded-xl" />
+          <div className="h-12 bg-zinc-200 rounded-lg" />
         </div>
       </div>
     </div>
@@ -324,30 +325,30 @@ export default function MoldProductClient({ moldId, viewCount }: { moldId: strin
 
           {/* CTA */}
           {isFree ? (
-            <button
+            <Button
               onClick={handleDownload}
               disabled={isDownloading}
-              className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
+              className="h-auto w-full flex items-center justify-center gap-2 font-bold text-base py-4 rounded-lg"
             >
               <Download size={18} />
               {isDownloading ? "Preparing download…" : "Free Download"}
-            </button>
+            </Button>
           ) : inCart ? (
             <Link
               href="/cart"
-              className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
+              className="w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-base py-4 rounded-lg transition-colors shadow-sm"
             >
               <CheckCircle size={18} />
               View in Cart
             </Link>
           ) : (
-            <button
+            <Button
               onClick={handleAddToCart}
-              className="w-full flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-base py-4 rounded-xl transition-colors shadow-sm"
+              className="h-auto w-full flex items-center justify-center gap-2 font-bold text-base py-4 rounded-lg"
             >
               <ShoppingCart size={18} />
               Add to Cart — {priceText}
-            </button>
+            </Button>
           )}
 
           {/* Trust note */}

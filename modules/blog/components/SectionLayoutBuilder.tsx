@@ -250,10 +250,10 @@ function SectionComposer({
       <button
         type="button"
         onClick={() => setStep("layout")}
-        className="w-full rounded-xl border-2 border-dashed border-zinc-200 py-10 text-center hover:border-primary transition-colors group"
+        className="w-full rounded-lg border-2 border-dashed border-zinc-200 py-10 text-center hover:border-primary transition-colors group"
       >
         <div className="flex justify-center mb-2.5">
-          <div className="rounded-xl bg-zinc-100 p-2.5 group-hover:bg-zinc-200 transition-colors">
+          <div className="rounded-lg bg-zinc-100 p-2.5 group-hover:bg-zinc-200 transition-colors">
             <LayoutTemplate className="size-5 text-zinc-400" />
           </div>
         </div>
@@ -266,7 +266,7 @@ function SectionComposer({
       <button
         type="button"
         onClick={() => setStep("layout")}
-        className="w-full flex items-center justify-center gap-2 rounded-xl border-2 border-dashed border-zinc-200 py-2.5 text-sm font-medium text-zinc-400 hover:border-primary hover:text-primary transition-colors"
+        className="w-full flex items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 py-2.5 text-sm font-medium text-zinc-400 hover:border-primary hover:text-primary transition-colors"
       >
         <Plus className="size-3.5" />
         Add Section
@@ -281,7 +281,7 @@ function SectionComposer({
   }
 
   return (
-    <div className="rounded-xl border border-zinc-300 bg-zinc-50 p-4 space-y-4">
+    <div className="rounded-2xl border border-zinc-300 bg-zinc-50 p-4 space-y-4">
       {/* Header */}
       <div className="flex items-center gap-2">
         {step !== "layout" && (
@@ -371,7 +371,7 @@ function LayoutOption({
     <button
       type="button"
       onClick={onClick}
-      className="group rounded-xl border-2 border-zinc-200 bg-white p-3 text-left hover:border-primary transition-all"
+      className="group rounded-lg border-2 border-zinc-200 bg-white p-3 text-left hover:border-primary transition-all"
     >
       <div className="mb-2 rounded-lg bg-zinc-100">{preview}</div>
       <p className="text-sm font-semibold text-zinc-900">{label}</p>
@@ -402,11 +402,11 @@ function SectionCard({
   const isTwoCol = section.type === "two-column"
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
+    <div className="rounded-2xl border border-zinc-200 bg-white shadow-sm overflow-hidden">
       {/* Header */}
       <div className="flex flex-wrap items-center gap-2 px-3 py-2 bg-zinc-50 border-b border-zinc-100">
         {/* Layout badge */}
-        <span className="flex items-center gap-1.5 rounded-md bg-zinc-100 border border-zinc-200 px-2 py-0.5 text-[11px] font-semibold text-zinc-500">
+        <span className="flex items-center gap-1.5 rounded-full bg-zinc-100 border border-zinc-200 px-2 py-0.5 text-[11px] font-semibold text-zinc-500">
           {isTwoCol
             ? <Columns2 className="size-3" />
             : <LayoutTemplate className="size-3" />}
@@ -418,7 +418,7 @@ function SectionCard({
 
         {/* Ratio switch (two-column only) */}
         {section.type === "two-column" && (
-          <div className="flex items-center gap-0.5 rounded-md border border-zinc-200 bg-white p-0.5">
+          <div className="flex items-center gap-0.5 rounded-lg border border-zinc-200 bg-white p-0.5">
             {RATIO_PRESETS.map((r) => (
               <button
                 key={r}
@@ -625,7 +625,7 @@ function ColumnEditor({
 function BlockBadge({ type }: { type: BlockType }) {
   const { label, icon: Icon, badge } = blockMeta(type)
   return (
-    <span className={cn("flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium", badge)}>
+    <span className={cn("flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-medium", badge)}>
       <Icon className="size-3" />
       {label}
     </span>

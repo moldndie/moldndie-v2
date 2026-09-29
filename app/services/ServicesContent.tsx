@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
@@ -232,7 +233,7 @@ export default function ServicesContent({
               </div>
             ))}
 
-            <p className="rounded-xl bg-zinc-50 border border-zinc-100 p-4 text-xs text-zinc-500 leading-relaxed">
+            <p className="rounded-2xl bg-zinc-50 border border-zinc-200 p-4 text-xs text-zinc-500 leading-relaxed">
               <span className="font-semibold text-zinc-700">Response time:</span> we typically
               respond within 24 hours on business days. For urgent requests, reach us at{" "}
               <a
@@ -273,7 +274,7 @@ export default function ServicesContent({
                       id="name" name="name" type="text" required
                       value={form.name} onChange={handleChange}
                       placeholder="Your full name"
-                      className="h-11 rounded-xl px-4"
+                      className="h-11 rounded-lg px-4"
                     />
                   </div>
                   <div>
@@ -284,7 +285,7 @@ export default function ServicesContent({
                       id="email" name="email" type="email" required
                       value={form.email} onChange={handleChange}
                       placeholder="you@example.com"
-                      className="h-11 rounded-xl px-4"
+                      className="h-11 rounded-lg px-4"
                     />
                   </div>
                 </div>
@@ -298,7 +299,7 @@ export default function ServicesContent({
                       id="phone" name="phone" type="tel"
                       value={form.phone} onChange={handleChange}
                       placeholder="+20 1XX XXX XXXX"
-                      className="h-11 rounded-xl px-4"
+                      className="h-11 rounded-lg px-4"
                     />
                   </div>
                   <div>
@@ -308,7 +309,7 @@ export default function ServicesContent({
                     <Select
                         id="service_type" name="service_type"
                         value={form.service_type} onChange={handleChange}
-                        className="h-11 rounded-xl pl-4"
+                        className="h-11 rounded-lg pl-4"
                       >
                         <option value="">Select a service…</option>
                         {serviceTypes.map((s) => (
@@ -333,7 +334,7 @@ export default function ServicesContent({
                     id="message" name="message" required rows={5}
                     value={form.message} onChange={handleChange}
                     placeholder="Describe your project requirements, timeline, and any specific needs…"
-                    className="rounded-xl px-4 py-3 resize-none"
+                    className="rounded-lg px-4 py-3 resize-none"
                   />
                 </div>
 
@@ -344,20 +345,20 @@ export default function ServicesContent({
                 )}
 
                 <div className="flex flex-wrap items-center gap-3">
-                  <button
+                  <Button
                     type="submit"
                     disabled={isLoading}
-                    className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-3 text-sm font-bold text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                    className="h-auto inline-flex items-center justify-center gap-2 rounded-lg px-7 py-3 text-sm font-bold"
                   >
                     {isLoading ? (
                       <><Loader2 size={16} className="animate-spin" /> Sending…</>
                     ) : (
                       <><Send size={15} /> Send Request</>
                     )}
-                  </button>
+                  </Button>
                   <a
                     href="mailto:moldndie.eg@gmail.com"
-                    className="inline-flex items-center gap-2 rounded-xl border border-zinc-200 px-7 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-primary hover:text-primary-foreground"
+                    className="inline-flex items-center gap-2 rounded-lg border border-zinc-200 px-7 py-3 text-sm font-semibold text-zinc-700 transition-colors hover:bg-primary hover:text-primary-foreground"
                   >
                     <Mail size={15} />
                     Email us

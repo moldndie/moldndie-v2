@@ -21,6 +21,7 @@ import {
   X,
 } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 interface NavChild {
   label: string
@@ -107,12 +108,9 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       >
         <div className="flex h-16 items-center justify-between px-6 border-b border-zinc-200 shrink-0">
           <Image src="/assets/logo-black-updated.png" alt="Mold N Die" width={100} height={32} className="h-8 w-auto" />
-          <button
-            onClick={onClose}
-            className="lg:hidden rounded-md p-1 text-zinc-500 hover:bg-zinc-100"
-          >
+          <Button type="button" variant="ghost" size="icon-xs" onClick={onClose} className="lg:hidden" aria-label="Close navigation">
             <X className="size-4" />
-          </button>
+          </Button>
         </div>
 
         <nav className="flex-1 space-y-0.5 p-3 overflow-y-auto">

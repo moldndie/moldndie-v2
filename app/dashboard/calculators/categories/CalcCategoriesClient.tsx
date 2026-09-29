@@ -167,7 +167,7 @@ export default function CalcCategoriesClient({ initialCategories }: Props) {
       {showForm && (
         <form
           onSubmit={handleSubmit}
-          className="rounded-xl border border-zinc-200 bg-zinc-50 p-5 space-y-4"
+          className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 space-y-4"
         >
           <h3 className="text-sm font-semibold text-zinc-700">
             {editingId ? "Edit Category" : "New Category"}
@@ -228,7 +228,7 @@ export default function CalcCategoriesClient({ initialCategories }: Props) {
 
       {/* Categories list */}
       {categories.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-200 py-16 text-center">
+        <div className="rounded-2xl border border-dashed border-zinc-200 py-16 text-center">
           <p className="text-sm text-zinc-400">No categories yet.</p>
           <Button variant="link"
             onClick={openCreate}
@@ -238,7 +238,7 @@ export default function CalcCategoriesClient({ initialCategories }: Props) {
           </Button>
         </div>
       ) : (
-        <div className="rounded-xl border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
+        <div className="rounded-2xl border border-zinc-200 divide-y divide-zinc-100 overflow-hidden">
           {categories.map((cat, i) => (
             <div
               key={cat.id}

@@ -22,7 +22,7 @@ export default async function CmsPagesPage() {
       />
 
       {pages.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-200 bg-zinc-50 p-12 text-center">
+        <div className="rounded-2xl border border-dashed border-zinc-200 bg-zinc-50 p-12 text-center">
           <FileText className="mx-auto mb-3 size-8 text-zinc-300" />
           <p className="text-sm font-medium text-zinc-500">No CMS pages found.</p>
           <p className="mt-1 text-xs text-zinc-400">
@@ -30,7 +30,7 @@ export default async function CmsPagesPage() {
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-xl border border-zinc-200 bg-white">
+        <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-zinc-100 bg-zinc-50">

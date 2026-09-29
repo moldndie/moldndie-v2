@@ -101,7 +101,7 @@ function LessonForm({
   const anyUploading = fileUploading
 
   return (
-    <div className="rounded-xl border border-zinc-200 bg-zinc-50 p-5 space-y-4">
+    <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold text-zinc-800">
           {form.id ? "Edit Lesson" : "New Lesson"}
@@ -291,19 +291,12 @@ function LessonRow({
             Paid
           </span>
         )}
-        <button
-          onClick={onEdit}
-          className="rounded-md p-1.5 text-zinc-400 hover:bg-primary hover:text-primary-foreground transition-colors"
-        >
+        <Button type="button" variant="ghost" size="icon-xs" onClick={onEdit}>
           <Pencil className="size-3.5" />
-        </button>
-        <button
-          onClick={onDelete}
-          disabled={isDeleting}
-          className="rounded-md p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600 transition-colors disabled:opacity-40"
-        >
+        </Button>
+        <Button type="button" variant="ghost-danger" size="icon-xs" onClick={onDelete} disabled={isDeleting}>
           <Trash2 className="size-3.5" />
-        </button>
+        </Button>
       </div>
     </div>
   )
@@ -441,7 +434,7 @@ export function LessonsManager({ courseId }: { courseId: string }) {
 
       {/* Lesson list */}
       {!isLoading && lessons.length > 0 && (
-        <div className="divide-y divide-zinc-100 rounded-xl border border-zinc-200 overflow-hidden">
+        <div className="divide-y divide-zinc-100 rounded-2xl border border-zinc-200 overflow-hidden">
           {lessons.map((lesson) => (
             <LessonRow
               key={lesson.id}
@@ -459,7 +452,7 @@ export function LessonsManager({ courseId }: { courseId: string }) {
         <button
           type="button"
           onClick={openAdd}
-          className="flex h-28 w-full flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-primary hover:text-zinc-500 transition-colors"
+          className="flex h-28 w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-zinc-200 text-sm text-zinc-400 hover:border-primary hover:text-zinc-500 transition-colors"
         >
           <Plus className="size-5" />
           Add your first lesson

@@ -29,7 +29,7 @@ export function OutputCard({ output, unitSystems, idx, total, vars, sampleVars, 
   const u = <K extends keyof DraftOutput>(k: K, v: DraftOutput[K]) => onUpdate(output._uid, k, v)
 
   return (
-    <div className={cn("overflow-hidden rounded-xl border bg-white", problem ? "border-red-300" : "border-zinc-200")}>
+    <div className={cn("overflow-hidden rounded-2xl border bg-white", problem ? "border-red-300" : "border-zinc-200")}>
       <div className="flex items-center gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-3">
         <ReorderBtns idx={idx} total={total} onMove={(d) => onMove(idx, d)} />
         <div className="min-w-0 flex-1">

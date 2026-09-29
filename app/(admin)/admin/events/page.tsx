@@ -12,7 +12,7 @@ export default function EventsPage() {
         description="Manage platform events."
         action={<Button>Create Event</Button>}
       />
-      <div className="rounded-xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-400">
+      <div className="rounded-2xl border border-zinc-200 bg-white p-8 text-center text-sm text-zinc-400">
         No events yet. Events table will appear here.
       </div>
     </div>

@@ -70,7 +70,7 @@ export function MoldsTable() {
       cell: ({ row }) => {
         const cat = categories.find((c) => c.id === row.original.category_id)
         return cat ? (
-          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
+          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">
             {cat.name}
           </span>
         ) : (
@@ -85,7 +85,7 @@ export function MoldsTable() {
       cell: ({ row }) => {
         const price = row.original.price
         if (price === null || price === 0) {
-          return <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">Free</span>
+          return <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">Free</span>
         }
         return <span className="text-zinc-700">{price.toFixed(2)} EGP</span>
       },
@@ -95,7 +95,7 @@ export function MoldsTable() {
       header: "File",
       cell: ({ row }) =>
         row.original.file_key ? (
-          <span className="rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-600">Uploaded</span>
+          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">Uploaded</span>
         ) : (
           <span className="text-zinc-300 text-xs">—</span>
         ),

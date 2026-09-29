@@ -35,7 +35,7 @@ export function CurrencySelector() {
           key={opt.value}
           onClick={() => setCurrency(opt.value)}
           aria-pressed={currency === opt.value}
-          className="ui-pill rounded-md border px-2.5 py-1"
+          className="ui-pill rounded-lg border px-2.5 py-1"
         >
           {opt.label}
         </button>

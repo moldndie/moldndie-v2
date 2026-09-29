@@ -7,7 +7,8 @@ import { Pencil, Trash2, BookOpen } from "lucide-react"
 import { DataTable } from "./DataTable"
 import { CourseModal } from "@/components/modals/CourseModal"
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal"
-import { Button } from "@/components/ui/button"
+import { Button, buttonVariants } from "@/components/ui/button"
+import { cn } from "@/lib/utils"
 import { useCourses, useDeleteCourse } from "@/hooks/queries/useCourses"
 import { getFileUrl } from "@/lib/utils"
 import type { Course } from "@/types"
@@ -53,7 +54,7 @@ export function CoursesTable() {
       cell: ({ row }) => {
         const price = row.original.price
         if (price === null || price === 0) {
-          return <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">Free</span>
+          return <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">Free</span>
         }
         return <span className="text-zinc-700">{price.toFixed(2)} EGP</span>
       },
@@ -63,9 +64,9 @@ export function CoursesTable() {
       header: "Status",
       cell: ({ row }) =>
         row.original.is_published ? (
-          <span className="rounded-full bg-green-50 px-2 py-0.5 text-xs font-medium text-green-700">Published</span>
+          <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">Published</span>
         ) : (
-          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500">Draft</span>
+          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">Draft</span>
         ),
     },
     {
@@ -86,7 +87,7 @@ export function CoursesTable() {
         <div className="flex items-center justify-end gap-1">
           <Link
             href={`/dashboard/courses/${row.original.id}`}
-            className="rounded-md p-1.5 text-zinc-400 hover:bg-primary hover:text-primary-foreground transition-colors"
+            className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "text-zinc-400")}
             title="Manage lessons"
           >
             <BookOpen className="size-3.5" />

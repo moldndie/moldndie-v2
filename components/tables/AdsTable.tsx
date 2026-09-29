@@ -77,7 +77,7 @@ export function AdsTable() {
           className={cn(
             "rounded-full px-2 py-0.5 text-xs font-medium",
             row.original.is_active
-              ? "bg-green-50 text-green-700"
+              ? "bg-emerald-50 text-emerald-700"
               : "bg-zinc-100 text-zinc-500"
           )}
         >

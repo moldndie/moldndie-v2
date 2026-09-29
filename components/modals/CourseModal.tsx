@@ -198,7 +198,7 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
               aria-checked={isFree}
               onClick={handleFreeToggle}
               className={cn(
-                "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500",
+                "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 isFree ? "bg-primary" : "bg-zinc-200"
               )}
             >
@@ -250,7 +250,7 @@ export function CourseModal({ open, onClose, course, onSuccess }: CourseModalPro
               aria-checked={isPublished}
               onClick={() => setValue("is_published", !isPublished, { shouldValidate: true })}
               className={cn(
-                "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-zinc-500",
+                "relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
                 isPublished ? "bg-primary" : "bg-zinc-200"
               )}
             >

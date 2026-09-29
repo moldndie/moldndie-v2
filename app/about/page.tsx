@@ -110,7 +110,7 @@ export default async function AboutPage() {
               {coreValues.map(({ icon: Icon, title, desc }) => (
                 <div
                   key={title}
-                  className="bg-zinc-50 rounded-xl border border-zinc-100 p-5 flex flex-col gap-3"
+                  className="bg-zinc-50 rounded-2xl border border-zinc-200 p-5 flex flex-col gap-3"
                 >
                   <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
                     <Icon size={18} className="text-primary" strokeWidth={1.5} />

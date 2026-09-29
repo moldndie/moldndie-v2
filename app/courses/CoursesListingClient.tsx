@@ -34,7 +34,7 @@ const TRAINEE_LEVELS: { label: string; value: TraineeLevel | "" }[] = [
 
 function SkeletonCard() {
   return (
-    <div className="rounded-xl overflow-hidden border border-zinc-100 bg-white animate-pulse">
+    <div className="rounded-2xl overflow-hidden border border-zinc-200 bg-white animate-pulse">
       <div className="aspect-video bg-zinc-200" />
       <div className="p-4 space-y-2.5">
         <div className="h-4 bg-zinc-200 rounded w-3/4" />
@@ -60,7 +60,7 @@ function CourseCard({ course, views }: { course: Course; views: number }) {
   return (
     <Link
       href={`/courses/${course.id}`}
-      className="group rounded-xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col"
+      className="group rounded-2xl overflow-hidden border border-zinc-200 bg-white shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col"
     >
       <div className="aspect-video relative bg-white overflow-hidden">
         {imgSrc ? (

@@ -73,7 +73,7 @@ export default function WhyCardForm({ card }: Props) {
 
   return (
     <div className="space-y-6 max-w-2xl">
-      <div className="flex items-center justify-between gap-4 rounded-xl border border-zinc-200 bg-white p-4">
+      <div className="flex items-center justify-between gap-4 rounded-2xl border border-zinc-200 bg-white p-4">
         <span className="text-sm text-zinc-500">{isEdit ? "Editing card" : "New card"}</span>
         <div className="flex items-center gap-2">
           {isEdit && (
@@ -99,7 +99,7 @@ export default function WhyCardForm({ card }: Props) {
         </div>
       </div>
 
-      <div className="rounded-xl border border-zinc-200 bg-white p-5 space-y-5">
+      <div className="rounded-2xl border border-zinc-200 bg-white p-5 space-y-5">
         <div className="space-y-1.5">
           <label className="text-sm font-medium text-zinc-700">Title <span className="text-red-500">*</span></label>
           <Input

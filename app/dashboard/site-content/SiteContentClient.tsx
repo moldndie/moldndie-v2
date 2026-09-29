@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { useState, useTransition } from "react"
@@ -114,7 +115,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
       </div>
 
       {/* Tab Content */}
-      <div className="bg-white rounded-xl border border-zinc-200 p-6">
+      <div className="bg-white rounded-2xl border border-zinc-200 p-6">
         {activeTab === "contact" && (
           <div className="space-y-5">
             <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">Contact Information</h3>
@@ -518,14 +519,10 @@ export default function SiteContentClient({ initialSettings }: Props) {
 
       {/* Save button */}
       <div className="flex justify-end">
-        <button
-          onClick={handleSave}
-          disabled={isPending}
-          className="inline-flex items-center gap-2 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white font-semibold text-sm px-6 py-2.5 rounded-lg transition-colors"
-        >
+        <Button onClick={handleSave} disabled={isPending} className="px-6">
           <Save className="size-4" />
           {isPending ? "Saving…" : "Save Changes"}
-        </button>
+        </Button>
       </div>
     </div>
   )

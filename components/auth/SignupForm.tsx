@@ -260,11 +260,12 @@ export default function SignupForm() {
       </div>
 
       {/* Google Sign In */}
-      <button
+      <Button
         type="button"
+        variant="outline"
         onClick={handleGoogleSignIn}
         disabled={googleLoading || isSubmitting}
-        className="w-full flex items-center justify-center gap-3 h-10 rounded-md border border-zinc-200 bg-white text-sm font-medium text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+        className="h-10 w-full gap-3"
       >
         {googleLoading ? (
           <span className="size-4 border-2 border-zinc-300 border-t-zinc-600 rounded-full animate-spin" />
@@ -277,7 +278,7 @@ export default function SignupForm() {
           </svg>
         )}
         {googleLoading ? "Redirecting…" : "Continue with Google"}
-      </button>
+      </Button>
 
       <p className="text-center text-sm text-muted-foreground">
         Already have an account?{" "}

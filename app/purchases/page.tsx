@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 import {
   Package,
   ShoppingBag,
@@ -116,7 +117,7 @@ export default function PurchasesPage() {
             </div>
             {Array.from({ length: 2 }).map((_, j) => (
               <div key={j} className="flex gap-4 px-5 py-4 border-b border-zinc-50 last:border-0">
-                <div className="w-14 h-14 bg-zinc-200 rounded-xl shrink-0" />
+                <div className="w-14 h-14 bg-zinc-200 rounded-lg shrink-0" />
                 <div className="flex-1 space-y-2 py-1">
                   <div className="h-3.5 bg-zinc-200 rounded w-2/3" />
                   <div className="h-3 bg-zinc-100 rounded w-1/4" />
@@ -153,7 +154,7 @@ export default function PurchasesPage() {
         </p>
         <Link
           href="/"
-          className="mt-6 inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors"
+          className="mt-6 inline-flex items-center gap-2 bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition-colors"
         >
           Browse Products
         </Link>
@@ -200,7 +201,7 @@ export default function PurchasesPage() {
                 return (
                   <li key={item.id} className="flex items-center gap-4 px-5 py-4">
                     {/* Thumbnail */}
-                    <div className="w-14 h-14 rounded-xl overflow-hidden bg-zinc-50 border border-zinc-100 shrink-0 relative">
+                    <div className="w-14 h-14 rounded-lg overflow-hidden bg-zinc-50 border border-zinc-100 shrink-0 relative">
                       {imgSrc ? (
                         <Image
                           src={imgSrc}
@@ -232,10 +233,10 @@ export default function PurchasesPage() {
 
                     {/* Download */}
                     {item.product_type === "mold" && (
-                      <button
+                      <Button
                         onClick={() => handleDownload(item)}
                         disabled={isThisDownloading}
-                        className="shrink-0 flex items-center gap-1.5 bg-primary hover:bg-primary/90 disabled:opacity-60 disabled:cursor-not-allowed text-white text-xs font-semibold px-4 py-2 rounded-lg transition-colors"
+                        className="h-auto shrink-0 gap-1.5 text-xs font-semibold px-4 py-2"
                       >
                         {isThisDownloading ? (
                           <Loader2 size={13} className="animate-spin" />
@@ -243,7 +244,7 @@ export default function PurchasesPage() {
                           <Download size={13} />
                         )}
                         Download
-                      </button>
+                      </Button>
                     )}
                   </li>
                 )

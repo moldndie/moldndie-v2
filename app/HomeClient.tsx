@@ -76,7 +76,7 @@ const cardItem: Variants = {
 function OfferCard({ item }: { item: HomeOfferItem }) {
   const content = (
     <motion.div variants={cardItem}>
-      <div className="group bg-white rounded-xl border border-zinc-100 p-6 flex flex-col gap-3 hover:shadow-md hover:border-zinc-200 transition-all duration-200 h-full">
+      <div className="group bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col gap-3 hover:shadow-md hover:border-zinc-200 transition-all duration-200 h-full">
         <DynamicIcon name={item.icon} size={36} strokeWidth={1.5} className="text-primary" />
         <h3 className="text-sm font-bold text-primary leading-snug uppercase tracking-wide">{item.title}</h3>
         {item.description && (
@@ -104,7 +104,7 @@ function WhyCard({ card }: { card: HomeWhyCard }) {
       variants={cardItem}
       whileHover={{ y: -2 }}
       transition={{ duration: 0.18 }}
-      className="bg-white rounded-xl border border-zinc-100 p-6 flex flex-col gap-3"
+      className="bg-white rounded-2xl border border-zinc-200 p-6 flex flex-col gap-3"
     >
       <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
         <DynamicIcon name={card.icon} size={20} strokeWidth={1.5} className="text-primary" />
@@ -173,10 +173,10 @@ function StatItem({
     >
       <DynamicIcon name={icon} size={36} strokeWidth={1.5} className="text-primary" />
       <div className="text-center">
-        <p className="text-4xl md:text-5xl font-black tabular-nums tracking-tight leading-none" style={{ color: "#5C1515" }}>
+        <p className="text-4xl md:text-5xl font-black tabular-nums tracking-tight leading-none text-primary">
           {displayed.toLocaleString()}{suffix}
         </p>
-        <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.18em]" style={{ color: "#9B4040" }}>{label}</p>
+        <p className="mt-2 text-[11px] font-bold uppercase tracking-[0.18em] text-primary/75">{label}</p>
       </div>
     </motion.div>
   )
@@ -347,13 +347,13 @@ export default function HomeClient({
           <div className="max-w-5xl mx-auto">
             {/* heading */}
             <motion.div {...scrollReveal} className="text-center mb-14">
-              <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-3" style={{ color: "#9B4040" }}>
+              <p className="text-[10px] font-bold uppercase tracking-[0.3em] mb-3 text-primary/75">
                 Trusted by professionals worldwide
               </p>
-              <h2 className="text-2xl md:text-3xl font-black tracking-tight" style={{ color: "#5C1515" }}>
+              <h2 className="text-2xl md:text-3xl font-black tracking-tight text-primary">
                 By the Numbers
               </h2>
-              <div className="mt-4 mx-auto w-10 h-0.5 rounded-full" style={{ background: "#C06060" }} />
+              <div className="mt-4 mx-auto w-10 h-0.5 rounded-full bg-primary/60" />
             </motion.div>
 
             {/* stats row */}

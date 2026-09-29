@@ -79,7 +79,7 @@ export function SuppliersTable() {
       cell: ({ row }) => {
         const cat = categories.find((c) => c.id === row.original.category_id)
         return cat ? (
-          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
+          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">
             {cat.name}
           </span>
         ) : (
@@ -92,7 +92,7 @@ export function SuppliersTable() {
       header: "Sponsored",
       cell: ({ row }) =>
         row.original.sponsored ? (
-          <span className="rounded-full bg-amber-100 px-2 py-0.5 text-xs font-semibold text-amber-700">
+          <span className="rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
             Sponsored
           </span>
         ) : (

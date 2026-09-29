@@ -135,7 +135,7 @@ function EventExpandedContent({ event }: {
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
-          className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-white font-bold text-sm py-2.5 rounded-xl transition-colors"
+          className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-white font-bold text-sm py-2.5 rounded-lg transition-colors"
         >
           <Globe size={14} />
           Visit Website
@@ -147,7 +147,7 @@ function EventExpandedContent({ event }: {
 
 function SkeletonCard() {
   return (
-    <div className="rounded-xl overflow-hidden border border-zinc-100 bg-white animate-pulse">
+    <div className="rounded-2xl overflow-hidden border border-zinc-200 bg-white animate-pulse">
       <div className="aspect-video bg-zinc-200" />
       <div className="p-4 space-y-2.5">
         <div className="h-3 bg-zinc-200 rounded w-1/3" />
@@ -193,7 +193,7 @@ function EventCard({
   return (
     <motion.div
       variants={cardVariants}
-      className={`rounded-xl overflow-hidden border bg-white shadow-sm transition-colors duration-200 flex flex-col h-full ${
+      className={`rounded-2xl overflow-hidden border bg-white shadow-sm transition-colors duration-200 flex flex-col h-full ${
         expanded ? "border-primary shadow-md" : "border-zinc-100 hover:shadow-lg hover:border-zinc-200"
       }`}
     >

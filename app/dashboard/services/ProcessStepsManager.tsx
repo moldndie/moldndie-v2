@@ -122,7 +122,7 @@ export default function ProcessStepsManager() {
           {steps.map((step, idx) => (
             <div
               key={step.id}
-              className="flex flex-col gap-2 rounded-xl border border-zinc-200 p-3 sm:flex-row sm:items-center"
+              className="flex flex-col gap-2 rounded-2xl border border-zinc-200 p-3 sm:flex-row sm:items-center"
             >
               <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
                 {idx + 1}

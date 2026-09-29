@@ -95,7 +95,7 @@ function PaymentSuccessContent({
 
       {/* Timeout — webhook hasn't fired yet; order will be confirmed shortly */}
       {timedOut && !confirmed && (
-        <div className="flex items-start gap-2 text-amber-700 bg-amber-50 border border-amber-100 rounded-xl px-4 py-3 text-sm mb-6 max-w-xs text-left">
+        <div className="flex items-start gap-2 text-amber-700 bg-amber-50 border border-amber-100 rounded-2xl px-4 py-3 text-sm mb-6 max-w-xs text-left">
           <Clock size={15} className="shrink-0 mt-0.5" />
           <span>
             Your payment was received. Access will be granted within a minute — check{" "}
@@ -116,7 +116,7 @@ function PaymentSuccessContent({
               </div>
               <Link
                 href={`/courses/${item.product_id}`}
-                className="w-full inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-8 py-3 rounded-xl transition-colors"
+                className="w-full inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-8 py-3 rounded-lg transition-colors"
               >
                 Start Course
               </Link>
@@ -130,7 +130,7 @@ function PaymentSuccessContent({
           {hasMold && (
             <Link
               href="/purchases"
-              className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-8 py-3 rounded-xl transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-primary hover:bg-primary/90 text-white font-bold text-sm px-8 py-3 rounded-lg transition-colors"
             >
               <Download size={15} />
               Download Purchases
@@ -140,7 +140,7 @@ function PaymentSuccessContent({
           {hasCourse && (
             <Link
               href="/my-courses"
-              className="inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-primary hover:text-primary-foreground text-zinc-700 font-semibold text-sm px-8 py-3 rounded-xl transition-colors"
+              className="inline-flex items-center justify-center gap-2 bg-zinc-100 hover:bg-primary hover:text-primary-foreground text-zinc-700 font-semibold text-sm px-8 py-3 rounded-lg transition-colors"
             >
               <BookOpen size={15} />
               My Courses
@@ -149,7 +149,7 @@ function PaymentSuccessContent({
 
           <Link
             href="/purchases"
-            className="inline-flex items-center justify-center bg-zinc-50 hover:bg-primary hover:text-primary-foreground text-zinc-500 text-sm px-8 py-2.5 rounded-xl transition-colors"
+            className="inline-flex items-center justify-center bg-zinc-50 hover:bg-primary hover:text-primary-foreground text-zinc-500 text-sm px-8 py-2.5 rounded-lg transition-colors"
           >
             View All Purchases
           </Link>
@@ -169,7 +169,7 @@ function PaymentFailedContent() {
       </p>
       <Link
         href="/cart"
-        className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-white font-bold text-sm px-8 py-3 rounded-xl transition-colors"
+        className="inline-flex items-center justify-center bg-primary hover:bg-primary/90 text-white font-bold text-sm px-8 py-3 rounded-lg transition-colors"
       >
         Try Again
       </Link>

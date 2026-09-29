@@ -25,7 +25,7 @@ const SORT_OPTIONS: { label: string; value: SortOption }[] = [
 
 function SkeletonCard() {
   return (
-    <div className="rounded-xl overflow-hidden border border-zinc-100 bg-white animate-pulse">
+    <div className="rounded-2xl overflow-hidden border border-zinc-200 bg-white animate-pulse">
       <div className="aspect-square bg-zinc-200" />
       <div className="p-4 space-y-2">
         <div className="h-4 bg-zinc-200 rounded w-3/4" />
@@ -46,7 +46,7 @@ function MoldCard({ mold, views }: {
   return (
     <Link
       href={`/molds/${mold.id}`}
-      className="group rounded-xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col"
+      className="group rounded-2xl overflow-hidden border border-zinc-200 bg-white shadow-sm hover:shadow-lg transition-all duration-200 flex flex-col"
     >
       <div className="aspect-square relative bg-white overflow-hidden">
         {imgSrc ? (

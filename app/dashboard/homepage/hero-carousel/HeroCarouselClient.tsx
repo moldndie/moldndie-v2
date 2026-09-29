@@ -304,7 +304,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
 
       {/* ── Add form ── */}
       {showForm && (
-        <div className="bg-white rounded-xl border border-zinc-200 p-6 space-y-5">
+        <div className="bg-white rounded-2xl border border-zinc-200 p-6 space-y-5">
           <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">New Slide</h3>
 
           {/* Images */}
@@ -424,7 +424,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
 
       {/* ── Slide list ── */}
       {slides.length === 0 ? (
-        <div className="bg-white rounded-xl border-2 border-dashed border-zinc-200 p-16 flex flex-col items-center gap-3 text-center">
+        <div className="bg-white rounded-2xl border-2 border-dashed border-zinc-200 p-16 flex flex-col items-center gap-3 text-center">
           <Images className="size-10 text-zinc-300" />
           <p className="text-sm font-medium text-zinc-400">No slides yet</p>
           <p className="text-xs text-zinc-400">
@@ -437,7 +437,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
             <div key={slide.id} className="space-y-2">
             <div
               className={cn(
-                "bg-white rounded-xl border border-zinc-200 p-4 flex gap-4 items-center transition-opacity duration-200",
+                "bg-white rounded-2xl border border-zinc-200 p-4 flex gap-4 items-center transition-opacity duration-200",
                 !slide.is_active && "opacity-55",
                 pendingId === slide.id && "opacity-30 pointer-events-none",
               )}
@@ -549,7 +549,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
 
             {/* ── Inline edit form ── */}
             {editingId === slide.id && (
-              <div className="bg-zinc-50 rounded-xl border border-primary/20 p-6 space-y-5">
+              <div className="bg-zinc-50 rounded-2xl border border-primary/20 p-6 space-y-5">
                 <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">
                   Edit Slide
                 </h3>

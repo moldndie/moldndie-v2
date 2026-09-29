@@ -491,7 +491,7 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
           </div>
 
           {fields.length === 0 && (
-            <div className="rounded-xl border-2 border-dashed border-zinc-200 py-12 text-center">
+            <div className="rounded-2xl border-2 border-dashed border-zinc-200 py-12 text-center">
               <FlaskConical className="mx-auto mb-2 size-8 text-zinc-200" />
               <p className="text-sm text-zinc-400">No inputs yet. Add your first one.</p>
             </div>
@@ -535,7 +535,7 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
           </div>
 
           {outputs.length === 0 && (
-            <div className="rounded-xl border-2 border-dashed border-zinc-200 py-12 text-center">
+            <div className="rounded-2xl border-2 border-dashed border-zinc-200 py-12 text-center">
               <Zap className="mx-auto mb-2 size-8 text-zinc-200" />
               <p className="text-sm text-zinc-400">No results yet. Add a formula.</p>
             </div>
@@ -621,13 +621,13 @@ export default function CalculatorBuilder({ calculator, categories, existing = [
   )
 
   const preview = (
-    <div className="rounded-xl border border-zinc-200 bg-zinc-50/60 p-4">
+    <div className="rounded-2xl border border-zinc-200 bg-zinc-50/60 p-4">
       <div className="mb-3 flex items-center gap-2">
         <Eye className="size-4 text-primary" />
         <p className="text-sm font-bold text-zinc-900">Live preview</p>
       </div>
       {fields.length === 0 && outputs.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-zinc-200 bg-white py-12 text-center">
+        <div className="rounded-2xl border border-dashed border-zinc-200 bg-white py-12 text-center">
           <Eye className="mx-auto mb-2 size-7 text-zinc-200" />
           <p className="text-sm text-zinc-400">Your tool appears here as you build it.</p>
         </div>
@@ -686,7 +686,7 @@ function StartScreen({ existing, onTemplate, onScratch, onDuplicate }: {
           <button
             key={key}
             onClick={() => onTemplate(key)}
-            className="rounded-xl border border-zinc-200 bg-white p-4 text-left transition-colors hover:border-primary hover:bg-primary/5"
+            className="rounded-2xl border border-zinc-200 bg-white p-4 text-left transition-colors hover:border-primary hover:bg-primary/5"
           >
             <p className="text-sm font-semibold text-zinc-900">{tpl.title}</p>
             <p className="mt-1 line-clamp-2 text-xs text-zinc-400">{tpl.description}</p>
@@ -709,14 +709,14 @@ function StartScreen({ existing, onTemplate, onScratch, onDuplicate }: {
           <label className="flex items-center gap-2 text-sm text-zinc-500">
             <Copy className="size-4 text-zinc-400" />
             Or copy an existing tool:
-            <select
+            <Select
               defaultValue=""
               onChange={(e) => e.target.value && onDuplicate(e.target.value)}
-              className="rounded-lg border border-zinc-200 bg-white px-2.5 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+              className="py-1.5"
             >
               <option value="">— pick one —</option>
               {existing.map((c) => <option key={c.id} value={c.id}>{c.title}</option>)}
-            </select>
+            </Select>
           </label>
         )}
       </div>
@@ -781,7 +781,7 @@ function StepDetails(props: {
   categories: CalcCategory[]
 }) {
   return (
-    <div className="space-y-5 rounded-xl border border-zinc-200 bg-white p-6">
+    <div className="space-y-5 rounded-2xl border border-zinc-200 bg-white p-6">
       <div>
         <Label required>Title</Label>
         <Input value={props.title} onChange={(e) => props.onTitle(e.target.value)} placeholder="e.g. Injection Molding Cycle Time" />
@@ -925,7 +925,7 @@ function StepPublish(props: {
   const ready = props.problems.count === 0
   return (
     <div className="space-y-5">
-      <div className={cn("rounded-xl border p-5", ready ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50")}>
+      <div className={cn("rounded-2xl border p-5", ready ? "border-emerald-200 bg-emerald-50" : "border-amber-200 bg-amber-50")}>
         <div className="mb-2 flex items-center gap-2">
           {ready ? <CheckCircle2 className="size-5 text-emerald-600" /> : <AlertTriangle className="size-5 text-amber-600" />}
           <p className={cn("text-sm font-bold", ready ? "text-emerald-800" : "text-amber-800")}>

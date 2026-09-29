@@ -1,5 +1,6 @@
 "use client"
 
+import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { toast } from "sonner"
@@ -72,17 +73,17 @@ function NextLessonCard({
 }) {
   return (
     <div className="aspect-video w-full rounded-2xl bg-zinc-900 flex flex-col items-center justify-center gap-5 text-center px-8 relative shadow-lg">
-      <button
+      <Button variant="ghost" size="icon-xs"
         onClick={onDismiss}
-        className="absolute top-4 right-4 text-zinc-500 hover:text-primary transition-colors text-lg leading-none"
+        className="absolute top-4 right-4 text-zinc-500"
       >
         ✕
-      </button>
+      </Button>
       <p className="text-zinc-400 text-xs uppercase tracking-widest font-semibold">Up Next</p>
       <p className="text-white text-xl font-bold max-w-xs leading-tight">{lesson.title}</p>
       <Link
         href={`/courses/${courseId}/lessons/${lesson.id}`}
-        className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-semibold text-sm px-7 py-3 rounded-xl transition-colors shadow"
+        className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white font-semibold text-sm px-7 py-3 rounded-lg transition-colors shadow"
       >
         <Play size={14} fill="currentColor" />
         Play Next
@@ -107,7 +108,7 @@ function PdfPrimaryCard({ pdfUrl }: { pdfUrl: string }) {
           href={pdfUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold text-sm px-6 py-3 rounded-xl transition-colors shadow-sm"
+          className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white font-semibold text-sm px-6 py-3 rounded-2xl transition-colors shadow-sm"
         >
           <BookOpen size={16} />
           Open PDF
@@ -115,7 +116,7 @@ function PdfPrimaryCard({ pdfUrl }: { pdfUrl: string }) {
         <a
           href={pdfUrl}
           download
-          className="flex items-center gap-2 bg-white hover:bg-primary hover:text-primary-foreground text-zinc-700 border border-zinc-200 font-semibold text-sm px-6 py-3 rounded-xl transition-colors"
+          className="flex items-center gap-2 bg-white hover:bg-primary hover:text-primary-foreground text-zinc-700 border border-zinc-200 font-semibold text-sm px-6 py-3 rounded-lg transition-colors"
         >
           <Download size={16} />
           Download
@@ -149,9 +150,9 @@ function FileCard({ url, label }: { url: string; label: string }) {
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-3 p-4 rounded-xl border border-zinc-200 bg-white hover:border-primary hover:bg-zinc-50 hover:shadow-sm transition-all group"
+      className="flex items-center gap-3 p-4 rounded-2xl border border-zinc-200 bg-white hover:border-primary hover:bg-zinc-50 hover:shadow-sm transition-all group"
     >
-      <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200 transition-colors">
+      <div className="w-10 h-10 rounded-2xl bg-zinc-100 flex items-center justify-center shrink-0 group-hover:bg-zinc-200 transition-colors">
         <FileIcon filename={name} />
       </div>
       <div className="flex-1 min-w-0">
@@ -205,18 +206,18 @@ function LockedLesson({
       {inCart ? (
         <Link
           href="/cart"
-          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors"
+          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-6 py-3 rounded-lg transition-colors"
         >
           View in Cart
         </Link>
       ) : (
-        <button
+        <Button
           onClick={onAddToCart}
-          className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-white text-sm font-semibold px-6 py-3 rounded-xl transition-colors"
+          className="h-auto flex items-center gap-2 text-sm font-semibold px-6 py-3 rounded-lg"
         >
           <ShoppingCart size={15} />
           {price ? `Buy Course — ${price} EGP` : "Buy Course"}
-        </button>
+        </Button>
       )}
       <Link
         href={`/courses/${courseId}`}
@@ -642,7 +643,7 @@ function ViewerSkeleton() {
           <div className="aspect-video bg-zinc-200 rounded-2xl" />
           <div className="h-7 w-2/3 bg-zinc-200 rounded-lg" />
           <div className="h-4 w-24 bg-zinc-100 rounded-full" />
-          <div className="h-14 w-full bg-zinc-100 rounded-xl" />
+          <div className="h-14 w-full bg-zinc-100 rounded-lg" />
         </div>
         <div className="w-full lg:w-80">
           <div className="rounded-2xl border border-zinc-100 overflow-hidden">

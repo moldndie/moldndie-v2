@@ -11,6 +11,7 @@ import type { Country as LibCountry } from "@/lib/countries";
 import type { Country as PhoneCountry } from "react-phone-number-input";
 import type { Profile } from "@/types/profile";
 import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button"
 
 type Props = { profile: Profile };
 
@@ -128,13 +129,9 @@ export default function ProfileForm({ profile }: Props) {
         />
       </div>
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className="rounded-lg bg-primary px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
-      >
+      <Button type="submit" disabled={isSubmitting}>
         {isSubmitting ? "Saving..." : "Save changes"}
-      </button>
+      </Button>
     </form>
   );
 }

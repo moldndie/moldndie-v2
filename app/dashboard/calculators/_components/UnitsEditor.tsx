@@ -59,7 +59,7 @@ export function UnitsEditor({ systems, value, onChange }: {
     <div className="space-y-2 rounded-lg border border-zinc-200 bg-zinc-50/60 p-3 sm:col-span-2">
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-[11px] font-medium text-zinc-500">This measures</span>
-        <select
+        <Select
           value={manual ? "__manual__" : groupName}
           onChange={(e) => {
             const v = e.target.value
@@ -67,12 +67,12 @@ export function UnitsEditor({ systems, value, onChange }: {
             setGroupName(v === "__manual__" ? "" : v)
             if (v !== "__manual__") onChange({})
           }}
-          className="rounded-md border border-zinc-200 bg-white px-2 py-1 text-xs focus:outline-none focus:ring-2 focus:ring-primary/30"
+          className="h-8 py-1 text-xs"
         >
           <option value="">— pick a quantity —</option>
           {UNIT_GROUPS.map((g) => <option key={g.name} value={g.name}>{g.name}</option>)}
           <option value="__manual__">Something else (enter manually)</option>
-        </select>
+        </Select>
       </div>
 
       {group && (

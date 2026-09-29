@@ -100,7 +100,7 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
   return (
     <div className="space-y-3">
       {value.length === 0 ? (
-        <div className="rounded-xl border-2 border-dashed border-zinc-200 py-12 text-center">
+        <div className="rounded-2xl border-2 border-dashed border-zinc-200 py-12 text-center">
           <p className="text-sm text-zinc-400">No content blocks yet</p>
           <p className="mt-1 text-xs text-zinc-300">Use the buttons below to add blocks</p>
         </div>
@@ -115,14 +115,14 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
               <div
                 key={block.id}
                 className={cn(
-                  "rounded-xl border border-zinc-200 border-l-4 bg-white shadow-sm overflow-hidden",
+                  "rounded-2xl border border-zinc-200 border-l-4 bg-white shadow-sm overflow-hidden",
                   meta.accent
                 )}
               >
                 {/* Block header */}
                 <div className="flex items-center gap-2 px-3 py-2 border-b border-zinc-100 bg-zinc-50/60">
                   {/* Type badge */}
-                  <span className={cn("flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold", meta.badge)}>
+                  <span className={cn("flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold", meta.badge)}>
                     <Icon className="size-3" />
                     {meta.label}
                   </span>

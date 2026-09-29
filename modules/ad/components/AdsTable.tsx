@@ -47,7 +47,7 @@ export function AdsTable() {
       cell: ({ row }) => (
         <div className="flex flex-wrap gap-1">
           {(row.original.target_pages ?? []).map((page) => (
-            <span key={page} className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs text-zinc-600">
+            <span key={page} className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">
               {pageLabel(page)}
             </span>
           ))}
@@ -60,9 +60,9 @@ export function AdsTable() {
       enableSorting: true,
       cell: ({ row }) =>
         row.original.is_active ? (
-          <span className="rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-700">Active</span>
+          <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700">Active</span>
         ) : (
-          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-500">Inactive</span>
+          <span className="rounded-full bg-zinc-100 px-2 py-0.5 text-xs font-medium text-zinc-600">Inactive</span>
         ),
     },
     {

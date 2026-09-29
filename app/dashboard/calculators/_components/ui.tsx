@@ -3,6 +3,7 @@
 // Small shared controls for the builder. Nothing clever — they exist so the
 // cards read as content rather than as class-name soup.
 
+import { Select as BaseSelect } from "@/components/ui/select"
 import { Input as BaseInput } from "@/components/ui/input"
 import { useState } from "react"
 import { ChevronDown, ChevronUp, Settings2 } from "lucide-react"
@@ -30,18 +31,8 @@ export function Input(props: React.InputHTMLAttributes<HTMLInputElement>) {
   return <BaseInput {...props} className={cn("h-auto px-3 py-2 text-sm", props.className)} />
 }
 
-export function Select({ children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement> & { children: React.ReactNode }) {
-  return (
-    <select
-      {...props}
-      className={cn(
-        "w-full rounded-lg border border-zinc-200 bg-white px-3 py-2 text-sm transition focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30",
-        props.className,
-      )}
-    >
-      {children}
-    </select>
-  )
+export function Select(props: React.ComponentProps<typeof BaseSelect>) {
+  return <BaseSelect {...props} />
 }
 
 export function ReorderBtns({ idx, total, onMove }: { idx: number; total: number; onMove: (d: 1 | -1) => void }) {

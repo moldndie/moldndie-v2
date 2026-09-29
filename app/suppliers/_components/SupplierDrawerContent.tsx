@@ -122,7 +122,7 @@ export function SupplierDrawerContent({ supplierId }: { supplierId: string }) {
               href={supplier.website}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-white font-bold text-sm py-3 rounded-xl transition-colors"
+              className="flex items-center justify-center gap-2 w-full bg-primary hover:bg-primary/90 text-white font-bold text-sm py-3 rounded-lg transition-colors"
             >
               <Globe size={15} />
               Visit Website

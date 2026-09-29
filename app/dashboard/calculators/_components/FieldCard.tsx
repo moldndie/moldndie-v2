@@ -33,10 +33,10 @@ export function FieldCard({ field, unitSystems, idx, total, problem, onUpdate, o
   const isNumeric = field.field_type === "number" || field.field_type === "range"
 
   return (
-    <div className={cn("overflow-hidden rounded-xl border bg-white", problem ? "border-red-300" : "border-zinc-200")}>
+    <div className={cn("overflow-hidden rounded-2xl border bg-white", problem ? "border-red-300" : "border-zinc-200")}>
       <div className="flex items-center gap-3 border-b border-zinc-200 bg-zinc-50 px-4 py-3">
         <ReorderBtns idx={idx} total={total} onMove={(d) => onMove(idx, d)} />
-        <button onClick={() => setExpanded((e) => !e)} className="flex-1 text-left">
+        <button onClick={() => setExpanded((e) => !e)} className="flex-1 text-left transition-colors hover:text-primary">
           <span className="text-sm font-semibold text-zinc-900">
             {field.label || <em className="font-normal text-zinc-400">Untitled input</em>}
           </span>

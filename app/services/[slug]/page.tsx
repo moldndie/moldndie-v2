@@ -95,7 +95,7 @@ export default async function ServiceDetailPage({ params }: Props) {
               )}
               <Link
                 href="/services#request-form"
-                className="inline-flex items-center justify-center rounded-xl bg-primary px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-primary/90"
+                className="inline-flex items-center justify-center rounded-lg bg-primary px-6 py-3 text-sm font-bold text-white transition-colors hover:bg-primary/90"
               >
                 Request This Service
               </Link>

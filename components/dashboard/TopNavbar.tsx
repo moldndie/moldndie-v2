@@ -2,6 +2,7 @@
 
 import { Menu } from "lucide-react"
 import { logoutAction } from "@/services/auth.service"
+import { Button } from "@/components/ui/button"
 
 interface TopNavbarProps {
   user: {
@@ -23,13 +24,16 @@ export default function TopNavbar({ user, onMenuClick }: TopNavbarProps) {
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 lg:px-6">
       {/* Mobile menu button */}
-      <button
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
         onClick={onMenuClick}
-        className="rounded-md p-2 text-zinc-500 hover:bg-primary hover:text-primary-foreground lg:hidden"
+        className="lg:hidden"
         aria-label="Open navigation"
       >
         <Menu className="size-5" />
-      </button>
+      </Button>
 
       <div className="ml-auto flex items-center gap-3">
         {/* User name / email */}
