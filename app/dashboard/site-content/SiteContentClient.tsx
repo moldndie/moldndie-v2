@@ -466,7 +466,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
           <div className="space-y-5">
             <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">Social Proof Counters</h3>
             <p className="text-xs text-zinc-400">
-              These numbers are displayed on the homepage. Leave blank to hide that counter.
+              These numbers are displayed on the homepage. Leave a field blank to show the real number (or the default shown in the field) — it is never hidden.
               Use a suffix like &ldquo;+&rdquo; (e.g. &ldquo;500+&rdquo;) or an exact number.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -502,7 +502,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 value={v("counter_users")}
                 onChange={handleChange}
                 placeholder="1,000+"
-                hint="Leave blank to show the real number of registered members"
+                hint="Blank = real number of registered members"
               />
               <Field
                 label="Industry Events"

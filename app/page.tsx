@@ -9,7 +9,7 @@ import { getSiteSettings } from "@/services/siteSettings.service"
 import { getActiveHeroSlides } from "@/services/heroSlides.service"
 import { getActiveOfferItems } from "@/services/homeOfferItems.service"
 import { getActiveWhyCards } from "@/services/homeWhyCards.service"
-import { getMemberCount } from "@/services/visitorCount.service"
+import { getMemberCount, getContentCounts } from "@/services/visitorCount.service"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 import type { HeroSlide } from "@/services/heroSlides.service"
 import type { HomeOfferItem } from "@/services/homeOfferItems.service"
@@ -28,23 +28,27 @@ export default async function HomePage() {
   let offerItems: HomeOfferItem[] = []
   let whyCards: HomeWhyCard[] = []
   let memberCount  = 0
+  let real = { blog: 0, toolings: 0, courses: 0, events: 0 }
 
   await Promise.allSettled([
     getSiteSettings().then((s) => { settings = s }).catch(() => {}),
     getActiveHeroSlides().then((s) => { heroSlides = s }).catch(() => {}),
     getActiveOfferItems().then((s) => { offerItems = s }).catch(() => {}),
     getActiveWhyCards().then((s) => { whyCards = s }).catch(() => {}),
+    getContentCounts().then((c) => { real = c }).catch(() => {}),
     getMemberCount().then((n)        => { memberCount  = n }).catch(() => {}),
   ])
 
-  // All editable in Site Content → Counters. Members falls back to the real
-  // count only when the admin leaves it blank.
+  // Editable in Site Content → Counters. A blank field is never hidden: it
+  // falls back to the real number, then to the default shown in the admin form.
+  const pick = (custom: string | undefined, actual: number, def: string) =>
+    custom?.trim() || (actual > 0 ? actual.toLocaleString() : def)
   const counters = {
-    blog:     settings.counter_blog,
-    toolings: settings.counter_toolings,
-    courses:  settings.counter_courses,
-    events:   settings.counter_events,
-    users:    settings.counter_users || (memberCount > 0 ? memberCount.toLocaleString() : undefined),
+    blog:     pick(settings.counter_blog,     real.blog,     "100+"),
+    toolings: pick(settings.counter_toolings, real.toolings, "200+"),
+    courses:  pick(settings.counter_courses,  real.courses,  "50+"),
+    events:   pick(settings.counter_events,   real.events,   "30+"),
+    users:    pick(settings.counter_users,    memberCount,   "1,000+"),
   }
 
   return (

@@ -37,3 +37,23 @@ export async function getMemberCount(): Promise<number> {
     return 0
   }
 }
+
+/** Real row counts behind the homepage "By the Numbers" counters. */
+export async function getContentCounts(): Promise<{ blog: number; toolings: number; courses: number; events: number }> {
+  noStore()
+  const admin = createAdminClient()
+  const n = async (table: string, published = false) => {
+    try {
+      let q = admin.from(table).select("*", { count: "exact", head: true })
+      if (published) q = q.eq("is_published", true)
+      const { count } = await q
+      return count ?? 0
+    } catch {
+      return 0
+    }
+  }
+  const [blog, toolings, courses, events] = await Promise.all([
+    n("blogs", true), n("molds"), n("courses", true), n("events"),
+  ])
+  return { blog, toolings, courses, events }
+}
