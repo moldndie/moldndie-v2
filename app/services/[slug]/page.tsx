@@ -1,14 +1,14 @@
 import type { Metadata } from "next"
 import { Suspense } from "react"
-import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { CheckCircle, FolderKanban } from "lucide-react"
+import { CheckCircle } from "lucide-react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import RichTextRenderer from "@/components/editor/RichTextRenderer"
 import PortfolioSection from "../PortfolioSection"
+import MediaGallery from "@/components/services/MediaGallery"
 import { getActiveServiceBySlug } from "@/services/service.service"
 import { getPortfolioItemsForService } from "@/services/portfolio.service"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
@@ -63,21 +63,13 @@ export default async function ServiceDetailPage({ params }: Props) {
           </div>
 
           <div className="grid gap-8 lg:grid-cols-2">
-            <div className="relative aspect-video overflow-hidden rounded-2xl border border-zinc-100 bg-white">
-              {service.image ? (
-                <Image
-                  src={service.image}
-                  alt={service.title}
-                  fill
-                  className="object-contain"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                />
-              ) : (
-                <div className="absolute inset-0 flex items-center justify-center bg-zinc-50">
-                  <FolderKanban size={72} className="text-primary/20" strokeWidth={0.8} />
-                </div>
-              )}
-            </div>
+            <MediaGallery
+              title={service.title}
+              images={service.images}
+              videos={service.videos}
+              videoUrls={service.video_urls}
+              placeholder
+            />
 
             <div className="space-y-5">
               {service.description && (

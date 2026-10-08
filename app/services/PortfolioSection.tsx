@@ -3,105 +3,61 @@
 import { useState } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { getFileUrl } from "@/lib/utils"
+import { FolderKanban, Images, Video } from "lucide-react"
+import { mediaUrl } from "@/lib/video"
 import RichTextRenderer from "@/components/editor/RichTextRenderer"
+import MediaGallery from "@/components/services/MediaGallery"
+import { Modal } from "@/components/ui/modal"
 import type { PortfolioItem } from "@/services/portfolio.service"
 import { Button } from "@/components/ui/button"
 
-function getYouTubeEmbedUrl(url: string): string | null {
-  const short = url.match(/youtu\.be\/([^?&]+)/)
-  if (short) return `https://www.youtube.com/embed/${short[1]}?rel=0&modestbranding=1`
-  const long = url.match(/[?&]v=([^&]+)/)
-  if (long) return `https://www.youtube.com/embed/${long[1]}?rel=0&modestbranding=1`
-  return null
-}
-
-function PortfolioCard({ item }: { item: PortfolioItem }) {
+function PortfolioTile({ item, onOpen }: { item: PortfolioItem; onOpen: () => void }) {
   const images = item.images ?? []
-  const [active, setActive] = useState(0)
-  const embedUrl = item.video_url ? getYouTubeEmbedUrl(item.video_url) : null
+  const videoCount = (item.video_paths?.length ?? 0) + (item.video_urls?.length ?? 0)
 
   return (
-    <motion.article
+    <motion.div
       initial={{ opacity: 0, y: 14 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-40px" }}
       transition={{ duration: 0.3, ease: "easeOut" }}
-      className="flex flex-col rounded-2xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-md transition-all duration-200"
     >
-      {images.length > 0 && (
-        <>
-          <div className="relative aspect-video bg-white overflow-hidden">
+      <Button
+        variant="unstyled"
+        type="button"
+        onClick={onOpen}
+        className="group flex w-full flex-col overflow-hidden rounded-xl border border-zinc-100 bg-white text-left shadow-sm transition-all hover:border-primary hover:shadow-md"
+      >
+        <span className="relative block aspect-4/3 w-full bg-zinc-50">
+          {images[0] ? (
             <Image
-              src={getFileUrl(images[active])}
+              src={mediaUrl(images[0])}
               alt={item.title}
               fill
-              className="object-contain"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              className="object-cover"
+              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
             />
-          </div>
-          {images.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto scrollbar-hide px-3 pt-3">
-              {images.map((key, i) => (
-                <Button variant="unstyled"
-                  key={`${key}-${i}`}
-                  type="button"
-                  onClick={() => setActive(i)}
-                  aria-label={`View image ${i + 1}`}
-                  className={`relative size-12 shrink-0 overflow-hidden rounded-lg border transition-colors ${
-                    i === active ? "border-primary ring-2 ring-primary/30" : "border-zinc-200 [@media(hover:hover)]:hover:border-primary"
-                  }`}
-                >
-                  <Image
-                    src={getFileUrl(key)}
-                    alt=""
-                    fill
-                    className="object-cover"
-                    sizes="48px"
-                  />
-                </Button>
-              ))}
-            </div>
+          ) : (
+            <span className="absolute inset-0 flex items-center justify-center">
+              <FolderKanban size={36} className="text-primary/20" strokeWidth={1} />
+            </span>
           )}
-        </>
-      )}
-
-      <div className="p-5 flex flex-col flex-1 gap-3">
-        <h3 className="text-base font-bold text-zinc-900">{item.title}</h3>
-
-        {item.description && (
-          <RichTextRenderer content={item.description} className="text-sm text-zinc-600" />
-        )}
-
-        {embedUrl ? (
-          <div className="aspect-video w-full overflow-hidden rounded-xl bg-zinc-950">
-            <iframe
-              src={embedUrl}
-              title={item.title}
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-              allowFullScreen
-              className="size-full"
-            />
-          </div>
-        ) : item.video_path ? (
-          <video
-            src={getFileUrl(item.video_path)}
-            controls
-            preload="metadata"
-            className="aspect-video w-full rounded-xl bg-zinc-950"
-          />
-        ) : item.video_url ? (
-          <a
-            href={item.video_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm font-semibold text-primary hover:underline"
-          >
-            Watch video
-          </a>
-        ) : null}
-      </div>
-    </motion.article>
+        </span>
+        <span className="flex flex-col gap-1.5 p-3">
+          <span className="line-clamp-2 text-sm font-bold text-zinc-900">{item.title}</span>
+          {(images.length > 0 || videoCount > 0) && (
+            <span className="flex gap-2 text-[11px] font-medium text-zinc-500">
+              {images.length > 0 && (
+                <span className="inline-flex items-center gap-1"><Images size={11} />{images.length}</span>
+              )}
+              {videoCount > 0 && (
+                <span className="inline-flex items-center gap-1"><Video size={11} />{videoCount}</span>
+              )}
+            </span>
+          )}
+        </span>
+      </Button>
+    </motion.div>
   )
 }
 
@@ -112,6 +68,8 @@ export default function PortfolioSection({
   items: PortfolioItem[]
   heading?: string
 }) {
+  const [open, setOpen] = useState<PortfolioItem | null>(null)
+
   if (items.length === 0) return null
 
   return (
@@ -119,11 +77,28 @@ export default function PortfolioSection({
       <h2 className="text-base font-bold text-zinc-900 uppercase tracking-wide mb-4">
         {heading}
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
         {items.map((item) => (
-          <PortfolioCard key={item.id} item={item} />
+          <PortfolioTile key={item.id} item={item} onOpen={() => setOpen(item)} />
         ))}
       </div>
+
+      <Modal open={!!open} onClose={() => setOpen(null)} title={open?.title ?? ""} size="xl">
+        {open && (
+          <div className="space-y-4">
+            <MediaGallery
+              key={open.id}
+              title={open.title}
+              images={open.images ?? []}
+              videos={open.video_paths}
+              videoUrls={open.video_urls}
+            />
+            {open.description && (
+              <RichTextRenderer content={open.description} className="text-sm text-zinc-600" />
+            )}
+          </div>
+        )}
+      </Modal>
     </section>
   )
 }
