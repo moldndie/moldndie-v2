@@ -124,12 +124,13 @@ export default function NavbarUserMenu() {
       <div className="relative" ref={dropdownRef}>
         <Button variant="unstyled"
           onClick={() => setOpen((v) => !v)}
-          className="flex items-center gap-1.5 cursor-pointer rounded-full p-1 [@media(hover:hover)]:hover:bg-primary [@media(hover:hover)]:hover:text-primary-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
+          aria-expanded={open}
+          className="flex items-center gap-1.5 cursor-pointer rounded-full bg-white p-1 [@media(hover:hover)]:hover:bg-primary [@media(hover:hover)]:hover:text-primary-foreground aria-expanded:bg-primary aria-expanded:text-primary-foreground transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
         >
           <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-xs font-semibold shrink-0">
             {initial}
           </div>
-          <ChevronDown className={`size-3.5 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`} />
+          <ChevronDown className={`size-3.5 transition-transform ${open ? "rotate-180" : ""}`} />
         </Button>
 
         {open && (

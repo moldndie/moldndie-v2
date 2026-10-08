@@ -501,7 +501,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                   onClick={() => handleMove(slide.id, "up")}
                   disabled={idx === 0 || isPending}
                   title="Move up"
-                  variant="ghost" size="icon-sm" className="text-zinc-400"
+                  variant="outline" size="icon-sm"
                 >
                   <ChevronUp className="size-4" />
                 </Button>
@@ -509,16 +509,15 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                   onClick={() => handleMove(slide.id, "down")}
                   disabled={idx === slides.length - 1 || isPending}
                   title="Move down"
-                  variant="ghost" size="icon-sm" className="text-zinc-400"
+                  variant="outline" size="icon-sm"
                 >
                   <ChevronDown className="size-4" />
                 </Button>
 
-                <Button variant="ghost" size="icon-sm" aria-pressed={editingId === slide.id}
+                <Button variant="outline" size="icon-sm" aria-pressed={editingId === slide.id}
                   onClick={() => (editingId === slide.id ? closeEdit() : openEdit(slide))}
                   disabled={isPending}
                   title={editingId === slide.id ? "Cancel edit" : "Edit slide"}
-                  className="text-zinc-400"
                 >
                   <Pencil className="size-4" />
                 </Button>
@@ -527,7 +526,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                   onClick={() => handleToggle(slide)}
                   disabled={isPending}
                   title={slide.is_active ? "Deactivate" : "Activate"}
-                  variant="ghost" size="icon-sm" className="text-zinc-400"
+                  variant="outline" size="icon-sm"
                 >
                   {slide.is_active ? (
                     <EyeOff className="size-4" />
@@ -540,7 +539,7 @@ export default function HeroCarouselClient({ initialSlides }: Props) {
                   onClick={() => handleDelete(slide.id)}
                   disabled={isPending}
                   title="Delete slide"
-                  variant="ghost-danger" size="icon-sm" className="text-zinc-400"
+                  variant="ghost-danger" size="icon-sm"
                 >
                   <Trash2 className="size-4" />
                 </Button>

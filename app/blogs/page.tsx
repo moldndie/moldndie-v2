@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { Suspense } from "react"
 import Link from "next/link"
 import Image from "next/image"
+import { IconChip } from "@/components/ui/IconChip"
 import { FileText, Heart, MessageSquare, Eye } from "lucide-react"
 import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
@@ -72,21 +73,21 @@ function BlogCard({ blog, likes, comments, views }: { blog: Blog; likes: number;
           <span className="text-xs font-medium text-primary group-hover:underline underline-offset-2">
             Read more →
           </span>
-          <div className="flex items-center gap-3 text-xs text-zinc-400">
+          <div className="flex items-center gap-1.5 text-xs">
             {views > 0 && (
-              <span className="flex items-center gap-1">
+              <IconChip>
                 <Eye className="size-3" />
                 {views >= 1000 ? `${(views / 1000).toFixed(1)}k` : views}
-              </span>
+              </IconChip>
             )}
-            <span className="flex items-center gap-1">
+            <IconChip>
               <Heart className="size-3" />
               {likes}
-            </span>
-            <span className="flex items-center gap-1">
+            </IconChip>
+            <IconChip>
               <MessageSquare className="size-3" />
               {comments}
-            </span>
+            </IconChip>
           </div>
         </div>
       </div>

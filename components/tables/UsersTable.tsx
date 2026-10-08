@@ -295,7 +295,7 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
             <Button
               onClick={() => setEditingUser(user)}
               title="Edit"
-              variant="ghost" size="icon-sm" className="text-zinc-400"
+              variant="outline" size="icon-sm"
             >
               <Pencil className="size-3.5" />
             </Button>
@@ -306,7 +306,7 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
                 onClick={() => setTogglingUser(user)}
                 disabled={isSelf}
                 title={isSelf ? "You cannot deactivate your own account." : "Deactivate"}
-                variant="ghost-danger" size="icon-sm" className="text-zinc-400"
+                variant="ghost-danger" size="icon-sm"
               >
                 <UserX className="size-3.5" />
               </Button>
@@ -314,7 +314,7 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
               <Button
                 onClick={() => setTogglingUser(user)}
                 title="Reactivate"
-                variant="ghost" size="icon-sm" className="text-zinc-400"
+                variant="outline" size="icon-sm"
               >
                 <UserCheck className="size-3.5" />
               </Button>
@@ -325,7 +325,7 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
               onClick={() => { if (hasEmail) resetPasswordMutation.mutate(user.email!) }}
               disabled={!hasEmail || resetPasswordMutation.isPending}
               title={hasEmail ? "Send password reset email" : "No email on file"}
-              variant="ghost" size="icon-sm" className="text-zinc-400"
+              variant="outline" size="icon-sm"
             >
               <KeyRound className="size-3.5" />
             </Button>
@@ -336,7 +336,7 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
                 onClick={() => { if (hasEmail) resendMutation.mutate(user.email!) }}
                 disabled={resendMutation.isPending}
                 title="Resend verification email"
-                variant="ghost" size="icon-sm" className="text-zinc-400"
+                variant="outline" size="icon-sm"
               >
                 <Send className="size-3.5" />
               </Button>
@@ -347,7 +347,7 @@ export function UsersTable({ currentUserRole, currentUserId }: UsersTableProps) 
               onClick={() => setDeletingUser(user)}
               disabled={isSelf}
               title={isSelf ? "You cannot delete your own account." : "Delete permanently"}
-              variant="ghost-danger" size="icon-sm" className="text-zinc-400"
+              variant="ghost-danger" size="icon-sm"
             >
               <Trash2 className="size-3.5" />
             </Button>

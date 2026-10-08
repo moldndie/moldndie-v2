@@ -1,3 +1,4 @@
+import { IconChip } from "@/components/ui/IconChip"
 import { Eye } from "lucide-react"
 import { getContentViewCount } from "@/services/contentViews.service"
 
@@ -18,9 +19,9 @@ export async function ViewCount({ contentType, contentId, className }: ViewCount
     : count.toLocaleString()
 
   return (
-    <span className={`inline-flex items-center gap-1 text-xs text-zinc-400 ${className ?? ""}`}>
+    <IconChip className={className}>
       <Eye size={12} className="shrink-0" />
       {formatted} {count === 1 ? "view" : "views"}
-    </span>
+    </IconChip>
   )
 }

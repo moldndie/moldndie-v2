@@ -6,6 +6,7 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter, usePathname, useSearchParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
+import { IconChip } from "@/components/ui/IconChip"
 import { CalendarDays, MapPin, MapPinned, ChevronDown, Lock, Globe, Eye, Phone, Mail } from "lucide-react"
 import { ListingFiltersBar } from "@/components/listing/ListingFiltersBar"
 import { Pagination } from "@/components/listing/Pagination"
@@ -239,10 +240,10 @@ function EventCard({
             )}
             {event.category && <span className="text-xs text-zinc-400">{event.category.name}</span>}
             {views > 0 && (
-              <span className="flex items-center gap-1 text-xs text-zinc-400">
+              <IconChip>
                 <Eye size={11} className="shrink-0" />
                 {views >= 1000 ? `${(views / 1000).toFixed(1)}k` : views}
-              </span>
+              </IconChip>
             )}
           </div>
           <div className="flex justify-center pt-1">

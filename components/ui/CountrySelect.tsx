@@ -57,7 +57,8 @@ export default function CountrySelect({
       <Button variant="unstyled"
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex w-full items-center gap-2.5 h-9 rounded-lg border border-input bg-white px-3 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
+        aria-expanded={open}
+        className="flex w-full items-center gap-2.5 aria-expanded:bg-primary aria-expanded:text-primary-foreground aria-expanded:border-primary h-9 rounded-lg border border-input bg-white px-3 text-sm outline-none transition-colors focus-visible:border-primary focus-visible:ring-3 focus-visible:ring-primary/20"
       >
         {selected ? (
           <>
@@ -68,14 +69,14 @@ export default function CountrySelect({
                 className="h-full w-full object-cover"
               />
             </span>
-            <span className="flex-1 text-left text-zinc-900">{selected.name}</span>
+            <span className="flex-1 text-left">{selected.name}</span>
           </>
         ) : (
           <span className="flex-1 text-left text-zinc-400">{placeholder}</span>
         )}
         <ChevronDown
           size={15}
-          className={`shrink-0 text-zinc-400 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`shrink-0 text-zinc-400 group-aria-expanded/button:text-primary-foreground transition-transform ${open ? "rotate-180" : ""}`}
         />
       </Button>
 

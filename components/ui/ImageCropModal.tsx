@@ -161,7 +161,7 @@ export function ImageCropModal({
           <Button
             type="button"
             onClick={onCancel}
-            variant="ghost" size="icon-sm" className="text-zinc-400"
+            variant="outline" size="icon-sm"
           >
             <X className="size-4" />
           </Button>

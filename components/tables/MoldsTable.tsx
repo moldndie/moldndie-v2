@@ -118,13 +118,13 @@ export function MoldsTable() {
         <div className="flex items-center justify-end gap-1">
           <Button
             onClick={() => setEditingMold(row.original)}
-            variant="ghost" size="icon-sm" className="text-zinc-400"
+            variant="outline" size="icon-sm"
           >
             <Pencil className="size-3.5" />
           </Button>
           <Button
             onClick={() => setDeletingMold(row.original)}
-            variant="ghost-danger" size="icon-sm" className="text-zinc-400"
+            variant="ghost-danger" size="icon-sm"
           >
             <Trash2 className="size-3.5" />
           </Button>

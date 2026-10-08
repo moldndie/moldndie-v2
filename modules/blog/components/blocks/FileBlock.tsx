@@ -122,7 +122,7 @@ export function FileBlock({ value, onChange }: FileBlockProps) {
         <Button
           type="button"
           onClick={() => onChange({ file_path: "", file_name: "", file_type: "" })}
-          variant="ghost" size="icon-xs" className="text-zinc-400"
+          variant="outline" size="icon-xs"
         >
           <X className="size-4" />
         </Button>

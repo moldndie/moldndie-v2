@@ -19,17 +19,18 @@ export default function IconPicker({ value, onChange }: Props) {
       <Button variant="unstyled"
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-2.5 w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+        aria-expanded={open}
+        className="flex items-center gap-2.5 w-full aria-expanded:bg-primary aria-expanded:text-primary-foreground aria-expanded:border-primary rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
       >
         {value ? (
           <>
-            <DynamicIcon name={value} size={18} strokeWidth={1.5} className="text-primary shrink-0" />
+            <DynamicIcon name={value} size={18} strokeWidth={1.5} className="text-primary shrink-0 group-aria-expanded/button:text-primary-foreground" />
             <span className="flex-1 text-left">{value}</span>
           </>
         ) : (
           <span className="flex-1 text-left text-zinc-400">Choose icon…</span>
         )}
-        <ChevronDown className={cn("size-4 text-zinc-400 transition-transform shrink-0", open && "rotate-180")} />
+        <ChevronDown className={cn("size-4 text-zinc-400 group-aria-expanded/button:text-primary-foreground transition-transform shrink-0", open && "rotate-180")} />
       </Button>
 
       {open && (

@@ -87,21 +87,21 @@ export function CoursesTable() {
         <div className="flex items-center justify-end gap-1">
           <Link
             href={`/dashboard/courses/${row.original.id}`}
-            className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "text-zinc-400")}
+            className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}
             title="Manage lessons"
           >
             <BookOpen className="size-3.5" />
           </Link>
           <Button
             onClick={() => setEditingCourse(row.original)}
-            variant="ghost" size="icon-sm" className="text-zinc-400"
+            variant="outline" size="icon-sm"
             title="Edit course"
           >
             <Pencil className="size-3.5" />
           </Button>
           <Button
             onClick={() => setDeletingCourse(row.original)}
-            variant="ghost-danger" size="icon-sm" className="text-zinc-400"
+            variant="ghost-danger" size="icon-sm"
             title="Delete course"
           >
             <Trash2 className="size-3.5" />

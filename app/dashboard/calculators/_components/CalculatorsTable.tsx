@@ -176,7 +176,7 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
                         <Link
                           href={`/tools/${row.slug}`}
                           target="_blank"
-                          className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "text-zinc-400")}
+                          className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}
                           title="Preview"
                         >
                           <Eye className="size-4" />
@@ -184,7 +184,7 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
                         <Button
                           onClick={() => handleToggle(row.id, !row.is_published)}
                           disabled={isPending}
-                          variant="ghost" size="icon-sm" className="text-zinc-400"
+                          variant="outline" size="icon-sm"
                           title={row.is_published ? "Unpublish" : "Publish"}
                         >
                           {row.is_published ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -192,14 +192,14 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
                         <Button
                           onClick={() => handleDuplicate(row.id)}
                           disabled={isPending}
-                          variant="ghost" size="icon-sm" className="text-zinc-400"
+                          variant="outline" size="icon-sm"
                           title="Duplicate"
                         >
                           <Copy className="size-4" />
                         </Button>
                         <Link
                           href={`/dashboard/calculators/${row.id}/edit`}
-                          className={cn(buttonVariants({ variant: "ghost", size: "icon-sm" }), "text-zinc-400")}
+                          className={cn(buttonVariants({ variant: "outline", size: "icon-sm" }))}
                           title="Edit"
                         >
                           <Edit2 className="size-4" />
@@ -207,7 +207,7 @@ export default function CalculatorsTable({ initialData }: { initialData: Row[] }
                         <Button
                           onClick={() => handleDelete(row.id, row.title)}
                           disabled={isPending}
-                          variant="ghost-danger" size="icon-sm" className="text-zinc-400"
+                          variant="ghost-danger" size="icon-sm"
                           title="Delete"
                         >
                           <Trash2 className="size-4" />

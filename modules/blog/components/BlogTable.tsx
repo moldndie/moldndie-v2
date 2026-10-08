@@ -109,7 +109,7 @@ export function BlogTable() {
             {/* Analytics */}
             <Button
               onClick={() => setEngagementBlog(blog)}
-              variant="ghost" size="icon-sm" className="text-zinc-400"
+              variant="outline" size="icon-sm"
               title="View engagement"
             >
               <BarChart2 className="size-3.5" />
@@ -118,7 +118,7 @@ export function BlogTable() {
             {/* Preview — opens full frontend preview in new tab */}
             <Button
               onClick={() => window.open(`/blogs/preview/${blog.id}`, "_blank")}
-              variant="ghost" size="icon-sm" className="text-zinc-400"
+              variant="outline" size="icon-sm"
               title="Preview"
             >
               <Eye className="size-3.5" />
@@ -127,7 +127,7 @@ export function BlogTable() {
             {/* Edit */}
             <Button
               onClick={() => router.push(`/dashboard/blogs/${blog.id}/edit`)}
-              variant="ghost" size="icon-sm" className="text-zinc-400"
+              variant="outline" size="icon-sm"
               title="Edit"
             >
               <Pencil className="size-3.5" />
@@ -137,8 +137,7 @@ export function BlogTable() {
             <Button
               onClick={() => handleTogglePublish(blog.id, blog.is_published)}
               disabled={isToggling}
-              variant="ghost" size="icon-sm"
-              className={blog.is_published ? "text-green-600" : "text-zinc-400"}
+              variant="outline" size="icon-sm" aria-pressed={blog.is_published}
               title={blog.is_published ? "Unpublish" : "Publish"}
             >
               {blog.is_published
@@ -150,7 +149,7 @@ export function BlogTable() {
             <Button
               onClick={() => handleDelete(blog.id)}
               disabled={deletingId === blog.id}
-              variant="ghost-danger" size="icon-sm" className="text-zinc-400"
+              variant="ghost-danger" size="icon-sm"
               title="Delete"
             >
               <Trash2 className="size-3.5" />

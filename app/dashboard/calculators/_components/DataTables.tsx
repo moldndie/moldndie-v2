@@ -92,7 +92,7 @@ function TableCard({ table, onChange, onRemove }: {
       <div className="flex items-center gap-2">
         <Input value={table.title} onChange={(e) => onChange({ title: e.target.value })} placeholder="Table name, e.g. Material Properties" />
         <Input value={table.category} onChange={(e) => onChange({ category: e.target.value })} placeholder="Category (optional)" className="max-w-48" />
-        <Button type="button" onClick={onRemove} variant="ghost-danger" size="icon-sm" className="text-zinc-400">
+        <Button type="button" onClick={onRemove} variant="ghost-danger" size="icon-sm">
           <Trash2 className="size-4" />
         </Button>
       </div>
@@ -141,7 +141,7 @@ function TableCard({ table, onChange, onRemove }: {
                       <Button
                         type="button"
                         onClick={() => onChange({ columns: table.columns.filter((x) => x.id !== c.id) })}
-                        variant="ghost-danger" size="icon-xs" className="text-zinc-400"
+                        variant="ghost-danger" size="icon-xs"
                         title="Remove column"
                       >
                         <Trash2 className="size-3" />
@@ -171,7 +171,7 @@ function TableCard({ table, onChange, onRemove }: {
                   <Button
                     type="button"
                     onClick={() => onChange({ rows: table.rows.filter((x) => x.id !== r.id) })}
-                    variant="ghost-danger" size="icon-xs" className="text-zinc-400"
+                    variant="ghost-danger" size="icon-xs"
                     title="Remove row"
                   >
                     <Trash2 className="size-3.5" />

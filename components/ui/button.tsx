@@ -20,7 +20,7 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         "ghost-danger":
-          "hover:bg-red-50 hover:text-red-600 disabled:opacity-40",
+          "border-border bg-background text-red-600 [@media(hover:hover)]:hover:bg-red-50 disabled:opacity-40",
         unstyled:
           "h-auto justify-start whitespace-normal rounded-none border-0 bg-transparent p-0 text-left font-normal focus-visible:ring-primary/30",
         link: "text-primary underline-offset-4 [@media(hover:hover)]:hover:underline [@media(hover:hover)]:hover:text-primary/80",
