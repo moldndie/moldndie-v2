@@ -13,9 +13,8 @@ import { Button } from "@/components/ui/button"
 
 interface HeroCarouselProps {
   slides: HeroSlide[]
+  autoplaySeconds?: number
 }
-
-const AUTOPLAY_MS = 10000
 
 // Premium cubic-bezier ease for slide transitions — typed as tuple so TS
 // maps it to Framer Motion's BezierDefinition rather than number[].
@@ -48,9 +47,9 @@ const textVariants = {
   }),
 }
 
-export default function HeroCarousel({ slides }: HeroCarouselProps) {
+export default function HeroCarousel({ slides, autoplaySeconds = 10 }: HeroCarouselProps) {
   const { index, direction, next: handleNext, prev: handlePrev, select: handleDot } =
-    useCarousel({ length: slides.length, intervalMs: AUTOPLAY_MS })
+    useCarousel({ length: slides.length, intervalMs: autoplaySeconds * 1000 })
 
   const slide = slides[index]
   const hasText = slide.title || slide.subtitle || slide.button_text
@@ -226,7 +225,7 @@ export default function HeroCarousel({ slides }: HeroCarouselProps) {
             className="h-full bg-white/50"
             initial={{ scaleX: 0, originX: 0 }}
             animate={{ scaleX: 1, originX: 0 }}
-            transition={{ duration: AUTOPLAY_MS / 1000, ease: "linear" }}
+            transition={{ duration: autoplaySeconds, ease: "linear" }}
           />
         </div>
       )}

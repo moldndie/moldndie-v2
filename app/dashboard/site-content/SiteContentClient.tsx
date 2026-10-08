@@ -16,6 +16,7 @@ const TABS = [
   { id: "social",   label: "Social Links" },
   { id: "homepage", label: "Homepage" },
   { id: "counters", label: "Counters" },
+  { id: "timing",   label: "Display timing" },
   { id: "branding", label: "Branding" },
 ] as const
 
@@ -30,9 +31,11 @@ interface FieldProps {
   placeholder?: string
   hint?: string
   type?: string
+  min?: number
+  max?: number
 }
 
-function Field({ label, icon, name, value, onChange, placeholder, hint, type = "text" }: FieldProps) {
+function Field({ label, icon, name, value, onChange, placeholder, hint, type = "text", min, max }: FieldProps) {
   return (
     <div className="space-y-1.5">
       <label className="flex items-center gap-1.5 text-sm font-medium text-zinc-700">
@@ -41,6 +44,8 @@ function Field({ label, icon, name, value, onChange, placeholder, hint, type = "
       </label>
       <Input
         type={type}
+        min={min}
+        max={max}
         value={value}
         onChange={(e) => onChange(name, e.target.value)}
         placeholder={placeholder}
@@ -458,6 +463,38 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 onClear={() => handleChange("logo_favicon", "")}
               />
               <p className="text-xs text-zinc-400">Recommended: 512×512px PNG or ICO. Changes require a site redeploy to take effect in browser tabs.</p>
+            </div>
+          </div>
+        )}
+
+        {activeTab === "timing" && (
+          <div className="space-y-5">
+            <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">Display Timing</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+              <Field
+                label="Home slides (seconds)"
+                icon={<Clock className="size-3.5" />}
+                name="hero_autoplay_seconds"
+                value={v("hero_autoplay_seconds")}
+                onChange={handleChange}
+                placeholder="10"
+                type="number"
+                min={2}
+                max={60}
+                hint="How long each homepage slide shows. 2-60, blank = 10."
+              />
+              <Field
+                label="Ads (seconds)"
+                icon={<Clock className="size-3.5" />}
+                name="ads_autoplay_seconds"
+                value={v("ads_autoplay_seconds")}
+                onChange={handleChange}
+                placeholder="4"
+                type="number"
+                min={2}
+                max={60}
+                hint="How long each ad shows before sliding. 2-60, blank = 4."
+              />
             </div>
           </div>
         )}
