@@ -143,7 +143,7 @@ export default function ProcessStepsManager() {
                 <Button
                   onClick={() => move(step, idx, -1)}
                   disabled={idx === 0}
-                  variant="ghost" size="icon-xs" className="text-zinc-400"
+                  variant="outline" size="icon-xs"
                   title="Move up"
                 >
                   <ArrowUp size={13} />
@@ -151,14 +151,13 @@ export default function ProcessStepsManager() {
                 <Button
                   onClick={() => move(step, idx, 1)}
                   disabled={idx === steps.length - 1}
-                  variant="ghost" size="icon-xs" className="text-zinc-400"
+                  variant="outline" size="icon-xs"
                   title="Move down"
                 >
                   <ArrowDown size={13} />
                 </Button>
-                <Button variant="ghost" size="icon-xs" aria-pressed={step.is_active}
+                <Button variant="outline" size="icon-xs" aria-pressed={step.is_active}
                   onClick={() => toggleMut.mutate({ id: step.id, is_active: !step.is_active })}
-                  className="text-zinc-400"
                   title={step.is_active ? "Visible" : "Hidden"}
                 >
                   {step.is_active ? <ToggleRight size={16} /> : <ToggleLeft size={16} />}
@@ -167,7 +166,7 @@ export default function ProcessStepsManager() {
                   onClick={() => {
                     if (confirm(`Delete the "${step.label}" step?`)) deleteMut.mutate(step.id)
                   }}
-                  variant="ghost-danger" size="icon-xs" className="text-zinc-400"
+                  variant="ghost-danger" size="icon-xs"
                   title="Delete"
                 >
                   <Trash2 size={14} />

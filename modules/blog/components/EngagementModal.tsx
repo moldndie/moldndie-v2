@@ -66,7 +66,7 @@ export function EngagementModal({ blogId, blogTitle, open, onClose }: Engagement
           </div>
           <Button
             onClick={onClose}
-            variant="ghost" size="icon-xs" className="text-zinc-400"
+            variant="outline" size="icon-xs"
           >
             <X className="size-4" />
           </Button>
@@ -119,7 +119,7 @@ export function EngagementModal({ blogId, blogTitle, open, onClose }: Engagement
                         <Button
                           onClick={() => handleDelete(comment.id)}
                           disabled={deletingId === comment.id}
-                          variant="ghost-danger" size="icon-xs" className="text-zinc-400"
+                          variant="ghost-danger" size="icon-xs"
                         >
                           <Trash2 className="size-3.5" />
                         </Button>

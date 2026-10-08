@@ -38,7 +38,7 @@ export function OutputCard({ output, unitSystems, idx, total, vars, sampleVars, 
           </span>
           {output.unit && <span className="ml-2 text-xs text-zinc-400">{output.unit}</span>}
         </div>
-        <Button onClick={() => onRemove(output._uid)} variant="ghost-danger" size="icon-xs" className="text-zinc-400">
+        <Button onClick={() => onRemove(output._uid)} variant="ghost-danger" size="icon-xs">
           <Trash2 className="size-4" />
         </Button>
       </div>

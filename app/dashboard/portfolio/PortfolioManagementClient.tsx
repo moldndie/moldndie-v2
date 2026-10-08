@@ -302,14 +302,14 @@ export default function PortfolioManagementClient() {
                       <Button
                         onClick={() => move(item, idx, -1)}
                         disabled={idx === 0}
-                        variant="ghost" size="icon-xs" className="text-zinc-400"
+                        variant="outline" size="icon-xs"
                       >
                         <ArrowUp size={13} />
                       </Button>
                       <Button
                         onClick={() => move(item, idx, 1)}
                         disabled={idx === items.length - 1}
-                        variant="ghost" size="icon-xs" className="text-zinc-400"
+                        variant="outline" size="icon-xs"
                       >
                         <ArrowDown size={13} />
                       </Button>
@@ -337,14 +337,14 @@ export default function PortfolioManagementClient() {
                     <div className="flex items-center gap-1 justify-end">
                       <Button
                         onClick={() => { setFormError(null); setEditing(item) }}
-                        variant="ghost" size="icon-sm" className="text-zinc-400"
+                        variant="outline" size="icon-sm"
                         title="Edit"
                       >
                         <Pencil size={14} />
                       </Button>
                       <Button
                         onClick={() => setDeleting(item)}
-                        variant="ghost-danger" size="icon-sm" className="text-zinc-400"
+                        variant="ghost-danger" size="icon-sm"
                         title="Delete"
                       >
                         <Trash2 size={14} />

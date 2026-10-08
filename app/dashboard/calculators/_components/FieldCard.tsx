@@ -44,7 +44,7 @@ export function FieldCard({ field, unitSystems, idx, total, problem, onUpdate, o
           {field.unit && <span className="ml-1 text-xs text-zinc-400">· {field.unit}</span>}
         </Button>
         {expanded ? <ChevronUp className="size-4 text-zinc-300" /> : <ChevronDown className="size-4 text-zinc-300" />}
-        <Button onClick={() => onRemove(field._uid)} variant="ghost-danger" size="icon-xs" className="text-zinc-400">
+        <Button onClick={() => onRemove(field._uid)} variant="ghost-danger" size="icon-xs">
           <Trash2 className="size-4" />
         </Button>
       </div>

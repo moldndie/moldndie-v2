@@ -288,7 +288,7 @@ function SectionComposer({
           <Button
             type="button"
             onClick={() => setStep("layout")}
-            variant="ghost" size="icon-xs" className="text-zinc-400"
+            variant="outline" size="icon-xs"
             title="Back"
           >
             <ArrowLeft className="size-3.5" />
@@ -300,7 +300,7 @@ function SectionComposer({
         <Button
           type="button"
           onClick={reset}
-          variant="ghost" size="icon-xs" className="text-zinc-400"
+          variant="outline" size="icon-xs"
           title="Cancel"
         >
           <X className="size-3.5" />
@@ -446,7 +446,7 @@ function SectionCard({
             type="button"
             onClick={() => onMove(section.id, "up")}
             disabled={index === 0}
-            variant="ghost" size="icon-xs" className="text-zinc-400"
+            variant="outline" size="icon-xs"
             title="Move up"
           >
             <ChevronUp className="size-3.5" />
@@ -455,7 +455,7 @@ function SectionCard({
             type="button"
             onClick={() => onMove(section.id, "down")}
             disabled={index === total - 1}
-            variant="ghost" size="icon-xs" className="text-zinc-400"
+            variant="outline" size="icon-xs"
             title="Move down"
           >
             <ChevronDown className="size-3.5" />
@@ -463,7 +463,7 @@ function SectionCard({
           <Button
             type="button"
             onClick={() => onRemove(section.id)}
-            variant="ghost-danger" size="icon-xs" className="text-zinc-400"
+            variant="ghost-danger" size="icon-xs"
             title="Remove section"
           >
             <Trash2 className="size-3.5" />
@@ -542,7 +542,7 @@ function ColumnEditor({
               type="button"
               onClick={() => onMove(sectionId, side, block.id, "up")}
               disabled={idx === 0}
-              variant="ghost" size="icon-xs" className="text-zinc-400"
+              variant="outline" size="icon-xs"
               title="Move up"
             >
               <ChevronUp className="size-3" />
@@ -551,7 +551,7 @@ function ColumnEditor({
               type="button"
               onClick={() => onMove(sectionId, side, block.id, "down")}
               disabled={idx === blocks.length - 1}
-              variant="ghost" size="icon-xs" className="text-zinc-400"
+              variant="outline" size="icon-xs"
               title="Move down"
             >
               <ChevronDown className="size-3" />
@@ -559,7 +559,7 @@ function ColumnEditor({
             <Button
               type="button"
               onClick={() => onRemove(sectionId, side, block.id)}
-              variant="ghost-danger" size="icon-xs" className="text-zinc-400"
+              variant="ghost-danger" size="icon-xs"
               title="Remove block"
             >
               <Trash2 className="size-3" />
@@ -583,7 +583,7 @@ function ColumnEditor({
             <Button
               type="button"
               onClick={() => setPicking(false)}
-              variant="ghost" size="icon-xs" className="text-zinc-400"
+              variant="outline" size="icon-xs"
               title="Cancel"
             >
               <X className="size-3" />

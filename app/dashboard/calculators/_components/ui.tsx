@@ -39,10 +39,10 @@ export function Select(props: React.ComponentProps<typeof BaseSelect>) {
 export function ReorderBtns({ idx, total, onMove }: { idx: number; total: number; onMove: (d: 1 | -1) => void }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <Button type="button" onClick={() => onMove(-1)} disabled={idx === 0} variant="ghost" size="icon-xs" className="text-zinc-400">
+      <Button type="button" onClick={() => onMove(-1)} disabled={idx === 0} variant="outline" size="icon-xs">
         <ChevronUp className="size-3.5" />
       </Button>
-      <Button type="button" onClick={() => onMove(1)} disabled={idx === total - 1} variant="ghost" size="icon-xs" className="text-zinc-400">
+      <Button type="button" onClick={() => onMove(1)} disabled={idx === total - 1} variant="outline" size="icon-xs">
         <ChevronDown className="size-3.5" />
       </Button>
     </div>

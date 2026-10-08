@@ -444,6 +444,43 @@
   outline-offset: 2px;
 }
 
+/* ─── Customizable <select>: dark-red highlight instead of the OS grey ───
+   Progressive enhancement; browsers without base-select keep the native list. */
+@supports (appearance: base-select) {
+  select[data-slot="select"],
+  select[data-slot="select"]::picker(select) {
+    appearance: base-select;
+  }
+  select[data-slot="select"]::picker-icon {
+    display: none; /* the wrapper already draws a ChevronDown */
+  }
+  select[data-slot="select"]:open {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px color-mix(in oklab, var(--primary) 20%, transparent);
+  }
+  select[data-slot="select"]::picker(select) {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+    padding: 0.25rem;
+  }
+  select[data-slot="select"] option {
+    padding: 0.375rem 0.625rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+  }
+  select[data-slot="select"] option:hover,
+  select[data-slot="select"] option:focus,
+  select[data-slot="select"] option:checked {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+  select[data-slot="select"] option::checkmark {
+    display: none;
+  }
+}
+
 /* ─── Calculator card palette ─────────────────────────────────
    The tool sits as one dark card on a white page. The dark is a deep tint of
    the brand maroon (same hue 22 as --primary), never neutral black, so the

@@ -178,7 +178,7 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
                       type="button"
                       onClick={() => moveBlock(block.id, "up")}
                       disabled={i === 0}
-                      variant="ghost" size="icon-xs" className="text-zinc-400"
+                      variant="outline" size="icon-xs"
                       title="Move up"
                     >
                       <ChevronUp className="size-3.5" />
@@ -187,7 +187,7 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
                       type="button"
                       onClick={() => moveBlock(block.id, "down")}
                       disabled={i === value.length - 1}
-                      variant="ghost" size="icon-xs" className="text-zinc-400"
+                      variant="outline" size="icon-xs"
                       title="Move down"
                     >
                       <ChevronDown className="size-3.5" />
@@ -195,7 +195,7 @@ export function BlockEditor({ value, onChange }: BlockEditorProps) {
                     <Button
                       type="button"
                       onClick={() => removeBlock(block.id)}
-                      variant="ghost-danger" size="icon-xs" className="text-zinc-400"
+                      variant="ghost-danger" size="icon-xs"
                       title="Remove block"
                     >
                       <Trash2 className="size-3.5" />

@@ -42,7 +42,7 @@ export function ListBlock({ value, onChange }: ListBlockProps) {
           <Button
             type="button"
             onClick={() => removeItem(i)}
-            variant="ghost-danger" size="icon-sm" className="text-zinc-400"
+            variant="ghost-danger" size="icon-sm"
           >
             <X className="size-4" />
           </Button>

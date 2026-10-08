@@ -249,14 +249,14 @@ export default function CalcCategoriesClient({ initialCategories }: Props) {
                 <Button
                   onClick={() => handleMove(cat.id, "up")}
                   disabled={i === 0 || isPending}
-                  variant="ghost" size="icon-xs" className="text-zinc-400"
+                  variant="outline" size="icon-xs"
                 >
                   <ChevronUp className="size-3.5" />
                 </Button>
                 <Button
                   onClick={() => handleMove(cat.id, "down")}
                   disabled={i === categories.length - 1 || isPending}
-                  variant="ghost" size="icon-xs" className="text-zinc-400"
+                  variant="outline" size="icon-xs"
                 >
                   <ChevronDown className="size-3.5" />
                 </Button>
@@ -285,21 +285,21 @@ export default function CalcCategoriesClient({ initialCategories }: Props) {
                 <Button
                   onClick={() => handleToggleActive(cat)}
                   disabled={isPending}
-                  variant="ghost" size="icon-sm" className="text-zinc-400"
+                  variant="outline" size="icon-sm"
                   title={cat.is_active ? "Deactivate" : "Activate"}
                 >
                   {cat.is_active ? <EyeOff className="size-3.5" /> : <Eye className="size-3.5" />}
                 </Button>
                 <Button
                   onClick={() => openEdit(cat)}
-                  variant="ghost" size="icon-sm" className="text-zinc-400"
+                  variant="outline" size="icon-sm"
                 >
                   <Pencil className="size-3.5" />
                 </Button>
                 <Button
                   onClick={() => handleDelete(cat.id, cat.name)}
                   disabled={isPending}
-                  variant="ghost-danger" size="icon-sm" className="text-zinc-400"
+                  variant="ghost-danger" size="icon-sm"
                 >
                   <Trash2 className="size-3.5" />
                 </Button>
