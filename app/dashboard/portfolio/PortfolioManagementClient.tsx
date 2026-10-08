@@ -22,9 +22,7 @@ import { getServices, type ServiceOffering } from "@/services/service.service"
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import { Modal } from "@/components/ui/modal"
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal"
-import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
-import { FileUploadField } from "@/components/forms/FileUploadField"
-import { FilePreview } from "@/components/forms/FilePreview"
+import { MediaListFields } from "@/components/forms/MediaListFields"
 import RichTextEditor from "@/components/editor/RichTextEditor"
 import { toDoc, fromDoc } from "@/lib/richtext"
 import { Button } from "@/components/ui/button"
@@ -33,8 +31,8 @@ const EMPTY_FORM: PortfolioItemFormValues = {
   title: "",
   description: "",
   images: [],
-  video_path: "",
-  video_url: "",
+  video_paths: [],
+  video_urls: [],
   service_id: "",
   sort_order: 0,
   is_active: true,
@@ -120,56 +118,17 @@ function PortfolioForm({
         />
       </div>
 
-      {/* Images — repeatable gallery */}
-      <div>
-        <label className={labelCls}>Images</label>
-        {images.length > 0 && (
-          <div className="grid grid-cols-2 gap-3 mb-3">
-            {images.map((key, i) => (
-              <FilePreview
-                key={`${key}-${i}`}
-                value={key}
-                onClear={() => set("images", images.filter((_, j) => j !== i))}
-              />
-            ))}
-          </div>
-        )}
-        <CroppableFileUploadField
-          key={`${formKey}-img-${images.length}`}
-          folder="portfolio/images"
-          aspect={4 / 3}
-          label="Click to add an image (4:3)"
-          onUploadSuccess={({ key }) => set("images", [...images, key])}
-          onUploadingChange={setUploading}
-        />
-        <p className="text-xs text-zinc-400 mt-1">
-          Add as many as you like — each upload is appended to the gallery.
-        </p>
-      </div>
-
-      <div>
-        <label className={labelCls}>Video file</label>
-        <FileUploadField
-          key={`${formKey}-video`}
-          folder="portfolio/videos"
-          accept="video/*"
-          label="Click to upload a video"
-          existingValue={form.video_path || null}
-          onUploadSuccess={({ key }) => set("video_path", key)}
-          onClear={() => set("video_path", "")}
-          onUploadingChange={setUploading}
-        />
-      </div>
-
-      <div>
-        <label className={labelCls}>Video link</label>
-        <Input
-          className="h-auto py-2"
-          value={form.video_url ?? ""}
-          onChange={(e) => set("video_url", e.target.value)}
-          placeholder="https://youtube.com/watch?v=…"
-        />
-      </div>
+      <MediaListFields
+        folder="portfolio"
+        formKey={formKey}
+        images={images}
+        videos={form.video_paths ?? []}
+        videoUrls={form.video_urls ?? []}
+        onImages={(v) => set("images", v)}
+        onVideos={(v) => set("video_paths", v)}
+        onVideoUrls={(v) => set("video_urls", v)}
+        onUploadingChange={setUploading}
+      />
 
       <label className="flex items-center gap-2 cursor-pointer">
         <input
@@ -276,8 +235,8 @@ export default function PortfolioManagementClient() {
         title:       editing.title,
         description: editing.description ?? "",
         images:      editing.images ?? [],
-        video_path:  editing.video_path ?? "",
-        video_url:   editing.video_url ?? "",
+        video_paths: editing.video_paths ?? [],
+        video_urls:  editing.video_urls ?? [],
         service_id:  editing.service_id ?? "",
         sort_order:  editing.sort_order,
         is_active:   editing.is_active,
@@ -361,7 +320,8 @@ export default function PortfolioManagementClient() {
                   <td className="px-4 py-3 text-zinc-500 hidden sm:table-cell">
                     {[
                       item.images?.length ? `${item.images.length} image${item.images.length !== 1 ? "s" : ""}` : null,
-                      item.video_path || item.video_url ? "video" : null,
+                      item.video_paths?.length || item.video_urls?.length
+        ? `${(item.video_paths?.length ?? 0) + (item.video_urls?.length ?? 0)} video(s)` : null,
                     ].filter(Boolean).join(" · ") || "—"}
                   </td>
                   <td className="px-4 py-3">

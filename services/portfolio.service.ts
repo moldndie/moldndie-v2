@@ -10,6 +10,8 @@ export interface PortfolioItem {
   images: string[]
   video_path: string | null
   video_url: string | null
+  video_paths: string[]
+  video_urls: string[]
   /** null = a general example, shown in the portfolio section on /services */
   service_id: string | null
   sort_order: number
@@ -21,8 +23,8 @@ export interface PortfolioItemFormValues {
   title: string
   description?: string
   images?: string[]
-  video_path?: string
-  video_url?: string
+  video_paths?: string[]
+  video_urls?: string[]
   service_id?: string
   sort_order: number
   is_active: boolean
@@ -41,13 +43,27 @@ function revalidate() {
   revalidatePath("/dashboard/portfolio")
 }
 
+/** Fall back to the legacy single video columns so existing rows keep showing. */
+function normalize(p: PortfolioItem): PortfolioItem {
+  return {
+    ...p,
+    images: p.images ?? [],
+    video_paths: p.video_paths?.length ? p.video_paths : p.video_path ? [p.video_path] : [],
+    video_urls: p.video_urls?.length ? p.video_urls : p.video_url ? [p.video_url] : [],
+  }
+}
+
 function toRow(values: PortfolioItemFormValues) {
+  const video_paths = values.video_paths ?? []
+  const video_urls = (values.video_urls ?? []).filter((u) => u.trim())
   return {
     title:      values.title,
     description: values.description || null,
     images:     values.images ?? [],
-    video_path: values.video_path || null,
-    video_url:  values.video_url || null,
+    video_path: video_paths[0] ?? null,
+    video_url:  video_urls[0] ?? null,
+    video_paths,
+    video_urls,
     service_id: values.service_id || null,
     sort_order: values.sort_order,
     is_active:  values.is_active,
@@ -60,7 +76,7 @@ export async function getPortfolioItems(): Promise<PortfolioItem[]> {
     .select("*")
     .order("sort_order", { ascending: true })
   if (error) throw dbError(error)
-  return (data ?? []) as PortfolioItem[]
+  return ((data ?? []) as PortfolioItem[]).map(normalize)
 }
 
 /** General examples — the portfolio section on /services. Items tied to a
@@ -73,7 +89,7 @@ export async function getActivePortfolioItems(): Promise<PortfolioItem[]> {
     .is("service_id", null)
     .order("sort_order", { ascending: true })
   if (error) throw dbError(error)
-  return (data ?? []) as PortfolioItem[]
+  return ((data ?? []) as PortfolioItem[]).map(normalize)
 }
 
 export async function getPortfolioItemsForService(serviceId: string): Promise<PortfolioItem[]> {
@@ -84,7 +100,7 @@ export async function getPortfolioItemsForService(serviceId: string): Promise<Po
     .eq("service_id", serviceId)
     .order("sort_order", { ascending: true })
   if (error) throw dbError(error)
-  return (data ?? []) as PortfolioItem[]
+  return ((data ?? []) as PortfolioItem[]).map(normalize)
 }
 
 export async function createPortfolioItem(values: PortfolioItemFormValues): Promise<PortfolioItem> {
@@ -95,7 +111,7 @@ export async function createPortfolioItem(values: PortfolioItemFormValues): Prom
     .single()
   if (error) throw dbError(error)
   revalidate()
-  return data as PortfolioItem
+  return normalize(data as PortfolioItem)
 }
 
 export async function updatePortfolioItem(
@@ -110,7 +126,7 @@ export async function updatePortfolioItem(
     .single()
   if (error) throw dbError(error)
   revalidate()
-  return data as PortfolioItem
+  return normalize(data as PortfolioItem)
 }
 
 export async function deletePortfolioItem(id: string): Promise<void> {

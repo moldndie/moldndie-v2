@@ -25,18 +25,10 @@ import { useCourseById, useCourseAccess } from "@/hooks/queries/useCourses"
 import { useAddToCart, useCartHasItem } from "@/hooks/queries/useCart"
 import { cn } from "@/lib/utils"
 import type { CourseLesson } from "@/types"
+import { getYouTubeEmbedUrl } from "@/lib/video"
 import RichTextRenderer from "@/components/editor/RichTextRenderer"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
-
-// ── YouTube embed ──────────────────────────────────────────────
-function getYouTubeEmbedUrl(url: string): string | null {
-  const short = url.match(/youtu\.be\/([^?&]+)/)
-  if (short) return `https://www.youtube.com/embed/${short[1]}?rel=0&modestbranding=1`
-  const long = url.match(/[?&]v=([^&]+)/)
-  if (long) return `https://www.youtube.com/embed/${long[1]}?rel=0&modestbranding=1`
-  return null
-}
 
 // ── Video player ───────────────────────────────────────────────
 function VideoPlayer({ url, onEnded }: { url: string; onEnded?: () => void }) {

@@ -11,6 +11,9 @@ export interface ServiceOffering {
   description: string | null
   highlights?: string[] | null
   image: string | null
+  images: string[]
+  videos: string[]
+  video_urls: string[]
   icon: string | null
   is_active: boolean
   is_egypt_only: boolean
@@ -25,10 +28,42 @@ export interface ServiceOfferingFormValues {
   description?: string
   highlights?: string[]
   image?: string
+  images?: string[]
+  videos?: string[]
+  video_urls?: string[]
   icon?: string
   is_active: boolean
   is_egypt_only: boolean
   sort_order: number
+}
+
+/** Fall back to the legacy single image so existing rows keep showing. */
+function normalize(s: ServiceOffering): ServiceOffering {
+  return {
+    ...s,
+    images: s.images?.length ? s.images : s.image ? [s.image] : [],
+    videos: s.videos ?? [],
+    video_urls: s.video_urls ?? [],
+  }
+}
+
+function toRow(values: ServiceOfferingFormValues) {
+  const images = values.images ?? []
+  return {
+    title:         values.title,
+    slug:          values.slug,
+    tagline:       values.tagline ?? null,
+    description:   values.description ?? null,
+    highlights:    values.highlights ?? [],
+    image:         images[0] ?? "",
+    images,
+    videos:        values.videos ?? [],
+    video_urls:    (values.video_urls ?? []).filter((u) => u.trim()),
+    icon:          values.icon ?? null,
+    is_active:     values.is_active,
+    is_egypt_only: values.is_egypt_only,
+    sort_order:    values.sort_order,
+  }
 }
 
 function dbError(e: unknown): Error {
@@ -45,7 +80,7 @@ export async function getServices(): Promise<ServiceOffering[]> {
     .select("*")
     .order("sort_order", { ascending: true })
   if (error) throw dbError(error)
-  return (data ?? []) as ServiceOffering[]
+  return ((data ?? []) as ServiceOffering[]).map(normalize)
 }
 
 export async function getActiveServices(): Promise<ServiceOffering[]> {
@@ -56,7 +91,7 @@ export async function getActiveServices(): Promise<ServiceOffering[]> {
     .eq("is_active", true)
     .order("sort_order", { ascending: true })
   if (error) throw dbError(error)
-  return (data ?? []) as ServiceOffering[]
+  return ((data ?? []) as ServiceOffering[]).map(normalize)
 }
 
 /** Active service for the public /services/[slug] page. null when missing. */
@@ -69,7 +104,7 @@ export async function getActiveServiceBySlug(slug: string): Promise<ServiceOffer
     .eq("is_active", true)
     .maybeSingle()
   if (error) throw dbError(error)
-  return (data as ServiceOffering | null) ?? null
+  return data ? normalize(data as ServiceOffering) : null
 }
 
 export async function getServiceById(id: string): Promise<ServiceOffering> {
@@ -80,56 +115,34 @@ export async function getServiceById(id: string): Promise<ServiceOffering> {
     .eq("id", id)
     .single()
   if (error) throw dbError(error)
-  return data as ServiceOffering
+  return normalize(data as ServiceOffering)
 }
 
 export async function createService(values: ServiceOfferingFormValues): Promise<ServiceOffering> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from("services")
-    .insert({
-      title:         values.title,
-      slug:          values.slug,
-      tagline:       values.tagline ?? null,
-      description:   values.description ?? null,
-      highlights:    values.highlights ?? [],
-      image:         values.image ?? null,
-      icon:          values.icon ?? null,
-      is_active:     values.is_active,
-      is_egypt_only: values.is_egypt_only,
-      sort_order:    values.sort_order,
-    })
+    .insert(toRow(values))
     .select()
     .single()
   if (error) throw dbError(error)
   revalidatePath("/services")
   revalidatePath("/dashboard/services")
-  return data as ServiceOffering
+  return normalize(data as ServiceOffering)
 }
 
 export async function updateService(id: string, values: ServiceOfferingFormValues): Promise<ServiceOffering> {
   const supabase = createAdminClient()
   const { data, error } = await supabase
     .from("services")
-    .update({
-      title:         values.title,
-      slug:          values.slug,
-      tagline:       values.tagline ?? null,
-      description:   values.description ?? null,
-      highlights:    values.highlights ?? [],
-      image:         values.image ?? null,
-      icon:          values.icon ?? null,
-      is_active:     values.is_active,
-      is_egypt_only: values.is_egypt_only,
-      sort_order:    values.sort_order,
-    })
+    .update(toRow(values))
     .eq("id", id)
     .select()
     .single()
   if (error) throw dbError(error)
   revalidatePath("/services")
   revalidatePath("/dashboard/services")
-  return data as ServiceOffering
+  return normalize(data as ServiceOffering)
 }
 
 export async function toggleServiceActive(id: string, is_active: boolean): Promise<void> {

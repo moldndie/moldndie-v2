@@ -18,7 +18,7 @@ import {
 import { QUERY_KEYS } from "@/lib/queryKeys"
 import { Modal } from "@/components/ui/modal"
 import { DeleteConfirmModal } from "@/components/modals/DeleteConfirmModal"
-import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
+import { MediaListFields } from "@/components/forms/MediaListFields"
 import IconPicker from "@/components/dashboard/IconPicker"
 import RichTextEditor from "@/components/editor/RichTextEditor"
 import { toDoc, fromDoc } from "@/lib/richtext"
@@ -36,7 +36,9 @@ const EMPTY_FORM: ServiceOfferingFormValues = {
   tagline: "",
   description: "",
   highlights: [""],
-  image: "",
+  images: [],
+  videos: [],
+  video_urls: [],
   icon: "",
   is_active: true,
   is_egypt_only: true,
@@ -58,7 +60,7 @@ function ServiceForm({
 }) {
   const [form, setForm] = useState<ServiceOfferingFormValues>(initial)
   const [imageUploading, setImageUploading] = useState(false)
-  // formKey remounts the upload field when form resets (edit → create switch)
+  // remounts the upload fields when form resets (edit → create switch)
   const [uploadKey, setUploadKey] = useState(0)
   const isNew = !initial.title
 
@@ -167,20 +169,17 @@ function ServiceForm({
         </div>
       </div>
 
-      {/* Image upload — 4:3 */}
-      <div>
-        <label className={labelCls}>Service Image (4:3)</label>
-        <CroppableFileUploadField
-          key={`service-img-${uploadKey}`}
-          folder="services/images"
-          aspect={4 / 3}
-          label="Click to upload service image (4:3)"
-          existingValue={form.image || null}
-          onUploadSuccess={({ url }) => set("image", url)}
-          onClear={() => set("image", "")}
-          onUploadingChange={setImageUploading}
-        />
-      </div>
+      <MediaListFields
+        folder="services"
+        formKey={`service-${uploadKey}`}
+        images={form.images ?? []}
+        videos={form.videos ?? []}
+        videoUrls={form.video_urls ?? []}
+        onImages={(v) => set("images", v)}
+        onVideos={(v) => set("videos", v)}
+        onVideoUrls={(v) => set("video_urls", v)}
+        onUploadingChange={setImageUploading}
+      />
 
       {/* Icon picker */}
       <div>
@@ -338,7 +337,9 @@ export default function ServicesManagementClient() {
         tagline:       editingService.tagline ?? "",
         description:   editingService.description ?? "",
         highlights:    (editingService.highlights ?? []).length > 0 ? editingService.highlights! : [""],
-        image:         editingService.image ?? "",
+        images:        editingService.images ?? [],
+        videos:        editingService.videos ?? [],
+        video_urls:    editingService.video_urls ?? [],
         icon:          editingService.icon ?? "",
         is_active:     editingService.is_active,
         is_egypt_only: editingService.is_egypt_only,

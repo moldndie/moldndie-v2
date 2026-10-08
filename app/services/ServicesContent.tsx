@@ -14,6 +14,7 @@ import {
   Mail,
 } from "lucide-react"
 import Image from "next/image"
+import { mediaUrl } from "@/lib/video"
 import Link from "next/link"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { docToText } from "@/lib/richtext"
@@ -58,9 +59,9 @@ function ServiceCard({ service }: { service: ServiceOffering }) {
       className="group flex flex-col flex-1 rounded-2xl overflow-hidden border border-zinc-100 bg-white shadow-sm hover:shadow-md transition-all duration-200"
     >
       <div className="aspect-video relative bg-white overflow-hidden">
-        {service.image ? (
+        {service.images[0] ? (
           <Image
-            src={service.image}
+            src={mediaUrl(service.images[0])}
             alt={service.title}
             fill
             className="object-contain group-hover:scale-105 transition-transform duration-300"
