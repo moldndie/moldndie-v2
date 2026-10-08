@@ -36,6 +36,8 @@ export type SiteSettingKey =
   | "logo_navbar"
   | "logo_footer"
   | "logo_favicon"
+  | "hero_autoplay_seconds"
+  | "ads_autoplay_seconds"
 
 export type SiteSettings = Partial<Record<SiteSettingKey, string>>
 

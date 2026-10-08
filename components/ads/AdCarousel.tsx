@@ -7,7 +7,6 @@ import { getFileUrl } from "@/lib/utils"
 import { AdViewTracker } from "./AdViewTracker"
 import type { Ad } from "@/types"
 
-const AUTOPLAY_MS = 4000
 const SLIDE_MS = 600
 const GAP_PX = 16
 
@@ -54,7 +53,7 @@ function CardBody({ ad }: { ad: Ad }) {
  * (no transition) to the identical real card, so the loop has no visible seam.
  * Independent of the listing above — pagination/filtering never moves it.
  */
-export function AdCarousel({ ads, className }: { ads: Ad[]; className?: string }) {
+export function AdCarousel({ ads, className, autoplaySeconds = 4 }: { ads: Ad[]; className?: string; autoplaySeconds?: number }) {
   const [perView, setPerView] = useState(1)
   const [offset, setOffset] = useState(0) // steps from the first real card
   const [animate, setAnimate] = useState(true)
@@ -84,9 +83,9 @@ export function AdCarousel({ ads, className }: { ads: Ad[]; className?: string }
 
   useEffect(() => {
     if (!loop || paused) return
-    const id = setInterval(() => step(1), AUTOPLAY_MS)
+    const id = setInterval(() => step(1), autoplaySeconds * 1000)
     return () => clearInterval(id)
-  }, [loop, paused, step])
+  }, [loop, paused, step, autoplaySeconds])
 
   // Landed on a clone → jump to its twin without animating.
   function onTransitionEnd(e: React.TransitionEvent<HTMLDivElement>) {

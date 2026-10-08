@@ -4,6 +4,7 @@ import Link from "next/link"
 import { useState, useEffect, useRef } from "react"
 import { motion, useInView, type Variants } from "framer-motion"
 import { buttonVariants } from "@/components/ui/button"
+import { clampSeconds } from "@/lib/autoplay"
 import HeroCarousel from "@/components/home/HeroCarousel"
 import type { HeroSlide } from "@/services/heroSlides.service"
 import type { HomeOfferItem } from "@/services/homeOfferItems.service"
@@ -236,7 +237,7 @@ export default function HomeClient({
     <main className="flex-1">
       {/* ── Hero ── */}
       {validSlides.length > 0 ? (
-        <HeroCarousel slides={validSlides} />
+        <HeroCarousel slides={validSlides} autoplaySeconds={clampSeconds(settings.hero_autoplay_seconds, 10)} />
       ) : (
         <section className="text-center px-6 pt-20 pb-12 max-w-4xl mx-auto">
           <motion.div
