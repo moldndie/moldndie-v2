@@ -11,7 +11,7 @@ import { displayPrice, formatPrice } from "@/lib/currency"
 
 const R2_BASE = process.env.NEXT_PUBLIC_R2_BASE_URL ?? ""
 
-export default function CartClient() {
+export default function CartClient({ showLibrary = true, showAcademy = true }: { showLibrary?: boolean; showAcademy?: boolean }) {
   const { data: items = [], isLoading } = useCart()
   const removeItem = useRemoveFromCart()
   const clearCart = useClearCart()
@@ -71,20 +71,23 @@ export default function CartClient() {
       <div className="flex flex-col items-center justify-center py-32 text-center px-6">
         <ShoppingCart size={56} className="text-zinc-200 mb-4" strokeWidth={1} />
         <p className="text-zinc-700 font-semibold text-lg">Your cart is empty</p>
-        <p className="text-zinc-400 text-sm mt-1">Browse the library or academy to add items.</p>
         <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <Link
-            href="/molds"
-            className="inline-block bg-primary text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            Browse Library
-          </Link>
-          <Link
-            href="/courses"
-            className="inline-block bg-primary text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            Browse Academy
-          </Link>
+          {showLibrary && (
+            <Link
+              href="/molds"
+              className="inline-block bg-primary text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              Browse Library
+            </Link>
+          )}
+          {showAcademy && (
+            <Link
+              href="/courses"
+              className="inline-block bg-primary text-white text-sm font-semibold px-6 py-3 rounded-lg hover:bg-primary/90 transition-colors"
+            >
+              Browse Academy
+            </Link>
+          )}
         </div>
       </div>
     )

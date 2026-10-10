@@ -2,23 +2,14 @@
 
 import Link from "next/link"
 import { usePathname } from "next/navigation"
+import type { SiteModule } from "@/lib/modules"
 
-const navLinks = [
-  { label: "Blog",        href: "/blogs" },
-  { label: "Library",     href: "/molds" },
-  { label: "Academy",     href: "/courses" },
-  { label: "Events",      href: "/events" },
-  { label: "Suppliers",   href: "/suppliers" },
-  { label: "Engineering", href: "/tools" },
-  { label: "Services",    href: "/services" },
-]
-
-export default function NavbarLinks() {
+export default function NavbarLinks({ links }: { links: SiteModule[] }) {
   const pathname = usePathname()
 
   return (
     <nav className="hidden md:flex items-center gap-8">
-      {navLinks.map((link) => {
+      {links.map((link) => {
         const isActive = pathname === link.href || pathname.startsWith(link.href + "/")
         return (
           <Link

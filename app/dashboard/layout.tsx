@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server"
 import { getCurrentUser, isAdmin } from "@/services/auth.service"
 import { redirect } from "next/navigation"
 import DashboardLayout from "@/components/dashboard/DashboardLayout"
+import { getDisabledModules } from "@/services/siteSettings.service"
 
 export default async function AdminDashboardLayout({ children }: { children: React.ReactNode }) {
   const user = await getCurrentUser()
@@ -21,6 +22,7 @@ export default async function AdminDashboardLayout({ children }: { children: Rea
 
   return (
     <DashboardLayout
+      disabledModules={await getDisabledModules()}
       user={{
         email: user.email,
         displayName,

@@ -10,15 +10,16 @@ interface DashboardLayoutProps {
     email?: string
     displayName?: string | null
   }
+  disabledModules?: string[]
   children: React.ReactNode
 }
 
-export default function DashboardLayout({ user, children }: DashboardLayoutProps) {
+export default function DashboardLayout({ user, disabledModules = [], children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false)
 
   return (
     <div className="flex h-screen overflow-hidden bg-zinc-50">
-      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <Sidebar open={sidebarOpen} onClose={() => setSidebarOpen(false)} disabledModules={disabledModules} />
 
       <div className="flex flex-1 flex-col min-w-0 overflow-hidden">
         <TopNavbar user={user} onMenuClick={() => setSidebarOpen(true)} />

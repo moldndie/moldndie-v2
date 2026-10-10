@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { Award, Layers, TrendingUp, GitBranch } from "lucide-react"
 import { getSiteSettings } from "@/services/siteSettings.service"
+import { enabledModules, parseDisabled } from "@/lib/modules"
 
 export const metadata: Metadata = {
   title: "About Us | MoldNdie",
@@ -43,9 +44,12 @@ const offerings = [
 
 export default async function AboutPage() {
   let contactEmail = "moldndie.eg@gmail.com"
+  let visibleOfferings = offerings
   try {
     const settings = await getSiteSettings()
     if (settings.contact_email) contactEmail = settings.contact_email
+    const labels = enabledModules(parseDisabled(settings.disabled_modules)).map((m) => m.label)
+    visibleOfferings = offerings.filter((o) => labels.includes(o.label))
   } catch {
     // graceful fallback
   }
@@ -155,7 +159,7 @@ export default async function AboutPage() {
               What We Offer
             </h2>
             <ul className="space-y-4">
-              {offerings.map(({ label, desc }) => (
+              {visibleOfferings.map(({ label, desc }) => (
                 <li key={label} className="flex gap-3">
                   <span className="mt-1.5 shrink-0 w-1.5 h-1.5 rounded-full bg-primary" />
                   <span className="text-zinc-600 text-sm leading-relaxed">

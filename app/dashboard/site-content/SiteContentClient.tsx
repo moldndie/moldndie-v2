@@ -10,6 +10,8 @@ import { Save, Phone, Mail, MapPin, Clock, Globe, MessageCircle, Share2, Type, B
 import { upsertSiteSettings } from "@/services/siteSettings.service"
 import type { SiteSettings } from "@/services/siteSettings.service"
 import { CroppableFileUploadField } from "@/components/forms/CroppableFileUploadField"
+import { Switch } from "@/components/ui/switch"
+import { MODULES, parseDisabled } from "@/lib/modules"
 
 const TABS = [
   { id: "contact",  label: "Contact Info" },
@@ -18,7 +20,11 @@ const TABS = [
   { id: "counters", label: "Counters" },
   { id: "timing",   label: "Display timing" },
   { id: "branding", label: "Branding" },
+  { id: "modules",  label: "Modules" },
 ] as const
+
+// Homepage isn't a module in the nav, but it's listed so it's clear it can't be switched off.
+const MODULE_ROWS = [{ key: "home", label: "Homepage", href: "/", locked: true }, ...MODULES]
 
 type TabId = (typeof TABS)[number]["id"]
 
@@ -103,6 +109,12 @@ export default function SiteContentClient({ initialSettings }: Props) {
   }
 
   const v = (key: keyof SiteSettings) => settings[key] ?? ""
+
+  const disabledModules = parseDisabled(settings.disabled_modules)
+  function setModuleEnabled(key: string, enabled: boolean) {
+    const next = enabled ? disabledModules.filter((k) => k !== key) : [...disabledModules, key]
+    handleChange("disabled_modules", next.join(","))
+  }
 
   return (
     <div className="space-y-6">
@@ -550,6 +562,35 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 placeholder="30+"
               />
             </div>
+          </div>
+        )}
+
+        {activeTab === "modules" && (
+          <div className="space-y-5">
+            <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">Modules</h3>
+            <p className="text-xs text-zinc-400">
+              Switch a module off to remove it from the public site — navbar, footer, homepage and its own pages (they return &ldquo;not found&rdquo;).
+              Nothing is deleted: its content stays manageable here and comes back when you switch it on again. Save to apply.
+            </p>
+            <ul className="divide-y divide-zinc-100 rounded-xl border border-zinc-200">
+              {MODULE_ROWS.map((m) => {
+                const enabled = !disabledModules.includes(m.key)
+                return (
+                  <li key={m.key} className="flex items-center justify-between gap-4 px-4 py-3">
+                    <div>
+                      <p className="text-sm font-medium text-zinc-900">{m.label}</p>
+                      <p className="text-xs text-zinc-400">{m.locked ? "Always on" : m.href}</p>
+                    </div>
+                    <Switch
+                      checked={enabled}
+                      onCheckedChange={(on) => setModuleEnabled(m.key, on)}
+                      disabled={m.locked}
+                      aria-label={`${m.label} module`}
+                    />
+                  </li>
+                )
+              })}
+            </ul>
           </div>
         )}
       </div>

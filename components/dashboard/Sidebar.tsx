@@ -33,22 +33,24 @@ interface NavItem {
   href: string
   icon: React.ElementType
   exact?: boolean
+  /** Public module this section manages (key in lib/modules) — tagged "Off" when it's switched off. */
+  module?: string
   children?: NavChild[]
 }
 
 const navItems: NavItem[] = [
   { label: "Dashboard",        href: "/dashboard",                   icon: LayoutDashboard, exact: true },
   { label: "Blog",             href: "/dashboard/blogs",             icon: FileText },
-  { label: "Library",          href: "/dashboard/molds",             icon: Package },
-  { label: "Academy",          href: "/dashboard/courses",           icon: BookOpen },
-  { label: "Events",           href: "/dashboard/events",            icon: Calendar },
-  { label: "Suppliers",        href: "/dashboard/suppliers",         icon: Truck },
+  { label: "Library",          href: "/dashboard/molds",             icon: Package,  module: "molds" },
+  { label: "Academy",          href: "/dashboard/courses",           icon: BookOpen, module: "courses" },
+  { label: "Events",           href: "/dashboard/events",            icon: Calendar, module: "events" },
+  { label: "Suppliers",        href: "/dashboard/suppliers",         icon: Truck,    module: "suppliers" },
   { label: "Ads",              href: "/dashboard/ads",               icon: Megaphone },
   { label: "Users",            href: "/dashboard/users",             icon: Users },
-{ label: "Service Requests", href: "/dashboard/service-requests",  icon: Inbox },
-  { label: "Services",         href: "/dashboard/services",          icon: Briefcase },
-  { label: "Service Examples", href: "/dashboard/portfolio",         icon: FolderKanban },
-  { label: "Engineering Tools", href: "/dashboard/calculators",       icon: Calculator },
+  { label: "Service Requests", href: "/dashboard/service-requests",  icon: Inbox,        module: "services" },
+  { label: "Services",         href: "/dashboard/services",          icon: Briefcase,    module: "services" },
+  { label: "Service Examples", href: "/dashboard/portfolio",         icon: FolderKanban, module: "services" },
+  { label: "Engineering Tools", href: "/dashboard/calculators",      icon: Calculator,   module: "tools" },
   {
     label: "Homepage",
     href: "/dashboard/homepage/hero-carousel",
@@ -73,9 +75,10 @@ const navItems: NavItem[] = [
 interface SidebarProps {
   open: boolean
   onClose: () => void
+  disabledModules?: string[]
 }
 
-export default function Sidebar({ open, onClose }: SidebarProps) {
+export default function Sidebar({ open, onClose, disabledModules = [] }: SidebarProps) {
   const pathname = usePathname()
 
   function isActive(href: string, exact?: boolean) {
@@ -179,6 +182,11 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               >
                 <Icon className="size-4 shrink-0" />
                 {item.label}
+                {item.module && disabledModules.includes(item.module) && (
+                  <span className="ml-auto rounded-full border border-current px-1.5 text-[10px] font-semibold uppercase leading-4 opacity-60">
+                    Off
+                  </span>
+                )}
               </Link>
             )
           })}

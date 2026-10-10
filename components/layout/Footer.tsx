@@ -4,16 +4,7 @@ import { Phone, Mail, MapPin, Clock, MessageCircle, Youtube, Facebook, Instagram
 import { getSiteSettings } from "@/services/siteSettings.service"
 import type { SiteSettings } from "@/services/siteSettings.service"
 import { CookieSettingsButton } from "@/components/layout/CookieSettingsButton"
-
-const pages = [
-  { label: "Blog",              href: "/blogs" },
-  { label: "Library",           href: "/molds" },
-  { label: "Academy",           href: "/courses" },
-  { label: "Events",            href: "/events" },
-  { label: "Suppliers",         href: "/suppliers" },
-  { label: "Engineering",       href: "/tools" },
-  { label: "Services",          href: "/services" },
-]
+import { enabledModules, parseDisabled } from "@/lib/modules"
 
 const company = [
   { label: "About Us",       href: "/about" },
@@ -83,6 +74,7 @@ export default async function Footer() {
   }
 
   const s = settings as Record<string, string>
+  const pages = enabledModules(parseDisabled(settings.disabled_modules))
 
   const socialLinks = [
     { icon: Linkedin,      href: s.social_linkedin,  label: "LinkedIn",  hoverClass: "hover:text-[#0A66C2]" },

@@ -5,18 +5,9 @@ import { useState } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
+import type { SiteModule } from "@/lib/modules"
 
-const navLinks = [
-  { label: "Blog",        href: "/blogs" },
-  { label: "Library",     href: "/molds" },
-  { label: "Academy",     href: "/courses" },
-  { label: "Events",      href: "/events" },
-  { label: "Suppliers",   href: "/suppliers" },
-  { label: "Engineering", href: "/tools" },
-  { label: "Services",    href: "/services" },
-]
-
-export default function NavbarMobileMenu() {
+export default function NavbarMobileMenu({ links }: { links: SiteModule[] }) {
   const [open, setOpen] = useState(false)
   const pathname = usePathname()
 
@@ -33,7 +24,7 @@ export default function NavbarMobileMenu() {
 
       {open && (
         <div className="absolute left-0 right-0 top-16 z-40 bg-white border-b border-zinc-100 shadow-sm px-6 py-4 flex flex-col gap-1">
-          {navLinks.map((link) => {
+          {links.map((link) => {
             const isActive = pathname === link.href || pathname.startsWith(link.href + "/")
             return (
               <Link
