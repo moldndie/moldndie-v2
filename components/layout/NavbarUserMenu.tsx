@@ -34,7 +34,7 @@ function CartButton() {
   )
 }
 
-export default function NavbarUserMenu() {
+export default function NavbarUserMenu({ showMyCourses = true }: { showMyCourses?: boolean }) {
   const router = useRouter()
   const supabase = createClient()
 
@@ -150,14 +150,16 @@ export default function NavbarUserMenu() {
               <UserCircle className="size-4 text-zinc-400" />
               My Profile
             </Link>
-            <Link
-              href="/my-courses"
-              onClick={() => setOpen(false)}
-              className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors"
-            >
-              <GraduationCap className="size-4 text-zinc-400" />
-              My Courses
-            </Link>
+            {showMyCourses && (
+              <Link
+                href="/my-courses"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-2 text-sm text-zinc-700 hover:bg-primary hover:text-primary-foreground transition-colors"
+              >
+                <GraduationCap className="size-4 text-zinc-400" />
+                My Courses
+              </Link>
+            )}
             <Link
               href="/purchases"
               onClick={() => setOpen(false)}

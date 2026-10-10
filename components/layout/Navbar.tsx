@@ -5,15 +5,20 @@ import NavbarMobileMenu from "@/components/layout/NavbarMobileMenu";
 import NavbarLinks from "@/components/layout/NavbarLinks";
 import { CurrencySelector } from "@/components/layout/CurrencySelector";
 import { getSiteSettings } from "@/services/siteSettings.service";
+import { enabledModules, parseDisabled } from "@/lib/modules";
 
 export default async function Navbar() {
   let navbarLogoSrc = "/assets/logo-black-updated.png";
+  let disabled: string[] = [];
   try {
     const settings = await getSiteSettings();
     if (settings.logo_navbar) navbarLogoSrc = settings.logo_navbar;
+    disabled = parseDisabled(settings.disabled_modules);
   } catch {
     // fall back to static asset
   }
+
+  const links = enabledModules(disabled);
 
   return (
     <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-zinc-100">
@@ -24,13 +29,13 @@ export default async function Navbar() {
         </Link>
 
         {/* Desktop nav links */}
-        <NavbarLinks />
+        <NavbarLinks links={links} />
 
         {/* Right side: currency + mobile menu + auth */}
         <div className="flex items-center gap-2">
           <CurrencySelector />
-          <NavbarMobileMenu />
-          <NavbarUserMenu />
+          <NavbarMobileMenu links={links} />
+          <NavbarUserMenu showMyCourses={!disabled.includes("courses")} />
         </div>
       </div>
     </header>

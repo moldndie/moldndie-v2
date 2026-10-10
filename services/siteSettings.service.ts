@@ -2,6 +2,8 @@
 
 import { createAdminClient } from "@/lib/supabase/admin"
 import { revalidatePath, unstable_noStore as noStore } from "next/cache"
+import { notFound } from "next/navigation"
+import { parseDisabled } from "@/lib/modules"
 
 export type SiteSettingKey =
   | "contact_phone"
@@ -38,6 +40,7 @@ export type SiteSettingKey =
   | "logo_favicon"
   | "hero_autoplay_seconds"
   | "ads_autoplay_seconds"
+  | "disabled_modules"
 
 export type SiteSettings = Partial<Record<SiteSettingKey, string>>
 
@@ -63,6 +66,20 @@ export async function getSiteSettings(): Promise<SiteSettings> {
     result[row.setting_key as SiteSettingKey] = typeof v === "string" ? v : v != null ? String(v) : ""
   }
   return result
+}
+
+/** Module keys switched off in Site Content → Modules. Fails open: a settings outage must not take the site down. */
+export async function getDisabledModules(): Promise<string[]> {
+  try {
+    return parseDisabled((await getSiteSettings()).disabled_modules)
+  } catch {
+    return []
+  }
+}
+
+/** 404s the current route when the module is switched off. */
+export async function requireModule(key: string): Promise<void> {
+  if ((await getDisabledModules()).includes(key)) notFound()
 }
 
 export async function upsertSiteSetting(key: SiteSettingKey, value: string): Promise<void> {

@@ -15,6 +15,7 @@ import type { HeroSlide } from "@/services/heroSlides.service"
 import type { HomeOfferItem } from "@/services/homeOfferItems.service"
 import type { HomeWhyCard } from "@/services/homeWhyCards.service"
 import type { SiteSettings } from "@/services/siteSettings.service"
+import { isHrefEnabled, parseDisabled } from "@/lib/modules"
 
 export const metadata: Metadata = {
   title: "MoldNdie — Mold & Die Design Resources",
@@ -39,15 +40,23 @@ export default async function HomePage() {
     getMemberCount().then((n)        => { memberCount  = n }).catch(() => {}),
   ])
 
+  // Modules switched off in Site Content → Modules leave no trace here:
+  // their offer cards, hero buttons and counters all go.
+  const disabled = parseDisabled(settings.disabled_modules)
+  const on = (href: string | null) => !href || isHrefEnabled(href, disabled)
+  offerItems = offerItems.filter((o) => on(o.button_url))
+  heroSlides = heroSlides.map((s) => (on(s.button_link) ? s : { ...s, button_text: null, button_link: null }))
+  const off = (key: string) => disabled.includes(key)
+
   // Editable in Site Content → Counters. A blank field is never hidden: it
   // falls back to the real number, then to the default shown in the admin form.
   const pick = (custom: string | undefined, actual: number, def: string) =>
     custom?.trim() || (actual > 0 ? actual.toLocaleString() : def)
   const counters = {
     blog:     pick(settings.counter_blog,     real.blog,     "100+"),
-    toolings: pick(settings.counter_toolings, real.toolings, "200+"),
-    courses:  pick(settings.counter_courses,  real.courses,  "50+"),
-    events:   pick(settings.counter_events,   real.events,   "30+"),
+    toolings: off("molds")   ? "" : pick(settings.counter_toolings, real.toolings, "200+"),
+    courses:  off("courses") ? "" : pick(settings.counter_courses,  real.courses,  "50+"),
+    events:   off("events")  ? "" : pick(settings.counter_events,   real.events,   "30+"),
     users:    pick(settings.counter_users,    memberCount,   "1,000+"),
   }
 
