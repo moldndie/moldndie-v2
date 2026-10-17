@@ -515,7 +515,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
           <div className="space-y-5">
             <h3 className="text-sm font-bold text-zinc-900 uppercase tracking-wide">Social Proof Counters</h3>
             <p className="text-xs text-zinc-400">
-              These numbers are displayed on the homepage. Leave a field blank to show the real number (or the default shown in the field) — it is never hidden.
+              These numbers are displayed on the homepage. Leave a field blank to show the real number — it is never hidden.
               Use a suffix like &ldquo;+&rdquo; (e.g. &ldquo;500+&rdquo;) or an exact number.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
@@ -525,7 +525,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 name="counter_blog"
                 value={v("counter_blog")}
                 onChange={handleChange}
-                placeholder="100+"
+                placeholder="Blank = real count"
               />
               <Field
                 label="Library Toolings"
@@ -533,7 +533,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 name="counter_toolings"
                 value={v("counter_toolings")}
                 onChange={handleChange}
-                placeholder="200+"
+                placeholder="Blank = real count"
                 hint="e.g. number of 3D files & PDFs"
               />
               <Field
@@ -542,7 +542,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 name="counter_courses"
                 value={v("counter_courses")}
                 onChange={handleChange}
-                placeholder="50+"
+                placeholder="Blank = real count"
               />
               <Field
                 label="Registered Users"
@@ -550,8 +550,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 name="counter_users"
                 value={v("counter_users")}
                 onChange={handleChange}
-                placeholder="1,000+"
-                hint="Blank = real number of registered members"
+                placeholder="Blank = real count"
               />
               <Field
                 label="Industry Events"
@@ -559,7 +558,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 name="counter_events"
                 value={v("counter_events")}
                 onChange={handleChange}
-                placeholder="30+"
+                placeholder="Blank = real count"
               />
             </div>
           </div>
