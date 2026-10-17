@@ -95,7 +95,7 @@ export function ListingFiltersBar({
         <Select
           value={sortValue}
           onChange={(e) => onSortChange(e.target.value)}
-          className="w-full sm:w-44 shrink-0"
+          className="w-full sm:w-56 shrink-0"
         >
           {sortOptions.map((o) => (
             <option key={o.value} value={o.value}>{o.label}</option>

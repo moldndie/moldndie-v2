@@ -49,15 +49,15 @@ export default async function HomePage() {
   const off = (key: string) => disabled.includes(key)
 
   // Editable in Site Content → Counters. A blank field is never hidden: it
-  // falls back to the real number, then to the default shown in the admin form.
-  const pick = (custom: string | undefined, actual: number, def: string) =>
-    custom?.trim() || (actual > 0 ? actual.toLocaleString() : def)
+  // shows the real number (no made-up defaults — they read as fake).
+  const pick = (custom: string | undefined, actual: number) =>
+    custom?.trim() || actual.toLocaleString()
   const counters = {
-    blog:     pick(settings.counter_blog,     real.blog,     "100+"),
-    toolings: off("molds")   ? "" : pick(settings.counter_toolings, real.toolings, "200+"),
-    courses:  off("courses") ? "" : pick(settings.counter_courses,  real.courses,  "50+"),
-    events:   off("events")  ? "" : pick(settings.counter_events,   real.events,   "30+"),
-    users:    pick(settings.counter_users,    memberCount,   "1,000+"),
+    blog:     pick(settings.counter_blog,     real.blog),
+    toolings: off("molds")   ? "" : pick(settings.counter_toolings, real.toolings),
+    courses:  off("courses") ? "" : pick(settings.counter_courses,  real.courses),
+    events:   off("events")  ? "" : pick(settings.counter_events,   real.events),
+    users:    pick(settings.counter_users,    memberCount),
   }
 
   return (
