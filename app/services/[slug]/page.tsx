@@ -7,10 +7,9 @@ import Navbar from "@/components/layout/Navbar"
 import Footer from "@/components/layout/Footer"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import RichTextRenderer from "@/components/editor/RichTextRenderer"
-import PortfolioSection from "../PortfolioSection"
 import MediaGallery from "@/components/services/MediaGallery"
 import { getActiveServiceBySlug } from "@/services/service.service"
-import { getPortfolioItemsForService } from "@/services/portfolio.service"
+import { getActivePortfolioItems } from "@/services/portfolio.service"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
 import { docToText } from "@/lib/richtext"
 
@@ -34,7 +33,7 @@ export default async function ServiceDetailPage({ params }: Props) {
   const service = await getActiveServiceBySlug(slug).catch(() => null)
   if (!service) notFound()
 
-  const portfolio = await getPortfolioItemsForService(service.id).catch(() => [])
+  const portfolio = (await getActivePortfolioItems().catch(() => [])).filter((p) => p.service_id === service.id)
   // Blank entries in the repeater would otherwise render as a bare tick icon.
   const highlights = (service.highlights ?? []).filter((h) => h.trim())
 
@@ -95,7 +94,16 @@ export default async function ServiceDetailPage({ params }: Props) {
           </div>
         </div>
 
-        <PortfolioSection items={portfolio} heading="Examples" />
+        {portfolio.length > 0 && (
+          <div className="max-w-7xl mx-auto px-6 pb-10">
+            <Link
+              href={`/services/case-studies?service=${service.slug}`}
+              className="text-sm font-bold uppercase tracking-wider text-primary hover:underline"
+            >
+              View case studies &rarr;
+            </Link>
+          </div>
+        )}
 
         <div className="max-w-7xl mx-auto px-6 pb-12">
           <hr className="border-zinc-100 mb-8" />

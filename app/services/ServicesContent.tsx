@@ -100,7 +100,7 @@ function ServiceCard({ service }: { service: ServiceOffering }) {
           </ul>
         )}
         <span className="mt-auto pt-2 text-xs font-bold uppercase tracking-wider text-primary">
-          View examples &rarr;
+          View details &rarr;
         </span>
       </div>
     </Link>

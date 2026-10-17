@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 }
 
 export default async function ServicesPage() {
-  const [services, portfolio, processSteps] = await Promise.all([
+  const [services, caseStudies, processSteps] = await Promise.all([
     getActiveServices(),
     getActivePortfolioItems().catch(() => []),
     getActiveProcessSteps().catch(() => []),
@@ -26,7 +26,11 @@ export default async function ServicesPage() {
       <Navbar />
       <main className="flex-1">
         <ServicesContent services={services} processSteps={processSteps} />
-        <PortfolioSection items={portfolio} />
+        <PortfolioSection
+          items={caseStudies.slice(0, 4)}
+          services={Object.fromEntries(services.map((s) => [s.id, s.title]))}
+          viewAllHref="/services/case-studies"
+        />
         <div className="max-w-7xl mx-auto px-6 pb-12">
           <hr className="border-zinc-100 mb-8" />
           <Suspense fallback={null}>
