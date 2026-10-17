@@ -97,13 +97,13 @@ function PortfolioForm({
           value={form.service_id ?? ""}
           onChange={(e) => set("service_id", e.target.value)}
         >
-          <option value="">General — show in “Our Work” on /services</option>
+          <option value="">General — no specific service</option>
           {services.map((s) => (
             <option key={s.id} value={s.id}>{s.title}</option>
           ))}
         </Select>
         <p className="text-xs text-zinc-400 mt-1">
-          Pick a service to show this example on that service&apos;s own page instead.
+          Optionally relate this case study to a service (used for filtering).
         </p>
       </div>
 
@@ -163,7 +163,7 @@ function PortfolioForm({
 export default function PortfolioManagementClient() {
   const qc = useQueryClient()
   const router = useRouter()
-  // Opened from a service's "Examples" button → show and add that service's examples.
+  // Opened from a service's "Case Studies" button → show and add that service's case studies.
   const serviceFilter = useSearchParams().get("service") ?? ""
 
   const [createOpen, setCreateOpen] = useState(false)
@@ -256,7 +256,7 @@ export default function PortfolioManagementClient() {
             {services.map((s) => <option key={s.id} value={s.id}>{s.title}</option>)}
           </Select>
           <p className="text-sm text-zinc-500">
-            {items.length} example{items.length !== 1 ? "s" : ""}
+            {items.length} case {items.length === 1 ? "study" : "studies"}
           </p>
         </div>
         <Button size="lg"
@@ -273,8 +273,8 @@ export default function PortfolioManagementClient() {
         </div>
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-24 text-center border-2 border-dashed border-zinc-200 rounded-2xl">
-          <p className="text-zinc-500 font-medium">No examples yet</p>
-          <p className="text-zinc-400 text-sm mt-1">Add the first example — each can have rich text, several images and a video</p>
+          <p className="text-zinc-500 font-medium">No case studies yet</p>
+          <p className="text-zinc-400 text-sm mt-1">Add the first case study — each can have rich text, several images and a video</p>
           <Button variant="link"
             onClick={() => { setFormError(null); setCreateOpen(true) }}
             className="mt-4 h-auto px-0 underline underline-offset-2"
@@ -361,7 +361,7 @@ export default function PortfolioManagementClient() {
       <Modal
         open={createOpen}
         onClose={() => { setCreateOpen(false); setFormError(null) }}
-        title="Add Example"
+        title="Add Case Study"
         size="md"
       >
         <PortfolioForm
@@ -377,7 +377,7 @@ export default function PortfolioManagementClient() {
       <Modal
         open={!!editing}
         onClose={() => { setEditing(null); setFormError(null) }}
-        title="Edit Example"
+        title="Edit Case Study"
         size="md"
       >
         <PortfolioForm

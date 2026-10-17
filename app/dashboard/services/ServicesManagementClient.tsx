@@ -446,9 +446,9 @@ export default function ServicesManagementClient() {
                       <Link
                         href={`/dashboard/portfolio?service=${s.id}`}
                         className="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-medium text-zinc-500 transition-colors hover:bg-primary hover:text-primary-foreground"
-                        title="Examples for this service"
+                        title="Case studies for this service"
                       >
-                        <Images size={14} /> Examples
+                        <Images size={14} /> Case Studies
                       </Link>
                       <Button
                         onClick={() => openEdit(s)}

@@ -49,7 +49,7 @@ const navItems: NavItem[] = [
   { label: "Users",            href: "/dashboard/users",             icon: Users },
   { label: "Service Requests", href: "/dashboard/service-requests",  icon: Inbox,        module: "services" },
   { label: "Services",         href: "/dashboard/services",          icon: Briefcase,    module: "services" },
-  { label: "Service Examples", href: "/dashboard/portfolio",         icon: FolderKanban, module: "services" },
+  { label: "Case Studies", href: "/dashboard/portfolio",         icon: FolderKanban, module: "services" },
   { label: "Engineering Tools", href: "/dashboard/calculators",      icon: Calculator,   module: "tools" },
   {
     label: "Homepage",

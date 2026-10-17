@@ -12,7 +12,7 @@ export interface PortfolioItem {
   video_url: string | null
   video_paths: string[]
   video_urls: string[]
-  /** null = a general example, shown in the portfolio section on /services */
+  /** Optional category: the service this case study relates to */
   service_id: string | null
   sort_order: number
   is_active: boolean
@@ -79,25 +79,12 @@ export async function getPortfolioItems(): Promise<PortfolioItem[]> {
   return ((data ?? []) as PortfolioItem[]).map(normalize)
 }
 
-/** General examples — the portfolio section on /services. Items tied to a
- *  specific service are shown on that service's own page instead. */
+/** Every active case study, in display order. */
 export async function getActivePortfolioItems(): Promise<PortfolioItem[]> {
   const { data, error } = await createAdminClient()
     .from("portfolio_items")
     .select("*")
     .eq("is_active", true)
-    .is("service_id", null)
-    .order("sort_order", { ascending: true })
-  if (error) throw dbError(error)
-  return ((data ?? []) as PortfolioItem[]).map(normalize)
-}
-
-export async function getPortfolioItemsForService(serviceId: string): Promise<PortfolioItem[]> {
-  const { data, error } = await createAdminClient()
-    .from("portfolio_items")
-    .select("*")
-    .eq("is_active", true)
-    .eq("service_id", serviceId)
     .order("sort_order", { ascending: true })
   if (error) throw dbError(error)
   return ((data ?? []) as PortfolioItem[]).map(normalize)
