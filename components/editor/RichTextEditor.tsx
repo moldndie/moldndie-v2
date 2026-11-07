@@ -6,7 +6,7 @@ import Link from "@tiptap/extension-link"
 import Underline from "@tiptap/extension-underline"
 import TextAlign from "@tiptap/extension-text-align"
 import Image from "@tiptap/extension-image"
-import Youtube from "@tiptap/extension-youtube"
+import Youtube, { isValidYoutubeUrl } from "@tiptap/extension-youtube"
 import { Table } from "@tiptap/extension-table"
 import TableRow from "@tiptap/extension-table-row"
 import TableCell from "@tiptap/extension-table-cell"
@@ -17,6 +17,8 @@ import Color from "@tiptap/extension-color"
 import Mathematics from "@tiptap/extension-mathematics"
 import type { Editor } from "@tiptap/core"
 import type { Mark } from "@tiptap/pm/model"
+import type { Transaction } from "@tiptap/pm/state"
+import { Paperclip } from "lucide-react"
 import "katex/dist/katex.min.css"
 import { useEffect, useCallback, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
@@ -26,7 +28,10 @@ import { Button } from "@/components/ui/button"
 import { uploadFileToR2 } from "@/services/upload.service"
 import { ArticleImage, articleImageLayout } from "./article-image"
 import { ArticleImageView } from "./ArticleImageView"
+import { ArticleDocument, ArticleMedia } from "./ArticleMedia"
+import { ArticleDragHandle, dropImageBesideText } from "./article-layout"
 import "./article-image.css"
+import "./article-layout.css"
 
 const EditableArticleImage = ArticleImage.extend({
   addNodeView() {
@@ -78,6 +83,8 @@ interface RichTextEditorProps {
   placeholder?: string
   minHeight?: number
   articleImages?: boolean
+  articleDocument?: boolean
+  onUploadingChange?: (uploading: boolean) => void
 }
 
 export default function RichTextEditor({
@@ -86,6 +93,8 @@ export default function RichTextEditor({
   placeholder = "Start writing…",
   minHeight = 400,
   articleImages = false,
+  articleDocument = false,
+  onUploadingChange,
 }: RichTextEditorProps) {
   const [linkUrl, setLinkUrl] = useState("")
   const [showLinkInput, setShowLinkInput] = useState(false)
@@ -93,6 +102,10 @@ export default function RichTextEditor({
   const [showImageInput, setShowImageInput] = useState(false)
   const [imageError, setImageError] = useState("")
   const [imageUploading, setImageUploading] = useState(false)
+  const [attachmentError, setAttachmentError] = useState("")
+  const attachmentInput = useRef<HTMLInputElement>(null)
+  const uploadInProgress = useRef(false)
+  const editableImages = articleImages || articleDocument
   const [youtubeUrl, setYoutubeUrl] = useState("")
   const [showYoutubeInput, setShowYoutubeInput] = useState(false)
   const [showColorPicker, setShowColorPicker] = useState(false)
@@ -108,11 +121,13 @@ export default function RichTextEditor({
         heading: { levels: [1, 2, 3, 4] },
         link: false,
         underline: false,
+        document: articleDocument ? false : undefined,
       }),
+      ...(articleDocument ? [ArticleDocument, ArticleMedia, ArticleDragHandle] : []),
       Underline,
       Link.configure({ openOnClick: false, HTMLAttributes: { class: "text-primary" } }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
-      articleImages ? EditableArticleImage : Image.configure({ inline: false, allowBase64: false }),
+      editableImages ? EditableArticleImage : Image.configure({ inline: false, allowBase64: false }),
       Youtube.configure({ width: 840, height: 472, nocookie: true }),
       Table.configure({ resizable: true }),
       TableRow,
@@ -130,11 +145,15 @@ export default function RichTextEditor({
       }),
     ],
     content: value ?? undefined,
+    shouldRerenderOnTransaction: articleDocument,
     editorProps: {
       transformPastedHTML: katexToMathNodes,
+      handleDrop: articleDocument ? dropImageBesideText : undefined,
       attributes: {
-        class: "cms-editor focus:outline-none",
-        style: `min-height: ${minHeight}px; padding: 1rem;`,
+        class: cn("cms-editor focus:outline-none", articleDocument && "article-writing-surface"),
+        ...(articleDocument
+          ? { role: "textbox", "aria-label": "Article body", "aria-multiline": "true" }
+          : { style: `min-height: ${minHeight}px; padding: 1rem;` }),
       },
     },
     onUpdate({ editor }) {
@@ -162,7 +181,7 @@ export default function RichTextEditor({
 
   // Sync external value changes (e.g. on page load)
   useEffect(() => {
-    if (!editor || !value) return
+    if (!editor || !value || articleDocument) return
     const current = editor.getJSON()
     if (JSON.stringify(current) !== JSON.stringify(value)) {
       editor.commands.setContent(value as Parameters<typeof editor.commands.setContent>[0])
@@ -184,7 +203,7 @@ export default function RichTextEditor({
   const insertImage = useCallback(() => {
     if (!editor || !imageUrl.trim()) return
     const src = imageUrl.trim()
-    if (articleImages) {
+    if (editableImages) {
       try {
         if (!["http:", "https:"].includes(new URL(src).protocol)) throw new Error()
       } catch {
@@ -198,31 +217,71 @@ export default function RichTextEditor({
     setImageError("")
     setImageUrl("")
     setShowImageInput(false)
-  }, [editor, imageUrl, articleImages])
+  }, [editor, imageUrl, editableImages])
 
-  async function uploadArticleImage(file: File) {
-    if (!file.type.startsWith("image/")) {
+  async function uploadArticleFile(file: File, kind: "image" | "attachment") {
+    if (!editor || uploadInProgress.current) return
+    const setError = kind === "image" ? setImageError : setAttachmentError
+    if (kind === "image" && !file.type.startsWith("image/")) {
       setImageError("Choose an image file.")
       return
     }
-    setImageError("")
+    if (kind === "attachment" && file.size > 100 * 1024 * 1024) {
+      setAttachmentError("Files must be 100 MB or smaller.")
+      return
+    }
+    setError("")
+    uploadInProgress.current = true
     setImageUploading(true)
+    onUploadingChange?.(true)
+    let position = editor.state.selection.to
+    const trackPosition = ({ transaction }: { transaction: Transaction }) => {
+      position = transaction.mapping.map(position)
+    }
+    editor.on("transaction", trackPosition)
     try {
-      const { url } = await uploadFileToR2("blog-images", file)
-      setImageUrl(url)
+      const type = file.type || "application/octet-stream"
+      const upload = file.type ? file : new File([file], file.name, { type })
+      const { key, url } = await uploadFileToR2(kind === "image" ? "blog-images" : "blog-attachments", upload)
+      if (editor.isDestroyed) return
+      if (!articleDocument) {
+        setImageUrl(url)
+        return
+      }
+      const node = kind === "image"
+        ? { type: "image", attrs: { src: url, placement: "block" } }
+        : { type: "articleMedia", attrs: {
+            kind: "file", file_path: key, file_name: file.name, file_type: type, file_size: file.size,
+          } }
+      editor.chain().focus().insertContentAt(position, node).run()
+      if (kind === "image") setShowImageInput(false)
     } catch {
-      setImageError("Image upload failed. Try again or enter an image URL.")
+      setError(kind === "image" ? "Image upload failed. Try again or enter an image URL." : "File upload failed. Try again.")
     } finally {
+      editor.off("transaction", trackPosition)
+      uploadInProgress.current = false
       setImageUploading(false)
+      onUploadingChange?.(false)
     }
   }
 
   const insertYoutube = useCallback(() => {
-    if (!editor || !youtubeUrl) return
-    editor.commands.setYoutubeVideo({ src: youtubeUrl })
+    if (!editor || !youtubeUrl.trim()) return
+    const url = youtubeUrl.trim()
+    if (isValidYoutubeUrl(url) || !articleDocument) {
+      if (!editor.commands.setYoutubeVideo({ src: url })) return
+      editor.commands.focus()
+    } else {
+      try {
+        if (!["http:", "https:"].includes(new URL(url).protocol)) return
+      } catch {
+        return
+      }
+      editor.chain().focus().insertContent({ type: "articleMedia", attrs: { kind: "video", url } }).run()
+    }
     setYoutubeUrl("")
     setShowYoutubeInput(false)
-  }, [editor, youtubeUrl])
+  }, [editor, youtubeUrl, articleDocument])
 
   const insertTable = useCallback(() => {
     if (!editor) return
@@ -232,9 +291,13 @@ export default function RichTextEditor({
   if (!editor) return null
 
   return (
-    <div className={cn("rounded-lg border border-zinc-200", !articleImages && "overflow-hidden")}>
+    <div className={cn("rounded-lg border border-zinc-200", !editableImages && "overflow-hidden", articleDocument && "article-editor")}>
       {/* Toolbar */}
-      <div className="relative flex flex-wrap items-center gap-0.5 rounded-t-lg border-b border-zinc-200 bg-zinc-50 p-1.5">
+      <div
+        role={articleDocument ? "group" : undefined}
+        aria-label={articleDocument ? "Article formatting" : undefined}
+        className={cn("relative flex flex-wrap items-center gap-0.5 rounded-t-lg border-b border-zinc-200 bg-zinc-50 p-1.5", articleDocument && "article-ribbon")}
+      >
         {/* Headings */}
         <ToolBtn title="Heading 1" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive("heading", { level: 1 })}>H1</ToolBtn>
         <ToolBtn title="Heading 2" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive("heading", { level: 2 })}>H2</ToolBtn>
@@ -435,7 +498,7 @@ export default function RichTextEditor({
                 />
                 <Button type="button" size="xs" disabled={imageUploading} onClick={insertImage}>Insert</Button>
               </div>
-              {articleImages && (
+              {editableImages && (
                 <label className="block space-y-1 text-xs text-zinc-600">
                   {imageUploading ? "Uploading image…" : "Or choose a file to upload"}
                   <input
@@ -446,7 +509,7 @@ export default function RichTextEditor({
                     onChange={(e) => {
                       const file = e.target.files?.[0]
                       e.target.value = ""
-                      if (file) void uploadArticleImage(file)
+                      if (file) void uploadArticleFile(file, "image")
                     }}
                   />
                 </label>
@@ -459,7 +522,7 @@ export default function RichTextEditor({
         {/* YouTube */}
         <div className="relative">
           <ToolBtn
-            title="Embed YouTube video"
+            title={articleDocument ? "Insert video" : "Embed YouTube video"}
             onClick={() => { setShowLinkInput(false); setShowImageInput(false); setShowColorPicker(false); setShowYoutubeInput((v) => !v) }}
             active={showYoutubeInput}
           >
@@ -469,17 +532,43 @@ export default function RichTextEditor({
             <div className="absolute top-8 left-0 z-10 flex gap-1 rounded-lg border border-zinc-200 bg-white p-1.5 shadow-lg">
               <Input
                 autoFocus
-                type="url"
+                inputMode="url"
                 value={youtubeUrl}
                 onChange={(e) => setYoutubeUrl(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && insertYoutube()}
-                placeholder="YouTube URL or ID"
+                onKeyDown={(e) => {
+                  if (e.key !== "Enter") return
+                  e.preventDefault()
+                  insertYoutube()
+                }}
+                placeholder={articleDocument ? "YouTube or video URL" : "YouTube URL or ID"}
                 className="h-7 w-52 px-2 py-1 text-xs"
               />
               <Button type="button" size="xs" onClick={insertYoutube}>Embed</Button>
             </div>
           )}
         </div>
+
+        {articleDocument && (
+          <>
+            <ToolBtn title="Attach file" onClick={() => !imageUploading && attachmentInput.current?.click()}>
+              <Paperclip className="size-4" aria-hidden="true" />
+            </ToolBtn>
+            <input
+              ref={attachmentInput}
+              type="file"
+              accept=".pdf,.ppt,.pptx,.doc,.docx,.xls,.xlsx,.jpg,.jpeg,.png,.mp4,.zip,.rar"
+              aria-label="Choose an article attachment"
+              className="hidden"
+              onChange={(event) => {
+                const file = event.target.files?.[0]
+                event.target.value = ""
+                if (file) void uploadArticleFile(file, "attachment")
+              }}
+            />
+            {attachmentError && <p role="alert" className="basis-full px-1 text-xs text-red-600">{attachmentError}</p>}
+            {imageUploading && <p role="status" className="basis-full px-1 text-xs text-zinc-600">Uploading media…</p>}
+          </>
+        )}
 
         {/* Table */}
         <ToolBtn title="Insert table" onClick={insertTable}><TableIcon /></ToolBtn>
@@ -499,7 +588,7 @@ export default function RichTextEditor({
       </div>
 
       {/* Editor area */}
-      <EditorContent editor={editor} className="rounded-b-lg bg-white" />
+      <EditorContent editor={editor} className={articleDocument ? "article-paper" : "rounded-b-lg bg-white"} />
     </div>
   )
 }

@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
+import { useRef, useState } from "react"
+import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
+import type { JSONContent } from "@tiptap/react"
 import { Plus } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
@@ -17,8 +18,7 @@ import { blogSchema, type BlogFormValues } from "@/schemas/blog.schema"
 import { useCreateBlog, useUpdateBlog } from "@/hooks/queries/useBlog"
 import { saveBlogBlocks, saveBlogTags } from "@/services/blog.service"
 import type { Blog, BlogCategory, BlogTag } from "@/types"
-import type { EditorBlock } from "../types"
-import { SectionLayoutBuilder } from "./SectionLayoutBuilder"
+import { blogBlocksToDocument, documentToBlogBlocks } from "../utils/article-document"
 
 function slugify(text: string) {
   return text
@@ -42,16 +42,10 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
 
   const createBlog = useCreateBlog()
   const updateBlog = useUpdateBlog()
-  const isPending = createBlog.isPending || updateBlog.isPending
-
   const [coverUploading, setCoverUploading] = useState(false)
-  const [blocks, setBlocks] = useState<EditorBlock[]>(() =>
-    [...(blog?.blocks ?? [])]
-      .sort((a, b) => a.order_index - b.order_index)
-      .map(({ id, block_type, content, layout, column_position, column_ratio }) => ({
-        id, block_type, content, layout, column_position, column_ratio,
-      }))
-  )
+  const [bodyUploading, setBodyUploading] = useState(false)
+  const [initialArticle] = useState(() => blogBlocksToDocument(blog?.blocks ?? []))
+  const editedArticle = useRef<JSONContent | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const [localCategories, setLocalCategories] = useState<BlogCategory[]>(categories)
@@ -64,8 +58,8 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
     register,
     handleSubmit,
     setValue,
-    watch,
-    formState: { errors },
+    control,
+    formState: { errors, isSubmitting },
   } = useForm<BlogFormValues>({
     resolver: zodResolver(blogSchema),
     defaultValues: {
@@ -78,14 +72,9 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
     },
   })
 
-  const titleValue = watch("title")
-
-  useEffect(() => {
-    if (submitError) setSubmitError(null)
-    if (!isEdit && titleValue) {
-      setValue("slug", slugify(titleValue), { shouldValidate: false })
-    }
-  }, [titleValue, isEdit, setValue])
+  const [introduction, coverPath] = useWatch({ control, name: ["introduction", "cover_image_path"] })
+  const isUploading = coverUploading || bodyUploading
+  const hasOldColumns = blog?.blocks?.some((block) => block.layout === "two-column")
 
   function toggleTag(id: string) {
     setPickedTagIds((prev) =>
@@ -94,7 +83,9 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
   }
 
   async function onSubmit(values: BlogFormValues) {
+    if (isUploading) return
     setSubmitError(null)
+    const content = editedArticle.current && documentToBlogBlocks(editedArticle.current)
     let saved: Blog
     try {
       saved = isEdit
@@ -110,7 +101,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
     // save and the post looked like it had saved cleanly.
     const failures: string[] = []
     try {
-      await saveBlogBlocks(saved.id, blocks.map((b, i) => ({ block_type: b.block_type, content: b.content, order_index: i, layout: b.layout ?? null, column_position: b.column_position ?? null, column_ratio: b.column_ratio ?? null })))
+      if (content) await saveBlogBlocks(saved.id, content)
     } catch (e) {
       failures.push(`content (${e instanceof Error ? e.message : "unknown error"})`)
     }
@@ -133,16 +124,28 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
 
   return (
     <>
-      <form onSubmit={handleSubmit(onSubmit, (errs) => {
+      <form onSubmit={(event) => {
+        void handleSubmit(onSubmit, (errs) => {
           console.error("[BlogForm] validation errors:", errs)
           setSubmitError("Please fix the highlighted fields above.")
-        })}>
+        })(event)
+      }}>
         <div className="grid gap-8 lg:grid-cols-3">
           {/* Main content */}
           <div className="lg:col-span-2 space-y-6">
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700">Title *</label>
-              <Input {...register("title")} placeholder="Blog title" />
+              <Input
+                {...register("title", {
+                  onChange: (event) => {
+                    setSubmitError(null)
+                    if (!isEdit && event.target.value) {
+                      setValue("slug", slugify(event.target.value), { shouldValidate: false })
+                    }
+                  },
+                })}
+                placeholder="Blog title"
+              />
               {errors.title && <p className="text-xs text-red-500">{errors.title.message}</p>}
             </div>
 
@@ -155,16 +158,11 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
             <div className="space-y-1.5">
               <label className="text-sm font-medium text-zinc-700">Introduction</label>
               <RichTextEditor
-                value={toDoc(watch("introduction"))}
+                value={toDoc(introduction)}
                 onChange={(doc) => setValue("introduction", fromDoc(doc), { shouldDirty: true })}
                 placeholder="Short description…"
                 minHeight={120}
               />
-            </div>
-
-            <div className="space-y-3">
-              <h3 className="text-sm font-semibold text-zinc-900">Content</h3>
-              <SectionLayoutBuilder value={blocks} onChange={setBlocks} />
             </div>
           </div>
 
@@ -176,7 +174,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
                 folder="blogs/covers"
                 accept="image/*"
                 label="Click to upload cover image"
-                existingValue={watch("cover_image_path") || null}
+                existingValue={coverPath || null}
                 onUploadSuccess={({ key }) => setValue("cover_image_path", key, { shouldValidate: true })}
                 onClear={() => setValue("cover_image_path", "", { shouldValidate: true })}
                 onUploadingChange={setCoverUploading}
@@ -254,34 +252,48 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
               </div>
             </div>
 
-            {(mutationError || submitError) && (
-              <p className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
-                {mutationError instanceof Error
-                  ? mutationError.message
-                  : submitError ?? "Something went wrong"}
+          </div>
+        </div>
+
+        <div className="mt-8 space-y-3">
+          <div>
+            <h3 className="text-base font-semibold text-zinc-900">Article body</h3>
+            <p className="mt-1 text-sm text-zinc-500">
+              Write anywhere on the page. Hover beside a paragraph to drag it. Drop a photo near either edge of a paragraph to wrap the text around it.
+            </p>
+            {hasOldColumns && (
+              <p className="mt-1 text-sm text-zinc-600">
+                This post used columns. Editing the body saves it as one continuous article.
               </p>
             )}
-
-            <div className="flex flex-col gap-2">
-              <Button type="submit" disabled={coverUploading || isPending}>
-                {coverUploading
-                  ? "Uploading…"
-                  : isPending
-                    ? "Saving…"
-                    : isEdit
-                      ? "Save Changes"
-                      : "Create Blog"}
-              </Button>
-              <Button
-                type="button"
-                variant="outline"
-                disabled={coverUploading || isPending}
-                onClick={() => router.push("/dashboard/blogs")}
-              >
-                Cancel
-              </Button>
-            </div>
           </div>
+          <RichTextEditor
+            value={initialArticle}
+            onChange={(doc) => { editedArticle.current = doc }}
+            onUploadingChange={setBodyUploading}
+            placeholder="Start writing your article…"
+            articleDocument
+          />
+        </div>
+
+        {(mutationError || submitError) && (
+          <p role="alert" className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+            {mutationError instanceof Error ? mutationError.message : submitError ?? "Something went wrong"}
+          </p>
+        )}
+
+        <div className="mt-4 flex justify-end gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            disabled={isUploading || isSubmitting}
+            onClick={() => router.push("/dashboard/blogs")}
+          >
+            Cancel
+          </Button>
+          <Button type="submit" disabled={isUploading || isSubmitting}>
+            {isUploading ? "Uploading…" : isSubmitting ? "Saving…" : isEdit ? "Save Changes" : "Create Blog"}
+          </Button>
         </div>
       </form>
 
