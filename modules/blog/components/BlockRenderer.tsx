@@ -1,13 +1,14 @@
-import { FileText, FileSpreadsheet, Presentation, Video, Archive, File, Download } from "lucide-react"
+import { FileText, FileSpreadsheet, Presentation, Archive, File, Download } from "lucide-react"
 import { getFileUrl } from "@/lib/utils"
 import RichTextRenderer from "@/components/editor/RichTextRenderer"
+import { ArticleVideoPlayer } from "@/components/editor/ArticleVideoPlayer"
 import type { BlogBlock } from "@/types"
 
 interface BlockRendererProps {
   blocks: BlogBlock[]
 }
 
-type TwoColRegion = { kind: "two-column"; left: BlogBlock[]; right: BlogBlock[]; ratio: number }
+type TwoColRegion = { kind: "two-column"; id: string; left: BlogBlock[]; right: BlogBlock[]; ratio: number }
 type Row = BlogBlock | TwoColRegion
 
 const DEFAULT_COLUMN_RATIO = 50
@@ -28,6 +29,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
       }
       rows.push({
         kind: "two-column",
+        id: run[0].id,
         left: run.filter((b) => b.column_position !== "right"),
         right: run.filter((b) => b.column_position === "right"),
         ratio: run[0].column_ratio ?? DEFAULT_COLUMN_RATIO,
@@ -42,10 +44,9 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
     <div className="space-y-4">
       {rows.map((row) => {
         if ("kind" in row) {
-          const key = row.left[0]?.id ?? row.right[0]?.id ?? String(Math.random())
           return (
             <div
-              key={key}
+              key={row.id}
               className="flex flex-col gap-4 sm:grid sm:gap-4"
               style={{ gridTemplateColumns: `${row.ratio}fr ${100 - row.ratio}fr` }}
             >
@@ -130,8 +131,7 @@ function BlockItem({ block }: { block: BlogBlock }) {
       const c = block.content as { file_path?: string; file_name?: string; file_size?: number; file_type?: string }
       if (!c.file_path) return null
       const mime = c.file_type ?? ""
-      const Icon = mime.startsWith("video/") ? Video
-        : mime.includes("pdf") ? FileText
+      const Icon = mime.includes("pdf") ? FileText
         : mime.includes("spreadsheet") || mime.includes("excel") || mime.includes("xls") ? FileSpreadsheet
         : mime.includes("presentation") || mime.includes("powerpoint") || mime.includes("ppt") ? Presentation
         : mime.includes("zip") || mime.includes("rar") ? Archive
@@ -145,9 +145,7 @@ function BlockItem({ block }: { block: BlogBlock }) {
       if (mime.startsWith("video/")) {
         return (
           <div className="max-w-2xl mx-auto rounded-xl overflow-hidden bg-zinc-100">
-            <video controls className="w-full" preload="metadata">
-              <source src={getFileUrl(c.file_path)} type={mime} />
-            </video>
+            <ArticleVideoPlayer src={getFileUrl(c.file_path)} type={mime} label={c.file_name} />
             {c.file_name && (
               <p className="px-3 py-2 text-xs text-zinc-500">{c.file_name}</p>
             )}

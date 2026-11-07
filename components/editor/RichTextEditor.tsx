@@ -18,7 +18,7 @@ import Mathematics from "@tiptap/extension-mathematics"
 import type { Editor } from "@tiptap/core"
 import type { Mark, Node as ProseMirrorNode } from "@tiptap/pm/model"
 import type { Transaction } from "@tiptap/pm/state"
-import { Paperclip } from "lucide-react"
+import { Paperclip, Video } from "lucide-react"
 import "katex/dist/katex.min.css"
 import { useEffect, useCallback, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
@@ -134,7 +134,9 @@ export default function RichTextEditor({
   const imageButtonRef = useRef<HTMLDivElement>(null)
   const imagePanelRef = useRef<HTMLDivElement>(null)
   const [imageError, setImageError] = useState("")
-  const [imageUploading, setImageUploading] = useState(false)
+  const [mediaUploading, setMediaUploading] = useState(false)
+  const [videoUploadProgress, setVideoUploadProgress] = useState<number | null>(null)
+  const [videoError, setVideoError] = useState("")
   const [attachmentError, setAttachmentError] = useState("")
   const attachmentInput = useRef<HTMLInputElement>(null)
   const uploadInProgress = useRef(false)
@@ -259,20 +261,34 @@ export default function RichTextEditor({
     setShowImageInput(false)
   }, [editor, imageUrl, editableImages])
 
-  async function uploadArticleFile(file: File, kind: "image" | "attachment") {
+  async function uploadArticleFile(file: File, kind: "image" | "attachment" | "video") {
     if (!editor || uploadInProgress.current) return
-    const setError = kind === "image" ? setImageError : setAttachmentError
+    const setError = kind === "image" ? setImageError : kind === "video" ? setVideoError : setAttachmentError
+    let type = file.type || "application/octet-stream"
     if (kind === "image" && !file.type.startsWith("image/")) {
       setImageError("Choose an image file.")
       return
     }
-    if (kind === "attachment" && file.size > 100 * 1024 * 1024) {
-      setAttachmentError("Files must be 100 MB or smaller.")
+    if (kind === "video") {
+      const extension = file.name.split(".").at(-1)?.toLowerCase()
+      if (extension !== "mp4" && extension !== "webm") {
+        setVideoError("Choose an MP4 or WebM video.")
+        return
+      }
+      if (file.size === 0) {
+        setVideoError("This video file is empty.")
+        return
+      }
+      type = `video/${extension}`
+    }
+    if (kind !== "image" && file.size > 100 * 1024 * 1024) {
+      setError("Files must be 100 MB or smaller.")
       return
     }
     setError("")
     uploadInProgress.current = true
-    setImageUploading(true)
+    setMediaUploading(true)
+    if (kind === "video") setVideoUploadProgress(0)
     onUploadingChange?.(true)
     let position = editor.state.selection.to
     const trackPosition = ({ transaction }: { transaction: Transaction }) => {
@@ -280,9 +296,12 @@ export default function RichTextEditor({
     }
     editor.on("transaction", trackPosition)
     try {
-      const type = file.type || "application/octet-stream"
-      const upload = file.type ? file : new File([file], file.name, { type })
-      const { key, url } = await uploadFileToR2(kind === "image" ? "blog-images" : "blog-attachments", upload)
+      const upload = file.type === type ? file : new File([file], file.name, { type })
+      const { key, url } = await uploadFileToR2(
+        kind === "image" ? "blog-images" : "blog-attachments",
+        upload,
+        kind === "video" ? setVideoUploadProgress : undefined,
+      )
       if (editor.isDestroyed) return
       if (!articleDocument) {
         setImageUrl(url)
@@ -295,12 +314,15 @@ export default function RichTextEditor({
           } }
       editor.chain().focus().insertContentAt(position, node).run()
       if (kind === "image") setShowImageInput(false)
+      if (kind === "video") setShowYoutubeInput(false)
     } catch {
-      setError(kind === "image" ? "Image upload failed. Try again or enter an image URL." : "File upload failed. Try again.")
+      const label = kind === "video" ? "Video" : kind === "image" ? "Image" : "File"
+      setError(`${label} upload failed. Try again.`)
     } finally {
       editor.off("transaction", trackPosition)
       uploadInProgress.current = false
-      setImageUploading(false)
+      setMediaUploading(false)
+      if (kind === "video") setVideoUploadProgress(null)
       onUploadingChange?.(false)
     }
   }
@@ -541,20 +563,20 @@ export default function RichTextEditor({
                   onKeyDown={(e) => {
                     if (e.key !== "Enter") return
                     e.preventDefault()
-                    if (!imageUploading) insertImage()
+                    if (!mediaUploading) insertImage()
                   }}
                   placeholder="https://… image URL"
                   className="h-7 min-w-0 px-2 py-1 text-xs"
                 />
-                <Button type="button" size="xs" disabled={imageUploading} onClick={insertImage}>Insert</Button>
+                <Button type="button" size="xs" disabled={mediaUploading} onClick={insertImage}>Insert</Button>
               </div>
               {editableImages && (
                 <label className="block space-y-1 text-xs text-zinc-600">
-                  {imageUploading ? "Uploading image…" : "Or choose a file to upload"}
+                  Or choose an image to upload
                   <input
                     type="file"
                     accept="image/*"
-                    disabled={imageUploading}
+                    disabled={mediaUploading}
                     className="block w-full text-xs"
                     onChange={(e) => {
                       const file = e.target.files?.[0]
@@ -569,38 +591,64 @@ export default function RichTextEditor({
           )}
         </div>
 
-        {/* YouTube */}
-        <div className="relative">
+        {/* Video */}
+        <div className={articleDocument ? undefined : "relative"}>
           <ToolBtn
             title={articleDocument ? "Insert video" : "Embed YouTube video"}
             onClick={() => { setShowLinkInput(false); setShowImageInput(false); setShowColorPicker(false); setShowYoutubeInput((v) => !v) }}
             active={showYoutubeInput}
           >
-            <YoutubeIcon />
+            {articleDocument ? <Video className="size-4" aria-hidden="true" /> : <YoutubeIcon />}
           </ToolBtn>
           {showYoutubeInput && (
-            <div className="absolute top-8 left-0 z-10 flex gap-1 rounded-lg border border-zinc-200 bg-white p-1.5 shadow-lg">
-              <Input
-                autoFocus
-                inputMode="url"
-                value={youtubeUrl}
-                onChange={(e) => setYoutubeUrl(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key !== "Enter") return
-                  e.preventDefault()
-                  insertYoutube()
-                }}
-                placeholder={articleDocument ? "YouTube or video URL" : "YouTube URL or ID"}
-                className="h-7 w-52 px-2 py-1 text-xs"
-              />
-              <Button type="button" size="xs" onClick={insertYoutube}>Embed</Button>
+            <div className={cn(
+              "absolute left-0 z-20 w-72 space-y-2 rounded-lg border border-zinc-200 bg-white p-2 shadow-lg",
+              articleDocument ? "top-full max-w-full" : "top-8",
+            )}>
+              {articleDocument && (
+                <label className="block space-y-1 text-xs text-zinc-600">
+                  <span className="block font-medium">Upload video</span>
+                  <input
+                    type="file"
+                    accept=".mp4,.webm,video/mp4,video/webm"
+                    aria-label="Upload video"
+                    aria-describedby="article-video-formats"
+                    disabled={mediaUploading}
+                    className="block w-full text-xs"
+                    onChange={(event) => {
+                      const file = event.target.files?.[0]
+                      event.target.value = ""
+                      if (file) void uploadArticleFile(file, "video")
+                    }}
+                  />
+                  <span id="article-video-formats" className="block">MP4 or WebM, up to 100 MB</span>
+                </label>
+              )}
+              <div className="flex items-center gap-1">
+                <Input
+                  autoFocus={!articleDocument}
+                  inputMode="url"
+                  aria-label="Video URL"
+                  value={youtubeUrl}
+                  onChange={(e) => setYoutubeUrl(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key !== "Enter") return
+                    e.preventDefault()
+                    insertYoutube()
+                  }}
+                  placeholder={articleDocument ? "Or paste a video URL" : "YouTube URL or ID"}
+                  className="h-7 min-w-0 px-2 py-1 text-xs"
+                />
+                <Button type="button" size="xs" onClick={insertYoutube}>Embed</Button>
+              </div>
+              {videoError && <p role="alert" className="text-xs text-red-600">{videoError}</p>}
             </div>
           )}
         </div>
 
         {articleDocument && (
           <>
-            <ToolBtn title="Attach file" onClick={() => !imageUploading && attachmentInput.current?.click()}>
+            <ToolBtn title="Attach file" onClick={() => !mediaUploading && attachmentInput.current?.click()}>
               <Paperclip className="size-4" aria-hidden="true" />
             </ToolBtn>
             <input
@@ -616,8 +664,14 @@ export default function RichTextEditor({
               }}
             />
             {attachmentError && <p role="alert" className="basis-full px-1 text-xs text-red-600">{attachmentError}</p>}
-            {imageUploading && <p role="status" className="basis-full px-1 text-xs text-zinc-600">Uploading media…</p>}
           </>
+        )}
+        {mediaUploading && (
+          <p role="status" className="basis-full px-1 text-xs text-zinc-600">
+            {videoUploadProgress === null
+              ? "Uploading media…"
+              : videoUploadProgress === 100 ? "Finishing video upload…" : `Uploading video… ${videoUploadProgress}%`}
+          </p>
         )}
 
         {/* Table */}

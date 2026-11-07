@@ -4,6 +4,8 @@ import { Node } from "@tiptap/core"
 import Document from "@tiptap/extension-document"
 import { NodeViewWrapper, ReactNodeViewRenderer, type NodeViewProps } from "@tiptap/react"
 import { Paperclip, Video } from "lucide-react"
+import { getFileUrl } from "@/lib/utils"
+import { ArticleVideoPlayer } from "./ArticleVideoPlayer"
 
 // Media cards are top-level only. Saving writes them back as ordinary blog
 // blocks, so the existing public renderer still handles playback and downloads.
@@ -12,23 +14,30 @@ export const ArticleDocument = Document.extend({ content: "(block | articleMedia
 const mediaFields = ["kind", "url", "file_path", "file_name", "file_type", "file_size"] as const
 
 function ArticleMediaView({ node, selected }: NodeViewProps) {
-  const { kind, url, file_name } = node.attrs
+  const { kind, url, file_name, file_path, file_type } = node.attrs
   const isVideo = kind === "video"
-  const Icon = isVideo ? Video : Paperclip
+  const isUploadedVideo = kind === "file" && file_path && file_type?.startsWith("video/")
+  const Icon = isVideo || isUploadedVideo ? Video : Paperclip
   return (
     <NodeViewWrapper
       contentEditable={false}
-      className="my-3 flex items-center gap-3 rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 text-sm"
-      data-drag-handle
+      className="my-3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50 text-sm"
     >
-      <Icon className="size-5 shrink-0 text-zinc-500" aria-hidden="true" />
-      <div className="min-w-0">
-        <div className="text-xs font-semibold text-zinc-500">{isVideo ? "Video embed" : "Attachment"}</div>
-        <div className="truncate text-zinc-900" title={isVideo ? url : file_name}>
-          {isVideo ? url : file_name || "Download file"}
+      <div data-drag-handle className="flex cursor-grab items-center gap-3 px-4 py-3">
+        <Icon className="size-5 shrink-0 text-zinc-500" aria-hidden="true" />
+        <div className="min-w-0">
+          <div className="text-xs font-semibold text-zinc-500">
+            {isUploadedVideo ? "Uploaded video" : isVideo ? "Video embed" : "Attachment"}
+          </div>
+          <div className="truncate text-zinc-900" title={isVideo ? url : file_name}>
+            {isVideo ? url : file_name || "Download file"}
+          </div>
         </div>
+        {selected && <span className="ml-auto shrink-0 text-xs text-zinc-500">Delete to remove</span>}
       </div>
-      {selected && <span className="ml-auto shrink-0 text-xs text-zinc-500">Delete to remove</span>}
+      {isUploadedVideo && (
+        <ArticleVideoPlayer src={getFileUrl(file_path)} type={file_type} label={file_name} preload="none" />
+      )}
     </NodeViewWrapper>
   )
 }
