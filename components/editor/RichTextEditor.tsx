@@ -29,7 +29,7 @@ import { uploadFileToR2 } from "@/services/upload.service"
 import { ArticleImage, articleImageLayout } from "./article-image"
 import { ArticleImageView } from "./ArticleImageView"
 import { ArticleDocument, ArticleMedia } from "./ArticleMedia"
-import { ArticleDragHandle, dropImageBesideText } from "./article-layout"
+import { ArticleDragHandle, dropMediaBesideText } from "./article-layout"
 import { useImagePanel } from "./use-image-panel"
 import "./article-image.css"
 import "./article-layout.css"
@@ -184,7 +184,7 @@ export default function RichTextEditor({
     shouldRerenderOnTransaction: false,
     editorProps: {
       transformPastedHTML: katexToMathNodes,
-      handleDrop: articleDocument ? dropImageBesideText : undefined,
+      handleDrop: articleDocument ? dropMediaBesideText : undefined,
       attributes: {
         class: cn("cms-editor focus:outline-none", articleDocument && "article-writing-surface"),
         ...(articleDocument

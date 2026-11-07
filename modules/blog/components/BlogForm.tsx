@@ -259,7 +259,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
           <div>
             <h3 className="text-base font-semibold text-zinc-900">Article body</h3>
             <p className="mt-1 text-sm text-zinc-500">
-              Write anywhere on the page. Hover beside a paragraph to drag it. Drop a photo near either edge of a paragraph to wrap the text around it.
+              Write anywhere on the page. Hover beside a paragraph to drag it. Drop an image or video near either edge of a paragraph to wrap the text around it.
             </p>
             {hasOldColumns && (
               <p className="mt-1 text-sm text-zinc-600">

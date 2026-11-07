@@ -1,0 +1,32 @@
+/* The video and its caption share the float, leaving text in normal flow. */
+:is(.cms-editor, .blog-article-flow):has(> [data-article-video]) {
+  display: flow-root;
+  container-type: inline-size;
+}
+
+[data-article-video] {
+  width: var(--article-video-width, 100%);
+  max-width: 100%;
+  margin-inline: auto;
+}
+
+[data-article-video="block"] { clear: both; }
+
+[data-article-video="left"] {
+  float: left;
+  margin: 0.25rem 1.25rem 0.75rem 0;
+}
+
+[data-article-video="right"] {
+  float: right;
+  margin: 0.25rem 0 0.75rem 1.25rem;
+}
+
+@container (max-width: 480px) {
+  [data-article-video="left"],
+  [data-article-video="right"] {
+    float: none;
+    width: 100%;
+    margin: 1rem auto;
+  }
+}

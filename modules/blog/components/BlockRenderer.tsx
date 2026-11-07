@@ -1,7 +1,10 @@
 import { FileText, FileSpreadsheet, Presentation, Archive, File, Download } from "lucide-react"
+import type { CSSProperties } from "react"
 import { getFileUrl } from "@/lib/utils"
 import RichTextRenderer from "@/components/editor/RichTextRenderer"
 import { ArticleVideoPlayer } from "@/components/editor/ArticleVideoPlayer"
+import { getVideoPlacement, getVideoWidthPercent } from "@/components/editor/article-video"
+import "@/components/editor/article-video.css"
 import type { BlogBlock } from "@/types"
 
 interface BlockRendererProps {
@@ -41,7 +44,7 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="blog-article-flow space-y-4">
       {rows.map((row) => {
         if ("kind" in row) {
           return (
@@ -50,10 +53,10 @@ export function BlockRenderer({ blocks }: BlockRendererProps) {
               className="flex flex-col gap-4 sm:grid sm:gap-4"
               style={{ gridTemplateColumns: `${row.ratio}fr ${100 - row.ratio}fr` }}
             >
-              <div className="space-y-4">
+              <div className="blog-article-flow space-y-4">
                 {row.left.map((b) => <BlockItem key={b.id} block={b} />)}
               </div>
-              <div className="space-y-4">
+              <div className="blog-article-flow space-y-4">
                 {row.right.map((b) => <BlockItem key={b.id} block={b} />)}
               </div>
             </div>
@@ -114,7 +117,10 @@ function BlockItem({ block }: { block: BlogBlock }) {
       )
     }
     case "video": {
-      const c = block.content as { url?: string }
+      const c = block.content as VideoFileContent & { url?: string }
+      if (c.file_path && c.file_type?.startsWith("video/")) {
+        return <UploadedVideo path={c.file_path} type={c.file_type} content={c} />
+      }
       if (!c.url) return null
       return (
         <div className="max-w-2xl mx-auto aspect-video w-full overflow-hidden rounded-xl bg-zinc-100">
@@ -128,9 +134,12 @@ function BlockItem({ block }: { block: BlogBlock }) {
       )
     }
     case "file": {
-      const c = block.content as { file_path?: string; file_name?: string; file_size?: number; file_type?: string }
+      const c = block.content as VideoFileContent
       if (!c.file_path) return null
       const mime = c.file_type ?? ""
+      if (mime.startsWith("video/")) {
+        return <UploadedVideo path={c.file_path} type={mime} content={c} />
+      }
       const Icon = mime.includes("pdf") ? FileText
         : mime.includes("spreadsheet") || mime.includes("excel") || mime.includes("xls") ? FileSpreadsheet
         : mime.includes("presentation") || mime.includes("powerpoint") || mime.includes("ppt") ? Presentation
@@ -141,17 +150,6 @@ function BlockItem({ block }: { block: BlogBlock }) {
           ? `${(c.file_size / 1024).toFixed(1)} KB`
           : `${(c.file_size / (1024 * 1024)).toFixed(1)} MB`
         : null
-
-      if (mime.startsWith("video/")) {
-        return (
-          <div className="max-w-2xl mx-auto rounded-xl overflow-hidden bg-zinc-100">
-            <ArticleVideoPlayer src={getFileUrl(c.file_path)} type={mime} label={c.file_name} />
-            {c.file_name && (
-              <p className="px-3 py-2 text-xs text-zinc-500">{c.file_name}</p>
-            )}
-          </div>
-        )
-      }
 
       return (
         <a
@@ -177,6 +175,31 @@ function BlockItem({ block }: { block: BlogBlock }) {
     default:
       return null
   }
+}
+
+interface VideoFileContent {
+  file_path?: string
+  file_name?: string
+  file_size?: number
+  file_type?: string
+  widthPercent?: number
+  placement?: string
+}
+
+function UploadedVideo({ path, type, content }: { path: string; type: string; content: VideoFileContent }) {
+  const placement = getVideoPlacement(content.placement)
+  const width = getVideoWidthPercent(content.widthPercent, placement)
+  const displayWidth = width === undefined ? (placement === "block" ? "min(100%, 42rem)" : "50%") : `${width}%`
+  return (
+    <figure
+      className="overflow-hidden rounded-xl bg-zinc-100"
+      data-article-video={placement}
+      style={{ "--article-video-width": displayWidth } as CSSProperties}
+    >
+      <ArticleVideoPlayer src={getFileUrl(path)} type={type} label={content.file_name} />
+      {content.file_name && <figcaption className="px-3 py-2 text-xs text-zinc-500">{content.file_name}</figcaption>}
+    </figure>
+  )
 }
 
 function toEmbedUrl(url: string): string {

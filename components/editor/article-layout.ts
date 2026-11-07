@@ -3,6 +3,7 @@ import type { Slice } from "@tiptap/pm/model"
 import { NodeSelection } from "@tiptap/pm/state"
 import type { EditorView } from "@tiptap/pm/view"
 import { articleImageWidth } from "./article-image"
+import { getVideoPlacement, getVideoWidthPercent, isUploadedArticleVideo } from "./article-video"
 
 export const ArticleDragHandle = DragHandle.configure({
   computePositionConfig: { placement: "left-start", strategy: "fixed" },
@@ -16,11 +17,16 @@ export const ArticleDragHandle = DragHandle.configure({
   },
 })
 
-export function dropImageBesideText(view: EditorView, event: DragEvent, slice: Slice, moved: boolean) {
-  const image = slice.content.firstChild
+export function dropMediaBesideText(view: EditorView, event: DragEvent, slice: Slice, moved: boolean) {
+  const media = slice.content.firstChild
   const { selection, doc } = view.state
-  if (!moved || image?.type.name !== "image" || slice.content.childCount !== 1 ||
-    slice.openStart || slice.openEnd || !selection.content().eq(slice)) return false
+  // ProseMirror can drag a node without changing the current text selection.
+  const draggedNode = (view.dragging as { node?: NodeSelection } | null)?.node
+  const source = draggedNode ?? selection
+  if (!moved || !media || slice.content.childCount !== 1 ||
+    slice.openStart || slice.openEnd || !source.content().eq(slice)) return false
+  const isImage = media.type.name === "image"
+  if (!isImage && !(media.type.name === "articleMedia" && isUploadedArticleVideo(media.attrs))) return false
 
   const bounds = view.dom.getBoundingClientRect()
   if (bounds.width < 500) return false
@@ -33,15 +39,17 @@ export function dropImageBesideText(view: EditorView, event: DragEvent, slice: S
   const target = doc.resolve(hit.pos)
   if (target.depth !== 1 || !target.parent.isTextblock) return false
 
-  const width = articleImageWidth(image.attrs.widthPercent, image.attrs.placement ?? "block")
-  const wrappedImage = image.type.create({
-    ...image.attrs,
+  const width = isImage
+    ? articleImageWidth(media.attrs.widthPercent, media.attrs.placement ?? "block")
+    : getVideoWidthPercent(media.attrs.widthPercent, getVideoPlacement(media.attrs.placement)) ?? 100
+  const wrapped = media.type.create({
+    ...media.attrs,
     placement,
     widthPercent: width > 80 ? 50 : width,
   })
-  const tr = view.state.tr.deleteSelection()
+  const tr = view.state.tr.delete(source.from, source.to)
   const pos = tr.mapping.map(target.before(1))
-  tr.insert(pos, wrappedImage).setSelection(NodeSelection.create(tr.doc, pos))
+  tr.insert(pos, wrapped).setSelection(NodeSelection.create(tr.doc, pos))
   view.focus()
   view.dispatch(tr.setMeta("uiEvent", "drop"))
   return true

@@ -1,4 +1,5 @@
 import type { JSONContent } from "@tiptap/react"
+import { getVideoPlacement, getVideoWidthPercent, MAX_VIDEO_WIDTH_PERCENT } from "@/components/editor/article-video"
 import { fromDoc, toDoc } from "@/lib/richtext"
 import type { BlogBlock } from "@/types/blog"
 import type { EditorBlock } from "../types"
@@ -40,6 +41,7 @@ function blockNodes({ block_type, content }: EditorBlock): JSONContent[] {
     case "file":
       return content.file_path ? [{ type: "articleMedia", attrs: { kind: "file", ...content } }] : []
     case "video":
+      if (content.file_path) return [{ type: "articleMedia", attrs: { ...content, kind: "file" } }]
       return content.url ? [{ type: "articleMedia", attrs: { kind: "video", url: content.url } }] : []
   }
 }
@@ -91,12 +93,19 @@ export function documentToBlogBlocks(doc: JSONContent): SavedBlock[] {
       writing.push(node)
       continue
     }
-    // Keep these as standard blog blocks so the existing reader and rollback
-    // editor can still display attachments and non-YouTube videos.
     flushWriting()
     const { kind, url, file_path, file_name, file_type, file_size } = node.attrs ?? {}
     if (kind === "video" && url) append("video", { url })
-    if (kind === "file" && file_path) append("file", { file_path, file_name, file_type, file_size })
+    if (kind === "file" && file_path) {
+      const file = { file_path, file_name, file_type, file_size }
+      if (typeof file_type === "string" && file_type.startsWith("video/")) {
+        const placement = getVideoPlacement(node.attrs?.placement)
+        const widthPercent = getVideoWidthPercent(node.attrs?.widthPercent, placement) ?? (placement === "block" ? MAX_VIDEO_WIDTH_PERCENT : 50)
+        append("video", { ...file, placement, widthPercent })
+      } else {
+        append("file", file)
+      }
+    }
   }
   flushWriting()
   return blocks

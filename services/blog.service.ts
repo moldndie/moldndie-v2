@@ -478,8 +478,13 @@ export async function saveBlogBlocks(
   blogId: string,
   blocks: (Omit<BlogBlock, "id" | "blog_id" | "created_at"> & { layout?: string | null; column_position?: string | null })[]
 ): Promise<void> {
+  if (blocks.some((block) => block.block_type === "file")) {
+    throw new Error("Remove unsupported file attachments from the article before saving.")
+  }
+
   const supabase = createAdminClient()
-  await supabase.from("blog_blocks").delete().eq("blog_id", blogId)
+  const { error: deleteError } = await supabase.from("blog_blocks").delete().eq("blog_id", blogId)
+  if (deleteError) throw dbError(deleteError)
   if (blocks.length > 0) {
     const { error } = await supabase
       .from("blog_blocks")
