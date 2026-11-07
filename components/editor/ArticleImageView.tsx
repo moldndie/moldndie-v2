@@ -6,6 +6,7 @@ import { GripVertical, Trash2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
+import { ArticleMediaReplacement, ArticleWidthControl } from "./ArticleMediaControls"
 import { articleImageWidth, type ImagePlacement } from "./article-image"
 import { useImagePanel } from "./use-image-panel"
 
@@ -22,6 +23,16 @@ export function ArticleImageView({ editor, node, selected, getPos, updateAttribu
   function selectImage() {
     const pos = getPos()
     if (typeof pos === "number") editor.commands.setNodeSelection(pos)
+  }
+
+  function replaceImage(nextSrc: string) {
+    if (editor.isDestroyed) return
+    const pos = getPos()
+    const current = typeof pos === "number" ? editor.state.doc.nodeAt(pos) : null
+    if (current?.type !== node.type || current.attrs.src !== src) {
+      throw new Error("The original image changed. Select it and try again.")
+    }
+    updateAttributes({ src: nextSrc })
   }
 
   function startResize(event: PointerEvent<HTMLDivElement>) {
@@ -97,18 +108,14 @@ export function ArticleImageView({ editor, node, selected, getPos, updateAttribu
                 <Trash2 aria-hidden="true" />
               </Button>
             </div>
-            <label className="flex items-center gap-2 text-xs">
-              Width
-              <input
-                type="range"
-                className="min-w-0 flex-1"
-                min={15}
-                max={widthLimit}
-                value={width}
-                onChange={(event) => updateAttributes({ widthPercent: event.target.valueAsNumber })}
-              />
-              {width}%
-            </label>
+            <ArticleWidthControl
+              label="Image width"
+              min={15}
+              max={widthLimit}
+              width={width}
+              onChange={(next) => updateAttributes({ widthPercent: next })}
+            />
+            <ArticleMediaReplacement kind="image" onUrl={replaceImage} onFile={({ url }) => replaceImage(url)} />
             <Input
               aria-label="Image caption"
               placeholder="Caption (optional)"

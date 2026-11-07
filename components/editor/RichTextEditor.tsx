@@ -29,6 +29,7 @@ import { uploadFileToR2 } from "@/services/upload.service"
 import { ArticleImage, articleImageLayout } from "./article-image"
 import { ArticleImageView } from "./ArticleImageView"
 import { ArticleDocument, ArticleMedia } from "./ArticleMedia"
+import { ArticleUploadContext, isArticleMediaUrl, type ArticleUploadKind, type ArticleUploadResult } from "./ArticleMediaControls"
 import { ArticleDragHandle, dropMediaBesideText } from "./article-layout"
 import { useImagePanel } from "./use-image-panel"
 import "./article-image.css"
@@ -246,9 +247,7 @@ export default function RichTextEditor({
     if (!editor || !imageUrl.trim()) return
     const src = imageUrl.trim()
     if (editableImages) {
-      try {
-        if (!["http:", "https:"].includes(new URL(src).protocol)) throw new Error()
-      } catch {
+      if (!isArticleMediaUrl(src)) {
         setImageError("Enter a valid HTTP or HTTPS image URL.")
         return
       }
@@ -261,69 +260,75 @@ export default function RichTextEditor({
     setShowImageInput(false)
   }, [editor, imageUrl, editableImages])
 
-  async function uploadArticleFile(file: File, kind: "image" | "attachment" | "video") {
-    if (!editor || uploadInProgress.current) return
-    const setError = kind === "image" ? setImageError : kind === "video" ? setVideoError : setAttachmentError
+  const uploadMedia = useCallback(async (file: File, kind: ArticleUploadKind, apply: (result: ArticleUploadResult) => void) => {
+    if (uploadInProgress.current) throw new Error("Wait for the current upload to finish.")
     let type = file.type || "application/octet-stream"
     if (kind === "image" && !file.type.startsWith("image/")) {
-      setImageError("Choose an image file.")
-      return
+      throw new Error("Choose an image file.")
     }
     if (kind === "video") {
       const extension = file.name.split(".").at(-1)?.toLowerCase()
       if (extension !== "mp4" && extension !== "webm") {
-        setVideoError("Choose an MP4 or WebM video.")
-        return
+        throw new Error("Choose an MP4 or WebM video.")
       }
-      if (file.size === 0) {
-        setVideoError("This video file is empty.")
-        return
-      }
+      if (file.size === 0) throw new Error("This video file is empty.")
       type = `video/${extension}`
     }
     if (kind !== "image" && file.size > 100 * 1024 * 1024) {
-      setError("Files must be 100 MB or smaller.")
-      return
+      throw new Error("Files must be 100 MB or smaller.")
     }
-    setError("")
     uploadInProgress.current = true
     setMediaUploading(true)
     if (kind === "video") setVideoUploadProgress(0)
     onUploadingChange?.(true)
+    try {
+      const upload = file.type === type ? file : new File([file], file.name, { type })
+      const result = await uploadFileToR2(
+        kind === "image" ? "blog-images" : "blog-attachments",
+        upload,
+        kind === "video" ? setVideoUploadProgress : undefined,
+      ).catch(() => {
+        const label = kind === "video" ? "Video" : kind === "image" ? "Image" : "File"
+        throw new Error(`${label} upload failed. Try again.`)
+      })
+      apply({ ...result, file: upload })
+    } finally {
+      uploadInProgress.current = false
+      setMediaUploading(false)
+      if (kind === "video") setVideoUploadProgress(null)
+      onUploadingChange?.(false)
+    }
+  }, [onUploadingChange])
+
+  async function uploadArticleFile(file: File, kind: ArticleUploadKind) {
+    if (!editor) return
+    const setError = kind === "image" ? setImageError : kind === "video" ? setVideoError : setAttachmentError
+    setError("")
     let position = editor.state.selection.to
     const trackPosition = ({ transaction }: { transaction: Transaction }) => {
       position = transaction.mapping.map(position)
     }
     editor.on("transaction", trackPosition)
     try {
-      const upload = file.type === type ? file : new File([file], file.name, { type })
-      const { key, url } = await uploadFileToR2(
-        kind === "image" ? "blog-images" : "blog-attachments",
-        upload,
-        kind === "video" ? setVideoUploadProgress : undefined,
-      )
-      if (editor.isDestroyed) return
-      if (!articleDocument) {
-        setImageUrl(url)
-        return
-      }
-      const node = kind === "image"
-        ? { type: "image", attrs: { src: url, placement: "block" } }
-        : { type: "articleMedia", attrs: {
-            kind: "file", file_path: key, file_name: file.name, file_type: type, file_size: file.size,
-          } }
-      editor.chain().focus().insertContentAt(position, node).run()
-      if (kind === "image") setShowImageInput(false)
-      if (kind === "video") setShowYoutubeInput(false)
-    } catch {
-      const label = kind === "video" ? "Video" : kind === "image" ? "Image" : "File"
-      setError(`${label} upload failed. Try again.`)
+      await uploadMedia(file, kind, ({ key, url, file }) => {
+        if (editor.isDestroyed) return
+        if (!articleDocument) {
+          setImageUrl(url)
+          return
+        }
+        const node = kind === "image"
+          ? { type: "image", attrs: { src: url, placement: "block" } }
+          : { type: "articleMedia", attrs: {
+              kind: "file", file_path: key, file_name: file.name, file_type: file.type, file_size: file.size,
+            } }
+        editor.chain().focus().insertContentAt(position, node).run()
+        if (kind === "image") setShowImageInput(false)
+        if (kind === "video") setShowYoutubeInput(false)
+      })
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Upload failed. Try again.")
     } finally {
       editor.off("transaction", trackPosition)
-      uploadInProgress.current = false
-      setMediaUploading(false)
-      if (kind === "video") setVideoUploadProgress(null)
-      onUploadingChange?.(false)
     }
   }
 
@@ -692,7 +697,9 @@ export default function RichTextEditor({
       </div>
 
       {/* Editor area */}
-      <EditorContent editor={editor} className={articleDocument ? "article-paper" : "rounded-b-lg bg-white"} />
+      <ArticleUploadContext.Provider value={uploadMedia}>
+        <EditorContent editor={editor} className={articleDocument ? "article-paper" : "rounded-b-lg bg-white"} />
+      </ArticleUploadContext.Provider>
     </div>
   )
 }

@@ -6,6 +6,7 @@ import { NodeViewWrapper, ReactNodeViewRenderer, type NodeViewProps } from "@tip
 import { Paperclip, Video } from "lucide-react"
 import { getFileUrl } from "@/lib/utils"
 import { Select } from "@/components/ui/select"
+import { ArticleMediaReplacement, ArticleWidthControl, type ArticleUploadResult } from "./ArticleMediaControls"
 import { ArticleVideoPlayer } from "./ArticleVideoPlayer"
 import {
   getVideoPlacement, getVideoWidthPercent, isUploadedArticleVideo, MAX_VIDEO_WIDTH_PERCENT,
@@ -19,13 +20,27 @@ export const ArticleDocument = Document.extend({ content: "(block | articleMedia
 
 const mediaFields = ["kind", "url", "file_path", "file_name", "file_type", "file_size", "widthPercent", "placement"] as const
 
-function ArticleMediaView({ node, selected, updateAttributes }: NodeViewProps) {
+function ArticleMediaView({ editor, node, selected, getPos, updateAttributes }: NodeViewProps) {
   const { kind, url, file_name, file_path, file_type, widthPercent } = node.attrs
   const isVideo = kind === "video"
   const isUploadedVideo = isUploadedArticleVideo(node.attrs)
   const placement = getVideoPlacement(node.attrs.placement)
   const videoWidth = getVideoWidthPercent(widthPercent, placement) ?? (placement === "block" ? MAX_VIDEO_WIDTH_PERCENT : 50)
   const Icon = isVideo || isUploadedVideo ? Video : Paperclip
+
+  function replaceVideoFile({ key, file }: ArticleUploadResult) {
+    if (editor.isDestroyed) return
+    const pos = getPos()
+    const current = typeof pos === "number" ? editor.state.doc.nodeAt(pos) : null
+    if (current?.type !== node.type || current.attrs.kind !== kind ||
+      current.attrs.file_path !== file_path || current.attrs.url !== url) {
+      throw new Error("The original video changed. Select it and try again.")
+    }
+    updateAttributes({
+      kind: "file", url: null, file_path: key, file_name: file.name, file_type: file.type, file_size: file.size,
+    })
+  }
+
   return (
     <NodeViewWrapper
       contentEditable={false}
@@ -61,25 +76,27 @@ function ArticleMediaView({ node, selected, updateAttributes }: NodeViewProps) {
               <option value="right">Video right, wrap text</option>
             </Select>
           </div>
-          <label className="grid max-w-sm gap-1 px-3 pb-3 text-xs font-medium text-zinc-600">
-            <span className="flex flex-wrap justify-between gap-x-2">
-              <span>Video width</span>
-              <span aria-hidden="true" className="tabular-nums">{videoWidth}%</span>
-            </span>
-            <input
-              aria-label="Video width"
-              aria-valuetext={`${videoWidth}%`}
-              type="range"
+          <div className="max-w-sm px-3 pb-2">
+            <ArticleWidthControl
+              label="Video width"
               min={MIN_VIDEO_WIDTH_PERCENT}
               max={placement === "block" ? MAX_VIDEO_WIDTH_PERCENT : MAX_WRAPPED_VIDEO_WIDTH_PERCENT}
-              value={videoWidth}
-              className="block w-full min-w-0"
-              onChange={(event) => updateAttributes({ widthPercent: event.currentTarget.valueAsNumber })}
+              width={videoWidth}
+              onChange={(next) => updateAttributes({ widthPercent: next })}
             />
-          </label>
-          <ArticleVideoPlayer src={getFileUrl(file_path)} type={file_type} label={file_name} preload="none" />
+          </div>
         </>
       )}
+      {(isUploadedVideo || isVideo) && (
+        <div className="max-w-sm px-3 pb-3">
+          <ArticleMediaReplacement
+            kind="video"
+            onFile={replaceVideoFile}
+            onUrl={isVideo ? (url) => updateAttributes({ url }) : undefined}
+          />
+        </div>
+      )}
+      {isUploadedVideo && <ArticleVideoPlayer src={getFileUrl(file_path)} type={file_type} label={file_name} preload="none" />}
     </NodeViewWrapper>
   )
 }
