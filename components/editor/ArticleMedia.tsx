@@ -3,8 +3,9 @@
 import { Node } from "@tiptap/core"
 import Document from "@tiptap/extension-document"
 import { NodeViewWrapper, ReactNodeViewRenderer, type NodeViewProps } from "@tiptap/react"
-import { Paperclip, Video } from "lucide-react"
+import { Paperclip, Trash2, Video } from "lucide-react"
 import { getFileUrl } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 import { Select } from "@/components/ui/select"
 import { ArticleMediaReplacement, ArticleWidthControl, type ArticleUploadResult } from "./ArticleMediaControls"
 import { ArticleVideoPlayer } from "./ArticleVideoPlayer"
@@ -20,7 +21,7 @@ export const ArticleDocument = Document.extend({ content: "(block | articleMedia
 
 const mediaFields = ["kind", "url", "file_path", "file_name", "file_type", "file_size", "widthPercent", "placement"] as const
 
-function ArticleMediaView({ editor, node, selected, getPos, updateAttributes }: NodeViewProps) {
+function ArticleMediaView({ editor, node, selected, getPos, updateAttributes, deleteNode }: NodeViewProps) {
   const { kind, url, file_name, file_path, file_type, widthPercent } = node.attrs
   const isVideo = kind === "video"
   const isUploadedVideo = isUploadedArticleVideo(node.attrs)
@@ -46,17 +47,27 @@ function ArticleMediaView({ editor, node, selected, getPos, updateAttributes }: 
       contentEditable={false}
       className="mx-auto my-3 overflow-hidden rounded-lg border border-zinc-200 bg-zinc-50 text-sm"
     >
-      <div data-drag-handle className="flex cursor-grab items-center gap-3 px-4 py-3">
-        <Icon className="size-5 shrink-0 text-zinc-500" aria-hidden="true" />
-        <div className="min-w-0">
-          <div className="text-xs font-semibold text-zinc-500">
-            {isUploadedVideo ? "Uploaded video" : isVideo ? "Video embed" : "Attachment"}
-          </div>
-          <div className="truncate text-zinc-900" title={isVideo ? url : file_name}>
-            {isVideo ? url : file_name || "Download file"}
+      <div className="flex items-center gap-3 px-4 py-3">
+        <div data-drag-handle className="flex min-w-0 flex-1 cursor-grab items-center gap-3">
+          <Icon className="size-5 shrink-0 text-zinc-500" aria-hidden="true" />
+          <div className="min-w-0">
+            <div className="text-xs font-semibold text-zinc-500">
+              {isUploadedVideo ? "Uploaded video" : isVideo ? "Video embed" : "Attachment"}
+            </div>
+            <div className="truncate text-zinc-900" title={isVideo ? url : file_name}>
+              {isVideo ? url : file_name || "Download file"}
+            </div>
           </div>
         </div>
-        {selected && <span className="ml-auto truncate text-xs text-zinc-500">Delete to remove</span>}
+        {selected && (
+          isUploadedVideo || isVideo ? (
+            <Button type="button" size="icon-xs" variant="ghost-danger" title="Remove video" aria-label="Remove video" onClick={deleteNode}>
+              <Trash2 aria-hidden="true" />
+            </Button>
+          ) : (
+            <span className="ml-auto truncate text-xs text-zinc-500">Delete to remove</span>
+          )
+        )}
       </div>
       {isUploadedVideo && (
         <>
