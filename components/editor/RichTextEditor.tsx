@@ -1,6 +1,6 @@
 "use client"
 
-import { useEditor, EditorContent, ReactNodeViewRenderer } from "@tiptap/react"
+import { useEditor, useEditorState, EditorContent, ReactNodeViewRenderer } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Link from "@tiptap/extension-link"
 import Underline from "@tiptap/extension-underline"
@@ -16,7 +16,7 @@ import { TextStyle, FontFamily, BackgroundColor } from "@tiptap/extension-text-s
 import Color from "@tiptap/extension-color"
 import Mathematics from "@tiptap/extension-mathematics"
 import type { Editor } from "@tiptap/core"
-import type { Mark } from "@tiptap/pm/model"
+import type { Mark, Node as ProseMirrorNode } from "@tiptap/pm/model"
 import type { Transaction } from "@tiptap/pm/state"
 import { Paperclip } from "lucide-react"
 import "katex/dist/katex.min.css"
@@ -30,6 +30,7 @@ import { ArticleImage, articleImageLayout } from "./article-image"
 import { ArticleImageView } from "./ArticleImageView"
 import { ArticleDocument, ArticleMedia } from "./ArticleMedia"
 import { ArticleDragHandle, dropImageBesideText } from "./article-layout"
+import { useImagePanel } from "./use-image-panel"
 import "./article-image.css"
 import "./article-layout.css"
 
@@ -77,9 +78,38 @@ function Divider() {
   return <div className="mx-1 h-5 w-px bg-zinc-200 shrink-0" />
 }
 
+function readToolbarState(editor: Editor) {
+  const textStyle = editor.getAttributes("textStyle")
+  return {
+    h1: editor.isActive("heading", { level: 1 }),
+    h2: editor.isActive("heading", { level: 2 }),
+    h3: editor.isActive("heading", { level: 3 }),
+    h4: editor.isActive("heading", { level: 4 }),
+    bold: editor.isActive("bold"),
+    italic: editor.isActive("italic"),
+    underline: editor.isActive("underline"),
+    strike: editor.isActive("strike"),
+    code: editor.isActive("code"),
+    blockquote: editor.isActive("blockquote"),
+    codeBlock: editor.isActive("codeBlock"),
+    bulletList: editor.isActive("bulletList"),
+    orderedList: editor.isActive("orderedList"),
+    alignLeft: editor.isActive({ textAlign: "left" }),
+    alignCenter: editor.isActive({ textAlign: "center" }),
+    alignRight: editor.isActive({ textAlign: "right" }),
+    alignJustify: editor.isActive({ textAlign: "justify" }),
+    color: textStyle.color as string | undefined,
+    backgroundColor: textStyle.backgroundColor as string | undefined,
+    fontFamily: textStyle.fontFamily as string | undefined,
+    link: editor.isActive("link"),
+    table: editor.isActive("table"),
+  }
+}
+
 interface RichTextEditorProps {
   value?: Record<string, unknown> | null
-  onChange: (value: Record<string, unknown>) => void
+  onChange?: (value: Record<string, unknown>) => void
+  onDocumentUpdate?: (document: ProseMirrorNode) => void
   placeholder?: string
   minHeight?: number
   articleImages?: boolean
@@ -90,6 +120,7 @@ interface RichTextEditorProps {
 export default function RichTextEditor({
   value,
   onChange,
+  onDocumentUpdate,
   placeholder = "Start writing…",
   minHeight = 400,
   articleImages = false,
@@ -100,6 +131,8 @@ export default function RichTextEditor({
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [imageUrl, setImageUrl] = useState("")
   const [showImageInput, setShowImageInput] = useState(false)
+  const imageButtonRef = useRef<HTMLDivElement>(null)
+  const imagePanelRef = useRef<HTMLDivElement>(null)
   const [imageError, setImageError] = useState("")
   const [imageUploading, setImageUploading] = useState(false)
   const [attachmentError, setAttachmentError] = useState("")
@@ -116,6 +149,7 @@ export default function RichTextEditor({
   const editorRef = useRef<Editor | null>(null)
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3, 4] },
@@ -145,7 +179,7 @@ export default function RichTextEditor({
       }),
     ],
     content: value ?? undefined,
-    shouldRerenderOnTransaction: articleDocument,
+    shouldRerenderOnTransaction: false,
     editorProps: {
       transformPastedHTML: katexToMathNodes,
       handleDrop: articleDocument ? dropImageBesideText : undefined,
@@ -157,11 +191,17 @@ export default function RichTextEditor({
       },
     },
     onUpdate({ editor }) {
-      onChange(editor.getJSON() as Record<string, unknown>)
+      onChange?.(editor.getJSON())
+      onDocumentUpdate?.(editor.state.doc)
     },
   })
 
   editorRef.current = editor
+  const selectedToolbar = useEditorState({
+    editor,
+    selector: ({ editor }) => editor && readToolbarState(editor),
+  })
+  useImagePanel(articleDocument && showImageInput, imageButtonRef, imagePanelRef)
 
   // Format painter: once armed, the next mouse selection takes the copied marks.
   useEffect(() => {
@@ -289,6 +329,7 @@ export default function RichTextEditor({
   }, [editor])
 
   if (!editor) return null
+  const toolbar = selectedToolbar ?? readToolbarState(editor)
 
   return (
     <div className={cn("rounded-lg border border-zinc-200", !editableImages && "overflow-hidden", articleDocument && "article-editor")}>
@@ -299,40 +340,40 @@ export default function RichTextEditor({
         className={cn("relative flex flex-wrap items-center gap-0.5 rounded-t-lg border-b border-zinc-200 bg-zinc-50 p-1.5", articleDocument && "article-ribbon")}
       >
         {/* Headings */}
-        <ToolBtn title="Heading 1" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive("heading", { level: 1 })}>H1</ToolBtn>
-        <ToolBtn title="Heading 2" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive("heading", { level: 2 })}>H2</ToolBtn>
-        <ToolBtn title="Heading 3" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={editor.isActive("heading", { level: 3 })}>H3</ToolBtn>
-        <ToolBtn title="Heading 4" onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()} active={editor.isActive("heading", { level: 4 })}>H4</ToolBtn>
+        <ToolBtn title="Heading 1" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={toolbar.h1}>H1</ToolBtn>
+        <ToolBtn title="Heading 2" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={toolbar.h2}>H2</ToolBtn>
+        <ToolBtn title="Heading 3" onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} active={toolbar.h3}>H3</ToolBtn>
+        <ToolBtn title="Heading 4" onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()} active={toolbar.h4}>H4</ToolBtn>
 
         <Divider />
 
         {/* Inline formatting */}
-        <ToolBtn title="Bold" onClick={() => editor.chain().focus().toggleBold().run()} active={editor.isActive("bold")}><strong>B</strong></ToolBtn>
-        <ToolBtn title="Italic" onClick={() => editor.chain().focus().toggleItalic().run()} active={editor.isActive("italic")}><em>I</em></ToolBtn>
-        <ToolBtn title="Underline" onClick={() => editor.chain().focus().toggleUnderline().run()} active={editor.isActive("underline")}><span className="underline">U</span></ToolBtn>
-        <ToolBtn title="Strikethrough" onClick={() => editor.chain().focus().toggleStrike().run()} active={editor.isActive("strike")}><s>S</s></ToolBtn>
-        <ToolBtn title="Inline code" onClick={() => editor.chain().focus().toggleCode().run()} active={editor.isActive("code")}><code className="text-[10px]">{"`"}</code></ToolBtn>
+        <ToolBtn title="Bold" onClick={() => editor.chain().focus().toggleBold().run()} active={toolbar.bold}><strong>B</strong></ToolBtn>
+        <ToolBtn title="Italic" onClick={() => editor.chain().focus().toggleItalic().run()} active={toolbar.italic}><em>I</em></ToolBtn>
+        <ToolBtn title="Underline" onClick={() => editor.chain().focus().toggleUnderline().run()} active={toolbar.underline}><span className="underline">U</span></ToolBtn>
+        <ToolBtn title="Strikethrough" onClick={() => editor.chain().focus().toggleStrike().run()} active={toolbar.strike}><s>S</s></ToolBtn>
+        <ToolBtn title="Inline code" onClick={() => editor.chain().focus().toggleCode().run()} active={toolbar.code}><code className="text-[10px]">{"`"}</code></ToolBtn>
 
         <Divider />
 
         {/* Block formatting */}
-        <ToolBtn title="Blockquote" onClick={() => editor.chain().focus().toggleBlockquote().run()} active={editor.isActive("blockquote")}>&#8220;</ToolBtn>
-        <ToolBtn title="Code block" onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={editor.isActive("codeBlock")}><span className="text-[9px] font-mono">{"{}"}</span></ToolBtn>
+        <ToolBtn title="Blockquote" onClick={() => editor.chain().focus().toggleBlockquote().run()} active={toolbar.blockquote}>&#8220;</ToolBtn>
+        <ToolBtn title="Code block" onClick={() => editor.chain().focus().toggleCodeBlock().run()} active={toolbar.codeBlock}><span className="text-[9px] font-mono">{"{}"}</span></ToolBtn>
         <ToolBtn title="Horizontal rule" onClick={() => editor.chain().focus().setHorizontalRule().run()}>&#8212;</ToolBtn>
 
         <Divider />
 
         {/* Lists */}
-        <ToolBtn title="Bullet list" onClick={() => editor.chain().focus().toggleBulletList().run()} active={editor.isActive("bulletList")}>&#8226;&#8212;</ToolBtn>
-        <ToolBtn title="Ordered list" onClick={() => editor.chain().focus().toggleOrderedList().run()} active={editor.isActive("orderedList")}>1.</ToolBtn>
+        <ToolBtn title="Bullet list" onClick={() => editor.chain().focus().toggleBulletList().run()} active={toolbar.bulletList}>&#8226;&#8212;</ToolBtn>
+        <ToolBtn title="Ordered list" onClick={() => editor.chain().focus().toggleOrderedList().run()} active={toolbar.orderedList}>1.</ToolBtn>
 
         <Divider />
 
         {/* Alignment */}
-        <ToolBtn title="Align left" onClick={() => editor.chain().focus().setTextAlign("left").run()} active={editor.isActive({ textAlign: "left" })}><AlignLeftIcon /></ToolBtn>
-        <ToolBtn title="Align center" onClick={() => editor.chain().focus().setTextAlign("center").run()} active={editor.isActive({ textAlign: "center" })}><AlignCenterIcon /></ToolBtn>
-        <ToolBtn title="Align right" onClick={() => editor.chain().focus().setTextAlign("right").run()} active={editor.isActive({ textAlign: "right" })}><AlignRightIcon /></ToolBtn>
-        <ToolBtn title="Justify" onClick={() => editor.chain().focus().setTextAlign("justify").run()} active={editor.isActive({ textAlign: "justify" })}><AlignJustifyIcon /></ToolBtn>
+        <ToolBtn title="Align left" onClick={() => editor.chain().focus().setTextAlign("left").run()} active={toolbar.alignLeft}><AlignLeftIcon /></ToolBtn>
+        <ToolBtn title="Align center" onClick={() => editor.chain().focus().setTextAlign("center").run()} active={toolbar.alignCenter}><AlignCenterIcon /></ToolBtn>
+        <ToolBtn title="Align right" onClick={() => editor.chain().focus().setTextAlign("right").run()} active={toolbar.alignRight}><AlignRightIcon /></ToolBtn>
+        <ToolBtn title="Justify" onClick={() => editor.chain().focus().setTextAlign("justify").run()} active={toolbar.alignJustify}><AlignJustifyIcon /></ToolBtn>
 
         <Divider />
 
@@ -343,7 +384,7 @@ export default function RichTextEditor({
             onClick={() => { setShowLinkInput(false); setShowImageInput(false); setShowYoutubeInput(false); setShowBgPicker(false); setShowColorPicker((v) => !v) }}
             active={showColorPicker}
           >
-            <TextColorIcon color={(editor.getAttributes("textStyle").color as string) ?? DEFAULT_SWATCH} />
+            <TextColorIcon color={toolbar.color ?? DEFAULT_SWATCH} />
           </ToolBtn>
           {showColorPicker && (
             <div className="absolute top-8 left-0 z-10 w-44 rounded-lg border border-zinc-200 bg-white p-2 shadow-lg">
@@ -374,7 +415,7 @@ export default function RichTextEditor({
             onClick={() => { setShowLinkInput(false); setShowImageInput(false); setShowYoutubeInput(false); setShowColorPicker(false); setShowBgPicker((v) => !v) }}
             active={showBgPicker}
           >
-            <HighlightIcon color={(editor.getAttributes("textStyle").backgroundColor as string) ?? DEFAULT_BG} />
+            <HighlightIcon color={toolbar.backgroundColor ?? DEFAULT_BG} />
           </ToolBtn>
           {showBgPicker && (
             <div className="absolute top-8 left-0 z-10 w-44 rounded-lg border border-zinc-200 bg-white p-2 shadow-lg">
@@ -403,7 +444,7 @@ export default function RichTextEditor({
         {/* Font family */}
         <Select
           title="Font"
-          value={(editor.getAttributes("textStyle").fontFamily as string) ?? ""}
+          value={toolbar.fontFamily ?? ""}
           onChange={(e) => {
             const v = e.target.value
             if (v) editor.chain().focus().setFontFamily(v).run()
@@ -449,7 +490,7 @@ export default function RichTextEditor({
           <ToolBtn
             title="Insert link"
             onClick={() => { setShowImageInput(false); setShowYoutubeInput(false); setShowColorPicker(false); setShowLinkInput((v) => !v) }}
-            active={editor.isActive("link") || showLinkInput}
+            active={toolbar.link || showLinkInput}
           >
             <LinkIcon />
           </ToolBtn>
@@ -471,7 +512,7 @@ export default function RichTextEditor({
         </div>
 
         {/* Image */}
-        <div>
+        <div ref={imageButtonRef}>
           <ToolBtn
             title="Insert image"
             onClick={() => { setShowLinkInput(false); setShowYoutubeInput(false); setShowColorPicker(false); setShowImageInput((v) => !v) }}
@@ -480,10 +521,19 @@ export default function RichTextEditor({
             <ImageIcon />
           </ToolBtn>
           {showImageInput && (
-            <div className="absolute top-full left-0 z-20 w-72 max-w-full space-y-2 rounded-lg border border-zinc-200 bg-white p-2 shadow-lg">
+            <div
+              ref={imagePanelRef}
+              role="group"
+              aria-label="Insert an image"
+              className={cn(
+                "w-72 space-y-2 rounded-lg border border-zinc-200 bg-white p-2 shadow-lg",
+                articleDocument ? "article-floating-image-panel" : "absolute top-full left-0 z-20 max-w-full",
+              )}
+            >
               <div className="flex items-center gap-1">
                 <Input
-                  autoFocus
+                  autoFocus={!articleDocument}
+                  data-image-panel-autofocus={articleDocument ? "" : undefined}
                   inputMode="url"
                   aria-label="Image URL"
                   value={imageUrl}
@@ -572,7 +622,7 @@ export default function RichTextEditor({
 
         {/* Table */}
         <ToolBtn title="Insert table" onClick={insertTable}><TableIcon /></ToolBtn>
-        {editor.isActive("table") && (
+        {toolbar.table && (
           <>
             <ToolBtn title="Add column after" onClick={() => editor.chain().focus().addColumnAfter().run()}><span className="text-[9px]">+col</span></ToolBtn>
             <ToolBtn title="Add row after" onClick={() => editor.chain().focus().addRowAfter().run()}><span className="text-[9px]">+row</span></ToolBtn>

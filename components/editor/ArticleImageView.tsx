@@ -7,14 +7,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
 import { articleImageWidth, type ImagePlacement } from "./article-image"
+import { useImagePanel } from "./use-image-panel"
 
 export function ArticleImageView({ editor, node, selected, getPos, updateAttributes, deleteNode }: NodeViewProps) {
   const figureRef = useRef<HTMLDivElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
   const resize = useRef<{ startX: number; startWidth: number; availableWidth: number } | null>(null)
   const { src, alt, caption, widthPercent } = node.attrs
   const placement: ImagePlacement = node.attrs.placement ?? "block"
   const width = articleImageWidth(widthPercent, placement)
   const widthLimit = placement === "block" ? 100 : 80
+  useImagePanel(selected, figureRef, panelRef, placement === "right" ? "bottom-end" : "bottom-start")
 
   function selectImage() {
     const pos = getPos()
@@ -74,7 +77,7 @@ export function ArticleImageView({ editor, node, selected, getPos, updateAttribu
             onPointerUp={(event) => finishResize(event, true)}
             onLostPointerCapture={(event) => finishResize(event, false)}
           />
-          <div className="article-image-controls">
+          <div ref={panelRef} role="group" aria-label="Image settings" className="article-floating-image-panel article-image-controls">
             <div className="flex flex-wrap items-center gap-1.5">
               <Select
                 aria-label="Image placement"

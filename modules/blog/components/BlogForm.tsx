@@ -4,7 +4,7 @@ import { useRef, useState } from "react"
 import { useForm, useWatch } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useRouter } from "next/navigation"
-import type { JSONContent } from "@tiptap/react"
+import type { Node as ProseMirrorNode } from "@tiptap/pm/model"
 import { Plus } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
@@ -45,7 +45,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
   const [coverUploading, setCoverUploading] = useState(false)
   const [bodyUploading, setBodyUploading] = useState(false)
   const [initialArticle] = useState(() => blogBlocksToDocument(blog?.blocks ?? []))
-  const editedArticle = useRef<JSONContent | null>(null)
+  const editedArticle = useRef<ProseMirrorNode | null>(null)
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const [localCategories, setLocalCategories] = useState<BlogCategory[]>(categories)
@@ -85,7 +85,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
   async function onSubmit(values: BlogFormValues) {
     if (isUploading) return
     setSubmitError(null)
-    const content = editedArticle.current && documentToBlogBlocks(editedArticle.current)
+    const content = editedArticle.current && documentToBlogBlocks(editedArticle.current.toJSON())
     let saved: Blog
     try {
       saved = isEdit
@@ -269,7 +269,7 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
           </div>
           <RichTextEditor
             value={initialArticle}
-            onChange={(doc) => { editedArticle.current = doc }}
+            onDocumentUpdate={(document) => { editedArticle.current = document }}
             onUploadingChange={setBodyUploading}
             placeholder="Start writing your article…"
             articleDocument
