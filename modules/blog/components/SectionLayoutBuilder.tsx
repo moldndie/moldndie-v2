@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useId, useState } from "react"
 import {
   ChevronUp, ChevronDown, Trash2, Plus, X, ArrowLeft,
   AlignLeft, ImageIcon, Quote, List, Play, Type,
@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils"
 import type { BlockType } from "@/types/blog"
 import type { EditorBlock, Section } from "../types"
-import { blocksToSections, sectionsToBlocks, makeBlock, DEFAULT_COLUMN_RATIO } from "../utils/sections"
+import { blocksToSections, sectionsToBlocks, makeBlock, DEFAULT_COLUMN_RATIO, canJoinArticle, joinArticleSections } from "../utils/sections"
 import { HeadingBlock } from "./blocks/HeadingBlock"
 import { ParagraphBlock } from "./blocks/ParagraphBlock"
 import { ImageBlock } from "./blocks/ImageBlock"
@@ -97,15 +97,19 @@ interface SectionLayoutBuilderProps {
 }
 
 export function SectionLayoutBuilder({ value, onChange }: SectionLayoutBuilderProps) {
-  // Derive sections each render — avoids dual-state sync when editing an existing blog
-  const sections = blocksToSections(value)
+  const starterBlock: EditorBlock = { id: useId(), block_type: "paragraph", content: { text: "" } }
+  const sections = blocksToSections(value.length ? value : [starterBlock])
+  const canCombine = sections.some((section, index) =>
+    canJoinArticle(section) && (section.block.block_type === "image" ||
+      (sections[index + 1] && canJoinArticle(sections[index + 1])))
+  )
 
   function commit(next: Section[]) {
     onChange(sectionsToBlocks(next))
   }
 
   function addSection(section: Section) {
-    commit([...sections, section])
+    commit(value.length ? [...sections, section] : [section])
   }
 
   function removeSection(id: string) {
@@ -179,6 +183,16 @@ export function SectionLayoutBuilder({ value, onChange }: SectionLayoutBuilderPr
 
   return (
     <div className="space-y-2">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <p className="text-xs text-zinc-500">
+          Write in the text area. Select an inserted image to wrap text, resize it, add a caption, or drag it to another spot.
+        </p>
+        {canCombine && (
+          <Button type="button" variant="outline" size="xs" onClick={() => commit(joinArticleSections(sections))}>
+            Combine neighboring text and images
+          </Button>
+        )}
+      </div>
       {/* Section cards */}
       {sections.map((section, i) => (
         <SectionCard
@@ -196,11 +210,7 @@ export function SectionLayoutBuilder({ value, onChange }: SectionLayoutBuilderPr
         />
       ))}
 
-      {/* Inline composer — empty state or append row */}
-      <SectionComposer
-        isEmpty={sections.length === 0}
-        onAdd={addSection}
-      />
+      <SectionComposer onAdd={addSection} />
     </div>
   )
 }
@@ -210,10 +220,8 @@ export function SectionLayoutBuilder({ value, onChange }: SectionLayoutBuilderPr
 type ComposerStep = "closed" | "layout" | "full-type"
 
 function SectionComposer({
-  isEmpty,
   onAdd,
 }: {
-  isEmpty: boolean
   onAdd: (section: Section) => void
 }) {
   const [step, setStep] = useState<ComposerStep>("closed")
@@ -222,22 +230,20 @@ function SectionComposer({
     setStep("closed")
   }
 
-  function newId() {
-    return `sec-${Date.now()}-${Math.random().toString(36).slice(2)}`
-  }
-
   function handleAddFull(type: BlockType) {
-    onAdd({ id: newId(), type: "full-width", block: makeBlock(type) })
+    const block = makeBlock(type)
+    onAdd({ id: `sec-${block.id}`, type: "full-width", block })
     reset()
   }
 
   function handleAddTwoCol() {
     // Seed the left column with one block so the region persists (an empty
     // region would produce no blocks and vanish on the next derive).
+    const firstBlock = makeBlock("paragraph")
     onAdd({
-      id: newId(),
+      id: `sec-${firstBlock.id}`,
       type: "two-column",
-      left: [makeBlock("paragraph")],
+      left: [firstBlock],
       right: [],
       ratio: DEFAULT_COLUMN_RATIO,
     })
@@ -246,23 +252,7 @@ function SectionComposer({
 
   // ── Closed state ─────────────────────────────────────────────────────────────
   if (step === "closed") {
-    return isEmpty ? (
-      <Button variant="unstyled"
-        type="button"
-        onClick={() => setStep("layout")}
-        className="w-full rounded-lg border-2 border-dashed border-zinc-200 py-10 text-center hover:border-primary transition-colors group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-      >
-        <div className="flex justify-center mb-2.5">
-          <div className="rounded-lg bg-zinc-100 p-2.5 group-hover:bg-zinc-200 transition-colors">
-            <LayoutTemplate className="size-5 text-zinc-400" />
-          </div>
-        </div>
-        <p className="text-sm font-medium text-zinc-400 group-hover:text-primary transition-colors">
-          No sections yet
-        </p>
-        <p className="mt-1 text-xs text-zinc-300">Click to add your first section</p>
-      </Button>
-    ) : (
+    return (
       <Button variant="unstyled"
         type="button"
         onClick={() => setStep("layout")}
@@ -476,6 +466,7 @@ function SectionCard({
         <div className="p-3">
           <BlockInput
             block={section.block}
+            spacious={section.block.block_type === "paragraph"}
             onChange={(content) => onUpdateBlock(section.id, "block", content)}
           />
         </div>
@@ -637,9 +628,11 @@ function BlockBadge({ type }: { type: BlockType }) {
 function BlockInput({
   block,
   onChange,
+  spacious,
 }: {
   block: EditorBlock
   onChange: (content: Record<string, unknown>) => void
+  spacious?: boolean
 }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const h = (v: any) => onChange(v as Record<string, unknown>)
@@ -648,7 +641,7 @@ function BlockInput({
     case "heading":
       return <HeadingBlock   value={block.content as { text: string; level: 1 | 2 | 3 }}  onChange={h} />
     case "paragraph":
-      return <ParagraphBlock value={block.content as { text: string }}                    onChange={h} />
+      return <ParagraphBlock value={block.content as { text: string }} onChange={h} spacious={spacious} />
     case "image":
       return <ImageBlock     value={block.content as { url: string; caption?: string }}   onChange={h} />
     case "quote":

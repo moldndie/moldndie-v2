@@ -1,6 +1,6 @@
 "use client"
 
-import { useEditor, EditorContent } from "@tiptap/react"
+import { useEditor, EditorContent, ReactNodeViewRenderer } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Link from "@tiptap/extension-link"
 import Underline from "@tiptap/extension-underline"
@@ -23,6 +23,18 @@ import { cn } from "@/lib/utils"
 import { Select } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { uploadFileToR2 } from "@/services/upload.service"
+import { ArticleImage, articleImageLayout } from "./article-image"
+import { ArticleImageView } from "./ArticleImageView"
+import "./article-image.css"
+
+const EditableArticleImage = ArticleImage.extend({
+  addNodeView() {
+    return ReactNodeViewRenderer(ArticleImageView, {
+      attrs: ({ node }) => articleImageLayout(node.attrs),
+    })
+  },
+})
 
 // ——— Toolbar button ———
 function ToolBtn({
@@ -39,10 +51,10 @@ function ToolBtn({
   return (
     <Button variant="unstyled"
       type="button"
-      onMouseDown={(e) => {
-        e.preventDefault()
-        onClick()
-      }}
+      onMouseDown={(e) => e.preventDefault()}
+      onClick={onClick}
+      aria-label={title}
+      aria-pressed={active}
       title={title}
       className={cn(
         "flex h-7 w-7 items-center justify-center rounded-lg text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40",
@@ -65,6 +77,7 @@ interface RichTextEditorProps {
   onChange: (value: Record<string, unknown>) => void
   placeholder?: string
   minHeight?: number
+  articleImages?: boolean
 }
 
 export default function RichTextEditor({
@@ -72,11 +85,14 @@ export default function RichTextEditor({
   onChange,
   placeholder = "Start writing…",
   minHeight = 400,
+  articleImages = false,
 }: RichTextEditorProps) {
   const [linkUrl, setLinkUrl] = useState("")
   const [showLinkInput, setShowLinkInput] = useState(false)
   const [imageUrl, setImageUrl] = useState("")
   const [showImageInput, setShowImageInput] = useState(false)
+  const [imageError, setImageError] = useState("")
+  const [imageUploading, setImageUploading] = useState(false)
   const [youtubeUrl, setYoutubeUrl] = useState("")
   const [showYoutubeInput, setShowYoutubeInput] = useState(false)
   const [showColorPicker, setShowColorPicker] = useState(false)
@@ -96,7 +112,7 @@ export default function RichTextEditor({
       Underline,
       Link.configure({ openOnClick: false, HTMLAttributes: { class: "text-primary" } }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
-      Image.configure({ inline: false, allowBase64: false }),
+      articleImages ? EditableArticleImage : Image.configure({ inline: false, allowBase64: false }),
       Youtube.configure({ width: 840, height: 472, nocookie: true }),
       Table.configure({ resizable: true }),
       TableRow,
@@ -166,11 +182,40 @@ export default function RichTextEditor({
   }, [editor, linkUrl])
 
   const insertImage = useCallback(() => {
-    if (!editor || !imageUrl) return
-    editor.chain().focus().setImage({ src: imageUrl }).run()
+    if (!editor || !imageUrl.trim()) return
+    const src = imageUrl.trim()
+    if (articleImages) {
+      try {
+        if (!["http:", "https:"].includes(new URL(src).protocol)) throw new Error()
+      } catch {
+        setImageError("Enter a valid HTTP or HTTPS image URL.")
+        return
+      }
+      editor.chain().focus().insertContent({ type: "image", attrs: { src, placement: "block" } }).run()
+    } else {
+      editor.chain().focus().setImage({ src }).run()
+    }
+    setImageError("")
     setImageUrl("")
     setShowImageInput(false)
-  }, [editor, imageUrl])
+  }, [editor, imageUrl, articleImages])
+
+  async function uploadArticleImage(file: File) {
+    if (!file.type.startsWith("image/")) {
+      setImageError("Choose an image file.")
+      return
+    }
+    setImageError("")
+    setImageUploading(true)
+    try {
+      const { url } = await uploadFileToR2("blog-images", file)
+      setImageUrl(url)
+    } catch {
+      setImageError("Image upload failed. Try again or enter an image URL.")
+    } finally {
+      setImageUploading(false)
+    }
+  }
 
   const insertYoutube = useCallback(() => {
     if (!editor || !youtubeUrl) return
@@ -187,9 +232,9 @@ export default function RichTextEditor({
   if (!editor) return null
 
   return (
-    <div className="rounded-lg border border-zinc-200 overflow-hidden">
+    <div className={cn("rounded-lg border border-zinc-200", !articleImages && "overflow-hidden")}>
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-0.5 border-b border-zinc-200 bg-zinc-50 p-1.5">
+      <div className="relative flex flex-wrap items-center gap-0.5 rounded-t-lg border-b border-zinc-200 bg-zinc-50 p-1.5">
         {/* Headings */}
         <ToolBtn title="Heading 1" onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} active={editor.isActive("heading", { level: 1 })}>H1</ToolBtn>
         <ToolBtn title="Heading 2" onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} active={editor.isActive("heading", { level: 2 })}>H2</ToolBtn>
@@ -363,7 +408,7 @@ export default function RichTextEditor({
         </div>
 
         {/* Image */}
-        <div className="relative">
+        <div>
           <ToolBtn
             title="Insert image"
             onClick={() => { setShowLinkInput(false); setShowYoutubeInput(false); setShowColorPicker(false); setShowImageInput((v) => !v) }}
@@ -372,17 +417,41 @@ export default function RichTextEditor({
             <ImageIcon />
           </ToolBtn>
           {showImageInput && (
-            <div className="absolute top-8 left-0 z-10 flex gap-1 rounded-lg border border-zinc-200 bg-white p-1.5 shadow-lg">
-              <Input
-                autoFocus
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && insertImage()}
-                placeholder="https://… image URL"
-                className="h-7 w-52 px-2 py-1 text-xs"
-              />
-              <Button type="button" size="xs" onClick={insertImage}>Insert</Button>
+            <div className="absolute top-full left-0 z-20 w-72 max-w-full space-y-2 rounded-lg border border-zinc-200 bg-white p-2 shadow-lg">
+              <div className="flex items-center gap-1">
+                <Input
+                  autoFocus
+                  inputMode="url"
+                  aria-label="Image URL"
+                  value={imageUrl}
+                  onChange={(e) => { setImageUrl(e.target.value); setImageError("") }}
+                  onKeyDown={(e) => {
+                    if (e.key !== "Enter") return
+                    e.preventDefault()
+                    if (!imageUploading) insertImage()
+                  }}
+                  placeholder="https://… image URL"
+                  className="h-7 min-w-0 px-2 py-1 text-xs"
+                />
+                <Button type="button" size="xs" disabled={imageUploading} onClick={insertImage}>Insert</Button>
+              </div>
+              {articleImages && (
+                <label className="block space-y-1 text-xs text-zinc-600">
+                  {imageUploading ? "Uploading image…" : "Or choose a file to upload"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    disabled={imageUploading}
+                    className="block w-full text-xs"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      e.target.value = ""
+                      if (file) void uploadArticleImage(file)
+                    }}
+                  />
+                </label>
+              )}
+              {imageError && <p role="alert" className="text-xs text-red-600">{imageError}</p>}
             </div>
           )}
         </div>
@@ -430,7 +499,7 @@ export default function RichTextEditor({
       </div>
 
       {/* Editor area */}
-      <EditorContent editor={editor} className="bg-white" />
+      <EditorContent editor={editor} className="rounded-b-lg bg-white" />
     </div>
   )
 }

@@ -45,7 +45,13 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
   const isPending = createBlog.isPending || updateBlog.isPending
 
   const [coverUploading, setCoverUploading] = useState(false)
-  const [blocks, setBlocks] = useState<EditorBlock[]>([])
+  const [blocks, setBlocks] = useState<EditorBlock[]>(() =>
+    [...(blog?.blocks ?? [])]
+      .sort((a, b) => a.order_index - b.order_index)
+      .map(({ id, block_type, content, layout, column_position, column_ratio }) => ({
+        id, block_type, content, layout, column_position, column_ratio,
+      }))
+  )
   const [submitError, setSubmitError] = useState<string | null>(null)
 
   const [localCategories, setLocalCategories] = useState<BlogCategory[]>(categories)
@@ -80,16 +86,6 @@ export function BlogForm({ blog, categories, tags, selectedTagIds = [] }: BlogFo
       setValue("slug", slugify(titleValue), { shouldValidate: false })
     }
   }, [titleValue, isEdit, setValue])
-
-  useEffect(() => {
-    if (blog?.blocks) {
-      setBlocks(
-        [...blog.blocks]
-          .sort((a, b) => a.order_index - b.order_index)
-          .map((b) => ({ id: b.id, block_type: b.block_type, content: b.content, layout: b.layout ?? null, column_position: b.column_position ?? null, column_ratio: b.column_ratio ?? null }))
-      )
-    }
-  }, [blog])
 
   function toggleTag(id: string) {
     setPickedTagIds((prev) =>

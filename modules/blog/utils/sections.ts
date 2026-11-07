@@ -1,5 +1,71 @@
 import type { BlockType } from "@/types/blog"
 import type { EditorBlock, Section } from "../types"
+import { fromDoc, toDoc } from "@/lib/richtext"
+
+type FullWidthSection = Extract<Section, { type: "full-width" }>
+
+export function canJoinArticle(section: Section): section is FullWidthSection {
+  return section.type === "full-width" &&
+    ["paragraph", "heading", "image", "list"].includes(section.block.block_type)
+}
+
+function articleNodes({ block_type, content }: EditorBlock): Record<string, unknown>[] {
+  const textNode = (text: unknown) =>
+    typeof text === "string" && text ? [{ type: "text", text }] : []
+
+  switch (block_type) {
+    case "paragraph": {
+      const nodes = toDoc(content.text)?.content
+      return Array.isArray(nodes) ? nodes : []
+    }
+    case "heading":
+      return [{ type: "heading", attrs: { level: content.level ?? 2 }, content: textNode(content.text) }]
+    case "image":
+      return content.url
+        ? [{ type: "image", attrs: { src: content.url, caption: content.caption, placement: "block" } }]
+        : []
+    case "list":
+      return Array.isArray(content.items) && content.items.length > 0
+        ? [{
+            type: "bulletList",
+            content: content.items.map((item) => ({
+              type: "listItem", content: [{ type: "paragraph", content: textNode(item) }],
+            })),
+          }]
+        : []
+    default:
+      return []
+  }
+}
+
+export function joinArticleSections(sections: Section[]): Section[] {
+  const result: Section[] = []
+  let pending: FullWidthSection[] = []
+
+  function flush() {
+    const first = pending[0]
+    if (!first) return
+    if (pending.length === 1 && first.block.block_type !== "image") {
+      result.push(first)
+    } else {
+      const block = makeBlock("paragraph")
+      block.content = { text: fromDoc({ type: "doc", content: pending.flatMap(({ block }) => articleNodes(block)) }) }
+      result.push({ id: `sec-${block.id}`, type: "full-width", block })
+    }
+    pending = []
+  }
+
+  for (const section of sections) {
+    if (canJoinArticle(section)) {
+      pending.push(section)
+    } else {
+      flush()
+      result.push(section)
+    }
+  }
+  flush()
+  return result
+}
 
 // ─── Default content per block type ──────────────────────────────────────────
 

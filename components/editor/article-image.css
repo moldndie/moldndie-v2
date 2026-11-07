@@ -1,0 +1,82 @@
+/* A figure floats with its caption, so the same paragraph can continue below it. */
+.cms-editor:has([data-article-image]),
+.cms-content:has([data-article-image]) {
+  display: flow-root;
+  container-type: inline-size;
+}
+[data-article-image] {
+  width: var(--article-image-live-width, var(--article-image-width, 100%));
+  max-width: 100%;
+  margin: 1rem auto;
+}
+[data-article-image="block"] { clear: both; }
+[data-article-image="left"] {
+  float: left;
+  margin: 0.25rem 1.25rem 0.75rem 0;
+}
+[data-article-image="right"] {
+  float: right;
+  margin: 0.25rem 0 0.75rem 1.25rem;
+}
+@container (max-width: 480px) {
+  [data-article-image="left"],
+  [data-article-image="right"] {
+    float: none;
+    width: 100%;
+    margin: 1rem auto;
+  }
+}
+.cms-editor [data-article-image] img,
+.cms-content [data-article-image] img {
+  display: block;
+  width: 100%;
+  margin: 0;
+}
+[data-article-image] figcaption {
+  margin-top: 0.5rem;
+  color: #52525b;
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+.article-image-grip,
+.article-image-resize {
+  position: absolute;
+  z-index: 1;
+  border: 1px solid #d4d4d8;
+  border-radius: 0.375rem;
+  background: white;
+  color: #3f3f46;
+}
+.article-image-grip {
+  top: 0.375rem;
+  left: 0.375rem;
+  padding: 0.25rem;
+  cursor: grab;
+}
+.article-image-resize {
+  right: 0;
+  bottom: 0;
+  width: 0.875rem;
+  height: 1.5rem;
+  cursor: ew-resize;
+  touch-action: none;
+}
+[data-article-image="right"] .article-image-resize { left: 0; right: auto; }
+@container (max-width: 480px) {
+  [data-article-image]:not([data-article-image="block"]) .article-image-resize { display: none; }
+}
+.article-image-controls {
+  position: absolute;
+  z-index: 5;
+  top: calc(100% + 0.375rem);
+  left: 0;
+  display: grid;
+  gap: 0.375rem;
+  width: min(14rem, 100cqw);
+  padding: 0.5rem;
+  border: 1px solid #e4e4e7;
+  border-radius: 0.5rem;
+  background: white;
+  box-shadow: 0 4px 12px #0002;
+}
+[data-article-image="right"] .article-image-controls { right: 0; left: auto; }

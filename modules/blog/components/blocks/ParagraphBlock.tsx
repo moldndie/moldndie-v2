@@ -10,6 +10,7 @@ interface ParagraphContent {
 interface ParagraphBlockProps {
   value: ParagraphContent
   onChange: (value: ParagraphContent) => void
+  spacious?: boolean
 }
 
 /**
@@ -17,13 +18,14 @@ interface ParagraphBlockProps {
  * rich-text column. Posts written before this block became rich text hold raw
  * plain text — `toDoc` wraps those in a paragraph rather than dropping them.
  */
-export function ParagraphBlock({ value, onChange }: ParagraphBlockProps) {
+export function ParagraphBlock({ value, onChange, spacious }: ParagraphBlockProps) {
   return (
     <RichTextEditor
       value={toDoc(value.text)}
       onChange={(doc) => onChange({ text: fromDoc(doc) })}
       placeholder="Start writing…"
-      minHeight={140}
+      minHeight={spacious ? 280 : 140}
+      articleImages
     />
   )
 }

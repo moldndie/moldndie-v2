@@ -5,7 +5,6 @@ import StarterKit from "@tiptap/starter-kit"
 import Link from "@tiptap/extension-link"
 import Underline from "@tiptap/extension-underline"
 import TextAlign from "@tiptap/extension-text-align"
-import Image from "@tiptap/extension-image"
 import Youtube from "@tiptap/extension-youtube"
 import { Table } from "@tiptap/extension-table"
 import TableRow from "@tiptap/extension-table-row"
@@ -16,6 +15,8 @@ import Color from "@tiptap/extension-color"
 import { InlineMath, BlockMath } from "@tiptap/extension-mathematics"
 import "katex/dist/katex.min.css"
 import { toDoc, isDocEmpty } from "@/lib/richtext"
+import { ArticleImage } from "./article-image"
+import "./article-image.css"
 
 // Extensions are configured at module level — they don't touch the DOM.
 // Only generateHTML → getHTMLFromFragment uses document/DOM APIs, which is
@@ -25,7 +26,7 @@ const extensions = [
   Underline,
   Link.configure({ HTMLAttributes: { class: "text-primary" } }),
   TextAlign.configure({ types: ["heading", "paragraph"] }),
-  Image.configure({ inline: false }),
+  ArticleImage,
   Youtube.configure({ nocookie: true }),
   Table.configure({ resizable: false }),
   TableRow,
