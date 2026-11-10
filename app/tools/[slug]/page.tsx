@@ -10,8 +10,12 @@ import { ContentViewTracker } from "@/components/analytics/ContentViewTracker"
 import { getCalculatorBySlug, getCalculators } from "@/services/calculator.service"
 import CalculatorRunner from "./CalculatorRunner"
 import CustomCalculatorFrame from "./CustomCalculatorFrame"
+import DraftAngleCalculator from "./DraftAngleCalculator"
+import GateSizeCalculator from "./GateSizeCalculator"
 import { PublicBreadcrumb } from "@/components/layout/PublicBreadcrumb"
 import { AdSlotGrid } from "@/components/ads/AdSlotGrid"
+import { DRAFT_ANGLE_SLUG, GATE_SIZE_SLUG } from "../native-calculators"
+import theme from "../engineering-theme.module.css"
 
 export async function generateStaticParams() {
   const calcs = await getCalculators({ published: true }).catch(() => [])
@@ -31,7 +35,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
 export default async function CalculatorPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const calc = await getCalculatorBySlug(slug)
-  if (!calc || !calc.is_published) notFound()
+  const isDraft = slug === DRAFT_ANGLE_SLUG
+  const isGate = slug === GATE_SIZE_SLUG
+  const localPreview = process.env.NODE_ENV === "development" && (isDraft || isGate)
+  if (!calc || (!calc.is_published && !localPreview)) notFound()
 
   // Related calculators (same category, excluding self)
   const related = calc.category_id
@@ -43,29 +50,23 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
   return (
     <div className="min-h-screen flex flex-col bg-white">
       <Navbar />
-      <main className="flex-1">
-        <ContentViewTracker contentType="calculator" contentId={calc.id} />
+      <main className={`flex-1 ${theme.main}`}>
+        {calc.is_published && <ContentViewTracker contentType="calculator" contentId={calc.id} />}
         {/* Header */}
-        <section className="max-w-7xl mx-auto px-6 pt-10">
+        <header className={`max-w-7xl mx-auto px-4 sm:px-6 ${theme.hero}`}>
           <PublicBreadcrumb crumbs={[
             { label: "Engineering", href: "/tools" },
             { label: calc.title },
           ]} />
-          {calc.category && (
-            <span className="mt-3 inline-block rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
-              {calc.category.name}
-            </span>
-          )}
-          <h1 className="mt-2 text-3xl md:text-4xl font-extrabold text-zinc-900 uppercase tracking-tight">
-            {calc.title}
-          </h1>
+          <p className={theme.eyebrow}>Engineering{calc.category && ` · ${calc.category.name}`}</p>
+          <h1 className={theme.title}>{calc.title}</h1>
           {calc.short_description && (
-            <p className="mt-1 text-sm text-zinc-500 max-w-2xl">{calc.short_description}</p>
+            <p className={theme.lead}>{calc.short_description}</p>
           )}
-        </section>
+        </header>
 
         {/* Calculator */}
-        <section className="max-w-7xl mx-auto px-6 py-10 space-y-8">
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 py-10 space-y-8">
           {/* `images` is the current field; `cover_image` covers rows saved before it existed. */}
           {(() => {
             const images = calc.images?.length ? calc.images : calc.cover_image ? [calc.cover_image] : []
@@ -96,7 +97,11 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
             )
           })()}
 
-          {calc.custom_html ? (
+          {isDraft ? (
+            <DraftAngleCalculator />
+          ) : isGate ? (
+            <GateSizeCalculator />
+          ) : calc.custom_html ? (
             <CustomCalculatorFrame html={calc.custom_html} title={calc.title} />
           ) : (
             /* White card holding footer-maroon panels (client's colour pick).
@@ -109,7 +114,7 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
           )}
 
           {/* Description */}
-          {calc.description && (
+          {calc.description && !isDraft && (
             <div className="rounded-2xl border border-zinc-100 bg-white p-6 shadow-sm">
               <h2 className="text-base font-bold text-zinc-900 uppercase tracking-wide mb-3">
                 About This Calculator
@@ -129,7 +134,7 @@ export default async function CalculatorPage({ params }: { params: Promise<{ slu
                   <a
                     key={r.id}
                     href={`/tools/${r.slug}`}
-                    className="group rounded-2xl border border-zinc-100 bg-white p-5 shadow-sm hover:shadow-md transition-all duration-200"
+                    className={`group p-5 ${theme.card}`}
                   >
                     <p className="text-sm font-bold text-zinc-900 group-hover:text-primary transition-colors">
                       {r.title}

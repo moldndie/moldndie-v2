@@ -77,11 +77,11 @@ export default async function Footer() {
   const pages = enabledModules(parseDisabled(settings.disabled_modules))
 
   const socialLinks = [
-    { icon: Linkedin,      href: s.social_linkedin,  label: "LinkedIn",  hoverClass: "hover:text-[#0A66C2]" },
-    { icon: Facebook,      href: s.social_facebook,  label: "Facebook",  hoverClass: "hover:text-[#1877F2]" },
-    { icon: Youtube,       href: s.social_youtube,   label: "YouTube",   hoverClass: "hover:text-[#FF0000]" },
-    { icon: PinterestIcon, href: s.social_pinterest, label: "Pinterest", hoverClass: "hover:text-[#BD081C]" },
-    { icon: Instagram,     href: s.social_instagram, label: "Instagram", hoverClass: "hover:text-pink-500" },
+    { icon: Linkedin,      href: s.social_linkedin,  label: "LinkedIn",  color: "#0A66C2" },
+    { icon: Facebook,      href: s.social_facebook,  label: "Facebook",  color: "#1877F2" },
+    { icon: Youtube,       href: s.social_youtube,   label: "YouTube",   color: "#FF0000" },
+    { icon: PinterestIcon, href: s.social_pinterest, label: "Pinterest", color: "#E60023" },
+    { icon: Instagram,     href: s.social_instagram, label: "Instagram", color: "#E4405F" },
   ].filter((item) => item.href)
 
   const hasContact =
@@ -99,9 +99,9 @@ export default async function Footer() {
             <Image
               src={s.logo_footer || "/assets/logo-white-updated.png"}
               alt="Mold N Die"
-              width={130}
+              width={s.logo_footer ? 176 : 88}
               height={44}
-              className="h-11 w-auto"
+              className={s.logo_footer ? "h-auto w-44 max-w-full" : "h-11 w-auto"}
               unoptimized={!!s.logo_footer}
             />
             {s.footer_tagline && (
@@ -186,14 +186,15 @@ export default async function Footer() {
             {/* Social icons */}
             {socialLinks.length > 0 && (
               <div className="flex items-center gap-3.5 mt-5">
-                {socialLinks.map(({ icon: Icon, href, label, hoverClass }) => (
+                {socialLinks.map(({ icon: Icon, href, label, color }) => (
                   <a
                     key={label}
                     href={href}
                     aria-label={label}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className={`text-white/50 transition-colors ${hoverClass}`}
+                    className="rounded-sm text-white/50 transition-colors hover:text-(--social-color) focus-visible:text-(--social-color) focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+                    style={{ "--social-color": color } as React.CSSProperties}
                   >
                     <Icon size={17} />
                   </a>
