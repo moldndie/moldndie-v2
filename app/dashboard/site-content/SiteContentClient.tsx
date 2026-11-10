@@ -460,7 +460,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
                     alt="Current favicon"
                     width={32}
                     height={32}
-                    className="size-8 object-contain"
+                    className="size-8 rounded-md bg-white object-contain"
                     unoptimized
                   />
                 </div>
@@ -474,7 +474,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 onUploadSuccess={({ url }) => handleChange("logo_favicon", url)}
                 onClear={() => handleChange("logo_favicon", "")}
               />
-              <p className="text-xs text-zinc-400">Recommended: 512×512px PNG or ICO. Changes require a site redeploy to take effect in browser tabs.</p>
+              <p className="text-xs text-zinc-400">Use a square PNG or JPEG with a simple, high-contrast mark. After saving, the site serves a 48 × 48 px tab icon on white. Browsers may take a few minutes to refresh it.</p>
             </div>
           </div>
         )}
