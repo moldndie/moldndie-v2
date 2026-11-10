@@ -5,7 +5,7 @@ function Part() {
     <>
       <rect x="360" y="100" width="230" height="130" rx="8" className="gate-svg-part" />
       <text x="457" y="170" className="gate-svg-label">PART</text>
-    < />
+    </>
   )
 }
 
@@ -19,7 +19,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M475 70v52" className="gate-svg-flow" />
       <text x="500" y="82" className="gate-svg-label">SPRUE</text>
       <text x="486" y="117" className="gate-svg-note">DIRECT GATE</text>
-    < />
+    </>
   ) },
   "Edge / Side Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -29,7 +29,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M130 165H410" className="gate-svg-flow" />
       <text x="105" y="145" className="gate-svg-label">RUNNER</text>
       <text x="312" y="196" className="gate-svg-note">EDGE</text>
-    < />
+    </>
   ) },
   "Internal Edge Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -39,7 +39,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M130 205H410V175" className="gate-svg-flow" />
       <text x="103" y="185" className="gate-svg-label">RUNNER</text>
       <text x="427" y="168" className="gate-svg-note">INTERNAL EDGE</text>
-    < />
+    </>
   ) },
   "Tab Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -50,7 +50,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M120 165H405" className="gate-svg-flow" />
       <text x="279" y="126" className="gate-svg-note">TAB</text>
       <text x="101" y="145" className="gate-svg-label">RUNNER</text>
-    < />
+    </>
   ) },
   "Overlap Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -60,7 +60,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M125 202H370V182H420" className="gate-svg-flow" />
       <text x="104" y="183" className="gate-svg-label">RUNNER</text>
       <text x="312" y="229" className="gate-svg-note">OVERLAP</text>
-    < />
+    </>
   ) },
   "Fan Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -70,7 +70,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M120 165H430" className="gate-svg-flow" />
       <text x="276" y="116" className="gate-svg-note">FAN</text>
       <text x="105" y="145" className="gate-svg-label">RUNNER</text>
-    < />
+    </>
   ) },
   "Film Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -80,7 +80,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M120 165H430" className="gate-svg-flow" />
       <text x="285" y="102" className="gate-svg-note">WIDE FILM ENTRY</text>
       <text x="104" y="145" className="gate-svg-label">RUNNER</text>
-    < />
+    </>
   ) },
   "Flash Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -90,7 +90,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M120 165H440" className="gate-svg-flow" />
       <path d="M360 100v130" className="gate-svg-dim" />
       <text x="268" y="138" className="gate-svg-note">FLASH / FULL-WIDTH ENTRY</text>
-    < />
+    </>
   ) },
   "Chisel Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -99,7 +99,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M295 143 L360 165 L295 187 Z" className="gate-svg-gate" />
       <path d="M125 165H420" className="gate-svg-flow" />
       <text x="295" y="132" className="gate-svg-note">CHISEL</text>
-    < />
+    </>
   ) },
   "Restricted Edge Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -108,7 +108,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <rect x="338" y="160" width="22" height="10" rx="2" className="gate-svg-gate" />
       <path d="M125 165H420" className="gate-svg-flow" />
       <text x="296" y="148" className="gate-svg-note">RESTRICTED EDGE</text>
-    < />
+    </>
   ) },
   "Pinpoint / Pin Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -119,7 +119,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M475 70V160" className="gate-svg-flow" />
       <text x="495" y="90" className="gate-svg-label">PIN RUNNER</text>
       <text x="493" y="136" className="gate-svg-note">PINPOINT</text>
-    < />
+    </>
   ) },
   "Tunnel / Submarine Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -130,7 +130,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M120 225L350 181" className="gate-svg-flow" />
       <text x="95" y="205" className="gate-svg-label">RUNNER</text>
       <text x="242" y="242" className="gate-svg-note">ANGLED SUBMARINE TUNNEL</text>
-    < />
+    </>
   ) },
   "Curved Tunnel Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -139,7 +139,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M230 225 C280 225 282 180 318 176 C340 174 347 160 360 150" className="gate-svg-runner-thin" />
       <path d="M120 225C285 225 290 175 355 153" className="gate-svg-flow" />
       <text x="224" y="248" className="gate-svg-note">CURVED TUNNEL</text>
-    < />
+    </>
   ) },
   "Cashew / Banana Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -148,7 +148,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M220 230 C300 250 335 250 346 210 C353 184 344 164 360 150" className="gate-svg-runner-thin" />
       <path d="M120 230C300 255 345 230 360 153" className="gate-svg-flow" />
       <text x="220" y="266" className="gate-svg-note">CASHEW / BANANA PATH</text>
-    < />
+    </>
   ) },
   "Diaphragm Gate": { caption: "TOP VIEW", art: (
     <>
@@ -159,7 +159,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M150 165H440" className="gate-svg-flow" />
       <text x="438" y="58" className="gate-svg-note">360° DIAPHRAGM</text>
       <text x="453" y="171" className="gate-svg-label">HOLE</text>
-    < />
+    </>
   ) },
   "Ring Gate": { caption: "TOP VIEW", art: (
     <>
@@ -169,7 +169,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M120 165H372" className="gate-svg-runner" />
       <path d="M150 165H382" className="gate-svg-flow" />
       <text x="432" y="49" className="gate-svg-note">ANNULAR RING GATE</text>
-    < />
+    </>
   ) },
   "Disk Gate": { caption: "TOP VIEW", art: (
     <>
@@ -179,7 +179,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M120 165H452" className="gate-svg-runner" />
       <path d="M150 165H445" className="gate-svg-flow" />
       <text x="438" y="104" className="gate-svg-note">DISK GATE</text>
-    < />
+    </>
   ) },
   "Spoke Gate": { caption: "TOP VIEW", art: (
     <>
@@ -190,7 +190,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M120 165H445" className="gate-svg-flow" />
       <path d="M120 165H456" className="gate-svg-runner" />
       <text x="426" y="57" className="gate-svg-note">RADIAL SPOKES</text>
-    < />
+    </>
   ) },
   "Hot Tip / Thermal Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -200,7 +200,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <circle cx="475" cy="119" r="7" className="gate-svg-gate" />
       <path d="M475 72v90" className="gate-svg-flow" />
       <text x="505" y="85" className="gate-svg-label">HOT TIP</text>
-    < />
+    </>
   ) },
   "Open Hot-Tip Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -210,7 +210,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M468 112h14v16h-14z" className="gate-svg-gate" />
       <path d="M475 70v98" className="gate-svg-flow" />
       <text x="500" y="90" className="gate-svg-label">OPEN HOT TIP</text>
-    < />
+    </>
   ) },
   "Valve Gate": { caption: "SECTION VIEW", art: (
     <>
@@ -222,7 +222,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M495 75v90" className="gate-svg-flow" />
       <text x="505" y="82" className="gate-svg-label">VALVE PIN</text>
       <text x="500" y="125" className="gate-svg-note">CONTROLLED SHUTOFF</text>
-    < />
+    </>
   ) },
   "Multiple Edge Gates": { caption: "SECTION VIEW", art: (
     <>
@@ -235,7 +235,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M120 165H405" className="gate-svg-flow" />
       <path d="M120 215H405" className="gate-svg-flow" />
       <text x="105" y="91" className="gate-svg-note">BALANCED EDGE FEEDS</text>
-    < />
+    </>
   ) },
   "Multiple Fan Gates": { caption: "SECTION VIEW", art: (
     <>
@@ -246,7 +246,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M120 120H415" className="gate-svg-flow" />
       <path d="M120 210H415" className="gate-svg-flow" />
       <text x="102" y="94" className="gate-svg-note">MULTIPLE FAN ENTRIES</text>
-    < />
+    </>
   ) },
   "Multiple Film Gates": { caption: "SECTION VIEW", art: (
     <>
@@ -257,7 +257,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M120 125H420" className="gate-svg-flow" />
       <path d="M120 205H420" className="gate-svg-flow" />
       <text x="105" y="94" className="gate-svg-note">DISTRIBUTED FILM FEEDS</text>
-    < />
+    </>
   ) },
   "Multiple Pin Gates": { caption: "SECTION VIEW", art: (
     <>
@@ -270,7 +270,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M475 72v86" className="gate-svg-flow" />
       <path d="M545 72v86" className="gate-svg-flow" />
       <text x="392" y="45" className="gate-svg-note">3-PLATE / PINPOINT ARRAY</text>
-    < />
+    </>
   ) },
   "Multiple Tunnel Gates": { caption: "SECTION VIEW", art: (
     <>
@@ -282,7 +282,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <circle cx="360" cy="190" r="7" className="gate-svg-gate" />
       <circle cx="360" cy="145" r="7" className="gate-svg-gate" />
       <text x="104" y="223" className="gate-svg-note">MULTI-TUNNEL FEED</text>
-    < />
+    </>
   ) },
   "Multiple Hot-Runner Drops": { caption: "SECTION VIEW", art: (
     <>
@@ -295,7 +295,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M475 70v92" className="gate-svg-flow" />
       <path d="M545 70v92" className="gate-svg-flow" />
       <text x="390" y="40" className="gate-svg-note">HOT-RUNNER DROP ARRAY</text>
-    < />
+    </>
   ) },
   "Sequential Valve Gating": { caption: "SECTION VIEW", art: (
     <>
@@ -314,7 +314,7 @@ const diagrams: Record<string, { caption: string; art: ReactNode }> = {
       <path d="M475 70v90" className="gate-svg-flow" />
       <path d="M545 70v90" className="gate-svg-flow" />
       <text x="385" y="40" className="gate-svg-note">SEQUENTIAL VALVE OPENING</text>
-    < />
+    </>
   ) },
 }
 
