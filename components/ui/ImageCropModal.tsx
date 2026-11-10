@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 interface ImageCropModalProps {
   imageSrc: string
   aspect: number
+  preserveTransparency?: boolean
   onCancel: () => void
   onCropDone: (croppedFile: File) => void
   originalFileName?: string
@@ -29,11 +30,12 @@ async function getCroppedImg(
   image: HTMLImageElement,
   pixelCrop: Area,
   originalFileName: string,
+  preserveTransparency: boolean,
 ): Promise<File> {
   // Crop extends beyond the source image bounds (e.g. image zoomed out to fit a
   // wider/taller frame) — export as PNG so that empty space is transparent
   // instead of an opaque fill color.
-  const outputType: "image/jpeg" | "image/png" = hasPadding(pixelCrop, image.naturalWidth, image.naturalHeight)
+  const outputType: "image/jpeg" | "image/png" = preserveTransparency || hasPadding(pixelCrop, image.naturalWidth, image.naturalHeight)
     ? "image/png"
     : "image/jpeg"
 
@@ -87,6 +89,7 @@ function clamp(value: number, min: number, max: number): number {
 export function ImageCropModal({
   imageSrc,
   aspect,
+  preserveTransparency = false,
   onCancel,
   onCropDone,
   originalFileName = "image",
@@ -143,7 +146,7 @@ export function ImageCropModal({
     if (!croppedAreaPixels || !imageEl) return
     setProcessing(true)
     try {
-      const file = await getCroppedImg(imageEl, croppedAreaPixels, originalFileName)
+      const file = await getCroppedImg(imageEl, croppedAreaPixels, originalFileName, preserveTransparency)
       onCropDone(file)
     } catch {
       onCancel()

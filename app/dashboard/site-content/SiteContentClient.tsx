@@ -460,7 +460,7 @@ export default function SiteContentClient({ initialSettings }: Props) {
                     alt="Current favicon"
                     width={32}
                     height={32}
-                    className="size-8 rounded-md bg-white object-contain"
+                    className="size-8 object-contain"
                     unoptimized
                   />
                 </div>
@@ -469,12 +469,13 @@ export default function SiteContentClient({ initialSettings }: Props) {
                 key={`logo-favicon-${brandingKey}`}
                 folder="branding"
                 aspect={1}
+                preserveTransparency
                 label="Upload favicon (1:1 square)"
                 existingValue={settings.logo_favicon || null}
                 onUploadSuccess={({ url }) => handleChange("logo_favicon", url)}
                 onClear={() => handleChange("logo_favicon", "")}
               />
-              <p className="text-xs text-zinc-400">Use a square PNG or JPEG with a simple, high-contrast mark. After saving, the site serves a 48 × 48 px tab icon on white. Browsers may take a few minutes to refresh it.</p>
+              <p className="text-xs text-zinc-400">Use a square PNG with a transparent background and a mark that fills the width. The site serves a 48 × 48 px tab icon. Browsers may take a few minutes to refresh it after saving.</p>
             </div>
           </div>
         )}

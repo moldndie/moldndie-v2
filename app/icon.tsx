@@ -35,13 +35,11 @@ function renderIcon(src: string | null) {
       height: "100%",
       alignItems: "center",
       justifyContent: "center",
-      background: "white",
-      borderRadius: 7,
     }}>
       {src ? (
         // next/og renders this data URL to PNG on the server.
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={src} alt="" width={46} height={46} style={{ objectFit: "contain" }} />
+        <img src={src} alt="" width={size.width} height={size.height} style={{ objectFit: "contain" }} />
       ) : (
         <svg width="40" height="40" viewBox="0 0 32 32" fill="none">
           <circle cx="16" cy="16" r="14" stroke="#7C2020" strokeWidth="3" />

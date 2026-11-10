@@ -12,6 +12,7 @@ interface CroppableFileUploadFieldProps {
   folder: string
   /** Aspect ratio for the cropper, e.g. 16/9, 4/3, 1 */
   aspect?: number
+  preserveTransparency?: boolean
   label?: string
   existingValue?: string | null
   onUploadSuccess: (result: { key: string; url: string }) => void
@@ -28,6 +29,7 @@ interface CroppableFileUploadFieldProps {
 export function CroppableFileUploadField({
   folder,
   aspect = 16 / 9,
+  preserveTransparency = false,
   label = "Click to select image",
   existingValue,
   onUploadSuccess,
@@ -88,6 +90,7 @@ export function CroppableFileUploadField({
           <ImageCropModal
             imageSrc={cropSrc}
             aspect={aspect}
+            preserveTransparency={preserveTransparency}
             originalFileName={pendingFileName}
             onCancel={handleCropCancel}
             onCropDone={handleCropDone}
@@ -151,6 +154,7 @@ export function CroppableFileUploadField({
           <ImageCropModal
             imageSrc={cropSrc}
             aspect={aspect}
+            preserveTransparency={preserveTransparency}
             originalFileName={pendingFileName}
             onCancel={handleCropCancel}
             onCropDone={handleCropDone}
@@ -180,6 +184,7 @@ export function CroppableFileUploadField({
         <ImageCropModal
           imageSrc={cropSrc}
           aspect={aspect}
+          preserveTransparency={preserveTransparency}
           originalFileName={pendingFileName}
           onCancel={handleCropCancel}
           onCropDone={handleCropDone}
